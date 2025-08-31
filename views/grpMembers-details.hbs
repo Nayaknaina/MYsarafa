@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Member Details - KYC Verification</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background-color: #f8fafc;
+        color: #1e293b;
+        line-height: 1.6;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px;
+        position: relative;
+        min-height: 100vh;
+      }
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 32px;
+        padding-bottom: 16px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      .page-header h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #0f172a;
+      }
+      .status-badge {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .status-badge.pending {
+        background-color: #fef3c7;
+        color: #92400e;
+      }
+      .status-badge.verified {
+        background-color: #d1fae5;
+        color: #065f46;
+      }
+      .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 32px;
+        margin-bottom: 100px;
+      }
+      .profile-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #e2e8f0;
+      }
+      .profile-header {
+        display: flex;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .avatar-container {
+        position: relative;
+      }
+      .avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #e2e8f0;
+      }
+      .verification-badge {
+        position: absolute;
+        bottom: -4px;
+        right: -4px;
+        width: 28px;
+        height: 28px;
+        background: #10b981;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid white;
+        animation: scaleIn 0.3s ease-out;
+      }
+      .check-icon {
+        width: 16px;
+        height: 16px;
+        color: white;
+        stroke-width: 3;
+      }
+      @keyframes scaleIn {
+        from { transform: scale(0); }
+        to { transform: scale(1); }
+      }
+      .profile-info h2 {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .member-id {
+        color: #64748b;
+        font-size: 14px;
+        margin-bottom: 2px;
+      }
+      .join-date {
+        color: #64748b;
+        font-size: 14px;
+      }
+      .profile-details {
+        border-top: 1px solid #e2e8f0;
+        padding-top: 20px;
+      }
+      .detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      .detail-row:last-child {
+        margin-bottom: 0;
+      }
+      .label {
+        font-weight: 500;
+        color: #475569;
+      }
+      .value {
+        color: #1e293b;
+      }
+      .documents-section h3 {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #0f172a;
+      }
+      .documents-grid {
+        display: grid;
+        gap: 16px;
+      }
+      .document-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+      }
+      .document-card:hover {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      }
+      .document-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .document-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .document-card.uploaded .document-icon {
+        background-color: #dcfce7;
+        color: #16a34a;
+      }
+      .document-card.pending .document-icon {
+        background-color: #fef3c7;
+        color: #d97706;
+      }
+      .document-icon svg {
+        width: 20px;
+        height: 20px;
+      }
+      .document-info {
+        flex: 1;
+      }
+      .document-info h4 {
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 2px;
+      }
+      .document-status {
+        font-size: 14px;
+        font-weight: 500;
+      }
+      .uploaded-status {
+        color: #16a34a;
+      }
+      .pending-status {
+        color: #d97706;
+      }
+      .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+      }
+      .uploaded-indicator {
+        background-color: #16a34a;
+      }
+      .pending-indicator {
+        background-color: #d97706;
+      }
+      .document-details {
+        padding-left: 52px;
+      }
+      .document-details p {
+        color: #64748b;
+        font-size: 14px;
+        margin-bottom: 4px;
+      }
+      .upload-date {
+        margin-bottom: 12px !important;
+      }
+      .view-btn,
+      .upload-btn {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+      .view-btn {
+        background-color: #f1f5f9;
+        color: #475569;
+      }
+      .view-btn:hover {
+        background-color: #e2e8f0;
+      }
+      .upload-btn {
+        background-color: #fef3c7;
+        color: #92400e;
+      }
+      .upload-btn:hover {
+        background-color: #fde68a;
+      }
+      .verify-btn {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        padding: 16px 24px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        transition: all 0.2s ease;
+        z-index: 100;
+      }
+      .verify-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+      }
+      .verify-btn:active {
+        transform: translateY(0);
+      }
+      .verify-btn.verified {
+        background: linear-gradient(135deg, #10b981, #059669);
+      }
+      .verify-icon {
+        width: 20px;
+        height: 20px;
+        stroke-width: 2.5;
+      }
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+      }
+      .modal {
+        background: white;
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+        box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1);
+      }
+      .success-icon {
+        width: 64px;
+        height: 64px;
+        background: #dcfce7;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: #16a34a;
+      }
+      .success-icon svg {
+        width: 32px;
+        height: 32px;
+        stroke-width: 2.5;
+      }
+      .modal h3 {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #0f172a;
+      }
+      .modal p {
+        color: #64748b;
+        margin-bottom: 24px;
+      }
+      .modal-btn {
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+      }
+      .modal-btn:hover {
+        background: #2563eb;
+      }
+      @media (max-width: 768px) {
+        .content-grid {
+          grid-template-columns: 1fr;
+          gap: 24px;
+        }
+        .profile-header {
+          flex-direction: column;
+          text-align: center;
+        }
+        .detail-row {
+          flex-direction: column;
+          gap: 4px;
+        }
+        .verify-btn {
+          bottom: 16px;
+          right: 16px;
+          padding: 14px 20px;
+        }
+      }
+    </style>
+</head>
+<body>
+    <div class="container">
+       
+        <div class="content-grid">
+            <!-- Member Profile Section -->
+            <div class="profile-section">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="avatar-container">
+                            <img src="{{#if user.avatar}}{{user.avatar}}{{else}}/Assets/Images/imgperson.png{{/if}}"  class="avatar" height="80" width="80">
+                            <div class="verification-badge" id="verificationBadge" style="display: {{#if user.isVerified}}flex{{else}}none{{/if}};">
+                                <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M9 12l2 2 4-4"></path>
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="profile-info">
+                            <h2>{{user.fullName}}</h2>
+                             <div class="member-status" id="memberStatus">
+                                <span class="status-badge {{#if user.isVerified}}verified{{else}}pending{{/if}}">
+                                    {{#if user.user_status}}Verified{{else}}Pending Verification{{/if}}
+                                </span>
+                                </div>
+                            <p class="join-date">Joined: {{formatDate user.createdAt}}</p>
+                        </div>
+                    </div>
+                    <div class="profile-details">
+                        <div class="detail-row">
+                            <span class="label">Email:</span>
+                            <span class="value">{{#if user.email}}{{user.email}}{{else}}-{{/if}}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Phone:</span>
+                            <span class="value">{{#if user.phone}}{{user.phone}}{{else}}-{{/if}}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Address:</span>
+                            <span class="value">{{#if user.address}}{{user.address}}{{else}}-{{/if}}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Date of Birth:</span>
+                            <span class="value">{{#if user.dob}}{{formatDate user.dob}}{{else}}-{{/if}}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="label">Shop Name:</span>
+                            <span class="value">{{#if user.shopname}}{{user.shopname}}{{else}}-{{/if}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- KYC Documents Section -->
+            <div class="documents-section">
+                <h3>KYC Documents</h3>
+                <div class="documents-grid">
+                    {{#each kycDocuments}}
+                        <div class="document-card {{#if this.uploaded}}uploaded{{else}}pending{{/if}}">
+                            <div class="document-header">
+                                <div class="document-icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14,2 14,8 20,8"></polyline>
+                                    </svg>
+                                </div>
+                                <div class="document-info">
+                                    <h4>{{this.name}}</h4>
+                                    <p class="document-status {{#if this.uploaded}}uploaded-status{{else}}pending-status{{/if}}">
+                                        {{#if this.uploaded}}Uploaded{{else}}Pending Upload{{/if}}
+                                    </p>
+                                </div>
+                                <div class="status-indicator {{#if this.uploaded}}uploaded-indicator{{else}}pending-indicator{{/if}}"></div>
+                            </div>
+                            <div class="document-details">
+                                <p>Photo of {{this.name}}</p>
+                                <p class="upload-date">
+                                    {{#if this.uploaded}}
+                                        {{#if this.uploadDate}}
+                                            Uploaded: {{this.uploadDate}}
+                                        {{else}}
+                                            Required for verification
+                                        {{/if}}
+                                    {{else}}
+                                        Required for verification
+                                    {{/if}}
+                                </p>
+                                <button class="{{#if this.uploaded}}view-btn{{else}}upload-btn{{/if}}" 
+                                        data-type="{{this.type}}"
+                                        data-user-id="{{../user._id}}"
+                                        {{#if this.uploaded}}onclick="window.location.href='{{this.filePath}}'"{{/if}}>
+                                    {{#if this.uploaded}}View Document{{else}}Request Upload{{/if}}
+                                </button>
+                            </div>
+                        </div>
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+
+        <!-- Verify Button -->
+        <button class="verify-btn {{#if user.isVerified}}verified{{/if}}" id="verifyBtn" {{#if user.isVerified}}disabled{{/if}}>
+            <svg class="verify-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M9 12l2 2 4-4"></path>
+                <circle cx="12" cy="12" r="10"></circle>
+            </svg>
+            {{#if user.isVerified}}Verified{{else}}Verify Member{{/if}}
+        </button>
+
+        <!-- Success Modal -->
+        <div class="modal-overlay" id="successModal" style="display: none;">
+            <div class="modal">
+                <div class="modal-content">
+                    <div class="success-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                            <path d="M9 12l2 2 4-4"></path>
+                            <circle cx="12" cy="12" r="10"></circle>
+                        </svg>
+                    </div>
+                    <h3>Member Verified Successfully!</h3>
+                    <p>{{user.fullName}}'s profile has been verified and approved.</p>
+                    <button class="modal-btn" onclick="closeModal()">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop().split(';').shift();
+        return null;
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const verifyBtn = document.getElementById("verifyBtn");
+        const successModal = document.getElementById("successModal");
+        const memberStatus = document.getElementById("memberStatus");
+        const verificationBadge = document.getElementById("verificationBadge");
+
+        if (verifyBtn && !verifyBtn.classList.contains('verified')) {
+          verifyBtn.addEventListener("click", () => {
+            verifyBtn.innerHTML = `
+              <svg class="verify-icon loading" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M12 6v6l4 2"></path>
+              </svg>
+              Verifying...
+            `;
+            verifyBtn.disabled = true;
+
+            fetch(`/user-app/user/{{user._id}}/verify`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${getCookie('token')}`
+              },
+            })
+              .then(response => response.json())
+              .then(data => {
+                if (data.success) {
+                  memberStatus.innerHTML = '<span class="status-badge verified">Verified</span>';
+                  verificationBadge.style.display = "flex";
+                  verifyBtn.innerHTML = `
+                    <svg class="verify-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M9 12l2 2 4-4"></path>
+                      <circle cx="12" cy="12" r="10"></circle>
+                    </svg>
+                    Verified
+                  `;
+                  verifyBtn.classList.add("verified");
+                  verifyBtn.disabled = true;
+
+                  const uploadedCards = document.querySelectorAll(".document-card.uploaded");
+                  uploadedCards.forEach((card) => {
+                    card.style.borderColor = "#10b981";
+                    card.style.backgroundColor = "#f0fdf4";
+                  });
+
+                  successModal.style.display = "flex";
+                } else {
+                  alert(data.message || 'Verification failed');
+                  verifyBtn.innerHTML = `
+                    <svg class="verify-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M9 12l2 2 4-4"></path>
+                      <circle cx="12" cy="12" r="10"></circle>
+                    </svg>
+                    Verify Member
+                  `;
+                  verifyBtn.disabled = false;
+                }
+              })
+              .catch(error => {
+                console.error('Verification error:', error);
+                alert('Error verifying member');
+                verifyBtn.innerHTML = `
+                  <svg class="verify-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M9 12l2 2 4-4"></path>
+                    <circle cx="12" cy="12" r="10"></circle>
+                  </svg>
+                  Verify Member
+                `;
+                verifyBtn.disabled = false;
+              });
+          });
+        }
+
+        const style = document.createElement("style");
+        style.textContent = `
+          .loading {
+            animation: spin 1s linear infinite;
+          }
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `;
+        document.head.appendChild(style);
+
+        document.addEventListener("click", (e) => {
+          if (e.target.classList.contains("view-btn")) {
+            const docType = e.target.getAttribute('data-type');
+            const userId = e.target.getAttribute('data-user-id');
+            alert(`Opening ${docType} viewer for user ${userId}...`);
+            // Example: window.location.href = `/admin/documents/${userId}/${docType}`;
+          }
+
+          if (e.target.classList.contains("upload-btn")) {
+            const docType = e.target.getAttribute('data-type');
+            const userId = e.target.getAttribute('data-user-id');
+            alert(`Sending upload request for ${docType} to member ${userId}...`);
+            // Example: fetch(`/admin/request-upload/${userId}/${docType}`, { method: 'POST', headers: { 'Authorization': `Bearer ${getCookie('token')}` } });
+          }
+        });
+      });
+
+      function closeModal() {
+        const successModal = document.getElementById("successModal");
+        successModal.style.display = "none";
+      }
+    </script>
+</body>
+</html>

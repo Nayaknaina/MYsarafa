@@ -1,0 +1,42 @@
+  <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="community-name">
+                    <span>Sarafa Community</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <nav class="nav-menu">
+                    <a href="/user-app/dashboard" class="nav-item">Home</a>
+                    <a href="Events-meetings.html" class="nav-item">Event</a>
+                    <a href="/user-app/members" class="nav-item">Members</a>
+                    <div class="nav-item dropdown">
+                        <span>More</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </nav>
+            </div>
+            <div class="header-right">
+                <div class="search-container">
+                    <input type="text" placeholder="Search" class="search-input">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+                <div class="user-avatar" id="userAvatar">
+                    <i class="fas fa-user"></i>
+                    <div class="avatar-dropdown" id="avatarDropdown" style="display: none;">
+                        <div class="avatar-user-info">
+                            <div class="avatar-user-pic"><i class="fas fa-user"></i></div>
+                            <div class="avatar-user-details">
+                                 <span class="avatar-user-name">{{user.f_name}} </span>
+                                <span class="avatar-user-email">{{user.email}}</span>
+                            </div>  
+                        </div>
+                        <ul>
+                            <li id="profileDetailsBtn"><i class="fas fa-user-circle"></i> Profile</li>
+                            <li><i class="fas fa-cog"></i> Settings</li>
+                            <li id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>

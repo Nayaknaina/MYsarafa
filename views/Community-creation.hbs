@@ -1,0 +1,300 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sarafa Community Creation</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Existing styles */
+        .group-create-container {
+            display: flex;
+            gap: 2rem;
+            padding: 2rem;
+        }
+        .group-create-form-section {
+            flex: 1;
+           
+        }
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 1.5rem;
+        }
+        .form-section {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s, transform 0.3s;
+        }
+        .form-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+        .form-hint {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+            display: block;
+        }
+        .form-btn {
+            width: 100%;
+            background: linear-gradient(to right, #3b82f6, #7c3aed);
+            color: white;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .form-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .group-create-preview-section {
+            flex: 1;
+            
+        }
+        .cover-photo-preview {
+            position: relative;
+            margin-bottom: 1rem;
+        }
+        .cover-img {
+            width: 100%;
+          /*  height: 200px;*/
+            object-fit: contain;
+            border-radius: 0.5rem;
+        }
+        .group-nav {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .group-nav h3 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #374151;
+            cursor: pointer;
+        }
+        .group-nav h3:hover {
+            color: #3b82f6;
+        }
+        .group-details h2 {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .group-details p {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-bottom: 0.5rem;
+        }
+        /* Loader styles */
+        .loader {
+            display: none;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 2rem;
+            height: 2rem;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .form-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    {{> header}}
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        {{> sidebar}}
+
+        <main class="main-content">
+        <h1 class="page-title">{{#if group}}Edit Community{{else}}Community Creation{{/if}}</h1>
+            <div class="group-create-container">
+                <!-- Left Section: Input Fields -->
+                <div class="group-create-form-section">
+                    <h2 class="form-title">{{#if group}}Edit Community Group{{else}}Community Group{{/if}}</h2>
+                    <form class="group-create-form" id="groupCreateForm">
+                        <input type="hidden" id="groupId" name="groupId" value="{{group._id}}">
+                        <div class="form-section">
+                            <label for="communityName" class="form-label">Community Name</label>
+                            <input type="text" id="communityName" name="communityName" class="form-input" placeholder="Enter Community name"  value="{{#if group.g_name}}{{group.g_name}}{{/if}}"  required>
+                        </div>
+                        <div class="form-section">
+                            <label for="community-type" class="form-label">Choose Privacy</label>
+                            <select id="community-type" name="communityType" class="form-input" required>
+                                <option value="">Select</option>
+                               <option value="private" {{#if (eq group.g_type 'private')}}selected{{/if}}>Private</option>
+                                <option value="public" {{#if (eq group.g_type 'public')}}selected{{/if}}>Public</option>
+                            </select>
+                            <small class="form-hint">
+                                Only members can see who's in the group and what they post. You can't change this group to public later.
+                            </small>
+                        </div>
+                        <div class="form-section">
+                            <label for="kyc" class="form-label">KYC Verification</label>
+                            <select id="kyc" name="kycRequired" class="form-input" required>
+                                <option value="">Select</option>
+                                <option value="Yes" {{#if group.is_kyc_req}}selected{{/if}}>Yes</option>
+                                <option value="No" {{#unless group.is_kyc_req}}selected{{/unless}}>No</option>
+                            </select>
+                            <small class="form-hint">
+                                If you select "Yes", group members will need to complete KYC verification.
+                            </small>
+                        </div>
+                        <div class="form-section">
+                            <label for="amount" class="form-label">Membership Amount (₹)</label>
+                            <input type="number" id="amount" name="amount" class="form-input" placeholder="Enter membership amount" value="{{#if group.amount}}{{group.amount}}{{else}}0{{/if}}" min="0" step="0.01">
+                            <small class="form-hint">
+                                Specify the membership fee for joining this group (optional, in INR).
+                            </small>
+                        </div>
+                        <div class="form-section">
+                            <label for="amountDescription" class="form-label">Amount Description</label>
+                            <textarea id="amountDescription" name="amountDescription" class="form-input" placeholder="Describe the purpose of the membership amount" rows="3">{{#if group.amount_description}}{{group.amount_description}}{{/if}}</textarea>
+                            <small class="form-hint">
+                                Explain what the membership amount is used for (optional).
+                            </small>
+                        </div>
+                        <div class="form-section">
+                            <label for="coverImage" class="form-label">Cover Photo</label>
+                            <input type="file" id="coverImage" name="coverImage" class="form-input" accept="image/*">
+                            <small class="form-hint">
+                                Upload a cover photo for your group. Recommended size: 820x312 pixels.
+                            </small>
+                        </div>
+                        <div class="form-section">
+                            <label for="qrCode" class="form-label">Payment QR Code</label>
+                            <input type="file" id="qrCode" name="qrCode" class="form-input" accept="image/*">
+                            <small class="form-hint">
+                                Upload a QR code image for collecting membership payments (optional, recommended size: 200x200 pixels).
+                            </small>
+                        </div>
+                        <div class="form-section">
+                            <label for="description" class="form-label">Community Description</label>
+                            <textarea id="description" name="description" class="form-input" placeholder="Describe your group" rows="3">{{#if group.description}}{{group.description}}{{/if}}</textarea>
+                        </div>
+                       <div class="form-section">
+                            <button type="submit" class="form-btn" id="createGroupBtn">{{#if group}}Update Community{{else}}Create Community{{/if}}</button>
+                            <div class="loader" id="formLoader"></div>
+                        </div>
+                        <p class="error text-red-600 text-sm text-center" id="formError" style="display: none;"></p>
+                    </form>
+                </div>
+
+                <!-- Right Section: Cover Photo and Group Details -->
+                <div class="group-create-preview-section">
+                    <div class="cover-photo-preview">
+                        <img src="{{#if group.g_cover}}{{group.g_cover}}{{else}}/assets/images/demo.jpg{{/if}}" alt="Cover Preview" class="cover-img" id="coverImagePreview">
+                    </div>
+                    <div class="group-nav">
+                        <h3>About</h3>
+                        <h3>Post</h3>
+                        <h3>Member</h3>
+                        <h3>Events</h3>
+                    </div>
+                   <div class="group-details">
+                        <h2 id="groupNamePreview">{{#if group.g_name}}{{group.g_name}}{{else}}Community Name{{/if}}</h2>
+                        <p id="groupPrivacyPreview">{{#if group.g_type}}{{group.g_type}} · {{group.total_mem}} member{{#if (gt group.total_mem 1)}}s{{/if}}{{else}}Community privacy · 1 member{{/if}}</p>
+                        <p id="groupDescriptionPreview">{{#if group.description}}{{group.description}}{{else}}Community description will appear here...{{/if}}</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Profile Modal -->
+    <div id="profileModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Profile Details</span>
+                <button class="modal-close-btn" id="closeProfileModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="profileForm" class="modal-form">
+                    <div class="modal-form-group">
+                        <label for="profileName" class="required">Name</label>
+                        <input type="text" id="profileName" class="modal-input" value="{{user.name}}" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="profileEmail" class="required">Email</label>
+                        <input type="email" id="profileEmail" class="modal-input" value="{{user.email}}" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="profilepassword" class="required">Password</label>
+                        <input type="password" id="profilepassword" class="modal-input" value="********" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="profileDOB" class="required">Date of Birth</label>
+                        <input type="date" id="profileDOB" class="modal-input" value="{{user.dob}}" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="profilePhone">Phone</label>
+                        <input type="tel" id="profilePhone" class="modal-input" value="{{user.mobile_no}}">
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="country" class="required">Country</label>
+                        <input type="text" id="country" class="modal-input" value="{{user.country}}" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="pincode" class="required">Pincode</label>
+                        <input type="text" id="pincode" class="modal-input" value="{{user.pincode}}" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="profileAddress">Address</label>
+                        <textarea id="profileAddress" class="modal-input modal-textarea">{{user.address}}</textarea>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="shopname" class="required">Shop Name</label>
+                        <input type="text" id="shopname" class="modal-input" value="{{user.shopname}}" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="shopaddress" class="required">Shop Address</label>
+                        <input type="text" id="shopaddress" class="modal-input" value="{{user.shopaddress}}" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="employee" class="required">Number of Employees</label>
+                        <input type="text" id="employee" class="modal-input" value="{{user.numEmployees}}" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="modal-btn modal-btn-secondary" id="closeProfileModal2">Cancel</button>
+                        <button type="submit" class="modal-btn modal-btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="/js/all.js"></script>
+    <script src="/js/communityGroup.js"></script>
+    </body>
+
+</html>

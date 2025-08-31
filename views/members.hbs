@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sarafa Community Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<style>
+    /* New styles for search and loader */
+    .filter-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        .filter-button:hover {
+            background-color: #f3f4f6;
+        }
+        .filter-section {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .search-input {
+            width: 100%;
+            max-width: 300px;
+            padding: 0.75rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+        .search-input:focus {
+            border-color: #3b82f6;
+            outline: none;
+        }
+        .loader {
+            display: none;
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 2rem;
+            height: 2rem;
+            animation: spin 1s linear infinite;
+            margin: 1rem auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+</style>
+<body>
+    <!-- Header -->
+    {{> header}}
+
+    <div class="main-container">
+        <!-- Sidebar -->
+       {{> sidebar}}
+
+        <main class="main-content">
+            <span class="page-title">Member</span>
+
+            <div class="filter-section">
+                <input type="text" class="search-input" id="searchName" placeholder="Search by member name">
+                <input type="text" class="search-input" id="searchGroup" placeholder="Search by group name">
+            </div>
+
+            <!-- Add Member Button -->
+            <div class="add-member-section">
+                <button class="add-member-btn" id="addNewBtn">
+                    <i class="fas fa-plus"></i>
+                    Add Member
+                </button>
+            </div>
+
+            <!-- Members Table -->
+            <div class="table-container">
+                <table class="members-table" id="membersTable">
+                    <thead>
+                        <tr>
+                            <th>Sr No</th>
+                            <th>Name</th>
+                            <th>Mobile Number</th>
+                            <th>Shop Name</th>
+                            <th>Address</th>
+                            <th>Group</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                  <tbody id="membersTableBody">
+                        <!-- Populated dynamically via JavaScript -->
+                    </tbody>
+                </table>
+                <div class="loader" id="tableLoader"></div>
+            </div>
+
+    </div>
+
+    <!-- Add New Member Modal -->
+    <div id="addMemberModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Add New Member</span>
+                <button class="modal-close-btn" id="closeAddMemberModal">&times;</button>
+            </div>
+            <form class="add-member-form" id="addMemberForm">
+                <label for="groupSelect">Group</label>
+                <select id="groupSelect" class="add-member-input" required>
+                    <option value="">Select Group</option>
+                    <!-- Populated dynamically via JavaScript -->
+                </select>
+                <label for="memberEmail">Email</label>
+                <input type="email" class="add-member-input" id="memberEmail" placeholder="Enter email" required>
+                <p class="error" id="formError" style="display: none;"></p>
+                <button type="submit" class="send-invite-btn" id="sendInviteBtn">Send Invite</button>
+                <div class="loader" id="formLoader" style="display: none;"></div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/script.js"></script>
+
+    <div id="profileModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Profile Details</span>
+                <button class="modal-close-btn" id="closeProfileModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="profileForm" class="modal-form">
+                    <div class="modal-form-group">
+                        <label for="profileName" class="required">Name</label>
+                        <input type="text" id="profileName" class="modal-input" value="Piyush Rathore" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="profileEmail" class="required">Email</label>
+                        <input type="email" id="profileEmail" class="modal-input" value="Piyush@email.com" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="profilepassword" class="required">Password</label>
+                        <input type="password" id="profilepassword" class="modal-input" value="********" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="profileDOB" class="required">Date of Birth</label>
+                        <input type="date" id="profileDOB" class="modal-input" value="1990-01-01" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="profilePhone">Phone</label>
+                        <input type="tel" id="profilePhone" class="modal-input" value="+91 98765 43210">
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="Country">Country</label>
+                        <input type="text" id="Country" class="modal-input" value="India" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="Pincode">Pincode</label>
+                        <input type="text" id="Pincode" class="modal-input" value="302001" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="profileAddress">Address</label>
+                        <textarea id="profileAddress" class="modal-input modal-textarea"></textarea>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="shopname">Shop Name</label>
+                        <input type="text" id="shopname" class="modal-input" value="Sarafa" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="shopaddress">Shop Address</label>
+                        <input type="text" id="shopaddress" class="modal-input" value="Bhopal Kolar" required>
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="Employee">NumberEmp</label>
+                        <input type="text" id="Employee" class="modal-input" value="10" required>
+                    </div>
+
+
+                    <div class="modal-footer">
+                        <button type="button" class="modal-btn modal-btn-secondary"
+                            id="closeProfileModal2">Cancel</button>
+                        <button type="submit" class="modal-btn modal-btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+     {{> profile}}
+</body>
+
+</html>

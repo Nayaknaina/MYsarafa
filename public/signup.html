@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Sarafa Community</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f6f5f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-family: 'Poppins', sans-serif;
+            height: 100vh;
+            margin: -20px 0 50px;
+        }
+
+        h1 {
+            font-weight: bold;
+            margin: 0;
+            font-size: 1.8em;
+            margin-bottom: 2.5rem;
+        }
+
+        h1 span {
+            font-size: 0.9em;
+            margin-left: 5px;
+        }
+
+        p {
+            font-size: 14px;
+            font-weight: 300;
+            line-height: 20px;
+            letter-spacing: 0.5px;
+            margin: 20px 0 30px;
+        }
+
+        span {
+            font-size: 12px;
+            margin-top: 2.5rem;
+        }
+
+        a {
+            color: #333;
+            font-size: 14px;
+            text-decoration: none;
+            margin: 15px 0;
+            transition: color 0.3s ease;
+        }
+
+        button {
+            border-radius: 20px;
+            border: 1px solid #ffffff;
+            background: linear-gradient(245deg, #551DFF -77.04%, #D324A8 119.05%);
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: bold;
+            padding: 12.5px 45px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: transform 80ms ease-in, background-color 0.3s ease, border-color 0.3s ease;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        button:focus {
+            outline: none;
+        }
+
+        button.ghost {
+            background-color: transparent;
+            border-color: #ffffff;
+        }
+
+        button.ghost:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        form {
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 50px;
+            height: 100%;
+            text-align: center;
+        }
+
+        input {
+            background-color: #eee;
+            border: none;
+            padding: 12px 15px;
+            margin: 8px 0;
+            width: 100%;
+            border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        input:focus {
+            outline: 2px solid #611a79;
+            background-color: #fff;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            margin-right: 8px;
+            width: auto;
+            accent-color: #611a79;
+        }
+
+        .checkbox-container a {
+            color: #611a79;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .checkbox-container a:hover {
+            color: #551DFF;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.2), 0 10px 10px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            width: 900px;
+            max-width: 100%;
+            min-height: 550px;
+        }
+
+        .form-container {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            transition: all 0.6s ease-in-out;
+        }
+
+        .sign-in-container {
+            left: 0;
+            width: 50%;
+            z-index: 2;
+        }
+
+        .sign-up-container {
+            left: 0;
+            width: 50%;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .overlay-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            transition: transform 0.6s ease-in-out;
+            z-index: 100;
+        }
+
+        .overlay {
+            background: #5f006d;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: 0 0;
+            color: #ffffff;
+            position: relative;
+            left: -100%;
+            height: 100%;
+            width: 200%;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .overlay-panel {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 0 40px;
+            text-align: center;
+            top: 0;
+            height: 100%;
+            width: 50%;
+            transform: translateX(0);
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .overlay-left {
+            transform: translateX(-20%);
+        }
+
+        .overlay-right {
+            right: 0;
+            transform: translateX(0);
+        }
+
+        .container.right-panel-active .sign-in-container {
+            transform: translateX(100%);
+        }
+
+        .container.right-panel-active .overlay-container {
+            transform: translateX(-100%);
+        }
+
+        .container.right-panel-active .sign-up-container {
+            transform: translateX(100%);
+            opacity: 1;
+            z-index: 5;
+            animation: show 0.6s;
+        }
+
+        .container.right-panel-active .overlay {
+            transform: translateX(50%);
+        }
+
+        .container.right-panel-active .overlay-left {
+            transform: translateX(0);
+        }
+
+        .container.right-panel-active .overlay-right {
+            transform: translateX(20%);
+        }
+
+        @keyframes show {
+
+            0%,
+            49.99% {
+                opacity: 0;
+                z-index: 1;
+            }
+
+            50%,
+            100% {
+                opacity: 1;
+                z-index: 5;
+            }
+        }
+
+        .social-container {
+            margin: 20px 0;
+        }
+
+        .social-container a {
+            border: 1px solid #dddddd;
+            border-radius: 50%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 5px;
+            height: 40px;
+            width: 40px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .social-container a:hover {
+            background-color: #eee;
+            color: #611a79;
+            border-color: transparent;
+        }
+
+        .copyright {
+            position: fixed;
+            bottom: 10px;
+            right: 15px;
+            color: #aaa;
+            font-size: 0.8em;
+            font-weight: 300;
+            z-index: 1001;
+        }
+
+        /* Terms Popup Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .modal.show {
+            display: flex;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            border-radius: 10px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            padding: 20px 20px 20px 30px;
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.2);
+            font-family: 'Poppins', sans-serif;
+            position: relative;
+            transform: scale(0.7);
+            opacity: 0;
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+
+        .modal.show .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: #611a79;
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: #551DFF;
+        }
+
+        .modal-content h2 {
+            font-size: 1.6em;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .modal-content h3 {
+            font-size: 1.2em;
+            color: #611a79;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .modal-content p,
+        .modal-content li {
+            font-size: 14px;
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .modal-content ul {
+            list-style: disc;
+            margin-left: 20px;
+        }
+
+        .modal-content button {
+            display: block;
+            margin: 20px auto 0;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            color: #333;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            color: #611a79;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+                min-height: 500px;
+            }
+
+            .form-container {
+                padding: 0 20px;
+            }
+
+            h1 {
+                font-size: 1.6em;
+            }
+
+            .overlay-panel {
+                padding: 0 20px;
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 15px 15px 15px 25px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.4em;
+            }
+
+            button {
+                padding: 10px 30px;
+            }
+
+            input {
+                padding: 10px 12px;
+            }
+
+            .social-container a {
+                height: 35px;
+                width: 35px;
+            }
+
+            .container {
+                min-height: 480px;
+            }
+
+            .copyright {
+                font-size: 0.7em;
+                bottom: 5px;
+                right: 10px;
+            }
+
+            .modal-content {
+                max-height: 70vh;
+                padding: 10px 10px 10px 20px;
+            }
+
+            .modal-content h2 {
+                font-size: 1.4em;
+            }
+
+            .modal-content h3 {
+                font-size: 1.1em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="container">
+        <!-- Sign Up Form -->
+        <div class="form-container sign-up-container">
+            <form action="#" id="signupForm">
+                <h1>Create Account 🚀</h1>
+                <div class="">
+                    <a href="#" type="button" id="googleSignupBtn" class="login-with-google-btn" style="
+                        text-decoration: none;
+                        transition: background-color 0.3s, box-shadow 0.3s;
+                        padding: 12px 16px 12px 42px;
+                        border: none;
+                        border-radius: 3px;
+                        box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.04), 0 1px 1px rgba(0, 0, 0, 0.25);
+                        color: #757575;
+                        font-size: 14px;
+                        font-weight: 700;
+                        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Fira Sans&quot;, &quot;Droid Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif;
+                        background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTcuNiA5LjJsLS4xLTEuOEg5djMuNGg0LjhDMTMuNiAxMiAxMyAxMyAxMiAxMy42djIuMmgzYTguOCA4LjggMCAwIDAgMi42LTYuNnoiIGZpbGw9IiM0Mjg1RjQiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik05IDE4czIuNCAwIDQuNS0uOCA2LTIuMmwtMy0yLjJhNS40IDUuNCAwIDAgMS04LTIuOUgxVjEzYTkgOSAwIDAgMCA4IDV6IiBmaWxsPSIjMzRBODUzIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNNCAxMC43YTUuNCA1LjQgMCAwIDEgMC0zLjRWNUgxYTkgOSAwIDAgMCAwIDhsMy0yLjN6IiBmaWxsPSIjRkJCQzA1IiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNOSAzLjZjMS4zIDAgMi41LjQgMy40IDEuM0wxNSAyLjNBOSA5IDAgMCAwIDEgNWwzIDIuNGE1LjQgNS40IDAgMCAxIDUtMy43eiIgZmlsbD0iI0VBNDMzNSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZD0iTTAgMGgxOHYxOEgweiIvPjwvZz48L3N2Zz4=);
+                        background-color: white;
+                        background-repeat: no-repeat;
+                        background-position: 12px 11px;
+                        border: 1px solid #611a79;
+                        margin-bottom: 20px;
+                    ">Sign in with Google</a>
+                </div>
+                <span>or use your email for registration</span>
+                <input type="text" id="f_name" name="f_name" placeholder="👤 Name" required />
+                <input type="text" id="l_name" name="l_name" placeholder="👤 Last Name" required />
+                <input type="email" id="email" name="email" placeholder="📧 Email" required />
+                <input type="password" id="signupPassword" name="password" placeholder="🔒 Password" required />
+                <div class="checkbox-container">
+
+                    <label for="termsCheckbox">By signing up,you agree to the <a id="termsLink">Terms of
+                            Service</a>,including Cookie Use.</label>
+                </div>
+                <button type="submit" id="signupButton">Sign Up</button>
+            </form>
+        </div>
+        <!-- Sign In Form -->
+        <div class="form-container sign-in-container">
+            <form action="#" id="loginForm">
+                <h1>Sign In 👋</h1>
+                <div class="">
+                    <a href="#" type="button" id="googleLoginBtn" class="login-with-google-btn" style="
+                        text-decoration: none;
+                        transition: background-color 0.3s, box-shadow 0.3s;
+                        padding: 12px 16px 12px 42px;
+                        border: none;
+                        border-radius: 3px;
+                        box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.04), 0 1px 1px rgba(0, 0, 0, 0.25);
+                        color: #757575;
+                        font-size: 14px;
+                        font-weight: 700;
+                        font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Roboto, Oxygen, Ubuntu, Cantarell, &quot;Fira Sans&quot;, &quot;Droid Sans&quot;, &quot;Helvetica Neue&quot;, sans-serif;
+                        background-image: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIj48cGF0aCBkPSJNMTcuNiA5LjJsLS4xLTEuOEg9djMuNGg0LjhDMTMuNiAxMiAxMyAxMyAxMiAxMy42djIuMmgzYTguOCA4LjggMCAwIDAgMi42LTYuNnoiIGZpbGw9IiM0Mjg1RjQiIGZpbGwtcnVsZT0ibm9uemVybyIvPjxwYXRoIGQ9Ik05IDE4czIuNCAwIDQuNS0uOCA2LTIuMmwtMy0yLjJhNS40IDUuNCAwIDAgMS04LTIuOUgxVjEzYTkgOSAwIDAgMCA4IDV6IiBmaWxsPSIjMzRBODUzIiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNNCAxMC43YTUuNCA1LjQgMCAwIDEgMC0zLjRWNUgxYTkgOSAwIDAgMCAwIDhsMy0yLjN6IiBmaWxsPSIjRkJCQzA1IiBmaWxsLXJ1bGU9Im5vbnplcm8iLz48cGF0aCBkPSJNOSAzLjZjMS4zIDAgMi41LjQgMy40IDEuM0wxNSAyLjNBOSA5IDAgMCAwIDEgNWwzIDIuNGE1LjQgNS40IDAgMCAxIDUtMy43eiIgZmlsbD0iI0VBNDMzNSIgZmlsbC1ydWxlPSJub256ZXJvIi8+PHBhdGggZD0iTTAgMGgxOHYxOEgweiIvPjwvZz48L3N2Zz4=);
+                        background-color: white;
+                        background-repeat: no-repeat;
+                        background-position: 12px 11px;
+                        border: 1px solid #611a79;
+                        margin-bottom: 20px;
+                    ">Sign in with Google</a>
+                </div>
+                <span>or use your account</span>
+                <input type="text" id="loginEmail" name="email" placeholder="📧 Email or 📱 Phone" required />
+                <input type="password" id="loginPassword" name="password" placeholder="🔒 Password" required />
+                <a href="#">Forgot your password? 🤔</a>
+                <button type="submit">Sign In</button>
+            </form>
+        </div>
+        <!-- Overlay Container -->
+        <div class="overlay-container">
+            <div class="overlay">
+                <!-- Overlay Left Panel (Shown when Sign In is active) -->
+                <div class="overlay-panel overlay-left">
+                    <h1>Welcome Back! 🎉</h1>
+                    <p>To keep connected with us please login with your personal info</p>
+                    <button class="ghost" id="signIn">Sign In</button>
+                </div>
+                <!-- Overlay Right Panel (Shown when Sign Up is active) -->
+                <div class="overlay-panel overlay-right">
+                    <h1>Hello, Friend! ✨</h1>
+                    <p>Enter your personal details and start your journey with us</p>
+                    <button class="ghost" id="signUp">Sign Up</button>
+                </div>
+            </div>
+        </div>
+        <!-- Terms and Conditions Popup -->
+        <div class="modal" id="termsModal">
+            <div class="modal-content">
+                <span class="close-modal" id="closeModal">&times;</span>
+                <h2>Terms and Conditions</h2>
+                <h3>1. Data Privacy & Access</h3>
+                <p>We respect your privacy and handle personal data in accordance with our Privacy Policy.</p>
+                <ul>
+                    <li>By using the App, you consent to the collection, storage, and processing of data as necessary to
+                        operate and improve the App.</li>
+                    <li>While we take reasonable security measures, we cannot guarantee complete protection against
+                        unauthorized access or breaches.</li>
+                    <li>We reserve the right to access or review data when required by law, for security purposes, or to
+                        investigate violations of these Terms.</li>
+                </ul>
+                <h3>2. No Liability for User Conduct</h3>
+                <ul>
+                    <li>Users are solely responsible for the content they share, post, or transmit within the App.</li>
+                    <li>Any disputes, conflicts, or disagreements between users must be resolved directly between the
+                        parties involved.</li>
+                    <li>We are not responsible or liable for any misconduct, harassment, or harm caused by users within
+                        the community.</li>
+                </ul>
+                <h3>3. No Liability for Fraud or Misuse</h3>
+                <ul>
+                    <li>We do not verify every user’s identity or guarantee the accuracy of information shared on the
+                        App.</li>
+                    <li>We are not liable for any fraudulent activities, scams, misrepresentations, or illegal
+                        transactions conducted by users.</li>
+                    <li>Users must exercise caution when interacting with others and are advised not to share sensitive
+                        or financial information.</li>
+                </ul>
+                <h3>4. Limitation of Liability</h3>
+                <p>To the maximum extent permitted by law:</p>
+                <ul>
+                    <li>The App is provided on an “as is” and “as available” basis.</li>
+                    <li>We disclaim all warranties, whether express or implied.</li>
+                    <li>We shall not be held responsible for any damages, financial loss, or harm resulting from:
+                        <ul>
+                            <li>User disputes or conflicts,</li>
+                            <li>Fraudulent activities by users,</li>
+                            <li>Unauthorized access to data,</li>
+                            <li>Service interruptions, bugs, or errors.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <h3>5. User Responsibility</h3>
+                <p>By using the App, you agree to:</p>
+                <ul>
+                    <li>Use the App lawfully and respectfully.</li>
+                    <li>Not engage in fraud, harassment, or harmful conduct.</li>
+                    <li>Accept that you are solely responsible for your interactions and the consequences thereof.</li>
+                </ul>
+                <button id="acceptTerms">Close</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOM fully loaded, initializing event listeners...');
+
+            const signUpButton = document.getElementById('signUp');
+            const signInButton = document.getElementById('signIn');
+            const container = document.getElementById('container');
+            const signupButton = document.getElementById('signupButton');
+            const termsCheckbox = document.getElementById('termsCheckbox');
+            const termsLink = document.getElementById('termsLink');
+            const termsModal = document.getElementById('termsModal');
+            const closeModal = document.getElementById('closeModal');
+            const acceptTerms = document.getElementById('acceptTerms');
+
+
+
+            // Sign-up/sign-in panel toggle
+            if (signUpButton && signInButton && container) {
+                signUpButton.addEventListener('click', () => {
+                    console.log('Sign Up button clicked, adding right-panel-active');
+                    container.classList.add("right-panel-active");
+                });
+                signInButton.addEventListener('click', () => {
+                    console.log('Sign In button clicked, removing right-panel-active');
+                    container.classList.remove("right-panel-active");
+                });
+            } else {
+                console.error("Could not find one or more elements: #signUp, #signIn, #container");
+            }
+
+            // Checkbox and signup button logic
+            /* if (termsCheckbox && signupButton && googleSignupBtn) {
+                 signupButton.disabled = true;
+                 googleSignupBtn.disabled = true;
+                termsCheckbox.addEventListener('change', () => {
+                     console.log('Terms checkbox changed, checked:', termsCheckbox.checked);
+                     signupButton.disabled = !termsCheckbox.checked;
+                     googleSignupBtn.disabled = !termsCheckbox.checked;
+                 });
+                 const signupForm = document.getElementById('signupForm');
+                 signupForm.addEventListener('submit', (e) => {
+                     console.log('Signup form submitted, terms checked:', termsCheckbox.checked);
+                     if (!termsCheckbox.checked) {
+                         e.preventDefault();
+                         toastr.error('You must agree to the Terms and Conditions to sign up.');
+                     }
+                 });
+             } else {
+                 console.error("Could not find termsCheckbox or signupButton");
+             }
+ */
+            // Modal logic
+            if (termsLink && termsModal && closeModal && acceptTerms) {
+                termsLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('Terms link clicked, showing modal');
+                    termsModal.style.display = 'flex';
+                    setTimeout(() => {
+                        termsModal.classList.add('show');
+                    }, 10); // Small delay to ensure display: flex is applied before transition
+                    termsModal.focus();
+                });
+                closeModal.addEventListener('click', () => {
+                    console.log('Close modal clicked');
+                    termsModal.classList.remove('show');
+                    setTimeout(() => {
+                        termsModal.style.display = 'none';
+                    }, 300);
+                });
+                acceptTerms.addEventListener('click', () => {
+                    console.log('Accept terms button clicked');
+                    termsModal.classList.remove('show');
+                    setTimeout(() => {
+                        termsModal.style.display = 'none';
+                    }, 300);
+                });
+                termsModal.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        console.log('ESC key pressed, closing modal');
+                        termsModal.classList.remove('show');
+                        setTimeout(() => {
+                            termsModal.style.display = 'none';
+                        }, 300);
+                    }
+                });
+                termsModal.addEventListener('click', (e) => {
+                    if (e.target === termsModal) {
+                        console.log('Clicked outside modal, closing');
+                        termsModal.classList.remove('show');
+                        setTimeout(() => {
+                            termsModal.style.display = 'none';
+                        }, 300);
+                    }
+                });
+                // Ensure modal is hidden initially
+                termsModal.style.display = 'none';
+            } else {
+                console.error("Could not find termsLink, termsModal, closeModal, or acceptTerms");
+            }
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+
+</html>

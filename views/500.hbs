@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error - Sarafa Community</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(120deg, #2f95ff 0%, #6dd5ed 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+        }
+        .error-container {
+            background: rgba(255,255,255,0.95);
+            padding: 40px 32px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(47,149,255,0.10);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        .error-title {
+            color: #2f95ff;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+        .error-message {
+            color: #374151;
+            font-size: 1.1rem;
+            margin-bottom: 20px;
+        }
+        .error-btn {
+            padding: 12px 24px;
+            background: #2f95ff;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .error-btn:hover {
+            background: #1e7fd6;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1 class="error-title">Something Went Wrong </h1>
+        <p class="error-message">{{errorMessage}}</p>
+        <a href="/" class="error-btn">Back to Dashboard</a>
+    </div>
+</body>
+</html>
