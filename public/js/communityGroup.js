@@ -12,15 +12,43 @@ document.addEventListener('DOMContentLoaded', function () {
     const groupDescriptionPreview = document.getElementById('groupDescriptionPreview');
     const groupIdInput = document.getElementById('groupId');
 
+    const communityTypeSelect = document.getElementById('community-type');
+    const privacyModal = document.getElementById('privacyModal');
+    const yesBtn = document.getElementById('yesBtn');
+    const noBtn = document.getElementById('noBtn');
+    const questionFormModal = document.getElementById('questionFormModal');
+    const questionForm = document.getElementById('questionForm');
+    const questionText = document.getElementById('questionText');
+    const questionTypeSelect = document.getElementById('questionTypeSelect');
+    const optionsSection = document.getElementById('optionsSection');
+    const closeQuestionModal = document.getElementById('closeQuestionModal');
+    const cancelQuestionBtn = document.getElementById('cancelQuestionBtn');
+    const deleteQuestionBtn = document.getElementById('deleteQuestionBtn');
+    const addAnotherQuestionBtn = document.getElementById('addAnotherQuestionBtn');
+    const questionsDisplayModal = document.getElementById('questionsDisplayModal');
+    const closeQuestionsDisplayModal = document.getElementById('closeQuestionsDisplayModal');
+    const cancelQuestionsBtn = document.getElementById('cancelQuestionsBtn');
+    const createQuestionBtn = document.getElementById('createQuestionBtn');
+    let questions = []; // Initialize with empty array or server-side questions if provided
+
     // Real-time preview for community name
     document.getElementById('communityName').addEventListener('input', function () {
         groupNamePreview.textContent = this.value || 'Community Name';
     });
 
     // Real-time preview for community type
+    // document.getElementById('community-type').addEventListener('change', function () {
+    //     const type = this.value ? this.value.charAt(0).toUpperCase() + this.value.slice(1) : 'Community privacy';
+    //     groupPrivacyPreview.textContent = `${type} · 1 member`;
+    // });
     document.getElementById('community-type').addEventListener('change', function () {
+        console.log("[communityTypeSelect] value =", this.value);
         const type = this.value ? this.value.charAt(0).toUpperCase() + this.value.slice(1) : 'Community privacy';
         groupPrivacyPreview.textContent = `${type} · 1 member`;
+        if (this.value === 'private') {
+            console.log("[communityTypeSelect] Showing privacyModal");
+            privacyModal.style.display = 'flex';
+        }
     });
 
     // Real-time preview for description
@@ -55,6 +83,9 @@ document.addEventListener('DOMContentLoaded', function () {
             formError.style.display = 'none';
 
             const formData = new FormData(groupCreateForm);
+            for (const [key, value] of formData.entries()) {
+                console.log(`  ${key}:`, value);
+            }
             console.log(formData)
             const groupId = groupIdInput.value;
             console.log(groupId);
@@ -186,5 +217,211 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     `;
     document.head.appendChild(notificationStyles);
+
+
+
+    // New Modal and Question Handling Logic
+  
+
+    // Show/hide options section based on question type
+    function updateOptionsSection() {
+        const type = questionTypeSelect.value;
+        optionsSection.style.display = type === 'text' ? 'none' : 'block';
+        document.querySelectorAll('#optionInputs .option-input').forEach(input => {
+            input.required = type !== 'text';
+        });
+    }
+
+    // Add new option input
+    window.addOption = function () {
+        const optionInputs = document.getElementById('optionInputs');
+        const newOption = document.createElement('div');
+        newOption.className = 'option-input-row';
+        newOption.innerHTML = `
+            <input type="text" class="option-input" placeholder="Write your answer" required>
+            <button type="button" class="remove-option-btn" onclick="removeOption(this)">×</button>
+        `;
+        optionInputs.appendChild(newOption);
+    };
+
+    // Remove option input
+    window.removeOption = function (btn) {
+        if (document.querySelectorAll('#optionInputs .option-input-row').length > 1) {
+            btn.parentElement.remove();
+        } else {
+            showNotification('At least one option is required for checkbox or multiple choice questions.', 'error');
+        }
+    };
+
+    // Show privacy modal when selecting private community
+    if (communityTypeSelect) {
+        communityTypeSelect.addEventListener('change', function () {
+            console.log("[communityTypeSelect] value =", this.value);
+            const type = this.value ? this.value.charAt(0).toUpperCase() + this.value.slice(1) : 'Community privacy';
+            groupPrivacyPreview.textContent = `${type} · 1 member`;
+            if (this.value === 'private') {
+                  console.log("[communityTypeSelect] Showing privacyModal");
+                privacyModal.style.display = 'flex';
+            }
+        });
+    }
+
+    // Privacy modal buttons
+    if (yesBtn) {
+        yesBtn.addEventListener('click', function () {
+            privacyModal.style.display = 'none';
+            questionFormModal.style.display = 'flex';
+            questionForm.reset();
+            updateOptionsSection();
+            deleteQuestionBtn.style.display = 'none';
+            document.getElementById('modalTitle').textContent = 'Create Question';
+        });
+    }
+
+    if (noBtn) {
+        noBtn.addEventListener('click', function () {
+            privacyModal.style.display = 'none';
+            questionsDisplayModal.style.display = 'flex';
+        });
+    }
+
+    // Question form modal
+    if (questionTypeSelect) {
+        questionTypeSelect.addEventListener('change', updateOptionsSection);
+    }
+
+    if (closeQuestionModal) {
+        closeQuestionModal.addEventListener('click', function () {
+            questionFormModal.style.display = 'none';
+            questionsDisplayModal.style.display = 'flex';
+        });
+    }
+
+    if (cancelQuestionBtn) {
+        cancelQuestionBtn.addEventListener('click', function () {
+            questionFormModal.style.display = 'none';
+            questionsDisplayModal.style.display = 'flex';
+        });
+    }
+
+    if (addAnotherQuestionBtn) {
+        addAnotherQuestionBtn.addEventListener('click', function () {
+            questionForm.dispatchEvent(new Event('submit'));
+            questionForm.reset();
+            updateOptionsSection();
+            document.getElementById('modalTitle').textContent = 'Create Question';
+        });
+    }
+
+    // Questions display modal
+    if (closeQuestionsDisplayModal) {
+        closeQuestionsDisplayModal.addEventListener('click', function () {
+            questionsDisplayModal.style.display = 'none';
+        });
+    }
+
+    if (cancelQuestionsBtn) {
+        cancelQuestionsBtn.addEventListener('click', function () {
+            questionsDisplayModal.style.display = 'none';
+        });
+    }
+
+    if (createQuestionBtn) {
+        createQuestionBtn.addEventListener('click', function () {
+            questionsDisplayModal.style.display = 'none';
+            questionFormModal.style.display = 'flex';
+            questionForm.reset();
+            updateOptionsSection();
+            document.getElementById('modalTitle').textContent = 'Create Question';
+        });
+    }
+
+    // Handle question form submission
+    if (questionForm) {
+      questionForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            console.log("[questionForm] Submitting question form");
+            const question = {
+                questionText: questionText.value,
+                questionType: questionTypeSelect.value,
+                options: questionTypeSelect.value !== 'text' ? Array.from(document.querySelectorAll('.option-input')).map(input => input.value).filter(v => v) : []
+            };
+            console.log("[questionForm] Built question object:", question);
+            if (!question.questionText) {
+                showNotification('Question text is required.', 'error');
+                console.log("[questionForm] Validation failed: Question text missing");
+                return;
+            }
+            if (question.questionType !== 'text' && question.options.length < 1) {
+                showNotification('At least one option is required for checkbox or multiple choice questions.', 'error');
+                console.log("[questionForm] Validation failed: Options missing for non-text question");
+                return;
+            }
+            questions.push(question);
+            console.log("[questionForm] Updated questions array:", questions);
+            updateQuestionsDisplay();
+            questionsDisplayModal.style.display = 'flex';
+            questionFormModal.style.display = 'none';
+            questionForm.reset();
+            document.getElementById('questionsInput').value = JSON.stringify(questions);
+            console.log("[questionForm] Set questionsInput value:", document.getElementById('questionsInput').value);
+        });
+    }
+
+    // Update questions display
+    function updateQuestionsDisplay() {
+       //  console.log("[updateQuestionsDisplay] Editing question at index =", idx, questions[idx]);
+        const questionsList = document.getElementById('questionsList');
+        questionsList.innerHTML = '';
+        questions.forEach((q, index) => {
+            const questionItem = document.createElement('div');
+            questionItem.className = 'question-item';
+            questionItem.setAttribute('data-question-id', index);
+            questionItem.innerHTML = `<p><strong>${q.questionText}</strong> (${q.questionType})</p>`;
+            if (q.options.length) {
+                const ul = document.createElement('ul');
+                q.options.forEach(opt => {
+                    const li = document.createElement('li');
+                    li.textContent = opt;
+                    ul.appendChild(li);
+                });
+                questionItem.appendChild(ul);
+            }
+            questionItem.addEventListener('click', function () {
+                const idx = this.getAttribute('data-question-id');
+                const question = questions[idx];
+                questionText.value = question.questionText;
+                questionTypeSelect.value = question.questionType;
+                updateOptionsSection();
+                document.getElementById('optionInputs').innerHTML = '';
+                question.options.forEach(opt => {
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'option-input-row';
+                    optionDiv.innerHTML = `
+                        <input type="text" class="option-input" value="${opt}" required>
+                        <button type="button" class="remove-option-btn" onclick="removeOption(this)">×</button>
+                    `;
+                    document.getElementById('optionInputs').appendChild(optionDiv);
+                });
+                deleteQuestionBtn.style.display = 'inline-block';
+                deleteQuestionBtn.onclick = function () {
+                    questions.splice(idx, 1);
+                    updateQuestionsDisplay();
+                    questionFormModal.style.display = 'none';
+                    questionsDisplayModal.style.display = 'flex';
+                    document.getElementById('questionsInput').value = JSON.stringify(questions);
+                };
+                document.getElementById('modalTitle').textContent = 'Edit Question';
+                questionFormModal.style.display = 'flex';
+                questionsDisplayModal.style.display = 'none';
+            });
+            questionsList.appendChild(questionItem);
+        });
+    }
+
+    // Initialize questions display
+    updateOptionsSection && updateOptionsSection();
+    updateQuestionsDisplay();
+    console.log("[INIT] Questions initialized:", questions);
 });
 

@@ -125,6 +125,494 @@
             transform: none;
             box-shadow: none;
         }
+         .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+      position: relative;
+      max-height: 150px;
+    }
+
+    .modal-content p {
+      font-size: 16px;
+      color: #1c1e21;
+      margin-bottom: 20px;
+      line-height: 1.34;
+      font-weight: 400;
+    }
+
+    .modal button {
+      padding: 8px 16px;
+      margin: 0 4px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      min-width: 80px;
+    }
+
+    #yesBtn {
+      background: #1877f2;
+      color: white;
+    }
+
+    #yesBtn:hover {
+      background: #166fe5;
+    }
+
+    #noBtn {
+      background: #e4e6ea;
+      color: #1c1e21;
+    }
+
+    #noBtn:hover {
+      background: #d8dadf;
+    }
+
+    .question-form-modal {
+      display: none;
+      position: fixed;
+      z-index: 1001;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .question-form-content {
+      background: white;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Facebook-style membership questions modal */
+    .questions-display-modal {
+      display: none;
+      position: fixed;
+      z-index: 1001;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.8);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .questions-display-content {
+      background: white;
+      border-radius: 8px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1), 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Membership questions display section */
+    .questions-display-section {
+      padding: 20px;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid #e4e6ea;
+    }
+
+    .modal-header h2 {
+      color: #1c1e21;
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #65676b;
+      padding: 8px;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.2s;
+    }
+
+    .close-btn:hover {
+      background-color: #f2f3f5;
+    }
+
+    /* Membership questions display section */
+    .questions-display-section {
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      margin: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .questions-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .questions-header h3 {
+      color: #1c1e21;
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .create-btn {
+      background: #1877f2;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .create-btn:hover {
+      background: #166fe5;
+    }
+
+    .question-item {
+      background: #f7f8fa;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      border: 1px solid #e4e6ea;
+    }
+
+    .question-number {
+      color: #65676b;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .question-text {
+      color: #1c1e21;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .question-preview {
+      background: #e4e6ea;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 12px;
+      color: #65676b;
+      font-size: 14px;
+      font-style: italic;
+    }
+
+    .question-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .edit-btn,
+    .delete-btn {
+      background: none;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .edit-btn {
+      background: #e7f3ff;
+      color: #1877f2;
+    }
+
+    .edit-btn:hover {
+      background: #d2e9ff;
+    }
+
+    .delete-btn {
+      background: #ffebee;
+      color: #d32f2f;
+    }
+
+    .delete-btn:hover {
+      background: #ffcdd2;
+    }
+
+    /* Edit question modal styles */
+    .question-input-section {
+      padding: 20px 20px 0 20px;
+    }
+
+    .question-input-section input[type="text"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #e4e6ea;
+      border-radius: 6px;
+      font-size: 15px;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+
+    .question-input-section input[type="text"]:focus {
+      outline: none;
+      border-color: #1877f2;
+      box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+    }
+
+    .question-input-section input[type="text"]::placeholder {
+      color: #65676b;
+    }
+
+    .question-type-section {
+      padding: 16px 20px;
+    }
+
+    .question-type-dropdown-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .question-type-dropdown {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #e4e6ea;
+      border-radius: 6px;
+      font-size: 15px;
+      background-color: white;
+      cursor: pointer;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+      appearance: none;
+    }
+
+    .question-type-dropdown:focus {
+      outline: none;
+      border-color: #1877f2;
+      box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+    }
+
+    .dropdown-icon {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #65676b;
+      pointer-events: none;
+      font-size: 12px;
+    }
+
+    .options-section {
+      padding: 0 20px 16px 20px;
+    }
+
+    .option-inputs {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .option-input-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .option-input-row input[type="text"] {
+      flex: 1;
+      padding: 12px 16px;
+      border: 1px solid #e4e6ea;
+      border-radius: 6px;
+      font-size: 15px;
+      transition: border-color 0.2s;
+      box-sizing: border-box;
+    }
+
+    .option-input-row input[type="text"]:focus {
+      outline: none;
+      border-color: #1877f2;
+      box-shadow: 0 0 0 2px rgba(24, 119, 242, 0.2);
+    }
+
+    .remove-option-btn {
+      background: #e4e6ea;
+      color: #65676b;
+      border: none;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      cursor: pointer;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+
+    .remove-option-btn:hover {
+      background: #d8dadf;
+      color: #1c1e21;
+    }
+
+    .add-option-btn {
+      background: none;
+      color: #1877f2;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      text-align: left;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .add-option-btn:hover {
+      color: #166fe5;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      border-top: 1px solid #e4e6ea;
+      background-color: #f8f9fa;
+      border-radius: 0 0 8px 8px;
+      gap: 12px;
+    }
+
+    .modal-footer button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      transition: all 0.2s;
+      min-width: 80px;
+    }
+
+    .btn-primary {
+      background: #1877f2;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #166fe5;
+    }
+
+    .btn-success {
+      background: #42b883;
+      color: white;
+    }
+
+    .btn-success:hover {
+      background: #369870;
+    }
+
+    .btn-secondary {
+      background: none;
+      color: #1877f2;
+      padding: 8px 0;
+      min-width: auto;
+    }
+
+    .btn-secondary:hover {
+      color: #166fe5;
+      text-decoration: underline;
+    }
+
+    .btn-danger {
+      background: none;
+      color: #e41e3f;
+      padding: 8px 0;
+      min-width: auto;
+    }
+
+    .btn-danger:hover {
+      color: #c5102e;
+      text-decoration: underline;
+    }
+
+    /* Group rules section styling */
+    .group-rules-section {
+      margin-top: 20px;
+      padding: 16px;
+      background: #f7f8fa;
+      border-radius: 8px;
+      border: 1px solid #e4e6ea;
+    }
+
+    .group-rules-header {
+      color: #1c1e21;
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .group-rules-text {
+      color: #65676b;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .learn-more-link {
+      color: #1877f2;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    .learn-more-link:hover {
+      text-decoration: underline;
+    }
     </style>
 </head>
 <body>
@@ -143,6 +631,7 @@
                     <h2 class="form-title">{{#if group}}Edit Community Group{{else}}Community Group{{/if}}</h2>
                     <form class="group-create-form" id="groupCreateForm">
                         <input type="hidden" id="groupId" name="groupId" value="{{group._id}}">
+                        <input type="hidden" id="questionsInput" name="questions" value="{{json questions}}">
                         <div class="form-section">
                             <label for="communityName" class="form-label">Community Name</label>
                             <input type="text" id="communityName" name="communityName" class="form-input" placeholder="Enter Community name"  value="{{#if group.g_name}}{{group.g_name}}{{/if}}"  required>
@@ -227,6 +716,96 @@
                     </div>
                 </div>
             </div>
+            <div class="modal" id="privacyModal">
+              <div class="modal-content">
+                <p>Do you want to ask members some questions before they join?</p>
+                <button id="yesBtn">Yes</button>
+                <button id="noBtn">No</button>
+              </div>
+            </div>
+
+            <!-- Question Form Modal -->
+            <div class="question-form-modal" id="questionFormModal">
+              <div class="question-form-content">
+                <div class="modal-header">
+                  <h2 id="modalTitle">Create Question</h2>
+                  <button class="close-btn" id="closeQuestionModal">&times;</button>
+                </div>
+                <form id="questionForm">
+                  <div class="question-input-section">
+                    <input type="text" id="questionText" name="questionText" placeholder="Ask a question..." required>
+                  </div>
+                  <div class="question-type-section">
+                    <div class="question-type-dropdown-container">
+                      <select id="questionTypeSelect" name="questionType" class="question-type-dropdown">
+                        <option value="checkbox">Checkboxes</option>
+                        <option value="radio">Multiple Choice</option>
+                        <option value="text">Written Answer</option>
+                      </select>
+                      <span class="dropdown-icon">▼</span>
+                    </div>
+                  </div>
+                  <div class="options-section" id="optionsSection">
+                    <div class="option-inputs" id="optionInputs">
+                      <div class="option-input-row">
+                        <input type="text" class="option-input" placeholder="Write your answer" required>
+                        <button type="button" class="remove-option-btn" onclick="removeOption(this)">×</button>
+                      </div>
+                      <div class="option-input-row">
+                        <input type="text" class="option-input" placeholder="Write your answer" required>
+                        <button type="button" class="remove-option-btn" onclick="removeOption(this)">×</button>
+                      </div>
+                    </div>
+                    <button type="button" class="add-option-btn" onclick="addOption()">+ Add an option</button>
+                  </div>
+                  <div class="modal-footer">
+                    <div style="display: flex; gap: 12px;">
+                      <button type="button" class="btn-secondary" id="cancelQuestionBtn">Cancel</button>
+                      <button type="button" class="btn-danger" id="deleteQuestionBtn" style="display: none;">Delete</button>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                      <button type="submit" class="btn-primary">Save</button>
+                      <button type="button" class="btn-success" id="addAnotherQuestionBtn">Create</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Questions Display Modal -->
+            <div class="questions-display-modal" id="questionsDisplayModal">
+              <div class="questions-display-content">
+                <div class="modal-header">
+                  <h2>Membership Questions</h2>
+                  <button class="close-btn" id="closeQuestionsDisplayModal">&times;</button>
+                </div>
+                <div class="questions-display-section">
+                  <div id="questionsList">
+                    {{#each questions}}
+                    <div class="question-item" data-question-id="{{this._id}}">
+                      <p><strong>{{this.question}}</strong> ({{this.que_type}})</p>
+                      {{#if this.options.length}}
+                      <ul>
+                        {{#each this.options}}
+                        <li>{{this}}</li>
+                        {{/each}}
+                      </ul>
+                      {{/if}}
+                    </div>
+                    {{/each}}
+                  </div>
+                  <div class="group-rules-section">
+                    <div class="group-rules-header">Group Rules</div>
+                    <div class="group-rules-text">Create group rules and ask pending members to agree to them.</div>
+                    <a href="#" class="learn-more-link">Learn More</a>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn-secondary" id="cancelQuestionsBtn">Cancel</button>
+                  <button type="button" class="btn-primary" id="createQuestionBtn">Create</button>
+                </div>
+              </div>
+            </div>
         </main>
     </div>
 
@@ -295,6 +874,7 @@
 
     <script src="/js/all.js"></script>
     <script src="/js/communityGroup.js"></script>
+   
     </body>
 
 </html>
