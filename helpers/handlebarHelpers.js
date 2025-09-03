@@ -20,6 +20,9 @@ module.exports = {
             const date = new Date(datetime);
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
             return date.toLocaleDateString('en-US', options);
+    },
+    json : function(context){
+        return JSON.stringify(context);
     }
     
 };

@@ -125,12 +125,6 @@
             transform: none;
             box-shadow: none;
         }
-
-        @media (max-width: 480px) {
-  .group-create-container {
-    flex-direction: column;
-  }
-}
     </style>
 </head>
 <body>
@@ -149,6 +143,7 @@
                     <h2 class="form-title">{{#if group}}Edit Community Group{{else}}Community Group{{/if}}</h2>
                     <form class="group-create-form" id="groupCreateForm">
                         <input type="hidden" id="groupId" name="groupId" value="{{group._id}}">
+                        <input type="hidden" id="questionsInput" name="questions" value="{{json questions}}">
                         <div class="form-section">
                             <label for="communityName" class="form-label">Community Name</label>
                             <input type="text" id="communityName" name="communityName" class="form-input" placeholder="Enter Community name"  value="{{#if group.g_name}}{{group.g_name}}{{/if}}"  required>
@@ -233,6 +228,96 @@
                     </div>
                 </div>
             </div>
+            <div class="modal" id="privacyModal">
+              <div class="modal-content">
+                <p>Do you want to ask members some questions before they join?</p>
+                <button id="yesBtn">Yes</button>
+                <button id="noBtn">No</button>
+              </div>
+            </div>
+
+            <!-- Question Form Modal -->
+            <div class="question-form-modal" id="questionFormModal">
+              <div class="question-form-content">
+                <div class="modal-header">
+                  <h2 id="modalTitle">Create Question</h2>
+                  <button class="close-btn" id="closeQuestionModal">&times;</button>
+                </div>
+                <form id="questionForm">
+                  <div class="question-input-section">
+                    <input type="text" id="questionText" name="questionText" placeholder="Ask a question..." required>
+                  </div>
+                  <div class="question-type-section">
+                    <div class="question-type-dropdown-container">
+                      <select id="questionTypeSelect" name="questionType" class="question-type-dropdown">
+                        <option value="checkbox">Checkboxes</option>
+                        <option value="radio">Multiple Choice</option>
+                        <option value="text">Written Answer</option>
+                      </select>
+                      <span class="dropdown-icon">▼</span>
+                    </div>
+                  </div>
+                  <div class="options-section" id="optionsSection">
+                    <div class="option-inputs" id="optionInputs">
+                      <div class="option-input-row">
+                        <input type="text" class="option-input" placeholder="Write your answer" required>
+                        <button type="button" class="remove-option-btn" onclick="removeOption(this)">×</button>
+                      </div>
+                      <div class="option-input-row">
+                        <input type="text" class="option-input" placeholder="Write your answer" required>
+                        <button type="button" class="remove-option-btn" onclick="removeOption(this)">×</button>
+                      </div>
+                    </div>
+                    <button type="button" class="add-option-btn" onclick="addOption()">+ Add an option</button>
+                  </div>
+                  <div class="modal-footer">
+                    <div style="display: flex; gap: 12px;">
+                      <button type="button" class="btn-secondary" id="cancelQuestionBtn">Cancel</button>
+                      <button type="button" class="btn-danger" id="deleteQuestionBtn" style="display: none;">Delete</button>
+                    </div>
+                    <div style="display: flex; gap: 12px;">
+                      <button type="submit" class="btn-primary">Save</button>
+                      <button type="button" class="btn-success" id="addAnotherQuestionBtn">Create</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+
+            <!-- Questions Display Modal -->
+            <div class="questions-display-modal" id="questionsDisplayModal">
+              <div class="questions-display-content">
+                <div class="modal-header">
+                  <h2>Membership Questions</h2>
+                  <button class="close-btn" id="closeQuestionsDisplayModal">&times;</button>
+                </div>
+                <div class="questions-display-section">
+                  <div id="questionsList">
+                    {{#each questions}}
+                    <div class="question-item" data-question-id="{{this._id}}">
+                      <p><strong>{{this.question}}</strong> ({{this.que_type}})</p>
+                      {{#if this.options.length}}
+                      <ul>
+                        {{#each this.options}}
+                        <li>{{this}}</li>
+                        {{/each}}
+                      </ul>
+                      {{/if}}
+                    </div>
+                    {{/each}}
+                  </div>
+                  <div class="group-rules-section">
+                    <div class="group-rules-header">Group Rules</div>
+                    <div class="group-rules-text">Create group rules and ask pending members to agree to them.</div>
+                    <a href="#" class="learn-more-link">Learn More</a>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn-secondary" id="cancelQuestionsBtn">Cancel</button>
+                  <button type="button" class="btn-primary" id="createQuestionBtn">Create</button>
+                </div>
+              </div>
+            </div>
         </main>
     </div>
 
@@ -301,6 +386,7 @@
 
     <script src="/js/all.js"></script>
     <script src="/js/communityGroup.js"></script>
+   
     </body>
 
 </html>
