@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const Group = require('../models/group.model');
 const Payment = require('../models/payReceive.model');
+const Gmem = require('../models/groupMem.model');
+
 
 // exports.dashboard = async (req, res,next) => {  
 //     try {
@@ -57,7 +59,6 @@ const Payment = require('../models/payReceive.model');
 // };
 
 
-const Gmem = require('../models/groupMem.model');
 
 exports.dashboard = async (req, res, next) => {
   try {
