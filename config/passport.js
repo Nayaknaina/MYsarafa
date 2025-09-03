@@ -21,16 +21,16 @@ passport.use(new GoogleStrategy({
                 // Create new user
                 user = new User({
                     googleId: profile.id,
-                   f_name: profile.name?.givenName || '',
-                   l_name: profile.name?.familyName || '', 
+                   f_name: profile.name?.givenName || profile.displayName?.split(' ')[0] || 'Google',
+                    l_name: profile.name?.familyName || profile.displayName?.split(' ')[1] || 'User',
                     email: profile.emails[0].value,
-                  kyc_status: 'pending',
+                 kyc_status: 'pending',
                     user_status: 'unverified'
                 });
                 await user.save();
             }
         }
-        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '12h' });
         user.token = token; // Attach token for session
         return done(null, user);
     } catch (error) {
