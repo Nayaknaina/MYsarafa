@@ -96,8 +96,8 @@ exports.createGroup = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid community type' });
         }
 
-        let coverPhoto = './assets/images/demo.jpg';
-        let qrCode = '/Assets/Images/default-qr.png';
+        let coverPhoto = '/assets/images/demo.jpg';
+        let qrCode = '/assets/images/default-qr.jpg';
         if (req.files && req.files.coverImage) {
             // const file = req.files.coverImage;
             // coverPhoto = `/uploads/${Date.now()}_${file.name}`;

@@ -112,10 +112,13 @@ document.addEventListener('DOMContentLoaded', function () {
                   showNotification(groupId ? 'Group updated successfully!' : 'Group created successfully!', 'success');
 
                     // // Reset form
-                    //  if(!groupId){
-                    //     groupCreateForm.requestFullscreen();
-                    //     coverImagePreview.src = './uploads/demo.jpg';
-                    //  }
+                    if (!groupId) {
+                    groupCreateForm.reset(); 
+                    coverImagePreview.src = '/assets/images/demo.jpg'; 
+                    groupNamePreview.textContent = '';
+                    groupPrivacyPreview.textContent = '';
+                    groupDescriptionPreview.textContent = 'Community description will appear here...';
+                      }
                     
                 } else {
                     formError.textContent = result.message || 'Failed to create group';
