@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sarafa Community Dashboard</title>
     <link rel="stylesheet" href="/css/styles.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
@@ -16,334 +17,437 @@
 </head>
 
 <style>
-      
-        .main-content {
-            flex: 1;
-            padding: 2rem;
-        }
-        .page-title {
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 1.5rem;
-            color: #1f2937;
-        }
-       .filterbutton, .addmemberbtn, .csv-btn,.submit-blacklist-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            background: linear-gradient(to right, #3b82f6, #7c3aed);
-            color: white;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            font-weight: 600;
-            transition: transform 0.3s;
-            border: none;
-            margin: 5px;
-        }
-        .filterbutton:hover, .addmemberbtn:hover, .csv-btn:hover, .submit-blacklist-btn:hover {
-            transform: scale(1.05);
-        }
-       .filter-form, .upload-csv-form, .download-csv-form{
-            display: none;
-            background: white;
-            border-radius: 0.5rem;
-            padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            margin-bottom: 1.5rem;
-            max-width: 500px;
-            animation: slideDown 0.3s ease-out;
-        }
-        .filter-form.open, .upload-csv-form.open, .download-csv-form.open {
-            display: block;
-        }
-     .filter-form label, .modal-content label, .upload-csv-form label, .download-csv-form label {
-            font-weight: 500;
-            color: #374151;
-            margin-bottom: 0.5rem;
-            display: block;
-        }
-       .filter-form input, .modal-content input, .modal-content select, .modal-content textarea,
-    .upload-csv-form input, .upload-csv-form select, .download-csv-form select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-        }
-       .filter-form input:focus, .modal-content input:focus, .modal-content select:focus,
-    .modal-content textarea:focus, .upload-csv-form input:focus, .upload-csv-form select:focus,
-    .download-csv-form select:focus{
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-            outline: none;
-        }
-        .add-member-section {
-            margin-bottom: 1.5rem;
-        }
-        .addmemberbtn {
-            background: linear-gradient(to right, #3b82f6, #7c3aed);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .addmemberbtn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        /*.table-container {
+    .main-content {
+        flex: 1;
+        padding: 2rem;
+    }
+
+    .page-title {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        color: #1f2937;
+    }
+
+    .filterbutton,
+    .addmemberbtn,
+    .csv-btn,
+    .submit-blacklist-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: linear-gradient(to right, #3b82f6, #7c3aed);
+        color: white;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-weight: 600;
+        transition: transform 0.3s;
+        border: none;
+        margin: 5px;
+    }
+
+    .filterbutton:hover,
+    .addmemberbtn:hover,
+    .csv-btn:hover,
+    .submit-blacklist-btn:hover {
+        transform: scale(1.05);
+    }
+
+    .filter-form,
+    .upload-csv-form,
+    .download-csv-form {
+        display: none;
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1.5rem;
+        max-width: 500px;
+        animation: slideDown 0.3s ease-out;
+    }
+
+    .filter-form.open,
+    .upload-csv-form.open,
+    .download-csv-form.open {
+        display: block;
+    }
+
+    .filter-form label,
+    .modal-content label,
+    .upload-csv-form label,
+    .download-csv-form label {
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .filter-form input,
+    .modal-content input,
+    .modal-content select,
+    .modal-content textarea,
+    .upload-csv-form input,
+    .upload-csv-form select,
+    .download-csv-form select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .filter-form input:focus,
+    .modal-content input:focus,
+    .modal-content select:focus,
+    .modal-content textarea:focus,
+    .upload-csv-form input:focus,
+    .upload-csv-form select:focus,
+    .download-csv-form select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        outline: none;
+    }
+
+    .add-member-section {
+        margin-bottom: 1.5rem;
+    }
+
+    .addmemberbtn {
+        background: linear-gradient(to right, #3b82f6, #7c3aed);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .addmemberbtn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /*.table-container {
             overflow-x: auto;
         }*/
-        .members-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .members-table th, .members-table td {
-            padding: 1rem;
-            text-align:center;
-            border-bottom: 1px solid #e5e7eb;
-        }
-        .members-table th {
-            background: #f9fafb;
-            font-weight: 600;
-            color: #374151;
-        }
-        .action-btn {
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0.5rem;
-        }
-        .action-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-        .dropdown-menu {
-            display: none;
-            position: absolute;
-            right: 0;
-            background: white;
-            border-radius: 0.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            z-index: 1000;
-        }
-        .action-btn:hover + .dropdown-menu, .dropdown-menu:hover {
-            display: block;
-        }
-        .dropdown-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1rem;
-            color: #374151;
-            text-decoration: none;
-        }
-        .dropdown-item:hover {
-            background: #f3f4f6;
-        }
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-        }
-        .modal-content {
-            background: white;
-            border-radius: 0.5rem;
-            width: 100%;
-            max-width: 500px;
-            
-        }
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-        .modal-close-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-      .add-member-form, .blacklist-form, .upload-csv-form, .download-csv-form {
-            display: flex;
-            flex-direction: column;
-                padding: 1rem 1rem;
-            
-        }
-       .add-member-input, .add-member-form select, .upload-csv-form select, .download-csv-form select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e5e7eb;
-            border-radius: 0.5rem;
-            font-size: 1rem;
-            outline: none;
-        }
-        .add-member-input:focus, .add-member-form select:focus {
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-        .add-member-input:focus, .add-member-form select:focus, .upload-csv-form select:focus, .download-csv-form select:focus {
+    .members-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .members-table th,
+    .members-table td {
+        padding: 1rem;
+        text-align: center;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .members-table th {
+        background: #f9fafb;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .action-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+    }
+
+    .action-dropdown {
+        position: relative;
+        display: inline-block;
+    }
+
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        right: 0;
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+    }
+
+    .action-btn:hover+.dropdown-menu,
+    .dropdown-menu:hover {
+        display: block;
+    }
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1rem;
+        color: #374151;
+        text-decoration: none;
+    }
+
+    .dropdown-item:hover {
+        background: #f3f4f6;
+    }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 0.5rem;
+        width: 100%;
+        max-width: 500px;
+
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .modal-close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    .add-member-form,
+    .blacklist-form,
+    .upload-csv-form,
+    .download-csv-form {
+        display: flex;
+        flex-direction: column;
+        padding: 1rem 1rem;
+
+    }
+
+    .add-member-input,
+    .add-member-form select,
+    .upload-csv-form select,
+    .download-csv-form select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+        outline: none;
+    }
+
+    .add-member-input:focus,
+    .add-member-form select:focus {
         border-color: #3b82f6;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
     }
-        .send-invite-btn,.csv-btn {
-            background: linear-gradient(to right, #3b82f6, #7c3aed);
-            color: white;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
+
+    .add-member-input:focus,
+    .add-member-form select:focus,
+    .upload-csv-form select:focus,
+    .download-csv-form select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .send-invite-btn,
+    .csv-btn {
+        background: linear-gradient(to right, #3b82f6, #7c3aed);
+        color: white;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .send-invite-btn:hover,
+    .csv-btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .send-invite-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .error {
+        color: #ef4444;
+        font-size: 0.875rem;
+        text-align: center;
+    }
+
+    .loader {
+        display: none;
+        border: 4px solid #f3f4f6;
+        border-top: 4px solid #3b82f6;
+        border-radius: 50%;
+        width: 2rem;
+        height: 2rem;
+        animation: spin 1s linear infinite;
+        margin: 1rem auto;
+    }
+
+    .invitation-link-display,
+    .invitation-password {
+        background: #f3f4f6;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        word-break: break-all;
+        font-size: 0.875rem;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    .invitation-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .invitation-actions button,
+    .share-platforms a {
+        padding: 0.75rem 1rem;
+        border-radius: 0.5rem;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.3s;
+        text-decoration: none;
+        text-align: center;
+    }
+
+    .copy-btn {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .share-btn {
+        background: #10b981;
+        color: white;
+    }
+
+    .close-btn {
+        background: #e5e7eb;
+        color: #374151;
+    }
+
+    .share-platforms {
+        display: none;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+
+    .share-platforms.open {
+        display: flex;
+    }
+
+    .share-whatsapp {
+        background: #25D366;
+        color: white;
+    }
+
+    .share-email {
+        background: #4B5EAA;
+        color: white;
+    }
+
+    .share-other {
+        background: #6b7280;
+        color: white;
+    }
+
+    .invitation-actions button:hover,
+    .share-platforms a:hover {
+        transform: scale(1.05);
+    }
+
+    .info-link {
+        color: #2f95ff;
+        text-decoration: none;
+        font-size: 18px;
+        transition: all 0.3s ease;
+        display: inline-block;
+        padding: 8px;
+        border-radius: 50%;
+        background: rgba(47, 149, 255, 0.1);
+    }
+
+    .info-link:hover {
+        color: #1d7dd8;
+        background: rgba(47, 149, 255, 0.2);
+        transform: scale(1.1);
+        box-shadow: 0 2px 8px rgba(47, 149, 255, 0.3);
+    }
+
+    .info-link i {
+        transition: transform 0.3s ease;
+    }
+
+    .info-link:hover i {
+        transform: rotate(15deg);
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
         }
-        .send-invite-btn:hover,.csv-btn:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+
+        100% {
+            transform: rotate(360deg);
         }
-        .send-invite-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
+    }
+
+    @keyframes slideDown {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
         }
-        .error {
-            color: #ef4444;
-            font-size: 0.875rem;
-            text-align: center;
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
         }
-        .loader {
-            display: none;
-            border: 4px solid #f3f4f6;
-            border-top: 4px solid #3b82f6;
-            border-radius: 50%;
-            width: 2rem;
-            height: 2rem;
-            animation: spin 1s linear infinite;
-            margin: 1rem auto;
+    }
+
+    @media (max-width: 768px) {
+        .main-container {
+            margin-left: 0;
         }
-       .invitation-link-display, .invitation-password {
-            background: #f3f4f6;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            word-break: break-all;
-            font-size: 0.875rem;
-            color: #374151;
-            margin-bottom: 1rem;
-        }
-        .invitation-actions {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-        .invitation-actions button, .share-platforms a {
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.3s;
-            text-decoration: none;
-            text-align: center;
-        }
-        .copy-btn {
-            background: #3b82f6;
-            color: white;
-        }
-        .share-btn {
-            background: #10b981;
-            color: white;
-        }
-        .close-btn {
-            background: #e5e7eb;
-            color: #374151;
-        }
-        .share-platforms {
-            display: none;
-            flex-direction: column;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-        .share-platforms.open {
-            display: flex;
-        }
-        .share-whatsapp {
-            background: #25D366;
-            color: white;
-        }
-        .share-email {
-            background: #4B5EAA;
-            color: white;
-        }
-        .share-other {
-            background: #6b7280;
-            color: white;
-        }
-        .invitation-actions button:hover, .share-platforms a:hover {
-            transform: scale(1.05);
-        }
-           .info-link {
-            color: #2f95ff;
-            text-decoration: none;
-            font-size: 18px;
-            transition: all 0.3s ease;
-            display: inline-block;
-            padding: 8px;
-            border-radius: 50%;
-            background: rgba(47, 149, 255, 0.1);
-        }
-        
-        .info-link:hover {
-            color: #1d7dd8;
-            background: rgba(47, 149, 255, 0.2);
-            transform: scale(1.1);
-            box-shadow: 0 2px 8px rgba(47, 149, 255, 0.3);
-        }
-        
-        .info-link i {
-            transition: transform 0.3s ease;
-        }
-        
-        .info-link:hover i {
-            transform: rotate(15deg);
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        @keyframes slideDown {
-            from { transform: translateY(-20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        @media (max-width: 768px) {
-            .main-container {
-                margin-left: 0;
-            }
-          .filter-form, .upload-csv-form, .download-csv-form {
+
+        .filter-form,
+        .upload-csv-form,
+        .download-csv-form {
             max-width: 100%;
         }
-        }
+    }
 </style>
+
 <body>
- 
+
     {{> header}}
 
     <div class="main-container">
-     
-       {{> sidebar}}
+
+        {{> sidebar}}
 
         <main class="main-content">
 
@@ -378,10 +482,10 @@
                     <input type="text" id="searchName" placeholder="Enter member name">
                     <label for="searchGroup">Search by Group Name</label>
                     <input type="text" id="searchGroup" placeholder="Enter group name">
-                </div>  
+                </div>
             </div>
 
-          
+
 
             <!-- Members Table -->
             <div class="table-container">
@@ -396,8 +500,8 @@
                             <th>Info</th>
                         </tr>
                     </thead>
-                  <tbody id="membersTableBody">
-                       
+                    <tbody id="membersTableBody">
+
                     </tbody>
                 </table>
                 <div class="loader" id="tableLoader"></div>
@@ -413,23 +517,28 @@
                 <button class="modal-close-btn" id="closeAddMemberModal">&times;</button>
             </div>
             <form class="add-member-form" id="addMemberForm">
-              <label for="groupSelect">Group</label>
-                <select id="groupSelect" class="add-member-input"  name="groupSelect" required>
+                <label for="groupSelect">Group</label>
+                <select id="groupSelect" class="add-member-input" name="groupSelect" required>
                     <option value="">Select Group</option>
-                    
+
                 </select>
                 <label for="memberName">First Name</label>
-                <input type="text" class="add-member-input" id="memberf_Name"  name="memberName" placeholder="Enter First name" required>
+                <input type="text" class="add-member-input" id="memberf_Name" name="memberName"
+                    placeholder="Enter First name" required>
                 <label for="memberName">Last Name</label>
-                <input type="text" class="add-member-input" id="memberl_Name"  name="memberl_Name" placeholder="Enter Last name" >
+                <input type="text" class="add-member-input" id="memberl_Name" name="memberl_Name"
+                    placeholder="Enter Last name">
                 <label for="memberEmail">Email</label>
-                <input type="email" class="add-member-input" id="memberEmail" placeholder="Enter email"  name="memberEmail" required>
+                <input type="email" class="add-member-input" id="memberEmail" placeholder="Enter email"
+                    name="memberEmail" required>
                 <label for="memberNumber">Mobile Number</label>
-                <input type="tel" class="add-member-input" id="memberNumber"  name="memberNumber"  placeholder="Enter mobile number">
+                <input type="tel" class="add-member-input" id="memberNumber" name="memberNumber"
+                    placeholder="Enter mobile number">
                 {{!-- <label for="shopName">Shop Name</label>
                 <input type="text" class="add-member-input" id="shopName" placeholder="Enter shop name">
                 <label for="memberAddress">Address</label>
-                <textarea class="add-member-input" id="memberAddress" placeholder="Enter address" rows="3"></textarea> --}}
+                <textarea class="add-member-input" id="memberAddress" placeholder="Enter address" rows="3"></textarea>
+                --}}
                 <p class="error" id="formError" style="display: none;"></p>
                 <button type="submit" class="send-invite-btn" id="sendInviteBtn">Send Invite</button>
                 <div class="loader" id="formLoader" style="display: none;"></div>
@@ -437,25 +546,30 @@
         </div>
     </div>
 
-    <div id="invitationModal" class="modal-overlay" style="display:none;">
+    <div id="invitationModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <span>Invitation Link Generated</span>
+                <span id="modalTitle">Invitation Link Generated</span>
                 <button class="modal-close-btn" id="closeInvitationModal">&times;</button>
             </div>
             <div class="modal-body">
-                <p><strong>Recipient:</strong> <span id="invitationName"></span> (<span id="invitationEmail"></span>)</p>
-                <p><strong>Group:</strong> <span id="invitationGroupName"></span></p>
-                <p><strong>Invitation Link:</strong></p>
-                <div class="invitation-link-display" id="invitationLink"></div>
-                <p><strong>Temporary Password:</strong></p>
-                <div class="invitation-password" id="invitationPassword"></div>
+                <p id="existingUserMessage" style="display: none;"><strong><span id="invitationName"></span></strong>
+                    has been successfully added to <strong><span id="invitationGroupName"></span></strong>.</p>
+                <p id="newUserRecipient" style="display: none;"><strong>Recipient:</strong> <span
+                        id="invitationNameNew"></span> (<span id="invitationEmail"></span>)</p>
+                <p id="newUserGroup" style="display: none;"><strong>Group:</strong> <span
+                        id="invitationGroupNameNew"></span></p>
+                <p id="invitationLinkLabel" style="display: none;"><strong>Invitation Link:</strong></p>
+                <div class="invitation-link-display" id="invitationLink" style="display: none;"></div>
+                <p id="invitationPasswordLabel" style="display: none;"><strong>Temporary Password:</strong></p>
+                <div class="invitation-password" id="invitationPassword" style="display: none;"></div>
                 <div class="invitation-actions">
-                    <button class="copy-btn" id="copyLinkBtn">Copy Link</button>
+                    <button class="copy-btn" id="copyLinkBtn" style="display: none;">Copy Link</button>
                     <button class="share-btn" id="shareBtn">Share</button>
                     <button class="close-btn" id="closeInvitationModalBtn">Close</button>
                     <div class="share-platforms" id="sharePlatforms">
-                        <a href="#" class="share-whatsapp" id="shareWhatsApp"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+                        <a href="#" class="share-whatsapp" id="shareWhatsApp"><i class="fab fa-whatsapp"></i>
+                            WhatsApp</a>
                         <a href="#" class="share-email" id="shareEmail"><i class="fas fa-envelope"></i> Email</a>
                         <a href="#" class="share-other" id="shareOther"><i class="fas fa-share"></i> Other</a>
                     </div>
@@ -471,12 +585,13 @@
             </div>
             <form class="blacklist-form" id="blacklistForm">
                 <label for="blacklistReason">Reason for Blacklisting</label>
-                <textarea id="blacklistReason" name="blacklistReason" placeholder="Enter reason for blacklisting" required></textarea>
+                <textarea id="blacklistReason" name="blacklistReason" placeholder="Enter reason for blacklisting"
+                    required></textarea>
                 <button type="submit" class="submit-blacklist-btn" id="submitBlacklistBtn">Confirm Blacklist</button>
             </form>
         </div>
     </div>
-<div id="uploadCsvModal" class="modal-overlay" style="display:none;">
+    <div id="uploadCsvModal" class="modal-overlay" style="display:none;">
         <div class="modal-content">
             <div class="modal-header">
                 <span>Upload Members CSV</span>
@@ -510,7 +625,8 @@
         </div>
     </div>
     <script src="/js/all.js"></script>
-    
-     {{> profile}}
+
+    {{> profile}}
 </body>
+
 </html>

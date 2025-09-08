@@ -18,6 +18,7 @@ router.put('/update/:groupId',authMiddleware,upload.fields([
   { name: 'qrCode', maxCount: 1 },
 
 ]), groupController.updateGroup);
+router.delete('/group/:id', authMiddleware, groupController.deleteGroup);
 
 router.post('/add-member', authMiddleware, groupController.addGroupMember);
 router.get('/members', authMiddleware, groupController.getGroupMembers);

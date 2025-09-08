@@ -98,7 +98,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     credentials: 'include'
                 });
                 const result = await response.json();
-
+                console.log(result);
                 if (response.ok) {
                     // Update preview section with response data
                     groupNamePreview.textContent = result.group.name;
@@ -428,3 +428,33 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log("[INIT] Questions initialized:", questions);
 });
 
+document.querySelector('.dlt-community')?.addEventListener('click', async () => {
+  const groupId = document.getElementById('groupId').value;
+
+  if(!groupId){
+    toastr.info("No community to delete");
+    return;
+  }
+
+  if (!confirm("Are you sure you want to delete this community? This cannot be undone.")) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`/group/${groupId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    const result = await response.json();
+    if (result.success) {
+      toastr.info("Community deleted successfully!");
+      window.location.href = "/dashboard"; // redirect after deletion
+    } else {
+      toastr.error(result.message || "Failed to delete community.");
+    }
+  } catch (error) {
+    console.error("Error deleting community:", error);
+    toastr.error("An error occurred while deleting the community.");
+  }
+});

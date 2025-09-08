@@ -202,7 +202,17 @@ const closeInvitationModal = document.getElementById('closeInvitationModal');
   const blacklistReason = document.getElementById('blacklistReason');
   const submitBlacklistBtn = document.getElementById('submitBlacklistBtn');
   const closeBlacklistModal = document.getElementById('closeBlacklistModal');
-  const invitationModal = document.getElementById('invitationModal');
+    const invitationModal = document.getElementById('invitationModal');
+
+    const invitationNameNew = document.getElementById('invitationNameNew');
+    const invitationGroupName = document.getElementById('invitationGroupName');
+    const invitationGroupNameNew = document.getElementById('invitationGroupNameNew');
+    const existingUserMessage = document.getElementById('existingUserMessage');
+    const newUserRecipient = document.getElementById('newUserRecipient');
+    const newUserGroup = document.getElementById('newUserGroup');
+    const invitationLinkLabel = document.getElementById('invitationLinkLabel');
+    const invitationPasswordLabel = document.getElementById('invitationPasswordLabel');
+    const modalTitle = document.getElementById('modalTitle');
   const blacklistModal = document.getElementById('blacklistModal');
   let currentBlacklistData = {};
 // Search Functionality
@@ -1611,12 +1621,44 @@ if (addMemberForm) {
           addMemberModal.style.display = 'none';
           addMemberForm.reset();
           await populateMembers();
-          invitationName.textContent = `${result.member.name} ${result.member.l_name || ''}`.trim();
-          invitationEmail.textContent = email;
-          invitationLinkDisplay.textContent = result.invitationLink;
-          invitationPassword.textContent = result.tempPassword || 'N/A (Existing user)';
-          invitationGroupName.textContent = result.member.groupName;
-          invitationModal.style.display = 'flex';
+          // invitationName.textContent = `${result.member.name} ${result.member.l_name || ''}`.trim();
+          // invitationEmail.textContent = email;
+          // invitationLinkDisplay.textContent = result.invitationLink;
+          // invitationPassword.textContent = result.tempPassword || 'N/A (Existing user)';
+          // invitationGroupName.textContent = result.member.groupName;
+          // invitationModal.style.display = 'flex';
+
+                   const isExistingUser = result.isExistingUser;
+                    if (isExistingUser) {
+                        modalTitle.textContent = 'Member Added';
+                        invitationName.textContent = `${result.member.name} ${result.member.l_name || ''}`.trim();
+                        invitationGroupName.textContent = result.member.groupName || 'MySarafa';
+                        existingUserMessage.style.display = 'block';
+                        newUserRecipient.style.display = 'none';
+                        newUserGroup.style.display = 'none';
+                        invitationLinkLabel.style.display = 'none';
+                        invitationLinkDisplay.style.display = 'none';
+                        invitationPasswordLabel.style.display = 'none';
+                        invitationPassword.style.display = 'none';
+                        copyLinkBtn.style.display = 'none';
+                    } else {
+                        modalTitle.textContent = 'Invitation Link Generated';
+                        invitationNameNew.textContent = `${result.member.name} ${result.member.l_name || ''}`.trim();
+                        invitationEmail.textContent = email;
+                        invitationLinkDisplay.textContent = result.invitationLink || 'N/A';
+                        invitationPassword.textContent = result.tempPassword || 'N/A';
+                        invitationGroupNameNew.textContent = result.member.groupName || 'MySarafa';
+                        existingUserMessage.style.display = 'none';
+                        newUserRecipient.style.display = 'block';
+                        newUserGroup.style.display = 'block';
+                        invitationLinkLabel.style.display = 'block';
+                        invitationLinkDisplay.style.display = 'block';
+                        invitationPasswordLabel.style.display = 'block';
+                        invitationPassword.style.display = 'block';
+                        copyLinkBtn.style.display = 'inline-block';
+                    }
+
+                    invitationModal.style.display = 'flex';
       
       } else {
         formErrorMember.textContent = result.message || 'Failed to add member';
@@ -1652,21 +1694,30 @@ if (addNewBtn && addMemberModal && closeAddMemberModal) {
 }
 
 if (invitationModal && closeInvitationModal && closeInvitationModalBtn) {
-    closeInvitationModal.addEventListener('click', () => {
-      invitationModal.style.display = 'none';
-      sharePlatforms.classList.remove('open');
-    });
-    closeInvitationModalBtn.addEventListener('click', () => {
-      invitationModal.style.display = 'none';
-      sharePlatforms.classList.remove('open');
-    });
-    invitationModal.addEventListener('click', (e) => {
-      if (e.target === invitationModal) {
-        invitationModal.style.display = 'none';
-        sharePlatforms.classList.remove('open');
-      }
-    });
-  }
+        closeInvitationModal.addEventListener('click', () => {
+            invitationModal.classList.remove('open');
+            setTimeout(() => {
+                invitationModal.style.display = 'none';
+                sharePlatforms.classList.remove('open');
+            }, 300);
+        });
+        closeInvitationModalBtn.addEventListener('click', () => {
+            invitationModal.classList.remove('open');
+            setTimeout(() => {
+                invitationModal.style.display = 'none';
+                sharePlatforms.classList.remove('open');
+            }, 300);
+        });
+        invitationModal.addEventListener('click', (e) => {
+            if (e.target === invitationModal) {
+                invitationModal.classList.remove('open');
+                setTimeout(() => {
+                    invitationModal.style.display = 'none';
+                    sharePlatforms.classList.remove('open');
+                }, 300);
+            }
+        });
+    }
 
   if (copyLinkBtn) {
     copyLinkBtn.addEventListener('click', () => {
@@ -1679,48 +1730,90 @@ if (invitationModal && closeInvitationModal && closeInvitationModalBtn) {
   }
 
   if (shareBtn && sharePlatforms) {
-    shareBtn.addEventListener('click', () => {
-      sharePlatforms.classList.toggle('open');
-    });
+    // shareBtn.addEventListener('click', () => {
+    //   sharePlatforms.classList.toggle('open');
+    // });
+    shareBtn.addEventListener('click', async () => {
+            const isExistingUser = existingUserMessage.style.display === 'block';
+            const shareData = {
+                title: isExistingUser ? 'Member Added to MySarafa' : 'MySarafa Community Invitation',
+                text: getShareMessage(isExistingUser),
+                url: isExistingUser ? '' : invitationLinkDisplay.textContent
+            };
+
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                    showNotification('Shared successfully!', 'success');
+                } catch (err) {
+                    showNotification('Share cancelled or failed: ' + err.message, 'error');
+                }
+            } else {
+                const message = getShareMessage(isExistingUser);
+                const textarea = document.createElement('textarea');
+                textarea.value = message;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    showNotification('Details copied to clipboard!', 'success');
+                } catch (err) {
+                    showNotification('Failed to copy details: ' + err.message, 'error');
+                }
+                document.body.removeChild(textarea);
+            }
+        });
   }
 
   if (shareWhatsApp && shareEmail && shareOther) {
-    shareWhatsApp.addEventListener('click', (e) => {
-      e.preventDefault();
-      const link = encodeURIComponent(invitationLinkDisplay.textContent);
-      const password = encodeURIComponent(invitationPassword.textContent);
-      const groupName = document.querySelector('#invitationGroupName')?.textContent || 'MySarafa';
-      const message = encodeURIComponent(`You have been added to MySarafa group ${groupName}. Use this link to sign up: ${link}\nCredentials:\nEmail: ${invitationEmail.textContent}\nPassword: ${password}`);
-      window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
-    });
-
-    shareEmail.addEventListener('click', (e) => {
-      e.preventDefault();
-      const name = invitationName.textContent;
-      const email = invitationEmail.textContent;
-      const password = invitationPassword.textContent;
-      const groupName = document.querySelector('#invitationGroupName')?.textContent || 'MySarafa';
-      const link = invitationLinkDisplay.textContent;
-      const subject = encodeURIComponent('You\'re invited to join MySarafa Community!');
-      const body = encodeURIComponent(`Dear ${name},\n\nYou have been added to the MySarafa group ${groupName}.\n\nPlease click the following link to complete your registration:\n${link}\n\nCredentials:\nEmail: ${email}\nPassword: ${password}\n\nThis invitation link is valid for 7 days.\n\nBest regards,\nMySarafa Community Team`);
-      window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
-    });
-
-    shareOther.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (navigator.share) {
-        const groupName = document.querySelector('#invitationGroupName')?.textContent || 'MySarafa';
-        navigator.share({
-          title: 'MySarafa Community Invitation',
-          text: `You have been added to MySarafa group ${groupName}. Use this link to sign up: ${invitationLinkDisplay.textContent}\nCredentials:\nEmail: ${invitationEmail.textContent}\nPassword: ${invitationPassword.textContent}`,
-          url: invitationLinkDisplay.textContent
-        }).catch(err => {
-          showNotification('Failed to share: ' + err.message, 'error');
+  shareWhatsApp.addEventListener('click', (e) => {
+            e.preventDefault();
+            const isExistingUser = existingUserMessage.style.display === 'block';
+            const message = encodeURIComponent(getShareMessage(isExistingUser));
+            window.open(`https://api.whatsapp.com/send?text=${message}`, '_blank');
         });
-      } else {
-        showNotification('Web Share API not supported in this browser', 'error');
-      }
-    });
+
+        shareEmail.addEventListener('click', (e) => {
+            e.preventDefault();
+            const isExistingUser = existingUserMessage.style.display === 'block';
+            const email = invitationEmail.textContent;
+            const subject = encodeURIComponent(isExistingUser ? 'Added to MySarafa Group' : 'You\'re invited to join MySarafa Community!');
+            const body = encodeURIComponent(getShareMessage(isExistingUser));
+            window.open(`mailto:${email}?subject=${subject}&body=${body}`, '_blank');
+        });
+
+        shareOther.addEventListener('click', (e) => {
+            e.preventDefault();
+            const isExistingUser = existingUserMessage.style.display === 'block';
+            const message = getShareMessage(isExistingUser);
+            if (navigator.share) {
+                navigator.share({
+                    title: isExistingUser ? 'Member Added to MySarafa' : 'MySarafa Community Invitation',
+                    text: message,
+                    url: isExistingUser ? '' : invitationLinkDisplay.textContent
+                }).then(() => {
+                    showNotification('Shared successfully!', 'success');
+                }).catch(err => {
+                    showNotification('Failed to share: ' + err.message, 'error');
+                });
+            } else {
+                const textarea = document.createElement('textarea');
+                textarea.value = message;
+                textarea.style.position = 'fixed';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.select();
+                try {
+                    document.execCommand('copy');
+                    showNotification('Details copied to clipboard!', 'success');
+                } catch (err) {
+                    showNotification('Failed to copy details: ' + err.message, 'error');
+                }
+                document.body.removeChild(textarea);
+            }
+        });
   }
 
   if (sampleCsvBtn) {
@@ -1939,12 +2032,14 @@ if (membersTableBody) {
             credentials: 'include'
           });
           const result = await response.json();
+          console.log("memebers coming result",result)
           if (response.ok && result.members.length) {
             const member = result.members[0];
             invitationName.textContent = name;
             invitationEmail.textContent = email;
             invitationLinkDisplay.textContent = `${window.location.origin}/signup?invite=${member.invitationToken}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`;
-            invitationPassword.textContent = 'N/A (Request admin for password)';
+            invitationPassword.textContent = result.tempPassword || 'N/A (Existing user)';
+
             const groupResponse = await fetch(`/Groups/groups/${groupId}`, {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
@@ -1992,4 +2087,36 @@ if (membersTableBody) {
     populateMembers();
   }
 
+  function getShareMessage(isExistingUser) {
+        const name = (isExistingUser ? invitationName : invitationNameNew).textContent || 'User';
+        const groupName = (isExistingUser ? invitationGroupName : invitationGroupNameNew).textContent || 'MySarafa';
+        if (isExistingUser) {
+            return `${name} has been successfully added to the MySarafa group ${groupName}.`;
+        }
+        const email = invitationEmail.textContent || 'N/A';
+        const password = invitationPassword.textContent || 'N/A';
+        const link = invitationLinkDisplay.textContent || 'N/A';
+        return `Dear ${name},\n\nYou have been added to the MySarafa group ${groupName}.\n\nPlease click the following link to complete your registration:\n${link}\n\nCredentials:\nEmail: ${email}\nPassword: ${password}\n\nThis invitation link is valid for 7 days.\n\nBest regards,\nMySarafa Community Team`;
+    }
+
+document.getElementById("shareBtn").addEventListener("click", async () => {
+  const shareData = {
+    title: "Check this out!",
+    text: "I found something useful for you.",
+    url: window.location.href
+  };
+
+  if (navigator.share) {
+    // Mobile or supported browser
+    try {
+      await navigator.share(shareData);
+      console.log("Shared successfully!");
+    } catch (err) {
+      console.log("Share cancelled or failed:", err);
+    }
+  } else {
+    // Laptop/Desktop fallback → redirect to your sharing page
+    window.open("/share-page", "_blank");
+  }
+});
 });

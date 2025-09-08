@@ -14,7 +14,8 @@ const groupSchema = new mongoose.Schema({
     g_name: {
         type: String,
         required: true,
-        trim: true
+        trim: true,
+        unique: true
     },
     g_cover: {
         type: String,

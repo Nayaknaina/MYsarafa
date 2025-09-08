@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
-
+    <link rel="canonical" href="https://app.mysarafa.com/">
 </head>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
@@ -97,7 +97,8 @@
                     <div class="modal-body">
                         <p style="font-size: 15px; color: #333; margin-bottom: 18px;">
                             Pay your pending payment.<br>
-                            Your <strong>{{pendingGroup.g_name}}</strong> payment is due.
+                            Your <strong>{{pendingGroup.g_name}}</strong> payment of 
+                            <strong>₹{{pendingGroup.amount}}</strong> is due.
                         </p>
                         <div style="display: flex; gap: 10px;">
                             <button id="payNowBtn" data-group-id="{{pendingGroup._id}}" style="flex: 1; background: #2f95ff; color: #fff; border: none; border-radius: 8px; padding: 10px 0; font-size: 15px; font-weight: 500; cursor: pointer;" class="pay-now-btn">Pay Now</button>
@@ -234,7 +235,11 @@
                                 <h3 class="group-title">{{this.g_name}}</h3>
                                 <p class="group-description">Manage your {{this.g_type}} community with
                                     {{this.total_mem}} members.</p>
-                                <button class="manage-group-btn" data-group-id="{{this._id}}">Manage Community</button>
+                                {{!-- <button class="manage-group-btn" data-group-id="{{this._id}}">Manage Community</button> --}}
+                                {{#if (eq this.membershipType "admin")}}
+                                      <button class="manage-group-btn" data-group-id="{{this._id}}">Manage Community</button>
+                                {{/if}}
+
                             </div>
                         </div>
                         {{else}}

@@ -176,7 +176,7 @@
                         <label for="upiId">UPI ID</label>
                         <input type="text" id="upiId" name="upiId" class="upload-input" placeholder="Enter UPI ID" required><br><br>
                         <label for="amount">Amount</label>
-                        <input type="number" id="amount" name="amount" class="upload-input" placeholder="Enter amount" required><br><br>
+                        <input type="text" id="amount" name="amount" class="upload-input"  placeholder="Enter amount" required><br><br>
                         <label for="method">Payment Method</label>
                         <select id="method" name="method" class="upload-input" required>
                             <option value="">Select Method</option>
@@ -290,7 +290,7 @@
                     const result = await response.json();
                     if (response.ok && result.success) {
                         showNotification('Screenshot uploaded successfully', 'success');
-                        setTimeout(() => window.location.href = '/user-app/dashborad', 2000);
+                        setTimeout(() => window.location.href = '/user-app/dashboard', 2000);
                     } else {
                         showNotification(result.message || 'Failed to upload screenshot', 'error');
                         submitButton.prop('disabled', false).text('Submit');
@@ -330,21 +330,13 @@
                     const result = await response.json();
                     console.log(result)
                     if (response.ok && result.success) {
-                        if (/\.(jpg|jpeg|png)$/i.test(result.group.qr_code)) {
-                            coverImagePreview.src = result.group.qr_code;
-                        } else {
-                            coverImagePreview.style.display = 'none';
-                            const downloadLink = document.createElement('a');
-                            downloadLink.href = result.group.qr_code;
-                            downloadLink.download = 'qrCode';
-                            downloadLink.textContent = 'Download QR Code File';
-                            coverImagePreview.parentElement.appendChild(downloadLink);
-                        }
-                        groupNamePreview.textContent = result.group.upiId;
-                        groupDescriptionPreview.textContent = result.group.amount_description;
+                      
+                 
+                           document.getElementById('amount').value = `₹ ${result.group.amount}`;
                     } else {
                         showNotification(result.message || 'Failed to load group details', 'error');
                     }
+                    
                 } catch (error) {
                     showNotification('Error loading group details: ' + error.message, 'error');
                 }

@@ -21,8 +21,9 @@ passport.use(new GoogleStrategy({
                 // Create new user
                 user = new User({
                     googleId: profile.id,
-                   f_name: profile.name?.givenName || profile.displayName?.split(' ')[0] || 'Google',
-                    l_name: profile.name?.familyName || profile.displayName?.split(' ')[1] || 'User',
+                    f_name: profile.name?.givenName || profile.displayName?.split(' ')[0] || '',
+                   l_name: profile.name?.familyName || (profile.displayName?.split(' ')[1] || ''),
+
                     email: profile.emails[0].value,
                  kyc_status: 'pending',
                     user_status: 'unverified'

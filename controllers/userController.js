@@ -79,15 +79,26 @@ exports.dashboard = async (req, res, next) => {
     const memberships = await Gmem.find({ user: user._id })
       .populate('group')
       .lean();
-    const myGroups = memberships.map(m => m.group).filter(g => g); // Groups user is part of
+    // const myGroups = memberships.map(m => m.group).filter(g => g); // Groups user is part of
+    // if (!myGroups.length) {
+    //   console.log('No groups found for user');
+    // }
+        const myGroups = memberships
+      .filter(m => m.group) 
+      .map(m => ({
+        ...m.group,
+        membershipType: m.type  
+      }));
+
     if (!myGroups.length) {
       console.log('No groups found for user');
     }
+    console.log("🚀 myGroups with membershipType:", myGroups);
 
     // Find public groups not owned by the user
     const discoverGroups = await Group.find({
       user: { $ne: user._id },
-      g_type: 'public'
+      // g_type: 'public'|| 'private'
     }).limit(4).lean();
 
     // Find groups with pending amount where user is a member (not admin)

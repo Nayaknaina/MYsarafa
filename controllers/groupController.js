@@ -38,27 +38,27 @@ exports.communityCreation = async (req, res, next) => {
             //     return res.status(404).json({ success: false, message: 'Group not found or you do not have permission to edit it' });
             // }
             group = await Group.findOne({ _id: groupId, user: req.user.id }).lean();
-      if (!group) {
-        return res.status(404).json({ success: false, message: 'Group not found or you do not have permission to edit it' });
-      }
-      questions = await GroupQue.find({ group: groupId }).lean().select('question que_type options');
-      questions = questions.map(q => ({
-        questionText: q.question,
-        questionType: q.que_type === 'multi-select' ? 'checkbox' : q.que_type === 'radio' ? 'radio' : 'text',
-        options: q.options
-      }));
-      console.log("[communityCreation] Loaded questions:", questions);
-        }
+            if (!group) {
+                return res.status(404).json({ success: false, message: 'Group not found or you do not have permission to edit it' });
+            }
+            questions = await GroupQue.find({ group: groupId }).lean().select('question que_type options');
+            questions = questions.map(q => ({
+                questionText: q.question,
+                questionType: q.que_type === 'multi-select' ? 'checkbox' : q.que_type === 'radio' ? 'radio' : 'text',
+                options: q.options
+            }));
+             console.log("[communityCreation] Loaded questions:", questions);
+            }
 
-        res.render("Community-creation", {
-            user,
-            group,
-            questions: questions || [],
-            layout: false
-        });
-    } catch (error) {
-        next(error);
-    }
+                res.render("Community-creation", {
+                    user,
+                    group,
+                    questions: questions || [],
+                    layout: false
+                });
+            } catch (error) {
+                next(error);
+            }
 };
 exports.groupMemberPage = async (req, res) => {
     try {
@@ -94,6 +94,14 @@ exports.createGroup = async (req, res) => {
 
         if (!['private', 'public'].includes(communityType.toLowerCase())) {
             return res.status(400).json({ success: false, message: 'Invalid community type' });
+        }
+
+         const existingGroup = await Group.findOne({ g_name: communityName.trim() });
+        if (existingGroup) {
+        return res.status(400).json({
+            success: false,
+            message: 'A group with this name already exists. Please choose another name.'
+        });
         }
 
         let coverPhoto = '/assets/images/demo.jpg';
@@ -291,6 +299,40 @@ exports.updateGroup = async (req, res) => {
     }
 };
 
+exports.deleteGroup = async (req, res) => {
+  try {
+    const groupId = req.params.id;
+
+    // Find group
+    const group = await Group.findById(groupId);
+    if (!group) {
+      return res.status(404).json({ success: false, message: 'Group not found' });
+    }
+
+    // Ensure only the admin/creator can delete
+    if (group.user.toString() !== req.user.id) {
+      return res.status(403).json({ success: false, message: 'Unauthorized to delete this group' });
+    }
+
+    // Delete related records (optional, based on your schema)
+    await Promise.all([
+      GMem.deleteMany({ group: groupId }),       // remove all members
+      GroupQue.deleteMany({ group: groupId }),   // remove all questions
+      // Payment.deleteMany({ group: groupId })   // if payments exist
+    ]);
+
+    // Delete the group itself
+    await Group.findByIdAndDelete(groupId);
+
+    res.json({ success: true, message: 'Group deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting group:', error);
+    res.status(500).json({ success: false, message: 'Server error: ' + error.message });
+  }
+};
+
+
+
 exports.getGroups = async (req, res) => {
     try {
 
@@ -353,14 +395,17 @@ exports.addGroupMember = async (req, res) => {
         let member = await User.findOne({ email: memberEmail });
         let tempPassword = Math.random().toString(36).slice(-8);
         let invitationToken = null;
+        const isExistingUser = !!member;
 
+      
         if (member) {
             // Update existing user details if provided
             member.f_name = name;
             member.l_name = l_name || member.l_name;
-            if (mobileNumber) member.mobile_no = mobileNumber;
+          
             await member.save();
             invitationToken = member.invitationToken;
+            tempPassword = null;
         } else {
 
 
@@ -380,11 +425,11 @@ exports.addGroupMember = async (req, res) => {
             // TODO: Send email with tempPassword and sign-up link
         }
 
-        const existingMember = await GMem.findOne({ group: groupId, user: member._id });
+       
+   const existingMember = await GMem.findOne({ group: groupId, user: member._id });
         if (existingMember) {
             return res.status(400).json({ success: false, message: 'User is already a member of this group' });
         }
-
         const groupMember = new GMem({
             group: groupId,
             user: member._id,
@@ -410,7 +455,8 @@ exports.addGroupMember = async (req, res) => {
                 groupName: group.g_name
             },
             invitationLink,
-            tempPassword
+          tempPassword: isExistingUser ? null : tempPassword,
+          isExistingUser
         });
     } catch (error) {
         console.error('Error adding group member:', error);
