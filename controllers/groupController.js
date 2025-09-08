@@ -219,6 +219,14 @@ exports.updateGroup = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid community type' });
         }
 
+          const existingGroup = await Group.findOne({ g_name: communityName.trim() });
+        if (existingGroup) {
+        return res.status(400).json({
+            success: false,
+            message: 'A group with this name already exists. Please choose another name.'
+        });
+        }
+
         // Handle cover photo upload
         // let coverPhoto = group.g_cover;
         // if (req.files && req.files.coverImage) {

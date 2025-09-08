@@ -441,7 +441,7 @@ document.querySelector('.dlt-community')?.addEventListener('click', async () => 
   }
 
   try {
-    const response = await fetch(`/group/${groupId}`, {
+    const response = await fetch(`/Groups/group/${groupId}`, {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' }
     });
@@ -449,7 +449,7 @@ document.querySelector('.dlt-community')?.addEventListener('click', async () => 
     const result = await response.json();
     if (result.success) {
       toastr.info("Community deleted successfully!");
-      window.location.href = "/dashboard"; // redirect after deletion
+      window.location.href = "/user-app/dashboard"; // redirect after deletion
     } else {
       toastr.error(result.message || "Failed to delete community.");
     }
