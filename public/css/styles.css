@@ -22,7 +22,7 @@ body {
   position: sticky;
   top: 0;
   height: 100vh;
-  overflow-y: auto;
+
   background: #fff;
   z-index: 100;
   box-shadow: 0 2px 8px rgba(60,60,60,0.07);
