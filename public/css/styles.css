@@ -713,7 +713,6 @@ body {
     z-index: 1100;
     padding-top: 60px;
     display: block;
-    overflow-y: auto;
     flex-direction: column;
   }
 
