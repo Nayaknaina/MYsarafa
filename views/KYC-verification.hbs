@@ -160,6 +160,66 @@
     font-size: 0.95em;
     margin-top: 2px;
   }
+  /* Style for OTP input boxes */
+.otp-fields {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.otp-box {
+  width: 40px;
+  height: 40px;
+  font-size: 1.5rem;
+  text-align: center;
+  border: 2px solid #551DFF;
+  border-radius: 8px;
+  background: #fffbe6;
+  color: #D324A8;
+  box-shadow: 0 1px 6px #D324A822;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.otp-box:focus {
+  border: 2px solid #D324A8;
+  box-shadow: 0 2px 12px #551DFF33;
+  outline: none;
+}
+
+.verify-btn {
+  background: linear-gradient(90deg, #551DFF 0%, #D324A8 100%);
+  color: #fff;
+  font-weight: 550px;
+  border: none;
+  border-radius: 8px;
+  padding: 0px 10px;
+  margin-left: 0px;
+  font-size: 15px;
+  height: 40px;
+  box-shadow: 0 2px 8px #551DFF22;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  max-width: 84px;
+}
+.custom-input{
+  width: 70%;
+}
+.get-otp-btn {
+ background: linear-gradient(90deg, #47ff53 0%, #2f95ff 100%);
+  color: #fff;
+  font-weight: 550;
+  border: none;
+  border-radius: 8px;
+  padding: 0 5px;
+  margin-left: 0px;
+  font-size: 1rem;
+  height: 32px;
+  box-shadow: 0 2px 8px #47ff5322;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  max-width: 95px;
+}
+
 </style>
 
 <body>
@@ -262,10 +322,21 @@
             <div class="kyc-fields-grid">
               <div class="form-group">
                 <label for="adhar_no">Aadhaar Number *</label>
-                <input type="text" id="adhar_no" name="adhar_no" class="kyc-input"
+                <input type="text" maxlength="12" id="adhar_no" name="adhar_no" class="kyc-input custom-input"
                   placeholder="Enter 12-digit Aadhaar number" pattern="\d{12}" required>
+                  <button class="get-otp-btn">Get OTP</button>
                 <small id="aadhaarVerificationMessage" style="color: #551DFF;"></small>
+                 <div class="otp-fields">
+            <input type="text" maxlength="1" class="otp-box"/>
+            <input type="text" maxlength="1" class="otp-box"/>
+            <input type="text" maxlength="1" class="otp-box"/>
+            <input type="text" maxlength="1" class="otp-box"/>
+
+            <button class="verify-btn"><span>Verify</span></button>
+          </div>
+          
               </div>
+              
               <div class="form-group">
                 <label for="aadhaarCard">Aadhaar Card *</label>
                 <input type="file" id="aadhaarCard" name="aadhaarCard" class="kyc-input"

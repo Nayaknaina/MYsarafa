@@ -321,7 +321,9 @@
         gap: 0.5rem;
         flex-wrap: wrap;
     }
-
+.mobile-actions {
+  display: none;
+}
     .invitation-actions button,
     .share-platforms a {
         padding: 0.75rem 1rem;
@@ -438,7 +440,69 @@
         .download-csv-form {
             max-width: 100%;
         }
+        .table-container{
+            overflow-x: scroll;
+
+        }
+        .filter-section{
+        flex-direction: column; 
+    align-items: stretch;   
+    display: none !important;
+  }
+
+   .mobile-actions {
+    display: block;
+    position: relative;
+    text-align: right; /* toggle button on right */
+    margin-bottom: 1rem;
+  }
+ .toggle-btn {
+    background: #4a6cf7;
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+  .action-menu {
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    position: absolute;
+    right: 0;
+    top: 110%;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 0.75rem;
+    width: 200px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 999;
+  }
+    .action-menu button {
+    width: 100%;
+    padding: 0.6rem;
+    border: none;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #6a11cb, #2575fc);
+    color: white;
+    cursor: pointer;
+    text-align: center;
+    font-size: 14px;
+  }
+   .action-menu.show {
+    display: flex;
+  }
     }
+    .filter-section{
+          display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;  
+  margin-bottom: 1rem;
+    }
+  
 </style>
 
 <body>
@@ -484,6 +548,20 @@
                     <input type="text" id="searchGroup" placeholder="Enter group name">
                 </div>
             </div>
+<!-- Mobile toggle -->
+<div class="mobile-actions">
+  <!-- Toggle button -->
+  <button class="toggle-btn">☰ Actions</button>
+
+  <!-- Hidden menu -->
+  <div class="action-menu">
+    <button>Filter</button>
+    <button>Add Member</button>
+    <button>Upload CSV</button>
+    <button>Download Sample</button>
+    <button>Download CSV</button>
+  </div>
+</div>
 
 
 

@@ -700,7 +700,26 @@ body {
     flex-direction: column;
     margin-top: auto;
   }
-
+.group-discovery-container{
+  flex-direction: column;
+    overflow: hidden;
+     height: 100vh; 
+}
+.discover-community,
+  .my-communities {
+    flex: 1; 
+    overflow-y: auto; 
+    -webkit-overflow-scrolling: touch;
+    padding: 0.5rem;
+  }
+.discover-groups{
+  order: 1;
+  overflow-y: auto;
+  height: 500px;
+}
+.my-groups{
+  order: 2;
+}
   .sidebar {
     position: fixed;
     top: 0;

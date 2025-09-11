@@ -2120,3 +2120,8 @@ document.getElementById("shareBtn").addEventListener("click", async () => {
   }
 });
 });
+
+
+document.querySelector('.toggle-btn').addEventListener('click', function() {
+  document.querySelector('.action-menu').classList.toggle('show');
+});
