@@ -25,7 +25,8 @@
     "node-exiftool": "^2.3.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "pdf-parse": "^1.1.1"
+    "pdf-parse": "^1.1.1",
+    "socketio": "^1.0.0"
   },
   "scripts": {
     "start": "node index.js",

@@ -13,7 +13,7 @@ const gMemSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['admin', 'user'],
+        enum: ['admin', 'user','pending'],
         required: true,
         default: 'user'
     }

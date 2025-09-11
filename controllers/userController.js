@@ -58,48 +58,60 @@ const Gmem = require('../models/groupMem.model');
 //     }
 // };
 
-
-
 exports.dashboard = async (req, res, next) => {
   try {
     console.log("/user/dashboard");
-
-    // Validate user authentication
     if (!req.user || !req.user.id) {
       return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
     }
-
-    // Find user
     const user = await User.findById(req.user.id).lean();
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    // Find groups where user is a member (admin or user)
     const memberships = await Gmem.find({ user: user._id })
-      .populate('group')
-      .lean();
-    // const myGroups = memberships.map(m => m.group).filter(g => g); // Groups user is part of
-    // if (!myGroups.length) {
-    //   console.log('No groups found for user');
-    // }
-        const myGroups = memberships
-      .filter(m => m.group) 
-      .map(m => ({
-        ...m.group,
-        membershipType: m.type  
-      }));
+      .populate('group').lean();
+      console.log(memberships,"all groups above under this ",user._id);
+    
+      //   const myGroups = memberships
+      // .filter(m => m.group) 
+      // .map(m => ({
+      //   ...m.group,
+      //   membershipType: m.type  
+      // })).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-    if (!myGroups.length) {
-      console.log('No groups found for user');
+      const myGroups = memberships
+  .filter(m => m.group) 
+  .map(m => ({
+    ...m.group,
+    membershipType: m.type,
+    joinedAt: m.createdAt   
+  }))
+  .sort((a, b) => {
+    // If both groups were created by the user → sort by group createdAt
+    if (a.user.toString() === user._id.toString() && b.user.toString() === user._id.toString()) {
+      return new Date(b.createdAt) - new Date(a.createdAt);
     }
-    console.log("🚀 myGroups with membershipType:", myGroups);
+    // Otherwise → sort by join date (recently joined first)
+    return new Date(b.joinedAt) - new Date(a.joinedAt);
+  });
+
+      if (!myGroups.length) {
+          console.log('No groups found for user');
+      }
+       // console.log("🚀 myGroups with membershipType:", myGroups);
 
     // Find public groups not owned by the user
-    const discoverGroups = await Group.find({
+    let discoverGroups = await Group.find({
       user: { $ne: user._id },
       // g_type: 'public'|| 'private'
-    }).limit(4).lean();
+    })
+     .sort({ createdAt: -1 }).limit(4).lean();
+     const joinedGroupIds = myGroups.map(g => g._id.toString());
+      discoverGroups = discoverGroups.map(g => ({
+        ...g,
+        isJoined: joinedGroupIds.includes(g._id.toString())
+      }));
 
     // Find groups with pending amount where user is a member (not admin)
     const recentThreshold = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // 7 days ago

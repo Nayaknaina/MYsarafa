@@ -1,5 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const http = require('http');
+const socketIo = require('socket.io');
+const app = express();
+const server = http.createServer(app);
+const io = socketIo(server);
+
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const path = require('path');
@@ -20,7 +26,7 @@ const errorHandler = require('./middleware/errorHandler');
 require('dotenv').config();
 require('./config/passport');
 
-const app = express();
+
 
 app.engine('hbs', engine({
     extname: '.hbs',
@@ -70,11 +76,33 @@ app.get('/signup', (req, res) => {
 
 app.use(errorHandler);
 
+app.set('socketio', io);
+io.on('connection', (socket) => {
+    console.log(`New connection: socket.id=${socket.id}`);
+
+    // Handle joinRoom event
+    socket.on('joinRoom', (userId) => {
+        if (!userId) {
+            console.error(`JoinRoom failed: No userId provided for socket.id=${socket.id}`);
+            return;
+        }
+        socket.join(userId);
+        console.log(`User ${userId} joined room with socket.id=${socket.id}`);
+    });
+
+    socket.on('disconnect', () => {
+        console.log(`User disconnected: socket.id=${socket.id}`);
+    });
+});
+
+// Export io for use in controllers
+module.exports = { app, server };
+
 const PORT = process.env.PORT || 5001;
 
 mongoose.connection.once('open', () => {
     console.log('MongoDB connected');
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 });
 
 mongoose.connection.on('error', (err) => {

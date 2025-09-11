@@ -20,6 +20,10 @@ router.put('/update/:groupId',authMiddleware,upload.fields([
 ]), groupController.updateGroup);
 router.delete('/group/:id', authMiddleware, groupController.deleteGroup);
 
+router.post('/join', authMiddleware, groupController.joinGroup);
+router.get('/pending-requests', authMiddleware, groupController.pendingRequests);
+router.post('/approve-request/:requestId', authMiddleware, groupController.approveRequest);
+
 router.post('/add-member', authMiddleware, groupController.addGroupMember);
 router.get('/members', authMiddleware, groupController.getGroupMembers);
 router.get('/search-members', authMiddleware, groupController.searchGroupMembers);

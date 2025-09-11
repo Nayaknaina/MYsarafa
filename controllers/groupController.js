@@ -47,18 +47,18 @@ exports.communityCreation = async (req, res, next) => {
                 questionType: q.que_type === 'multi-select' ? 'checkbox' : q.que_type === 'radio' ? 'radio' : 'text',
                 options: q.options
             }));
-             console.log("[communityCreation] Loaded questions:", questions);
-            }
+            console.log("[communityCreation] Loaded questions:", questions);
+        }
 
-                res.render("Community-creation", {
-                    user,
-                    group,
-                    questions: questions || [],
-                    layout: false
-                });
-            } catch (error) {
-                next(error);
-            }
+        res.render("Community-creation", {
+            user,
+            group,
+            questions: questions || [],
+            layout: false
+        });
+    } catch (error) {
+        next(error);
+    }
 };
 exports.groupMemberPage = async (req, res) => {
     try {
@@ -79,15 +79,13 @@ exports.createGroup = async (req, res) => {
 
     try {
         console.log("we are adding groups");
-        console.log("[createGroup] req.body:", req.body);
+       
         const { communityName, communityType, kycRequired, description, amount, amountDescription, questions } = req.body;
-      
-        const user = await User.findById(req.user.id);
 
+        const user = await User.findById(req.user.id);
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
-
         if (!communityName || !communityType) {
             return res.status(400).json({ success: false, message: 'Community name and type are required' });
         }
@@ -96,12 +94,12 @@ exports.createGroup = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid community type' });
         }
 
-         const existingGroup = await Group.findOne({ g_name: communityName.trim() });
+        const existingGroup = await Group.findOne({ g_name: communityName.trim() });
         if (existingGroup) {
-        return res.status(400).json({
-            success: false,
-            message: 'A group with this name already exists. Please choose another name.'
-        });
+            return res.status(400).json({
+                success: false,
+                message: 'A group with this name already exists. Please choose another name.'
+            });
         }
 
         let coverPhoto = '/assets/images/demo.jpg';
@@ -139,39 +137,39 @@ exports.createGroup = async (req, res) => {
         });
         await groupMember.save();
 
-       if (communityType.toLowerCase() === 'private' && questions) {
-      let parsedQuestions;
-      try {
-        parsedQuestions = typeof questions === 'string' ? JSON.parse(questions) : questions;
-        console.log("[createGroup] Parsed questions:", parsedQuestions);
-      } catch (error) {
-        console.error("[createGroup] Error parsing questions:", error);
-        return res.status(400).json({ success: false, message: 'Invalid questions format' });
-      }
-      if (Array.isArray(parsedQuestions)) {
-        for (const q of parsedQuestions) {
-          if (!q.questionText || !q.questionType) {
-            console.warn("[createGroup] Skipping invalid question:", q);
-            continue;
-          }
-          const groupQue = new GroupQue({
-            group: group._id,
-            que_type: q.questionType === 'checkbox' ? 'multi-select' : q.questionType === 'radio' ? 'radio' : 'fill_form',
-            question: q.questionText,
-            options: q.options || []
-          });
-          await groupQue.save();
-          console.log("[createGroup] Saved question:", groupQue);
+        if (communityType.toLowerCase() === 'private' && questions) {
+            let parsedQuestions;
+            try {
+                parsedQuestions = typeof questions === 'string' ? JSON.parse(questions) : questions;
+                console.log("[createGroup] Parsed questions:", parsedQuestions);
+            } catch (error) {
+                console.error("[createGroup] Error parsing questions:", error);
+                return res.status(400).json({ success: false, message: 'Invalid questions format' });
+            }
+            if (Array.isArray(parsedQuestions)) {
+                for (const q of parsedQuestions) {
+                    if (!q.questionText || !q.questionType) {
+                        console.warn("[createGroup] Skipping invalid question:", q);
+                        continue;
+                    }
+                    const groupQue = new GroupQue({
+                        group: group._id,
+                        que_type: q.questionType === 'checkbox' ? 'multi-select' : q.questionType === 'radio' ? 'radio' : 'fill_form',
+                        question: q.questionText,
+                        options: q.options || []
+                    });
+                    await groupQue.save();
+                    console.log("[createGroup] Saved question:", groupQue);
+                }
+            } else {
+                console.warn("[createGroup] No valid questions provided for private group");
+            }
+        } else if (communityType.toLowerCase() === 'private') {
+            console.warn("[createGroup] No questions provided for private group");
         }
-      } else {
-        console.warn("[createGroup] No valid questions provided for private group");
-      }
-    } else if (communityType.toLowerCase() === 'private') {
-      console.warn("[createGroup] No questions provided for private group");
-    }
         res.status(201).json({
             success: true,
-            message: 'Group created successfully',
+            message: 'Group created succesfully',
             group: {
                 id: group._id,
                 name: group.g_name,
@@ -195,7 +193,7 @@ exports.createGroup = async (req, res) => {
 exports.updateGroup = async (req, res) => {
     try {
         const groupId = req.params.groupId;
-        const { communityName, communityType, kycRequired, description, amount, amountDescription,questions } = req.body;
+        const { communityName, communityType, kycRequired, description, amount, amountDescription, questions } = req.body;
         const user = await User.findById(req.user.id);
 
         if (!mongoose.isValidObjectId(groupId)) {
@@ -219,12 +217,12 @@ exports.updateGroup = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid community type' });
         }
 
-          const existingGroup = await Group.findOne({ g_name: communityName.trim() });
+        const existingGroup = await Group.findOne({ g_name: communityName.trim() });
         if (existingGroup) {
-        return res.status(400).json({
-            success: false,
-            message: 'A group with this name already exists. Please choose another name.'
-        });
+            return res.status(400).json({
+                success: false,
+                message: 'A group with this name already exists. Please choose another name.'
+            });
         }
 
         // Handle cover photo upload
@@ -268,23 +266,23 @@ exports.updateGroup = async (req, res) => {
         group.qr_code = qrCode;
 
         await group.save();
-        
+
 
         if (communityType.toLowerCase() === 'private' && questions) {
-      await GroupQue.deleteMany({ group: groupId }); // Clear existing questions
-      const parsedQuestions = typeof questions === 'string' ? JSON.parse(questions) : questions;
-      for (const q of parsedQuestions) {
-        const groupQue = new GroupQue({
-          group: group._id,
-          que_type: q.questionType === 'checkbox' ? 'multi-select' : q.questionType === 'radio' ? 'radio' : 'fill_form',
-          question: q.questionText,
-          options: q.options || []
-        });
-        await groupQue.save();
-      }
-    } else if (communityType.toLowerCase() === 'public') {
-      await GroupQue.deleteMany({ group: groupId }); // Remove questions for public groups
-    }
+            await GroupQue.deleteMany({ group: groupId }); // Clear existing questions
+            const parsedQuestions = typeof questions === 'string' ? JSON.parse(questions) : questions;
+            for (const q of parsedQuestions) {
+                const groupQue = new GroupQue({
+                    group: group._id,
+                    que_type: q.questionType === 'checkbox' ? 'multi-select' : q.questionType === 'radio' ? 'radio' : 'fill_form',
+                    question: q.questionText,
+                    options: q.options || []
+                });
+                await groupQue.save();
+            }
+        } else if (communityType.toLowerCase() === 'public') {
+            await GroupQue.deleteMany({ group: groupId }); // Remove questions for public groups
+        }
 
         res.status(200).json({
             success: true,
@@ -308,37 +306,261 @@ exports.updateGroup = async (req, res) => {
 };
 
 exports.deleteGroup = async (req, res) => {
-  try {
-    const groupId = req.params.id;
+    try {
+        const groupId = req.params.id;
 
-    // Find group
-    const group = await Group.findById(groupId);
-    if (!group) {
-      return res.status(404).json({ success: false, message: 'Group not found' });
+        // Find group
+        const group = await Group.findById(groupId);
+        if (!group) {
+            return res.status(404).json({ success: false, message: 'Group not found' });
+        }
+
+        // Ensure only the admin/creator can delete
+        if (group.user.toString() !== req.user.id) {
+            return res.status(403).json({ success: false, message: 'Unauthorized to delete this group' });
+        }
+
+        // Delete related records (optional, based on your schema)
+        await Promise.all([
+            GMem.deleteMany({ group: groupId }),       // remove all members
+            GroupQue.deleteMany({ group: groupId }),   // remove all questions
+            // Payment.deleteMany({ group: groupId })   // if payments exist
+        ]);
+
+        // Delete the group itself
+        await Group.findByIdAndDelete(groupId);
+
+        res.json({ success: true, message: 'Group deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting group:', error);
+        res.status(500).json({ success: false, message: 'Server error: ' + error.message });
     }
-
-    // Ensure only the admin/creator can delete
-    if (group.user.toString() !== req.user.id) {
-      return res.status(403).json({ success: false, message: 'Unauthorized to delete this group' });
-    }
-
-    // Delete related records (optional, based on your schema)
-    await Promise.all([
-      GMem.deleteMany({ group: groupId }),       // remove all members
-      GroupQue.deleteMany({ group: groupId }),   // remove all questions
-      // Payment.deleteMany({ group: groupId })   // if payments exist
-    ]);
-
-    // Delete the group itself
-    await Group.findByIdAndDelete(groupId);
-
-    res.json({ success: true, message: 'Group deleted successfully' });
-  } catch (error) {
-    console.error('Error deleting group:', error);
-    res.status(500).json({ success: false, message: 'Server error: ' + error.message });
-  }
 };
 
+exports.joinGroup = async (req, res) => {
+    try {
+        console.log("🔹 [joinGroup] Request body:", req.body);
+        console.log("🔹 [joinGroup] Authenticated user ID:", req.user?.id);
+
+        const { groupId } = req.body;
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            console.warn("⚠️ [joinGroup] User not found:", req.user.id);
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        console.log("✅ [joinGroup] User found:", { id: user._id, email: user.email });
+
+        if (!mongoose.isValidObjectId(groupId)) {
+            console.warn("⚠️ [joinGroup] Invalid group ID:", groupId);
+            return res.status(400).json({ success: false, message: 'Invalid group ID' });
+        }
+
+        const group = await Group.findById(groupId);
+        if (!group) {
+            console.warn("⚠️ [joinGroup] Group not found:", groupId);
+            return res.status(404).json({ success: false, message: 'Group not found' });
+        }
+
+        console.log("✅ [joinGroup] Group found:", { id: group._id, name: group.g_name, type: group.g_type });
+
+        const existingMember = await GMem.findOne({ group: groupId, user: user._id });
+        if (existingMember) {
+            console.warn("⚠️ [joinGroup] Already a member:", { user: user._id, group: groupId });
+            return res.status(400).json({ success: false, message: 'You are already a member of this group' });
+        }
+
+        if (group.g_type === 'public') {
+            console.log("ℹ️ [joinGroup] Public group join flow triggered");
+
+            const groupMember = new GMem({
+                group: group._id,
+                user: user._id,
+                type: 'user'
+            });
+            await groupMember.save();
+
+            group.total_mem += 1;
+            await group.save();
+
+            console.log("✅ [joinGroup] User added to public group:", { user: user._id, group: group._id });
+
+            return res.status(201).json({
+                success: true,
+                message: `Successfully joined ${group.g_name}!`,
+                group: {
+                    id: group._id,
+                    name: group.g_name,
+                    type: group.g_type,
+                    cover: group.g_cover,
+                    total_mem: group.total_mem
+                }
+            });
+        } else {
+            console.log("ℹ️ [joinGroup] Private group request flow triggered");
+
+            const adminMember = await GMem.findOne({ group: groupId, type: 'admin' });
+            if (!adminMember) {
+                console.error("❌ [joinGroup] No admin found for group:", groupId);
+                return res.status(400).json({ success: false, message: 'Group admin not found' });
+            }
+
+            const admin = await User.findById(adminMember.user);
+            if (!admin || !admin.mobile_no) {
+                console.error("❌ [joinGroup] Admin contact not found:", adminMember.user);
+                return res.status(400).json({ success: false, message: 'Admin contact not found' });
+            }
+
+            const aisensyApiKey = process.env.AISENSY_API_KEY || 'your-aisensy-api-key';
+            const campaignName = process.env.AISENSY_CAMPAIGN_NAME || 'membership_request';
+            const userName = user.f_name + (user.l_name ? ' ' + user.l_name : '');
+            const message = `New membership request for ${group.g_name} from ${userName} (${user.email}). Please review in the MySarafa admin panel.`;
+
+            console.log("📤 [joinGroup] Sending WhatsApp request via AiSensy:", {
+                apiKey: aisensyApiKey ? "****** (loaded)" : "❌ missing",
+                campaignName,
+                destination: admin.mobile_no,
+                message
+            });
+
+            try {
+                const response = await axios.post('https://api.aisensy.com/campaign/v1/send', {
+                    apiKey: aisensyApiKey,
+                    campaignName: campaignName,
+                    destination: admin.mobile_no,
+                    source: 'MySarafa',
+                    message: message
+                });
+
+                console.log("📩 [joinGroup] AiSensy response:", response.data);
+
+                if (response.data.success) {
+                    const membershipRequest = new GMem({
+                        group: group._id,
+                        user: user._id,
+                        type: 'pending'
+                    });
+                    await membershipRequest.save();
+
+                    console.log("✅ [joinGroup] Membership request saved:", membershipRequest._id);
+
+                    // Get Socket.IO instance from app
+                    const io = req.app.get('socketio');
+                    io.to(adminMember.user.toString()).emit('membershipRequest', {
+                        requestId: membershipRequest._id,
+                        groupId: group._id,
+                        groupName: group.g_name,
+                        userName: userName,
+                        userEmail: user.email,
+                        requestedAt: membershipRequest.createdAt
+                    });
+
+                    console.log("📡 [joinGroup] Socket.IO event emitted to admin:", adminMember.user.toString());
+
+                    return res.status(201).json({
+                        success: true,
+                        message: `Membership request sent for ${group.g_name}!`
+                    });
+                } else {
+                    console.error("❌ [joinGroup] AiSensy request failed:", response.data);
+                    return res.status(500).json({ success: false, message: 'Failed to send WhatsApp request' });
+                }
+            } catch (error) {
+                console.error("❌ [joinGroup] Error sending WhatsApp message:", error.response?.data || error.message);
+                return res.status(500).json({ success: false, message: 'Failed to send WhatsApp request' });
+            }
+        }
+    } catch (error) {
+        console.error("❌ [joinGroup] Unexpected error:", error);
+        return res.status(500).json({ success: false, message: 'Something went wrong, please try again later' });
+    }
+};
+
+exports.approveRequest = async (req, res) => {
+    try {
+        const { requestId } = req.params;
+        const user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        if (!mongoose.isValidObjectId(requestId)) {
+            return res.status(400).json({ success: false, message: 'Invalid request ID' });
+        }
+
+        const membershipRequest = await GMem.findById(requestId).populate('group');
+        if (!membershipRequest || membershipRequest.type !== 'pending') {
+            return res.status(404).json({ success: false, message: 'Membership request not found or already processed' });
+        }
+
+        const isAdmin = await GMem.findOne({ group: membershipRequest.group._id, user: user._id, type: 'admin' });
+        if (!isAdmin) {
+            return res.status(403).json({ success: false, message: 'You are not authorized to approve this request' });
+        }
+
+        membershipRequest.type = 'user';
+        await membershipRequest.save();
+
+        const group = await Group.findById(membershipRequest.group._id);
+        group.total_mem += 1;
+        await group.save();
+
+        // Get Socket.IO instance from app
+        const io = req.app.get('socketio');
+        // Emit Socket.IO event to notify user of approval
+        io.to(membershipRequest.user.toString()).emit('requestApproved', {
+            groupId: group._id,
+            groupName: group.g_name,
+            message: `Your membership request for ${group.g_name} has been approved!`
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: `Membership request approved for ${group.g_name}!`
+        });
+    } catch (error) {
+        console.error('Error approving membership request:', error);
+        return res.status(500).json({ success: false, message: 'Something went wrong, please try again later' });
+    }
+};
+
+exports.pendingRequests = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Find groups where the user is an admin
+        const adminGroups = await GMem.find({ user: user._id, type: 'admin' }).select('group');
+        const groupIds = adminGroups.map(g => g.group);
+
+        // Find pending requests for those groups
+        const pendingRequests = await GMem.find({
+            group: { $in: groupIds },
+            type: 'pending'
+        }).populate('group user');
+
+        const requests = pendingRequests.map(request => ({
+            requestId: request._id,
+            groupId: request.group._id,
+            groupName: request.group.g_name,
+            userName: `${request.user.f_name}${request.user.l_name ? ' ' + request.user.l_name : ''}`,
+            userEmail: request.user.email,
+            requestedAt: request.createdAt
+        }));
+
+        return res.status(200).json({
+            success: true,
+            requests
+        });
+    } catch (error) {
+        console.error('Error fetching pending requests:', error);
+        return res.status(500).json({ success: false, message: 'Something went wrong, please try again later' });
+    }
+};
 
 
 exports.getGroups = async (req, res) => {
@@ -405,12 +627,12 @@ exports.addGroupMember = async (req, res) => {
         let invitationToken = null;
         const isExistingUser = !!member;
 
-      
+
         if (member) {
             // Update existing user details if provided
             member.f_name = name;
             member.l_name = l_name || member.l_name;
-          
+
             await member.save();
             invitationToken = member.invitationToken;
             tempPassword = null;
@@ -433,8 +655,8 @@ exports.addGroupMember = async (req, res) => {
             // TODO: Send email with tempPassword and sign-up link
         }
 
-       
-   const existingMember = await GMem.findOne({ group: groupId, user: member._id });
+
+        const existingMember = await GMem.findOne({ group: groupId, user: member._id });
         if (existingMember) {
             return res.status(400).json({ success: false, message: 'User is already a member of this group' });
         }
@@ -463,8 +685,8 @@ exports.addGroupMember = async (req, res) => {
                 groupName: group.g_name
             },
             invitationLink,
-          tempPassword: isExistingUser ? null : tempPassword,
-          isExistingUser
+            tempPassword: isExistingUser ? null : tempPassword,
+            isExistingUser
         });
     } catch (error) {
         console.error('Error adding group member:', error);

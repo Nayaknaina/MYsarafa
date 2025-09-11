@@ -10,7 +10,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-
+    <script src="/socket.io/socket.io.js"></script>
     <link rel="canonical" href="https://app.mysarafa.com/">
 </head>
 <script src="https://cdn.tailwindcss.com"></script>
@@ -217,7 +217,12 @@
                                 <h3 class="group-title">{{this.g_name}}</h3>
                                 <p class="group-description">{{this.description}}Join this {{this.g_type}} community to
                                     connect with others.</p>
-                                <button class="join-group-btn" data-group-id="{{this._id}}">Join Community</button>
+                                {{!-- <button class="join-group-btn" data-group-id="{{this._id}}">Join Community</button> --}}
+                                 {{#if isJoined}}
+                                <button class="joined-btn" disabled>Joined</button>
+                                {{else}}
+                                <button class="join-group-btn" data-group-id="{{_id}}">Join Community</button>
+                                {{/if}}
                             </div>
                         </div>
                         {{else}}
@@ -530,17 +535,101 @@
 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
     <script>
         $(document).ready(function () {
             $('.manage-group-btn').click(function () {
                 const groupId = $(this).data('group-id');
                 window.location.href = `/Groups/community/${groupId}`;
             });
+            const socket = io();
+            socket.emit('joinRoom', '{{user._id}}');
 
+            // Check if user is an admin and fetch initial pending requests
+            $.ajax({
+                url: '/Groups/pending-requests',
+                method: 'GET',
+                xhrFields: { withCredentials: true },
+                success: function (response) {
+                    if (response.success && response.requests.length > 0) {
+                        $('#notificationBanner').show();
+                        response.requests.forEach(request => {
+                            appendRequest(request);
+                        });
+                    }
+                },
+                error: function (err) {
+                    console.error('Error fetching pending requests:', err);
+                }
+            });
+
+            // Listen for real-time membership requests
+            socket.on('membershipRequest', function (data) {
+                $('#notificationBanner').show();
+                appendRequest(data);
+            });
+
+            // Function to append a request to the notification banner
+            function appendRequest(data) {
+                const requestHtml = `
+                    <div class="notification-banner" data-request-id="${data.requestId}">
+                        <p>${data.userName} (${data.userEmail}) requested to join ${data.groupName}</p>
+                        <button class="approve-request-btn" data-request-id="${data.requestId}" data-group-id="${data.groupId}">Accept</button>
+                    </div>
+                `;
+                $('#requestList').append(requestHtml);
+            }
+
+            // Handle approve button click
+            $(document).on('click', '.approve-request-btn', function () {
+                const requestId = $(this).data('request-id');
+                $.ajax({
+                    url: `/Groups/approve-request/${requestId}`,
+                    method: 'POST',
+                    xhrFields: { withCredentials: true },
+                    success: function (response) {
+                        if (response.success) {
+                            showNotification(response.message, 'success');
+                            $(`div[data-request-id="${requestId}"]`).remove();
+                            if ($('#requestList').children().length === 0) {
+                                $('#notificationBanner').hide();
+                            }
+                        } else {
+                            showNotification(response.message || 'Failed to approve request', 'error');
+                        }
+                    },
+                    error: function (err) {
+                        showNotification('Error approving request: ' + (err.responseJSON?.message || 'Server error'), 'error');
+                    }
+                });
+            });
+
+            // Existing join group logic
             $('.join-group-btn').click(function () {
+                  const $btn = $(this);
                 const groupId = $(this).data('group-id');
-                console.log('Join group:', groupId);
-                toastr.success('Join group request sent for group ID: ' + groupId);
+                const groupName = $(this).closest('.group-card').find('.group-title').text();
+                $.ajax({
+                    url: '/Groups/join',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ groupId }),
+                    xhrFields: { withCredentials: true },
+                    success: function (response) {
+                        if (response.success) {
+                            showNotification(response.message, 'success');
+                           $btn.text('Joined')
+                   
+                    .removeClass('join-group-btn') 
+                    .addClass('joined-btn'); 
+                        } else {
+                            showNotification(response.message || 'Failed to join group', 'error');
+                        }
+                    },
+                    error: function (err) {
+                        showNotification('Error joining group: ' + (err.responseJSON?.message || 'Server error'), 'error');
+                    }
+                });
             });
 
             const duePaymentModal = $('#duePaymentModal');

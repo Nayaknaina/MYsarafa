@@ -2779,3 +2779,14 @@ body {
 .manage-group-btn:hover {
    background: linear-gradient(to left, #3b82f6, #7c3aed);
 }
+
+.joined-btn {
+  background-color: #28a745; /* green */
+   color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.3s;
+  cursor: default;
+}
