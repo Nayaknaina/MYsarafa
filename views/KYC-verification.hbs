@@ -33,7 +33,7 @@
     top: -60px;
     left: -60px;
     width: 200px;
-    height: 200px;
+    height: 120px;
     background: radial-gradient(circle, #D324A8 0%, #551DFF 80%, transparent 100%);
     opacity: 0.12;
     z-index: 0;
@@ -41,11 +41,11 @@
 
   .kyc-form.colorful::after {
     content: '';
-    position: absolute;
+   position: absolute;
     bottom: -60px;
     right: -60px;
     width: 200px;
-    height: 200px;
+    height: 120px;
     background: radial-gradient(circle, #ffe066 0%, #47ff53 80%, transparent 100%);
     opacity: 0.10;
     z-index: 0;
@@ -201,9 +201,12 @@
   transition: background 0.2s, box-shadow 0.2s;
   max-width: 84px;
 }
+
+/*
 .custom-input{
   width: 70%;
-}
+}*/
+
 .get-otp-btn {
  background: linear-gradient(90deg, #47ff53 0%, #2f95ff 100%);
   color: #fff;
@@ -213,7 +216,7 @@
   padding: 0 5px;
   margin-left: 0px;
   font-size: 1rem;
-  height: 32px;
+ /* height: 32px;*/
   box-shadow: 0 2px 8px #47ff5322;
   cursor: pointer;
   transition: background 0.2s, box-shadow 0.2s;
@@ -324,15 +327,17 @@
                 <label for="adhar_no">Aadhaar Number *</label>
                 <input type="text" maxlength="12" id="adhar_no" name="adhar_no" class="kyc-input custom-input"
                   placeholder="Enter 12-digit Aadhaar number" pattern="\d{12}" required>
-                  <button class="get-otp-btn">Get OTP</button>
+                  <button class="get-otp-btn" id="getOtpBtn" style="display: none;">Get OTP</button>
                 <small id="aadhaarVerificationMessage" style="color: #551DFF;"></small>
-                 <div class="otp-fields">
+                 <div class="otp-fields" id="otpFields" style="display: none;">
+            <input type="text" maxlength="1" class="otp-box"/>
+            <input type="text" maxlength="1" class="otp-box"/>
             <input type="text" maxlength="1" class="otp-box"/>
             <input type="text" maxlength="1" class="otp-box"/>
             <input type="text" maxlength="1" class="otp-box"/>
             <input type="text" maxlength="1" class="otp-box"/>
 
-            <button class="verify-btn"><span>Verify</span></button>
+            <button class="verify-btn" id="verifyOtpBtn"><span>Verify</span></button>
           </div>
           
               </div>
@@ -453,6 +458,55 @@
         return false;
       }
     }
+
+    async function sendAadhaarOtp(aadhaarNumber) {
+      try {
+        const response = await fetch('/kyc/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ aadhaarNumber })
+        });
+        const result = await response.json();
+        console.log('sendAadhaarOtp response:', result);
+        if (response.ok) {
+          showNotification(result.message || 'OTP sent successfully!', 'success');
+          return true;
+        } else {
+          showNotification(result.message || 'Failed to send OTP', 'error');
+          return false;
+        }
+      } catch (error) {
+        console.error('Error sending OTP:', error);
+        showNotification('Error sending OTP: ' + error.message, 'error');
+        return false;
+      }
+    }
+
+    async function verifyAadhaarOtp(otp) {
+      try {
+        const response = await fetch('/kyc/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ otp })
+        });
+        const result = await response.json();
+        console.log('verifyAadhaarOtp response:', result);
+        if (response.ok) {
+          showNotification(result.message || 'OTP verified successfully!', 'success');
+          return true;
+        } else {
+          showNotification(result.message || 'Invalid OTP', 'error');
+          return false;
+        }
+      } catch (error) {
+        console.error('Error verifying OTP:', error);
+        showNotification('Error verifying OTP: ' + error.message, 'error');
+        return false;
+      }
+    }
+
     async function fetchKycData() {
       try {
         const response = await fetch('/kyc/data', {
@@ -480,17 +534,20 @@
           const panCardCurrent = document.getElementById('panCardCurrent');
 
           if (aadhaarCardCurrent) {
-            aadhaarCardCurrent.textContent = data.adhar_photo ? path.basename(data.adhar_photo) : 'None';
+          /*   aadhaarCardCurrent.textContent = data.adhar_photo ? path.basename(data.adhar_photo) : 'None';*/
+          aadhaarCardCurrent.textContent = data.adhar_photo ? data.adhar_photo.split('/').pop() : 'None';
+
+
           } else {
             console.error('Element #aadhaarCardCurrent not found');
           }
           if (shopLicenceCurrent) {
-            shopLicenceCurrent.textContent = data.shop_licence ? path.basename(data.shop_licence) : 'None';
+            shopLicenceCurrent.textContent = data.shop_licence ? data.shop_licence.split('/').pop() : 'None';
           } else {
             console.error('Element #shopLicenceCurrent not found');
           }
           if (panCardCurrent) {
-            panCardCurrent.textContent = data.pan_photo ? path.basename(data.pan_photo) : 'None';
+            panCardCurrent.textContent = data.pan_photo ? data.pan_photo.split('/').pop() : 'None';
           } else {
             console.error('Element #panCardCurrent not found');
           }
@@ -585,6 +642,82 @@
       // Fetch KYC data on load
       fetchKycData();
 
+      const aadhaarInput = document.getElementById('adhar_no');
+      const getOtpBtn = document.getElementById('getOtpBtn');
+      const otpFields = document.getElementById('otpFields');
+      const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+
+      if (aadhaarInput && getOtpBtn) {
+        aadhaarInput.addEventListener('input', () => {
+          const aadhaarNumber = aadhaarInput.value.trim();
+          if (/^\d{12}$/.test(aadhaarNumber)) {
+            getOtpBtn.style.display = 'inline-block';
+          } else {
+            getOtpBtn.style.display = 'none';
+            otpFields.style.display = 'none';
+            verifyOtpBtn.style.display = 'none';
+            document.getElementById('aadhaarVerificationMessage').textContent = '';
+          }
+        });
+      }
+
+      // Handle Send OTP
+      if (getOtpBtn) {
+        getOtpBtn.addEventListener('click', async () => {
+          const aadhaarNumber = aadhaarInput.value.trim();
+          if (/^\d{12}$/.test(aadhaarNumber)) {
+            const success = await sendAadhaarOtp(aadhaarNumber);
+            if (success) {
+              getOtpBtn.style.display = 'none';
+              otpFields.style.display = 'flex';
+              verifyOtpBtn.style.display = 'inline-block';
+            }
+          } else {
+            showNotification('Please enter a valid 12-digit Aadhaar number.', 'error');
+          }
+        });
+      }
+
+      // Handle OTP input and auto-focus
+      const otpBoxes = document.querySelectorAll('.otp-box');
+      otpBoxes.forEach((box, index) => {
+        box.addEventListener('input', (e) => {
+          if (e.target.value.length === 1 && index < otpBoxes.length - 1) {
+            otpBoxes[index + 1].focus();
+          }
+          // Enable verify button when all OTP boxes are filled
+          const otp = Array.from(otpBoxes).map(box => box.value).join('');
+          verifyOtpBtn.disabled = otp.length !== otpBoxes.length;
+        });
+        box.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace' && !e.target.value && index > 0) {
+            otpBoxes[index - 1].focus();
+          }
+        });
+      });
+
+      // Handle Verify OTP
+      if (verifyOtpBtn) {
+        verifyOtpBtn.addEventListener('click', async () => {
+          const otp = Array.from(otpBoxes).map(box => box.value).join('');
+          if (otp.length === otpBoxes.length) {
+            const success = await verifyAadhaarOtp(otp);
+            if (success) {
+              aadhaarVerified = true;
+              document.getElementById('aadhaarVerificationMessage').textContent = 'Aadhaar OTP verified successfully!';
+              document.getElementById('aadhaarVerificationMessage').style.color = '#47ff53';
+              otpFields.style.display = 'none';
+              verifyOtpBtn.style.display = 'none';
+            } else {
+              document.getElementById('aadhaarVerificationMessage').textContent = 'Invalid OTP. Please try again.';
+              document.getElementById('aadhaarVerificationMessage').style.color = '#ef4444';
+            }
+          } else {
+            showNotification('Please enter the complete OTP.', 'error');
+          }
+        });
+      }
+       
       const postalCodeInput = document.getElementById("postalCode");
       if (postalCodeInput) {
         let timeOut;
@@ -763,7 +896,7 @@
     });
   </script>
   {{> profile}}
-  
+
 
     <script src="/js/all.js"></script>
 </body>

@@ -52,19 +52,120 @@ exports.getKycData = async (req, res) => {
       user_status: user.user_status || 'unverified',
     };
 
-    console.log('getKycData response:', kycData); 
+    // console.log('getKycData response:', kycData); 
     res.status(200).json({ success: true, data: kycData });
   } catch (error) {
     console.error('Error fetching KYC data:', error);
     res.status(500).json({ success: false, message: 'Error fetching KYC data', error: error.message });
   }
 };
+const aadhaarRequestStore = {};
+exports.sendAadhaarOtp = async (req, res) => {
+  try {
+    const { aadhaarNumber } = req.body;
+    if (!/^\d{12}$/.test(aadhaarNumber)) {
+      return res.status(400).json({ success: false, message: 'Invalid Aadhaar number. Must be 12 digits.' });
+    }
+
+    // Replace with actual Quick eKYC API call
+   // const quickEkycApiKey = process.env.QUICK_EKYC_API_KEY;
+     const response = await axios.post(
+      'https://sandbox.quickekyc.com/api/v1/aadhaar-v2/generate-otp',
+      {
+        key: process.env.QUICK_EKYC_API_KEY ,
+        id_number: aadhaarNumber
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+          
+        }
+      }
+    );
+
+    console.log("Generate OTP response:", response.data);
+
+    if (response.data.status === 'success' && response.data.data.otp_sent)  {
+      console.log("response fo generate otp have",response);
+      // const user = await User.findById(req.user.id);
+      // user.temp_aadhaar_request_id = response.data.request_id;
+      // await user.save();
+        aadhaarRequestStore[req.user.id] = response.data.request_id;
+      res.status(200).json({ success: true, message: 'OTP sent to registered mobile number' });
+    } else {
+      res.status(400).json({ success: false, message: response.data.message || 'Failed to send OTP' });
+    }
+  }catch (error) {
+  console.error('Error sending Aadhaar OTP:', error.response?.data || error.message);
+  if (error.response?.status === 401) {
+    return res.status(401).json({ 
+      success: false, 
+      message: 'API authentication failed. Check your Quick eKYC API key.' 
+    });
+  }
+  res.status(500).json({ success: false, message: 'Error sending OTP', error: error.message });
+};
+}
+
+exports.verifyAadhaarOtp = async (req, res) => {
+  try {
+    const { otp } = req.body;
+    if (!otp || otp.length !== 6) {
+      return res.status(400).json({ success: false, message: 'Invalid OTP. Must be 6 digits.' });
+    }
+
+    const user = await User.findById(req.user.id);
+    // if (!user.temp_aadhaar_request_id) {
+    //   return res.status(400).json({ success: false, message: 'No OTP request found for this session' });
+    // }
+     const requestId = aadhaarRequestStore[req.user.id];
+       if (!requestId) {
+      return res.status(400).json({ success: false, message: 'No OTP request found for this user' });
+    }
+
+    // Replace with actual Quick eKYC API call
+   // const quickEkycApiKey = process.env.QUICK_EKYC_API_KEY ;
+    const response = await axios.post(
+      'https://sandbox.quickekyc.com/api/v1/aadhaar-v2/submit-otp',
+      {
+        key: process.env.QUICK_EKYC_API_KEY,
+        request_id: requestId,
+        otp: otp
+      },
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+
+    console.log("Verify OTP response:", response.data);
+
+    // Clear request_id from memory after verification attempt
+  
+
+    if (response.data.status === 'success') {
+      user.kyc_status = 'approved';
+      user.user_status = 'verified';
+      user.temp_aadhaar_request_id= null; // Clear temporary data
+      await user.save();
+        delete aadhaarRequestStore[req.user.id];
+
+      res.status(200).json({ success: true, message: 'Aadhaar OTP verified successfully',data: response.data.data });
+    } else {
+      res.status(400).json({ success: false, message: response.data.message || 'Invalid OTP' });
+    }
+    
+  } catch (error) {
+     console.error('Error verifying Aadhaar OTP:', error.response?.data || error.message);
+    return res.status(error.response?.status || 500).json({
+      success: false,
+      message: error.response?.data?.message || 'Error verifying OTP'
+    });
+  }
+};
 
 exports.submitKyc = async (req, res, next) => {
   try {
-    console.log('submitkyc Headers:', req.headers);
-    console.log('submitKyc body:', req.body);
-    console.log('submitKyc files:', req.files);
+    // console.log('submitkyc Headers:', req.headers);
+    // console.log('submitKyc body:', req.body);
+    // console.log('submitKyc files:', req.files);
 
     const user = await User.findById(req.user.id);
     if (!user) {

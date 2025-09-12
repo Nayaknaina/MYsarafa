@@ -14,4 +14,8 @@ router.post('/submit', authMiddleware,upload.fields([
 ]), kycController.submitKyc);
 
 router.get('/pincode', authMiddleware, kycController.getLocationByPincode);
+
+router.post('/send-otp', authMiddleware, kycController.sendAadhaarOtp);
+router.post('/verify-otp', authMiddleware, kycController.verifyAadhaarOtp);
+
 module.exports = router;
