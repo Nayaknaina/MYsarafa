@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sarafa Community Notifications</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="icon" href="Assets/Images/logo.png" type="image/x-icon">
+    <style>
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding: 20px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .notification-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #111827;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 0;
+        }
+        .notification-title i {
+            color: #2f95ff;
+            font-size: 24px;
+        }
+        .notification-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .mark-all-read-btn {
+            background: #2f95ff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        .mark-all-read-btn:hover {
+            background: #1d7dd8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(47, 149, 255, 0.3);
+        }
+        .notification-settings-btn {
+            background: #f3f4f6;
+            color: #6b7280;
+            border: none;
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+        .notification-settings-btn:hover {
+            background: #e5e7eb;
+            color: #374151;
+            transform: scale(1.05);
+        }
+        .notification-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            padding: 4px;
+            background: #f9fafb;
+            border-radius: 12px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .notification-tabs::-webkit-scrollbar {
+            display: none;
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            position: relative;
+        }
+        .tab-btn:hover {
+            background: #e5e7eb;
+            color: #374151;
+        }
+        .tab-btn.active {
+            background: #2f95ff;
+            color: white;
+            box-shadow: 0 2px 8px rgba(47, 149, 255, 0.3);
+        }
+        .tab-count {
+            background: rgba(255, 255, 255, 0.2);
+            color: inherit;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 20px;
+            text-align: center;
+        }
+        .tab-btn.active .tab-count {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .notifications-container {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+        .notification-section {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #374151;
+            margin: 0 0 8px 0;
+            padding: 8px 0;
+            border-bottom: 2px solid #e5e7eb;
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: #2f95ff;
+        }
+        .notification-item {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            transition: all 0.2s ease;
+            position: relative;
+            cursor: pointer;
+        }
+        .notification-item:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+            transform: translateY(-1px);
+        }
+        .notification-item.unread {
+            border-left: 4px solid #2f95ff;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+        .notification-item.unread::before {
+            content: '';
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 8px;
+            height: 8px;
+            background: #2f95ff;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        .notification-avatar {
+            position: relative;
+            flex-shrink: 0;
+        }
+        .main-content {
+            background: white;
+        }
+        .avatar-img {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #e5e7eb;
+        }
+        .notification-content {
+            flex: 1;
+            min-width: 0;
+        }
+        .notification-text {
+            font-size: 15px;
+            line-height: 1.4;
+            color: #111827;
+            margin-bottom: 8px;
+        }
+        .notification-text strong {
+            font-weight: 600;
+            color: #2f95ff;
+        }
+        .notification-time {
+            color: #6b7280;
+            font-size: 13px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        .notification-preview {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+            color: #4b5563;
+            border-left: 3px solid #e5e7eb;
+            font-style: italic;
+            line-height: 1.4;
+        }
+        .request-action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .btn-accept {
+            background: #2f95ff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-accept:hover {
+            background: #1d7dd8;
+            transform: scale(1.05);
+        }
+        .btn-decline {
+            background: #f3f4f6;
+            color: #6b7280;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .btn-decline:hover {
+            background: #fef2f2;
+            color: #dc2626;
+            transform: scale(1.05);
+        }
+        .notifications-empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        .notifications-empty i {
+            font-size: 48px;
+            color: #d1d5db;
+            margin-bottom: 16px;
+        }
+        .notifications-empty h3 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #374151;
+        }
+        .notifications-empty p {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        @media (max-width: 768px) {
+            .notification-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+                margin-bottom: 20px;
+            }
+            .notification-title {
+                font-size: 24px;
+            }
+            .notification-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .mark-all-read-btn {
+                font-size: 13px;
+                padding: 8px 12px;
+            }
+            .notification-tabs {
+                margin-bottom: 20px;
+                padding: 2px;
+            }
+            .tab-btn {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+            .notification-item {
+                padding: 12px;
+                gap: 12px;
+            }
+            .avatar-img {
+                width: 40px;
+                height: 40px;
+            }
+            .notification-text {
+                font-size: 14px;
+            }
+            .notification-preview {
+                font-size: 13px;
+                padding: 10px;
+            }
+            .request-action-buttons {
+                gap: 6px;
+            }
+            .btn-accept, .btn-decline {
+                padding: 6px 12px;
+                font-size: 13px;
+            }
+        }
+        @media (max-width: 480px) {
+            .notification-header {
+                padding: 16px 0;
+            }
+            .notification-title {
+                font-size: 20px;
+            }
+            .notification-actions {
+                flex-direction: column;
+                gap: 8px;
+                width: 100%;
+            }
+            .mark-all-read-btn,
+            .notification-settings-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .notification-tabs {
+                gap: 4px;
+            }
+            .tab-btn {
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+            .tab-count {
+                font-size: 10px;
+                padding: 1px 6px;
+            }
+            .notification-item {
+                padding: 10px;
+                gap: 10px;
+            }
+            .avatar-img {
+                width: 36px;
+                height: 36px;
+            }
+            .notification-text {
+                font-size: 13px;
+            }
+            .notification-time {
+                font-size: 11px;
+            }
+            .notification-preview {
+                font-size: 12px;
+                padding: 8px;
+            }
+            .section-title {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    {{> header}}
+    <div class="main-container">
+        {{> sidebar}}
+        <main class="main-content">
+            <div class="notification-header">
+                <h1 class="notification-title">
+                    <i class="fas fa-bell"></i>
+                    Notifications
+                </h1>
+                <div class="notification-actions">
+                    <button class="mark-all-read-btn" id="markAllReadBtn">
+                        <i class="fas fa-check-double"></i> Mark All as Read
+                    </button>
+                    <button class="notification-settings-btn" title="Notification Settings">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="notification-tabs">
+                <button class="tab-btn active" data-filter="all">
+                    <i class="fas fa-list"></i>
+                    All
+                    <span class="tab-count" id="all-notifications-count">0</span>
+                </button>
+            </div>
+            <div class="notifications-container">
+                <div class="notification-section" id="today-section">
+                    <h3 class="section-title">Today</h3>
+                    <div id="today-notifications">
+                        {{#each todayRequests}}
+                        <div class="notification-item unread" data-type="request" data-request-id="{{this.requestId}}">
+                            {{!-- <div class="notification-avatar">
+                                <img src="/Assets/Images/default-avatar.jpg" alt="User Avatar" class="avatar-img">
+                            </div> --}}
+                            <div class="notification-content">
+                                <div class="notification-text">
+                                    <strong>{{this.userName}}</strong> requested to join <strong>{{this.groupName}}</strong>
+                                    <span class="notification-time">{{this.createdAt}}</span>
+                                </div>
+                                <div class="notification-preview" style="font-style: normal;">
+                                    "Hi, I’d like to join this community to participate in events."
+                                </div>
+                                <div class="request-action-buttons">
+                                    <button class="btn-accept" data-request-id="{{this.requestId}}" data-group-id="{{this.groupId}}"><i class="fas fa-check"></i> Accept</button>
+                                    <button class="btn-decline" data-request-id="{{this.requestId}}"><i class="fas fa-times"></i> Decline</button>
+                                </div>
+                            </div>
+                        </div>
+                        {{else}}
+                        <div class="notifications-empty">
+                            <i class="fas fa-bell-slash"></i>
+                            <h3>No Notifications</h3>
+                            <p>You don't have any notifications at the moment.</p>
+                        </div>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script>
+        $(document).ready(function () {
+            const socket = io();
+            socket.emit('joinRoom', '{{user._id}}');
+            let notificationCount = 0;
+            function updateNotificationCount(count) {
+                $('#all-notifications-count').text(count);
+                if (count === 0) {
+                    $('#today-notifications').html(`
+                        <div class="notifications-empty">
+                            <i class="fas fa-bell-slash"></i>
+                            <h3>No Notifications</h3>
+                            <p>You don't have any notifications at the moment.</p>
+                        </div>
+                    `);
+                }
+            }
+            $.ajax({
+                url: '/Groups/pending-requests',
+                method: 'GET',
+                xhrFields: { withCredentials: true },
+                success: function (response) {
+                    if (response.success && response.requests.length > 0) {
+                        notificationCount = response.requests.length;
+                        updateNotificationCount(notificationCount);
+                        $('#today-notifications').empty();
+                        response.requests.forEach(request => {
+                            appendNotification(request);
+                        });
+                    } else {
+                        updateNotificationCount(0);
+                    }
+                },
+                error: function (err) {
+                    console.error('Error fetching pending requests:', err);
+                    toastr.error('Error fetching notifications');
+                }
+            });
+            socket.on('membershipRequest', function (data) {
+                  console.log("📩 Incoming membershipRequest socket data:", data);
+                notificationCount++;
+                updateNotificationCount(notificationCount);
+                appendNotification(data);
+            });
+            function appendNotification(data) {
+                 console.log("🔔 Appending notification:", data);
+                const timeAgo = new Date(data.requestedAt).toLocaleTimeString(undefined, { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                    });
+                const notificationHtml = `
+                    <div class="notification-item unread new" data-type="request" data-request-id="${data.requestId}">
+                       
+                        <div class="notification-content">
+                            <div class="notification-text">
+                                <strong>${data.userName}</strong> requested to join <strong>${data.groupName}</strong>
+                                <span class="notification-time">${timeAgo}</span>
+                            </div>
+                            <div class="notification-preview" style="font-style: normal;">
+                                "Hi, I’d like to join this community to participate in events."
+                            </div>
+                            <div class="request-action-buttons">
+                                <button class="btn-accept" data-request-id="${data.requestId}" data-group-id="${data.groupId}"><i class="fas fa-check"></i> Accept</button>
+                                <button class="btn-decline" data-request-id="${data.requestId}"><i class="fas fa-times"></i> Decline</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                $('#today-notifications').prepend(notificationHtml);
+                setTimeout(() => {
+                    $(`div[data-request-id="${data.requestId}"]`).removeClass('new');
+                }, 300);
+            }
+            $(document).on('click', '.btn-accept', function () {
+                const requestId = $(this).data('request-id');
+                const groupId = $(this).data('group-id');
+                $.ajax({
+                    url: `/Groups/approve-request/${requestId}`,
+                    method: 'POST',
+                    xhrFields: { withCredentials: true },
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success(response.message);
+                            $(`div[data-request-id="${requestId}"]`).remove();
+                            notificationCount--;
+                            updateNotificationCount(notificationCount);
+                        } else {
+                            toastr.error(response.message || 'Failed to approve request');
+                        }
+                    },
+                    error: function (err) {
+                        toastr.error('Error approving request: ' + (err.responseJSON?.message || 'Server error'));
+                    }
+                });
+            });
+            $(document).on('click', '.btn-decline', function () {
+                const requestId = $(this).data('request-id');
+                $.ajax({
+                    url: `/Groups/decline-request/${requestId}`,
+                    method: 'POST',
+                    xhrFields: { withCredentials: true },
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success(response.message || 'Request declined');
+                            $(`div[data-request-id="${requestId}"]`).remove();
+                            notificationCount--;
+                            updateNotificationCount(notificationCount);
+                        } else {
+                            toastr.error(response.message || 'Failed to decline request');
+                        }
+                    },
+                    error: function (err) {
+                        toastr.error('Error declining request: ' + (err.responseJSON?.message || 'Server error'));
+                    }
+                });
+            });
+            $('#markAllReadBtn').click(function () {
+                $.ajax({
+                    url: '/Groups/mark-all-read',
+                    method: 'POST',
+                    xhrFields: { withCredentials: true },
+                    success: function (response) {
+                        if (response.success) {
+                            $('.notification-item').removeClass('unread').addClass('read');
+                            notificationCount = 0;
+                            updateNotificationCount(notificationCount);
+                            toastr.success('All notifications marked as read');
+                        } else {
+                            toastr.error(response.message || 'Failed to mark all as read');
+                        }
+                    },
+                    error: function (err) {
+                        toastr.error('Error marking notifications as read');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

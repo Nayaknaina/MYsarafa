@@ -61,14 +61,14 @@
     button:disabled {
         opacity: 0.5;
         cursor: not-allowed;
-        background-image: linear-gradient(to right, #404450, #3c485f);
+           background-image: linear-gradient(to right, #2a4aa7, #224485);
         transform: scale(1);
         box-shadow: none;
         transition: none;
     }
 
     button:disabled:hover {
-        background-image: linear-gradient(to right, #404450, #3c485f);
+        background-image: linear-gradient(to right, #224485, #2a4aa7);
         transform: scale(1);
         box-shadow: none;
         transition: none;
@@ -107,6 +107,7 @@
                 </div>
             </div>
             {{/if}}
+
             <!-- Stats Cards -->
             <div class="stats-grid">
                 <div class="stat-card blue-card">
@@ -218,8 +219,10 @@
                                 <p class="group-description">{{this.description}}Join this {{this.g_type}} community to
                                     connect with others.</p>
                                 {{!-- <button class="join-group-btn" data-group-id="{{this._id}}">Join Community</button> --}}
-                                 {{#if isJoined}}
+                                {{#if isJoined}}
                                 <button class="joined-btn" disabled>Joined</button>
+                                {{else if isPending}}
+                                <button class="pending-btn" disabled>Pending</button>
                                 {{else}}
                                 <button class="join-group-btn" data-group-id="{{_id}}">Join Community</button>
                                 {{/if}}
@@ -544,18 +547,30 @@
             });
             const socket = io();
             socket.emit('joinRoom', '{{user._id}}');
+            socket.on('connect', () => {
+                console.log("✅ Connected to socket server:", socket.id);
+            });
 
+            
+
+            let notificationCount = 0;
+            function updateNotificationBadge(count) {
+                const badge = $('.notification-badge');
+                if (count > 0) {
+                    badge.text(count).show();
+                } else {
+                    badge.hide();
+                }
+            }
             // Check if user is an admin and fetch initial pending requests
             $.ajax({
                 url: '/Groups/pending-requests',
                 method: 'GET',
                 xhrFields: { withCredentials: true },
-                success: function (response) {
+               success: function (response) {
                     if (response.success && response.requests.length > 0) {
-                        $('#notificationBanner').show();
-                        response.requests.forEach(request => {
-                            appendRequest(request);
-                        });
+                        notificationCount = response.requests.length;
+                        updateNotificationBadge(notificationCount);
                     }
                 },
                 error: function (err) {
@@ -564,73 +579,48 @@
             });
 
             // Listen for real-time membership requests
-            socket.on('membershipRequest', function (data) {
-                $('#notificationBanner').show();
-                appendRequest(data);
+           socket.on('membershipRequest', function (data) {
+                console.log("📩 membershipRequest received:", data);
+                notificationCount++;
+                updateNotificationBadge(notificationCount);
+                toastr.info(`${data.userName} requested to join ${data.groupName}`, 'New Membership Request');
             });
 
-            // Function to append a request to the notification banner
-            function appendRequest(data) {
-                const requestHtml = `
-                    <div class="notification-banner" data-request-id="${data.requestId}">
-                        <p>${data.userName} (${data.userEmail}) requested to join ${data.groupName}</p>
-                        <button class="approve-request-btn" data-request-id="${data.requestId}" data-group-id="${data.groupId}">Accept</button>
-                    </div>
-                `;
-                $('#requestList').append(requestHtml);
-            }
-
-            // Handle approve button click
-            $(document).on('click', '.approve-request-btn', function () {
-                const requestId = $(this).data('request-id');
-                $.ajax({
-                    url: `/Groups/approve-request/${requestId}`,
-                    method: 'POST',
-                    xhrFields: { withCredentials: true },
-                    success: function (response) {
-                        if (response.success) {
-                            showNotification(response.message, 'success');
-                            $(`div[data-request-id="${requestId}"]`).remove();
-                            if ($('#requestList').children().length === 0) {
-                                $('#notificationBanner').hide();
-                            }
-                        } else {
-                            showNotification(response.message || 'Failed to approve request', 'error');
-                        }
-                    },
-                    error: function (err) {
-                        showNotification('Error approving request: ' + (err.responseJSON?.message || 'Server error'), 'error');
-                    }
-                });
-            });
 
             // Existing join group logic
-            $('.join-group-btn').click(function () {
-                  const $btn = $(this);
-                const groupId = $(this).data('group-id');
-                const groupName = $(this).closest('.group-card').find('.group-title').text();
-                $.ajax({
-                    url: '/Groups/join',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ groupId }),
-                    xhrFields: { withCredentials: true },
-                    success: function (response) {
-                        if (response.success) {
-                            showNotification(response.message, 'success');
-                           $btn.text('Joined')
-                   
-                    .removeClass('join-group-btn') 
-                    .addClass('joined-btn'); 
-                        } else {
-                            showNotification(response.message || 'Failed to join group', 'error');
+                $('.join-group-btn').click(function () {
+                    const $btn = $(this);
+                    const groupId = $(this).data('group-id');
+                    const groupName = $(this).closest('.group-card').find('.group-title').text();
+                    $.ajax({
+                        url: '/Groups/join',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ groupId }),
+                        xhrFields: { withCredentials: true },
+                        success: function (response) {
+                            if (response.success) {
+                                showNotification(response.message, 'success');
+                                    if (response.status === 'joined') {
+                                     $btn.text('Joined')
+                                    .removeClass('join-group-btn')
+                                    .addClass('joined-btn')
+                                    .prop('disabled', true);
+                            } else if (response.status === 'pending') {
+                                $btn.text('Pending')
+                                    .removeClass('join-group-btn')
+                                    .addClass('pending-btn')
+                                    .prop('disabled', true);
+                            }
+                            } else {
+                                showNotification(response.message || 'Failed to join group', 'error');
+                            }
+                        },
+                        error: function (err) {
+                            showNotification('Error joining group: ' + (err.responseJSON?.message || 'Server error'), 'error');
                         }
-                    },
-                    error: function (err) {
-                        showNotification('Error joining group: ' + (err.responseJSON?.message || 'Server error'), 'error');
-                    }
+                    });
                 });
-            });
 
             const duePaymentModal = $('#duePaymentModal');
             const closeDuePaymentModal = $('#closeDuePaymentModal');
@@ -661,6 +651,7 @@
                 toastr[type](message);
             }
         });
+        
     </script>
     <script src="/js/all.js"></script>
 

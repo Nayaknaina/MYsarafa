@@ -11,6 +11,8 @@ const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 const fs = require('fs');
 const path = require('path');
 const upload = require('../middleware/multer');
+const axios = require("axios");
+
 
 exports.communityCreation = async (req, res, next) => {
     try {
@@ -388,6 +390,7 @@ exports.joinGroup = async (req, res) => {
 
             return res.status(201).json({
                 success: true,
+                status :'joined',
                 message: `Successfully joined ${group.g_name}!`,
                 group: {
                     id: group._id,
@@ -397,7 +400,7 @@ exports.joinGroup = async (req, res) => {
                     total_mem: group.total_mem
                 }
             });
-        } else {
+        }  else if (group.g_type === 'private'){
             console.log("ℹ️ [joinGroup] Private group request flow triggered");
 
             const adminMember = await GMem.findOne({ group: groupId, type: 'admin' });
@@ -416,21 +419,33 @@ exports.joinGroup = async (req, res) => {
             const campaignName = process.env.AISENSY_CAMPAIGN_NAME || 'membership_request';
             const userName = user.f_name + (user.l_name ? ' ' + user.l_name : '');
             const message = `New membership request for ${group.g_name} from ${userName} (${user.email}). Please review in the MySarafa admin panel.`;
+            let adminMobile = admin.mobile_no.toString().trim();
+            if (!adminMobile.startsWith("91")) {
+            adminMobile = "91" + adminMobile;
+            }
 
             console.log("📤 [joinGroup] Sending WhatsApp request via AiSensy:", {
                 apiKey: aisensyApiKey ? "****** (loaded)" : "❌ missing",
                 campaignName,
-                destination: admin.mobile_no,
+                userName: "MySarafa",
+                destination: adminMobile,
+                 parameters: [
+                    { name: "user_name", value: userName } 
+                ],
                 message
             });
 
             try {
-                const response = await axios.post('https://api.aisensy.com/campaign/v1/send', {
+                const response = await axios.post('https://backend.aisensy.com/campaign/t1/api/v2', {
                     apiKey: aisensyApiKey,
                     campaignName: campaignName,
                     destination: admin.mobile_no,
                     source: 'MySarafa',
-                    message: message
+                    userName:'Mysarafa',
+                    templateParams: [
+                     userName 
+                    ],
+                    message
                 });
 
                 console.log("📩 [joinGroup] AiSensy response:", response.data);
@@ -460,6 +475,7 @@ exports.joinGroup = async (req, res) => {
 
                     return res.status(201).json({
                         success: true,
+                        status :'pending',
                         message: `Membership request sent for ${group.g_name}!`
                     });
                 } else {
@@ -470,6 +486,13 @@ exports.joinGroup = async (req, res) => {
                 console.error("❌ [joinGroup] Error sending WhatsApp message:", error.response?.data || error.message);
                 return res.status(500).json({ success: false, message: 'Failed to send WhatsApp request' });
             }
+        }
+        else {
+            // ⚠️ Other types (handle separately or return error)
+            return res.status(400).json({
+                success: false,
+                message: `Joining is not supported for group type: ${group.g_type}`
+            });
         }
     } catch (error) {
         console.error("❌ [joinGroup] Unexpected error:", error);

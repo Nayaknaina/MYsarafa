@@ -81,7 +81,7 @@ exports.dashboard = async (req, res, next) => {
       // })).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
       const myGroups = memberships
-  .filter(m => m.group) 
+   .filter(m => m.group && m.type !== 'pending')
   .map(m => ({
     ...m.group,
     membershipType: m.type,
@@ -108,9 +108,14 @@ exports.dashboard = async (req, res, next) => {
     })
      .sort({ createdAt: -1 }).limit(4).lean();
      const joinedGroupIds = myGroups.map(g => g._id.toString());
+     const pendingGroupIds = memberships
+      .filter(m => m.group && m.type === 'pending')
+      .map(m => m.group._id.toString());
+
       discoverGroups = discoverGroups.map(g => ({
         ...g,
-        isJoined: joinedGroupIds.includes(g._id.toString())
+        isJoined: joinedGroupIds.includes(g._id.toString()),
+        isPending : pendingGroupIds.includes(g._id.toString())
       }));
 
     // Find groups with pending amount where user is a member (not admin)
@@ -281,5 +286,30 @@ exports.verifyMember = async (req, res, next) => {
   } catch (error) {
     console.error('Error verifying member:', error);
     res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+exports.notifications = async (req, res, next) => {
+  try {
+    
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
+    }
+    const user = await User.findById(req.user.id).lean();
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    res.render("notifications", {
+      user: {
+        ...user,
+        has_password: !!user.password
+      },
+     
+      layout: false
+    });
+  } catch (error) {
+    console.error('Error rendering dashboard:', error);
+    res.status(500).json({ success: false, message: 'Server error: ' + error.message });
   }
 };

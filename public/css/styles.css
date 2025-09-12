@@ -2809,3 +2809,15 @@ body {
     transition: transform 0.3s;
   cursor: default;
 }
+
+
+.pending-btn {
+  background-color: #f6ff0069; 
+   color: white;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.3s;
+  cursor: default;
+}

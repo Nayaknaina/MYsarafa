@@ -12,4 +12,6 @@ router.post('/update-profile',authMiddleware, userController.updateProfile);
 router.get('/user/:id', authMiddleware, isAdmin, userController.getMemberDetails);
 router.post('/user/:id/verify', authMiddleware, isAdmin, userController.verifyMember);
 
+router.get('/notifs',authMiddleware,userController.notifications);
+
 module.exports = router;
