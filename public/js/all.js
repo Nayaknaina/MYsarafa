@@ -428,30 +428,30 @@ document.addEventListener('click', function (e) {
 
 console.log('Community Dashboard initialized successfully!');
 
-document.addEventListener('DOMContentLoaded', function () {
-  console.log('DOMContentLoaded fired');
-  console.log('kycForm element:', document.getElementById('kycForm'));
+// document.addEventListener('DOMContentLoaded', function () {
+//   // console.log('DOMContentLoaded fired');
+//   // console.log('kycForm element:', document.getElementById('kycForm'));
 
-  // Initialize KYC form if on KYC page
-  if (document.getElementById('kycForm')) {
-    console.log('Initializing KYC form...');
-    showStep(1);
-    updateProgress();
+//   // Initialize KYC form if on KYC page
+//   // if (document.getElementById('kycForm')) {
+//   //   console.log('Initializing KYC form...');
+//   //   showStep(1);
+//   //   updateProgress();
 
-    // Handle form submission
-    document.getElementById('kycForm').addEventListener('submit', function (e) {
-      e.preventDefault();
+//   //   // Handle form submission
+//   //   document.getElementById('kycForm').addEventListener('submit', function (e) {
+//   //     e.preventDefault();
 
-      if (validateStep(3)) {
-        // Submit the form
-        alert('KYC form submitted successfully!');
-        // Here you would typically send the data to your server
-      }
-    });
-  } else {
-    console.log('KYC form not found on this page');
-  }
-});
+//   //     if (validateStep(3)) {
+//   //       // Submit the form
+//   //       alert('KYC form submitted successfully!');
+//   //       // Here you would typically send the data to your server
+//   //     }
+//   //   });
+//   // } else {
+//   //   console.log('KYC form not found on this page');
+//   // }
+// });
 
 
 const membersTable = document.querySelector('.members-table tbody');
@@ -838,7 +838,7 @@ document.addEventListener('DOMContentLoaded', function () {
   if (kycForm) {
     kycForm.addEventListener('submit', function (e) {
       e.preventDefault();
-      handleKYCSubmission();
+      // handleKYCSubmission();
     });
   }
 });
@@ -911,64 +911,64 @@ function updateWorkersFields(numWorkers) {
 }
 
 // Function to handle KYC form submission
-function handleKYCSubmission() {
-  // Get form data
-  const formData = new FormData(document.getElementById('kycForm'));
-  const formObject = {};
+// function handleKYCSubmission() {
+//   // Get form data
+//   const formData = new FormData(document.getElementById('kycForm'));
+//   const formObject = {};
 
-  for (let [key, value] of formData.entries()) {
-    formObject[key] = value;
-  }
+//   for (let [key, value] of formData.entries()) {
+//     formObject[key] = value;
+//   }
 
-  // Validate required fields
-  const requiredFields = ['fullName', 'dob', 'nationality', 'state', 'city', 'postalCode', 'address', 'shopOwner', 'shopName', 'shopAddress', 'aadhaarCard', 'shopLicence', 'panCard'];
-  const missingFields = [];
+//   // Validate required fields
+//   const requiredFields = ['fullName', 'dob', 'nationality', 'state', 'city', 'postalCode', 'address', 'shopOwner', 'shopName', 'shopAddress', 'aadhaarCard', 'shopLicence', 'panCard'];
+//   const missingFields = [];
 
-  requiredFields.forEach(field => {
-    if (!formObject[field] || formObject[field].trim() === '') {
-      missingFields.push(field);
-    }
-  });
+//   requiredFields.forEach(field => {
+//     if (!formObject[field] || formObject[field].trim() === '') {
+//       missingFields.push(field);
+//     }
+//   });
 
-  if (missingFields.length > 0) {
-    alert('Please fill in all required fields: ' + missingFields.join(', '));
-    return;
-  }
+//   if (missingFields.length > 0) {
+//     alert('Please fill in all required fields: ' + missingFields.join(', '));
+//     return;
+//   }
 
-  // Validate file uploads
-  const fileFields = ['aadhaarCard', 'shopLicence', 'panCard'];
-  const missingFiles = [];
+//   // Validate file uploads
+//   const fileFields = ['aadhaarCard', 'shopLicence', 'panCard'];
+//   const missingFiles = [];
 
-  fileFields.forEach(field => {
-    const fileInput = document.getElementById(field);
-    if (!fileInput.files || fileInput.files.length === 0) {
-      missingFiles.push(field);
-    }
-  });
+//   fileFields.forEach(field => {
+//     const fileInput = document.getElementById(field);
+//     if (!fileInput.files || fileInput.files.length === 0) {
+//       missingFiles.push(field);
+//     }
+//   });
 
-  if (missingFiles.length > 0) {
-    alert('Please upload all required documents: ' + missingFiles.join(', '));
-    return;
-  }
+//   if (missingFiles.length > 0) {
+//     alert('Please upload all required documents: ' + missingFiles.join(', '));
+//     return;
+//   }
 
-  // Show success message
-  alert('KYC form submitted successfully! Your application is under review.');
+//   // Show success message
+//   alert('KYC form submitted successfully! Your application is under review.');
 
-  // Reset form
-  document.getElementById('kycForm').reset();
+//   // Reset form
+//   document.getElementById('kycForm').reset();
 
-  // Clear workers container
-  const workersContainer = document.getElementById('workersContainer');
-  if (workersContainer) {
-    workersContainer.innerHTML = '';
-  }
+//   // Clear workers container
+//   const workersContainer = document.getElementById('workersContainer');
+//   if (workersContainer) {
+//     workersContainer.innerHTML = '';
+//   }
 
-  // Reset number of workers
-  const numWorkersInput = document.getElementById('numWorkers');
-  if (numWorkersInput) {
-    numWorkersInput.value = '';
-  }
-}
+//   // Reset number of workers
+//   const numWorkersInput = document.getElementById('numWorkers');
+//   if (numWorkersInput) {
+//     numWorkersInput.value = '';
+//   }
+// }
 
 // User avatar dropdown logic
 const userAvatar = document.getElementById('userAvatar');

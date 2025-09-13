@@ -327,7 +327,7 @@
                 <label for="adhar_no">Aadhaar Number *</label>
                 <input type="text" maxlength="12" id="adhar_no" name="adhar_no" class="kyc-input custom-input"
                   placeholder="Enter 12-digit Aadhaar number" pattern="\d{12}" required>
-                  <button class="get-otp-btn" id="getOtpBtn" style="display: none;">Get OTP</button>
+                  <button class="get-otp-btn" id="getOtpBtn" type="button" style="display: none;">Get OTP</button>
                 <small id="aadhaarVerificationMessage" style="color: #551DFF;"></small>
                  <div class="otp-fields" id="otpFields" style="display: none;">
             <input type="text" maxlength="1" class="otp-box"/>
@@ -337,7 +337,7 @@
             <input type="text" maxlength="1" class="otp-box"/>
             <input type="text" maxlength="1" class="otp-box"/>
 
-            <button class="verify-btn" id="verifyOtpBtn"><span>Verify</span></button>
+            <button class="verify-btn" type="button" id="verifyOtpBtn"><span>Verify</span></button>
           </div>
           
               </div>
