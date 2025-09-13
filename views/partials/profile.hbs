@@ -67,7 +67,22 @@
                     <input type="text" id="shopaddress" name="shopadd" class="modal-input" value="{{user.shopadd}}"
                         required>
                 </div>
-
+                <div class="modal-form-group">
+                    <label for="categorySelect" class="required">Category</label>
+                    <select id="categorySelect" name="category" class="modal-input" required>
+                        <option value="">Select Category</option>
+                        <option value="Jeweller Shop Owner" {{#if_eq user.category "Jeweller Shop Owner"}}selected{{/if_eq}}>Jeweller Shop Owner</option>
+                        <option value="Hallmarking Center/Bullion/Gold Exchange" {{#if_eq user.category "Hallmarking Center/Bullion/Gold Exchange"}}selected{{/if_eq}}>Hallmarking Center/Bullion/Gold Exchange</option>
+                        <option value="Gold Silver Refinery" {{#if_eq user.category "Gold Silver Refinery"}}selected{{/if_eq}}>Gold Silver Refinery</option>
+                        <option value="Bengali/Soni Karigar" {{#if_eq user.category "Bengali/Soni Karigar"}}selected{{/if_eq}}>Bengali/Soni Karigar</option>
+                        <option value="Taar Vala/Dai Vala" {{#if_eq user.category "Taar Vala/Dai Vala"}}selected{{/if_eq}}>Taar Vala/Dai Vala</option>
+                        <option value="Wholesaler" {{#if_eq user.category "Wholesaler"}}selected{{/if_eq}}>Wholesaler</option>
+                        <option value="Retailer" {{#if_eq user.category "Retailer"}}selected{{/if_eq}}>Retailer</option>
+                        <option value="Manufacturer" {{#if_eq user.category "Manufacturer"}}selected{{/if_eq}}>Manufacturer</option>
+                        <option value="Trader" {{#if_eq user.category "Trader"}}selected{{/if_eq}}>Trader</option>
+                        <option value="Artisan/Craftsman" {{#if_eq user.category "Artisan/Craftsman"}}selected{{/if_eq}}>Artisan/Craftsman</option>
+                    </select>
+                </div>
                 <div class="modal-form-group">
                     <label for="Employee">NumberEmp</label>
                     <input type="number" id="Employee" name="no_of_emp" class="modal-input" value="{{user.no_of_emp}}"

@@ -78,7 +78,7 @@ exports.rendertabularPayReceived = async (req, res, next) => {
       return res.status(404).render('error', {
         statusCode: 404,
         title: 'User Not Found',
-        errorMessage: 'No user found with the provided credentials.',
+        errorMessage: 'No user found with the provided credentials',
         layout: false
       });
     }

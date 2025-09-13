@@ -23,6 +23,10 @@ module.exports = {
     },
     json : function(context){
         return JSON.stringify(context);
-    }
+    },
+    if_eq :  function(a, b, opts) {
+    return a === b ? opts.fn(this) : opts.inverse(this);
+     }
+
     
 };

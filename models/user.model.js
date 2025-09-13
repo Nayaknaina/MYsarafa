@@ -75,6 +75,22 @@ const userSchema = new mongoose.Schema({
     type: String,
     unique: true,
     sparse: true
+  },
+  category: {
+    type: String,
+    enum: [
+      'Jeweller Shop Owner',
+      'Hallmarking Center/Bullion/Gold Exchange',
+      'Gold Silver Refinery',
+      'Bengali/Soni Karigar',
+      'Taar Vala/Dai Vala',
+      'Wholesaler',
+      'Retailer',
+      'Manufacturer',
+      'Trader',
+      'Artisan/Craftsman'
+    ],
+    default: null 
   }
 
 }, { timestamps: true });

@@ -529,10 +529,47 @@ exports.approveRequest = async (req, res) => {
         const group = await Group.findById(membershipRequest.group._id);
         group.total_mem += 1;
         await group.save();
+            
+         const approvedUser = await User.findById(membershipRequest.user);
+        if (approvedUser && approvedUser.mobile_no) {
+            let approvedUserMobile = approvedUser.mobile_no.toString().trim();
+            if (!approvedUserMobile.startsWith("91")) {
+                approvedUserMobile = "91" + approvedUserMobile;
+            }
 
-        // Get Socket.IO instance from app
+            const aisensyApiKey = process.env.AISENSY_API_KEY ;
+            const approvalCampaign = process.env.AISENSY_APPROVAL_CAMPAIGN ;
+            const approvedUserName = approvedUser.f_name + (approvedUser.l_name ? ' ' + approvedUser.l_name : '');
+
+            console.log("📤 [approveRequest] Sending approval WhatsApp notification via AiSensy:", {
+                apiKey: aisensyApiKey ? "****** (loaded)" : "❌ missing",
+                campaignName: approvalCampaign,
+                destination: approvedUserMobile,
+                templateParams: [approvedUserName, group.g_name]
+            });
+
+            try {
+                const approvalResponse = await axios.post('https://backend.aisensy.com/campaign/t1/api/v2', {
+                    apiKey: aisensyApiKey,
+                    campaignName: approvalCampaign,
+                    destination: approvedUserMobile,
+                    source: 'MySarafa',
+                    userName: 'Mysarafa',
+                    templateParams: [
+                        approvedUserName,
+                        group.g_name
+                    ],
+                    message: `Your request to join ${group.g_name} has been approved! 🎉`
+                });
+
+                console.log("📩 [approveRequest] AiSensy approval response:", approvalResponse.data);
+            } catch (err) {
+                console.error("❌ [approveRequest] Failed to send approval notification:", err.response?.data || err.message);
+            }
+        }
+
+        // 🔹 Socket notification
         const io = req.app.get('socketio');
-        // Emit Socket.IO event to notify user of approval
         io.to(membershipRequest.user.toString()).emit('requestApproved', {
             groupId: group._id,
             groupName: group.g_name,
@@ -624,7 +661,7 @@ exports.getMyGroups = async (req, res) => {
 exports.addGroupMember = async (req, res) => {
     try {
         console.log("addGroupMember input:", req.body);
-        const { groupId, memberEmail, name, mobileNumber, l_name } = req.body;
+        const { groupId, memberEmail, name, mobileNumber, l_name,category } = req.body;
         const user = await User.findById(req.user.id);
 
         if (!user) {
@@ -641,8 +678,8 @@ exports.addGroupMember = async (req, res) => {
             return res.status(403).json({ success: false, message: 'Only group admins can add members' });
         }
 
-        if (!name || !memberEmail) {
-            return res.status(400).json({ success: false, message: 'Name and email are required' });
+        if (!name || !memberEmail || !category) {
+            return res.status(400).json({ success: false, message: 'Name ,email and category are required' });
         }
 
         let member = await User.findOne({ email: memberEmail });
@@ -672,7 +709,8 @@ exports.addGroupMember = async (req, res) => {
                 mobile_verified: false,
                 user_status: 'unverified',
                 kyc_status: 'pending',
-                invitationToken
+                invitationToken,
+                category
             });
             await member.save();
             // TODO: Send email with tempPassword and sign-up link
@@ -705,7 +743,8 @@ exports.addGroupMember = async (req, res) => {
                 name: member.f_name,
                 l_name: member.l_name,
                 mobile_no: member.mobile_no,
-                groupName: group.g_name
+                groupName: group.g_name,
+                category: member.category
             },
             invitationLink,
             tempPassword: isExistingUser ? null : tempPassword,

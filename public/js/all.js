@@ -1568,9 +1568,10 @@ if (addMemberForm) {
     const mobileNumber = formData.get('memberNumber').trim();
     const email = formData.get('memberEmail').trim();
     const groupId = formData.get('groupSelect');
+    const category = formData.get('category');
 
     // Validate required fields
-    if (!name || !mobileNumber || !email) {
+    if (!name || !mobileNumber || !email || !category) {
       formErrorMember.textContent = 'Please fill in all required fields';
       formErrorMember.style.display = 'block';
       sendInviteBtn.disabled = false;
@@ -1603,6 +1604,7 @@ if (addMemberForm) {
       name,
       l_name,
       mobileNumber,
+      category
     };
     console.log('addMemberForm data:', data);
 
