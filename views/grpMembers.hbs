@@ -321,9 +321,7 @@
         gap: 0.5rem;
         flex-wrap: wrap;
     }
-.mobile-actions {
-  display: none;
-}
+
     .invitation-actions button,
     .share-platforms a {
         padding: 0.75rem 1rem;
@@ -444,29 +442,38 @@
             overflow-x: scroll;
 
         }
-        .filter-section{
-        flex-direction: column; 
-    align-items: stretch;   
-    display: none !important;
+        
+    }
+    
+    /* Default (desktop view) */
+.button-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.toggle-btn {
+  display: none; /* hidden on desktop */
+}
+
+/* Mobile view */
+@media (max-width: 768px) {
+  .button-group {
+    position: relative;
+    justify-content: flex-end; /* toggle on right */
   }
 
-   .mobile-actions {
+  .toggle-btn {
     display: block;
-    position: relative;
-    text-align: right; /* toggle button on right */
-    margin-bottom: 1rem;
-  }
- .toggle-btn {
     background: #4a6cf7;
     color: white;
     border: none;
     padding: 0.6rem 1rem;
     border-radius: 6px;
     cursor: pointer;
-    font-size: 14px;
   }
 
-  .action-menu {
+  .actions {
     display: none;
     flex-direction: column;
     gap: 0.5rem;
@@ -481,27 +488,23 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     z-index: 999;
   }
-    .action-menu button {
+
+  .actions button {
     width: 100%;
     padding: 0.6rem;
     border: none;
     border-radius: 6px;
     background: linear-gradient(90deg, #6a11cb, #2575fc);
     color: white;
-    cursor: pointer;
-    text-align: center;
     font-size: 14px;
+    cursor: pointer;
   }
-   .action-menu.show {
+
+  .actions.show {
     display: flex;
   }
-    }
-    .filter-section{
-          display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;  
-  margin-bottom: 1rem;
-    }
+}
+
   
 </style>
 
@@ -516,20 +519,21 @@
         <main class="main-content">
 
             <!-- Filter Section -->
-            <div class="filter-section mb-2">
-                <button class="filterbutton" id="filterBtn">
+            <div class="filter-section mb-2 button-group">
+                 <button class="toggle-btn">☰ Actions</button>
+                <button class="filterbutton actions" id="filterBtn">
                     <i class="fas fa-filter"></i> Filter
                 </button>
-                <button class="addmemberbtn" id="addNewBtn">
+                <button class="addmemberbtn actions" id="addNewBtn">
                     <i class="fas fa-plus"></i> Add Member
                 </button>
-                <button class="csv-btn" id="uploadCsvBtn">
+                <button class="csv-btn actions" id="uploadCsvBtn">
                     <i class="fas fa-upload"></i> Upload CSV
                 </button>
-                <button class="csv-btn" id="sampleCsvBtn">
+                <button class="csv-btn actions" id="sampleCsvBtn">
                     <i class="fas fa-file-csv"></i> Download Sample
                 </button>
-                <button class="csv-btn" id="downloadCsvBtn">
+                <button class="csv-btn actions" id="downloadCsvBtn">
                     <i class="fas fa-download"></i> Download CSV
                 </button>
                 {{!-- <form id="uploadCsvForm" enctype="multipart/form-data">
@@ -549,20 +553,7 @@
                     <label for="searchGroup">Search by Group Name</label>
                     <input type="text" id="searchGroup" placeholder="Enter group name">
             </div>
-            <!-- Mobile toggle -->
-            <div class="mobile-actions">
-            <!-- Toggle button -->
-            <button class="toggle-btn">☰ Actions</button>
-
-            <!-- Hidden menu -->
-            <div class="action-menu">
-                <button>Filter</button>
-                <button>Add Member</button>
-                <button>Upload CSV</button>
-                <button>Download Sample</button>
-                <button>Download CSV</button>
-            </div>
-            </div>
+        
 
 
 
