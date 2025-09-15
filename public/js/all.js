@@ -1676,9 +1676,13 @@ if (addMemberForm) {
   });
 }
 
+
+
+
 if (addNewBtn && addMemberModal && closeAddMemberModal) {
   addNewBtn.addEventListener('click', () => {
     addMemberModal.style.display = 'flex';
+      // document.querySelector('.actions').classList.toggle('show');
     populateGroups();
   });
   closeAddMemberModal.addEventListener('click', () => {
@@ -1988,7 +1992,7 @@ if (downloadCsvForm) {
 
 if (filterBtn && filterForm) {
   filterBtn.addEventListener('click', () => {
-    filterForm.classList.toggle('show');
+    filterForm.classList.toggle('open');
   });
 }
 

@@ -521,21 +521,23 @@
             <!-- Filter Section -->
             <div class="filter-section mb-2 button-group">
                  <button class="toggle-btn">☰ Actions</button>
-                <button class="filterbutton actions" id="filterBtn">
-                    <i class="fas fa-filter"></i> Filter
-                </button>
-                <button class="addmemberbtn actions" id="addNewBtn">
-                    <i class="fas fa-plus"></i> Add Member
-                </button>
-                <button class="csv-btn actions" id="uploadCsvBtn">
-                    <i class="fas fa-upload"></i> Upload CSV
-                </button>
-                <button class="csv-btn actions" id="sampleCsvBtn">
-                    <i class="fas fa-file-csv"></i> Download Sample
-                </button>
-                <button class="csv-btn actions" id="downloadCsvBtn">
-                    <i class="fas fa-download"></i> Download CSV
-                </button>
+                 <div class="actions">
+                        <button class="filterbutton " id="filterBtn">
+                            <i class="fas fa-filter"></i> Filter
+                        </button>
+                        <button class="addmemberbtn " id="addNewBtn">
+                            <i class="fas fa-plus"></i> Add Member
+                        </button>
+                        <button class="csv-btn " id="uploadCsvBtn">
+                            <i class="fas fa-upload"></i> Upload CSV
+                        </button>
+                        <button class="csv-btn " id="sampleCsvBtn">
+                            <i class="fas fa-file-csv"></i> Download Sample
+                        </button>
+                        <button class="csv-btn " id="downloadCsvBtn">
+                            <i class="fas fa-download"></i> Download CSV
+                        </button>
+                    </div>
                 {{!-- <form id="uploadCsvForm" enctype="multipart/form-data">
                     <label for="uploadGroupSelect">Select Group for Upload</label>
                     <select id="uploadGroupSelect" name="groupSelect" required>
@@ -590,7 +592,20 @@
                 <label for="groupSelect">Group</label>
                 <select id="groupSelect" class="add-member-input" name="groupSelect" required>
                     <option value="">Select Group</option>
-
+                </select>
+                <label for="categorySelect">Category</label>
+                <select id="categorySelect" class="add-member-input" name="category" required>
+                    <option value="">Select Category</option>
+                    <option value="Jeweller Shop Owner">Jeweller Shop Owner</option>
+                    <option value="Hallmarking Center/Bullion/Gold Exchange">Hallmarking Center/Bullion/Gold Exchange</option>
+                    <option value="Gold Silver Refinery">Gold Silver Refinery</option>
+                    <option value="Bengali/Soni Karigar">Bengali/Soni Karigar</option>
+                    <option value="Taar Vala/Dai Vala">Taar Vala/Dai Vala</option>
+                    <option value="Wholesaler">Wholesaler</option>
+                    <option value="Retailer">Retailer</option>
+                    <option value="Manufacturer">Manufacturer</option>
+                    <option value="Trader">Trader</option>
+                    <option value="Artisan/Craftsman">Artisan/Craftsman</option>
                 </select>
                 <label for="memberName">First Name</label>
                 <input type="text" class="add-member-input" id="memberf_Name" name="memberName"

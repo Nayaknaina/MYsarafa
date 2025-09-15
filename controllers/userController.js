@@ -188,6 +188,7 @@ exports.updateProfile = async (req, res) => {
             shopname: req.body.shopname,
             shopadd: req.body.shopadd,
             no_of_emp: req.body.no_of_emp,
+            category:req.body.category
         };
 
       
