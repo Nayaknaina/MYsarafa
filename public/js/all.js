@@ -1988,7 +1988,7 @@ if (downloadCsvForm) {
 
 if (filterBtn && filterForm) {
   filterBtn.addEventListener('click', () => {
-    filterForm.classList.toggle('open');
+    filterForm.classList.toggle('show');
   });
 }
 
@@ -2125,5 +2125,5 @@ document.getElementById("shareBtn").addEventListener("click", async () => {
 
 
 document.querySelector('.toggle-btn').addEventListener('click', function() {
-  document.querySelector('.action-menu').classList.toggle('show');
+  document.querySelector('.actions').classList.toggle('show');
 });
