@@ -381,7 +381,7 @@
                         <div class="profile-info">
                             <h2>{{user.fullName}}</h2>
                              <div class="member-status" id="memberStatus">
-                                <span class="status-badge {{#if user.isVerified}}verified{{else}}pending{{/if}}">
+                                <span class="status-badge {{#if user.user_status}}verified{{else}}pending{{/if}}">
                                     {{#if user.user_status}}Verified{{else}}Pending Verification{{/if}}
                                 </span>
                                 </div>
@@ -461,7 +461,7 @@
         </div>
 
         <!-- Verify Button -->
-        <button class="verify-btn {{#if user.isVerified}}verified{{/if}}" id="verifyBtn" {{#if user.isVerified}}disabled{{/if}}>
+        <button class="verify-btn {{#if user.user_status}}verified{{/if}}" id="verifyBtn" {{#if user.isVerified}}disabled{{/if}}>
             <svg class="verify-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M9 12l2 2 4-4"></path>
                 <circle cx="12" cy="12" r="10"></circle>
