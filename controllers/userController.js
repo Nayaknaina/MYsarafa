@@ -268,10 +268,10 @@ exports.getMemberDetails = async (req, res, next) => {
 // Route to handle verification
 exports.verifyMember = async (req, res, next) => {
   try {
-    // Ensure admin access
-    if (!req.user || !req.user.isAdmin) {
-      return res.status(403).json({ success: false, message: 'Access denied. Admin only.' });
-    }
+  
+    // if (!req.user || !req.user.isAdmin) {
+    //   return res.status(403).json({ success: false, message: 'Access denied. Admin only.' });
+    // }
 
     const userId = req.params.id;
     const user = await User.findById(userId);
