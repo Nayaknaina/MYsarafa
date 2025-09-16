@@ -167,44 +167,157 @@ exports.dashboard = async (req, res, next) => {
 };
 
 exports.updateProfile = async (req, res) => {
-    console.log('Incoming form body:', req.body);
+    console.log('Incoming form body:', req.body, 'File:', req.file);
     try {
         const user = await User.findById(req.user.id);
-
         if (!user) {
-            return res.status(404).json({ success: false, message: 'User not found' });
+            const errorMsg = 'User not found';
+            console.error(errorMsg);
+            if (req.xhr || req.headers.accept?.includes('application/json')) {
+                return res.status(404).json({ success: false, message: errorMsg });
+            }
+            return res.status(404).send(errorMsg);
         }
         console.log("user found");
 
+        const {
+            f_name,
+            l_name,
+            email,
+            dob,
+            phone,
+            country,
+            pincode,
+            address,
+            shopname,
+            shopadd,
+            no_of_emp,
+            category
+        } = req.body;
+
+        // Validate required fields
+        const requiredFields = [
+            { key: 'f_name', value: f_name?.trim() },
+            { key: 'l_name', value: l_name?.trim() },
+            { key: 'email', value: email?.trim() },
+            { key: 'dob', value: dob },
+            { key: 'country', value: country?.trim() },
+            { key: 'pincode', value: pincode?.trim() },
+            { key: 'shopname', value: shopname?.trim() },
+            { key: 'shopadd', value: shopadd?.trim() },
+            { key: 'no_of_emp', value: no_of_emp },
+            { key: 'category', value: category }
+        ];
+        const missingFields = requiredFields.filter(field => !field.value || field.value === '');
+        if (missingFields.length > 0) {
+            const errorMsg = `Missing required fields: ${missingFields.map(f => f.key).join(', ')}`;
+            console.error(errorMsg);
+            if (req.xhr || req.headers.accept?.includes('application/json')) {
+                return res.status(400).json({ success: false, message: errorMsg });
+            }
+            return res.status(400).send(errorMsg);
+        }
+
+        // Validate email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            const errorMsg = 'Invalid email format';
+            console.error(errorMsg);
+            if (req.xhr || req.headers.accept?.includes('application/json')) {
+                return res.status(400).json({ success: false, message: errorMsg });
+            }
+            return res.status(400).send(errorMsg);
+        }
+
+        // Validate phone (map to mobile_no)
+        if (phone && !/^\d{10}$/.test(phone)) {
+            const errorMsg = 'Phone number must be 10 digits';
+            console.error(errorMsg);
+            if (req.xhr || req.headers.accept?.includes('application/json')) {
+                return res.status(400).json({ success: false, message: errorMsg });
+            }
+            return res.status(400).send(errorMsg);
+        }
+
+        // Validate category
+        const validCategories = [
+            'Jeweller Shop Owner',
+            'Hallmarking Center/Bullion/Gold Exchange',
+            'Gold Silver Refinery',
+            'Bengali/Soni Karigar',
+            'Taar Vala/Dai Vala',
+            'Wholesaler',
+            'Retailer',
+            'Manufacturer',
+            'Trader',
+            'Artisan/Craftsman'
+        ];
+        if (!validCategories.includes(category)) {
+            const errorMsg = 'Invalid category selected';
+            console.error(errorMsg);
+            if (req.xhr || req.headers.accept?.includes('application/json')) {
+                return res.status(400).json({ success: false, message: errorMsg });
+            }
+            return res.status(400).send(errorMsg);
+        }
+
+        // Handle profile picture
+        let profilePicture = user.profilePicture;
+        if (req.file) {
+            profilePicture = `/uploads/${req.file.filename}`;
+        }
+
+        // Build updated fields
         const updatedFields = {
-            f_name: req.body.f_name,
-            l_name: req.body.l_name,
-            email: req.body.email,
-            dob: req.body.dob,
-            phone: req.body.phone,
-            country: req.body.country,
-            pincode: req.body.pincode,
-            address: req.body.address,
-            shopname: req.body.shopname,
-            shopadd: req.body.shopadd,
-            no_of_emp: req.body.no_of_emp,
-            category:req.body.category
+            f_name: f_name?.trim(),
+            l_name: l_name?.trim(),
+            email: email?.trim(),
+            dob: dob ? new Date(dob) : user.dob,
+            mobile_no: phone ? phone : user.mobile_no,
+            country: country?.trim(),
+            pincode: pincode?.trim(),
+            address: address?.trim() || user.address,
+            shopname: shopname?.trim(),
+            shopadd: shopadd?.trim(),
+            no_of_emp: parseInt(no_of_emp) || user.no_of_emp,
+            category,
+            profilePicture
         };
 
-      
+        // Remove empty/undefined fields
         Object.keys(updatedFields).forEach(
             (key) => (updatedFields[key] === '' || updatedFields[key] === undefined) && delete updatedFields[key]
         );
 
-        await User.findByIdAndUpdate(user._id, updatedFields, { new: true });
-        console.log("details saved", updatedFields)
+        const updatedUser = await User.findByIdAndUpdate(user._id, updatedFields, { new: true });
+        console.log("details saved", updatedFields);
+
+        if (req.xhr || req.headers.accept?.includes('application/json')) {
+            return res.status(200).json({
+                success: true,
+                message: 'Profile updated successfully',
+                user: {
+                    f_name: updatedUser.f_name,
+                    l_name: updatedUser.l_name,
+                    email: updatedUser.email,
+                    category: updatedUser.category,
+                    profilePicture: updatedUser.profilePicture
+                }
+            });
+        }
+
         res.redirect('/user-app/dashboard');
     } catch (error) {
         console.error('Profile update error:', error);
-        res.status(500).send('Server error');
+        const errorMsg = error.message.includes('Only JPEG, PNG, or GIF') || error.message.includes('File too large')
+            ? error.message
+            : 'Server error: ' + error.message;
+        if (req.xhr || req.headers.accept?.includes('application/json')) {
+            return res.status(500).json({ success: false, message: errorMsg });
+        }
+        res.status(500).send(errorMsg);
     }
 };
-
 exports.getMemberDetails = async (req, res, next) => {
   try {
    
@@ -269,10 +382,7 @@ exports.getMemberDetails = async (req, res, next) => {
 exports.verifyMember = async (req, res, next) => {
   try {
   
-    // if (!req.user || !req.user.isAdmin) {
-    //   return res.status(403).json({ success: false, message: 'Access denied. Admin only.' });
-    // }
-
+  
     const userId = req.params.id;
     const user = await User.findById(userId);
     if (!user) {
