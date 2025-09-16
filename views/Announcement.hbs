@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sarafa Community Creation</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <style>
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 90%;
+  width: 100%;
+  margin: 30px auto 0 auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  padding: 20px;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 15px;
+  padding-right: 5px;
+  border-bottom: 1px solid #eee;
+}
+
+.chat-message {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  background: #f1f1f1;
+  border-radius: 8px;
+  max-width: 80%;
+  word-break: break-word;
+}
+
+.chat-message.user {
+  background: #d1e7dd;
+  align-self: flex-end;
+}
+
+.chat-form {
+  background: #e3f0ff;
+  border-radius: 12px;
+  padding: 8px 16px;
+  margin-top: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.chat-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.chat-icons {
+  display: flex;
+  gap: 16px;
+  color: #222;
+  font-size: 1.3rem;
+  margin-right: 12px;
+}
+
+.chat-input {
+  flex: 1 1 0%;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 1rem;
+  padding: 10px 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.chat-input::placeholder {
+  color: #a0aec0;
+  opacity: 1;
+}
+
+.chat-send-btn {
+  flex-shrink: 0;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.3rem;
+  padding: 0 18px;
+  height: 40px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.chat-send-btn:hover {
+  background: #1256a3;
+}
+
+.announcement-container {
+  width: 100%;
+  height: 100%;
+  margin: 40px auto;
+  padding: 0 16px;
+}
+
+.announcement-post-box {
+  display: flex;
+  align-items: center;
+  background: #f3f4f6;
+  border-radius: 16px;
+  padding: 18px 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  gap: 16px;
+}
+
+.announcement-post-box i {
+  font-size: 2rem;
+  color: #aaa;
+}
+
+.announcement-input {
+  flex: 1 1 0%;
+  min-width: 0;
+  max-width: 100%;
+  font-size: 1rem;
+  padding: 10px 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.announcement-add-btn {
+  flex-shrink: 0;
+  background: #1976d2;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.3rem;
+  padding: 0 18px;
+  height: 40px;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.announcement-add-btn:hover {
+  background: #1256a3;
+}
+
+.announcement-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.announcement-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.10);
+  padding: 24px;
+  margin-bottom: 8px;
+  position: relative;
+}
+
+.announcement-message {
+  font-size: 1.1rem;
+  margin-bottom: 18px;
+}
+
+.announcement-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.announcement-user {
+  font-weight: bold;
+  color: #2f95ff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.announcement-time {
+  color: #aaa;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.announcement-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: #aaa5a5;
+  font-size: 1.2rem;
+}
+
+.announcement-like, .announcement-comment {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.announcement-like:hover {
+  color: #ff2f2f;
+}
+.announcement-comment:hover{
+  color:#2f95ff ;
+}
+.announcement-comments-count {
+  color: #bbb;
+  font-size: 1rem;
+  margin-left: auto;
+}
+
+.comments-section {
+  background: #f6faff;
+  border-radius: 8px;
+  margin-top: 10px;
+  padding: 10px 12px 6px 12px;
+}
+
+.comments-list {
+  max-height: 120px;
+  overflow-y: auto;
+  margin-bottom: 8px;
+}
+
+.comment-item {
+  background: #e3f0ff;
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  font-size: 0.97rem;
+  color: #222;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.comment-avatar {
+  color: #007bff;
+  font-size: 1.1rem;
+}
+
+.comment-delete {
+  margin-left: auto;
+  color: #e74c3c;
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.comment-delete:hover {
+  color: #c0392b;
+}
+
+.comment-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.comment-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: #fff;
+  border-radius: 5px;
+  padding: 7px 10px;
+  font-size: 1rem;
+  color: #222;
+}
+
+.comment-input::placeholder {
+  color: #a0aec0;
+  opacity: 1;
+}
+
+.comment-send-btn {
+  background: none;
+  border: none;
+  color: #222;
+  font-size: 1.3rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.comment-send-btn:hover {
+  color: #007bff;
+}
+
+.new-event-btn {
+  background: linear-gradient(245deg, #D324A8 -67.04%, #551DFF 129.05%);
+  color: #fff;
+  border: none;
+  border-radius: 22px;
+  padding: 10px 28px;
+  font-size: 1rem;
+  font-weight: 300;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  transition: background 0.2s, color 0.2s;
+}
+
+.new-event-btn:hover {
+  background:linear-gradient(245deg, #551DFF -67.04%, #D324A8 129.05%);
+  
+}
+.Announcement-btn{
+  position: absolute;
+  top: 100px;
+  right: 50px;
+  width: 161px;
+  height: 60px;
+  background: linear-gradient(245deg, #D324A8 -67.04%, #551DFF 129.05%);
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 600;
+
+  media
+}
+    </style>
+</head>
+<body>
+ {{> header}}
+
+ 
+
+ <div class="main-container">
+  {{> sidebar}}
+<main class="main-content">
+  <a href="/user-app/Announcementform" style="text-decoration: none;">
+  <button class="Announcement-btn">New +</button>
+  </a>  
+        <h1 class="page-title">Announcement</h1>
+        <div class="announcement-container">
+          <div class="announcement-list">
+            <div class="announcement-card" data-announcement-id="1">
+              <!-- Add image if available -->
+              <img
+                src="Assets/Images/get together.jpg"
+                alt="Announcement Image"
+                class="announcement-img"
+              />
+              <div class="announcement-content">
+                <div class="announcement-message">
+                  I'm Happy to announce that we are upgrade Our Community.
+                </div>
+                <div class="announcement-meta">
+                  <span class="announcement-user"
+                    ><i class="fas fa-user-circle"></i> Piyush Rathore</span
+                  >
+                  <span class="announcement-time">11:20 AM</span>
+                </div>
+                <div class="announcement-actions">
+                  <span class="announcement-like"
+                    ><i class="fas fa-heart"></i
+                  ></span>
+                  <span class="announcement-comment comment-toggle"
+                    ><i class="fas fa-comment"></i
+                  ></span>
+                  <span class="announcement-comments-count">0 comments</span>
+                </div>
+              </div>
+              <div class="comments-section" style="display: none">
+                <div class="comments-list"></div>
+                <form class="comment-form" autocomplete="off">
+                  <input
+                    type="text"
+                    class="comment-input"
+                    placeholder="Write a comment..."
+                    required
+                  />
+                  <button type="submit" class="comment-send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <div class="announcement-card" data-announcement-id="2">
+              <div class="announcement-message">Gold Is Booming!!!!</div>
+              <div class="announcement-meta">
+                <span class="announcement-user"
+                  ><i class="fas fa-user-circle"></i> Shekawat</span
+                >
+                <span class="announcement-time">11:20 AM</span>
+              </div>
+              <div class="announcement-actions">
+                <span class="announcement-like"
+                  ><i class="fas fa-heart"></i
+                ></span>
+                <span class="announcement-comment comment-toggle"
+                  ><i class="fas fa-comment"></i
+                ></span>
+                <span class="announcement-comments-count">0 comments</span>
+              </div>
+              <div class="comments-section" style="display: none">
+                <div class="comments-list"></div>
+                <form class="comment-form" autocomplete="off">
+                  <input
+                    type="text"
+                    class="comment-input"
+                    placeholder="Write a comment..."
+                    required
+                  />
+                  <button type="submit" class="comment-send-btn">
+                    <i class="fas fa-paper-plane"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+ </div>
+  </body>
+</html>
+
+<script src="/js/all.js"></script>
+    <script src="/js/communityGroup.js"></script>
+   
+    </body>
+
+</html>
