@@ -21,7 +21,7 @@ exports.signup = async (req, res ,next) => {
         //const hashedPassword = await bcrypt.hash(password, 10);
         const user = new User({
             f_name, l_name, password, email,kyc_status: 'pending',
-            user_status: 'unverified'
+            user_status: 'unverified',  profilePicture: '/images/default-profile.png'
         });
         await user.save();
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '12h' });

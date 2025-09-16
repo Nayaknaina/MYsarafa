@@ -370,8 +370,8 @@
                 <div class="profile-card">
                     <div class="profile-header">
                         <div class="avatar-container">
-                            <img src="{{#if user.avatar}}{{user.avatar}}{{else}}/Assets/Images/imgperson.png{{/if}}"  class="avatar" height="80" width="80">
-                            <div class="verification-badge" id="verificationBadge" style="display: {{#if user.isVerified}}flex{{else}}none{{/if}};">
+                            <img src="{{#if user.profilePicture}}{{user.profilePicture}}{{else}}/Assets/Images/imgperson{{/if}}"  class="avatar" height="80" width="80">
+                            <div class="verification-badge" id="verificationBadge" style="display: {{#if user.user_status}}flex{{else}}none{{/if}};">
                                 <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                                     <path d="M9 12l2 2 4-4"></path>
                                     <circle cx="12" cy="12" r="10"></circle>
@@ -602,5 +602,7 @@
         successModal.style.display = "none";
       }
     </script>
+    
+  <script src="/js/all.js"></script>
 </body>
 </html>

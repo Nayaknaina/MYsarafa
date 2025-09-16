@@ -16,6 +16,7 @@ passport.use(new GoogleStrategy({
             if (user) {
                 // Link Google account to existing user
                 user.googleId = profile.id;
+                user.profilePicture = profile.photos?.[0]?.value || user.profilePicture || '/images/default-profile.png';
                 await user.save();
             } else {
                 // Create new user
@@ -26,7 +27,8 @@ passport.use(new GoogleStrategy({
 
                     email: profile.emails[0].value,
                  kyc_status: 'pending',
-                    user_status: 'unverified'
+                    user_status: 'unverified',
+                    profilePicture: profile.photos?.[0]?.value || '/images/default-profile.png'
                 });
                 await user.save();
             }

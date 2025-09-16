@@ -7,6 +7,11 @@
         <div class="modal-body">
             <form id="profileForm" action="/user-app/update-profile" method="POST">
                 <div class="modal-form-group">
+                    <label for="profilePicture">Profile Picture</label>
+                    <img id="profilePicturePreview" src="{{user.profilePicture}}" alt="Profile Picture" style="width: 100px; height: 100px; object-fit: cover; border-radius: 50%; margin-bottom: 10px;" />
+                    <input type="file" id="profilePicture" name="profilePicture" class="modal-input" accept="image/*">
+                </div>
+                <div class="modal-form-group">
                     <label for="profileName" class="required">First Name</label>
                     <input type="text" id="profileName" name="f_name" class="modal-input" value="{{user.f_name}}"
                         required>

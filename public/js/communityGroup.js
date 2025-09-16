@@ -167,8 +167,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 const result = await response.json();
                 if (response.ok) {
-                    showNotification('Profile updated successfully!', 'success');
-                    profileModal.style.display = 'none';
+                 showNotification('Profile updated successfully!', 'success');
+                profileModal.style.display = 'none';
+                if (result.user?.profilePicture) {
+                    profilePicturePreview.src = result.user.profilePicture;
+                }
                 } else {
                     showNotification(result.message || 'Failed to update profile', 'error');
                 }
