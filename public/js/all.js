@@ -136,6 +136,119 @@ class OTPInputHandler {
     });
   }
 }
+        $(document).ready(function () {
+            $('.manage-group-btn').click(function () {
+                const groupId = $(this).data('group-id');
+                window.location.href = `/Groups/community/${groupId}`;
+            });
+            const socket = io();
+            socket.emit('joinRoom', '{{user._id}}');
+            socket.on('connect', () => {
+                console.log("✅ Connected to socket server:", socket.id);
+            });
+
+            
+
+            let notificationCount = 0;
+            function updateNotificationBadge(count) {
+                const badge = $('.notification-badge');
+                if (count > 0) {
+                    badge.text(count).show();
+                } else {
+                    badge.hide();
+                }
+            }
+            // Check if user is an admin and fetch initial pending requests
+            $.ajax({
+                url: '/Groups/pending-requests',
+                method: 'GET',
+                xhrFields: { withCredentials: true },
+               success: function (response) {
+                    if (response.success && response.requests.length > 0) {
+                        notificationCount = response.requests.length;
+                        updateNotificationBadge(notificationCount);
+                    }
+                },
+                error: function (err) {
+                    console.error('Error fetching pending requests:', err);
+                }
+            });
+
+           
+           socket.on('membershipRequest', function (data) {
+                console.log("📩 membershipRequest received:", data);
+                notificationCount++;
+                updateNotificationBadge(notificationCount);
+                toastr.info(`${data.userName} requested to join ${data.groupName}`, 'New Membership Request');
+            });
+
+
+            // Existing join group logic
+                $('.join-group-btn').click(function () {
+                    const $btn = $(this);
+                    const groupId = $(this).data('group-id');
+                    const groupName = $(this).closest('.group-card').find('.group-title').text();
+                    $.ajax({
+                        url: '/Groups/join',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ groupId }),
+                        xhrFields: { withCredentials: true },
+                        success: function (response) {
+                            if (response.success) {
+                                showNotification(response.message, 'success');
+                                    if (response.status === 'joined') {
+                                     $btn.text('Joined')
+                                    .removeClass('join-group-btn')
+                                    .addClass('joined-btn')
+                                    .prop('disabled', true);
+                            } else if (response.status === 'pending') {
+                                $btn.text('Pending')
+                                    .removeClass('join-group-btn')
+                                    .addClass('pending-btn')
+                                    .prop('disabled', true);
+                            }
+                            } else {
+                                showNotification(response.message || 'Failed to join group', 'error');
+                            }
+                        },
+                        error: function (err) {
+                            showNotification('Error joining group: ' + (err.responseJSON?.message || 'Server error'), 'error');
+                        }
+                    });
+                });
+
+            const duePaymentModal = $('#duePaymentModal');
+            const closeDuePaymentModal = $('#closeDuePaymentModal');
+            const payNowBtn = $('#payNowBtn');
+
+            if (duePaymentModal.length) {
+                // Close modal
+                closeDuePaymentModal.click(function () {
+                    duePaymentModal.hide();
+                });
+
+                // Handle clicks outside the modal content
+                duePaymentModal.click(function (e) {
+                    if (e.target === duePaymentModal[0]) {
+                        duePaymentModal.hide();
+                    }
+                });
+
+                // Pay Now button redirect
+                payNowBtn.click(function () {
+                    const groupId = $(this).data('group-id');
+                    window.location.href = `/pay/Membership-QR`;
+                });
+            }
+
+          
+            function showNotification(message, type) {
+                toastr[type](message);
+            }
+          
+        });
+        
 const searchInput = document.querySelector('.search-input');
 const joinBtn = document.querySelector('.join-btn');
 const communityDropdown = document.querySelector('.community-name');
@@ -2210,3 +2323,7 @@ document.addEventListener('DOMContentLoaded', function () {
 document.querySelector('.toggle-btn').addEventListener('click', function () {
   document.querySelector('.actions').classList.toggle('show');
 });
+
+  function goBack() {
+    window.history.back(); 
+}

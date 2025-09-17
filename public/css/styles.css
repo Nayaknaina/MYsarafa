@@ -659,7 +659,7 @@ body {
   }
 
   .header-right {
-    gap: 12px;
+    gap: 20px;
     display: flex;
     align-items: center;
     margin-right: -30px;
@@ -2821,4 +2821,27 @@ body {
     cursor: pointer;
     transition: transform 0.3s;
   cursor: default;
+}
+
+.notification-icon{
+   position: relative;
+    display: inline-block;
+}
+.notification-badge{
+  position: relative;
+    top: -12px;
+    right: -11px;
+    background-color: #25D366;
+    color: #fff;
+    border-radius: 50%;
+    /* padding: 4px 7px; */
+    font-size: 10px;
+    font-weight: bold;
+    line-height: 1;
+    min-width: 10px;
+    min-height: 13px;
+    display: flex
+;
+    align-items: center;
+    justify-content: center;
 }
