@@ -41,10 +41,15 @@
             width: 100%;
             padding: 0.75rem;
             border: 2px solid #e5e7eb;
-            border-radius: 0.5rem;
-            font-size: 1rem;
             outline: none;
             transition: border-color 0.3s, transform 0.3s;
+
+            background: linear-gradient(90deg, #fff 80%, #e3f0ff 100%);
+  border-radius: 8px;
+  font-size: 1.05rem;
+  color: #551DFF;
+  box-shadow: 0 1px 6px #D324A822;
+  transition: border 0.2s, box-shadow 0.2s;
         }
         .form-input:focus {
             border-color: #3b82f6;
@@ -133,8 +138,12 @@
             @media (max-width: 480px) {
   .group-create-container {
     flex-direction: column;
+    padding: 0;
   }
-}
+ 
+  }
+ 
+
      .modal {
       display: none;
       position: fixed;
@@ -624,6 +633,19 @@
     .learn-more-link:hover {
       text-decoration: underline;
     }
+.form-title{
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  background: linear-gradient(90deg, #D324A8 0%, #551DFF 100%);
+  border-radius: 8px;
+  padding: 8px 18px;
+  box-shadow: 0 2px 8px rgba(85, 29, 255, 0.10);
+}
     </style>
 </head>
 <body>

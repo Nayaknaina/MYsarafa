@@ -10,7 +10,8 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-  <style>
+    <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+<style>
     body {
       background: #f6f7fb;
       font-family: 'Segoe UI', Arial, sans-serif;
@@ -309,11 +310,32 @@
         padding: 14px 8px 14px 8px;
       }
     }
+    .back-btn {
+      position:absolute;
+      top: 20px;
+      left: 20px;
+      background: none;
+      border: none;
+      color: #2f95ff;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 8px;
+      transition: background 0.2s;
+      z-index: 1000;
+    }
   </style>
 </head>
 <body>
-  
+ 
   <div class="announcement-main-wrapper">
+     <button class="back-btn">
+    <i class="fas fa-arrow-left"></i> Back
+  </button
     <!-- Left: Announcement Form -->
     <div class="announcement-form-panel">
       <div class="announcement-form-header">
@@ -328,6 +350,12 @@
           <input type="text" id="announcementTitle" class="announcement-form-input" required placeholder="Announcement title">
         </div>
         <div class="announcement-form-group">
+          <label class="announcement-form-label" for="Meetinglink">
+            <i class="fa fa-users"></i> Meeting Link
+          </label>
+          <input type="text" id="Meetinglink" class="announcement-form-input" required placeholder="Meeting Link">
+        </div>
+        <div class="announcement-form-group">
           <label class="announcement-form-label" for="announcementImage">
             <i class="fas fa-camera"></i> Image
           </label>
@@ -337,12 +365,13 @@
           </div>
           <div class="announcement-upload-preview" id="imagePreview"></div>
         </div>
-        <div class="announcement-form-group">
-          <label class="announcement-form-label" for="announcementMessage">
-            <i class="fas fa-align-left"></i> Description
-          </label>
-          <textarea id="announcementMessage" class="announcement-form-textarea" required placeholder="Add description"></textarea>
-        </div>
+          <div class="announcement-form-group">
+    <label class="announcement-form-label" for="announcementMessage">
+      <i class="fas fa-align-left"></i> Description
+    </label>
+    <textarea id="announcementMessage" class="announcement-form-textarea" required placeholder="Add description"></textarea>
+  </div>
+
         <div class="announcement-form-footer">
           <button type="button" class="announcement-form-btn secondary" onclick="window.location.href='Announcement.html'">Cancel</button>
           <button type="submit" class="announcement-form-btn primary">Save</button>
@@ -445,6 +474,22 @@ document.getElementById('announcementForm').addEventListener('submit', function(
   alert('Announcement saved!');
   window.location.href = 'Announcement.html';
 });
+
+   
+  ClassicEditor.create(document.querySelector('#announcementMessage'), {
+        toolbar: ['bold', 'italic', 'underline', '|', 'link', 'bulletedList', 'numberedList']
+      })
+      .then(editor => {
+        console.log('Editor ready', editor);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  
 </script>
+
+
+</script>
+ <script src="/js/all.js"></script>
 </body>
 </html>
