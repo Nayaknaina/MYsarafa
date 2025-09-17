@@ -659,7 +659,7 @@ body {
   }
 
   .header-right {
-    gap: 8px;
+    gap: 12px;
     display: flex;
     align-items: center;
     margin-right: -30px;
@@ -2355,11 +2355,12 @@ body {
 
 @media (max-width: 480px) {
   .modal-content {
-    width: 100vw;
-    height: 100vh;
+   width: 100vw;
+    height: auto;
     max-height: 100vh;
-    border-radius: 0;
-    margin: 0;
+    border-radius: 31px;
+    margin: 25px 20px auto;
+    padding: 20px;
   }
 
   .modal-header {
