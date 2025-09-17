@@ -1,10 +1,13 @@
 const bcrypt = require('bcryptjs');
+const path = require('path');
+const fs = require('fs').promises;
+
 const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const Group = require('../models/group.model');
 const Payment = require('../models/payReceive.model');
 const Gmem = require('../models/groupMem.model');
-
+  
 
 // exports.dashboard = async (req, res,next) => {  
 //     try {
@@ -142,13 +145,13 @@ exports.dashboard = async (req, res, next) => {
       // Show modal if no payment or group amount changed after payment
       if (!payment || (payment && group.updatedAt > payment.uploadedAt)) {
         pendingGroup = group;
-        console.log(`Pending group found: ${group.g_name}`);
+        // console.log(`Pending group found: ${group.g_name}`);
         break;
       }
     }
 
-    console.log("discover", discoverGroups);
-    console.log("pending group", pendingGroup);
+    // console.log("discover", discoverGroups);
+    // console.log("pending group", pendingGroup);
 
     res.render("dashboard", {
       user: {
@@ -264,6 +267,11 @@ exports.updateProfile = async (req, res) => {
         // Handle profile picture
         let profilePicture = user.profilePicture;
         if (req.file) {
+            // Delete old picture if not default
+            if (user.profilePicture && user.profilePicture !== '/images/default-profile.png') {
+                const oldFilePath = path.join(__dirname, '../public', user.profilePicture);
+                await fs.unlink(oldFilePath).catch(err => console.error('Failed to delete old file:', err));
+            }
             profilePicture = `/uploads/${req.file.filename}`;
         }
 
@@ -292,21 +300,31 @@ exports.updateProfile = async (req, res) => {
         const updatedUser = await User.findByIdAndUpdate(user._id, updatedFields, { new: true });
         console.log("details saved", updatedFields);
 
-        if (req.xhr || req.headers.accept?.includes('application/json')) {
-            return res.status(200).json({
-                success: true,
-                message: 'Profile updated successfully',
-                user: {
-                    f_name: updatedUser.f_name,
-                    l_name: updatedUser.l_name,
-                    email: updatedUser.email,
-                    category: updatedUser.category,
-                    profilePicture: updatedUser.profilePicture
-                }
-            });
-        }
+        // if (req.xhr || req.headers.accept?.includes('application/json')) {
+        //     return res.status(200).json({
+        //         success: true,
+        //         message: 'Profile updated successfully',
+        //         user: {
+        //             f_name: updatedUser.f_name,
+        //             l_name: updatedUser.l_name,
+        //             email: updatedUser.email,
+        //             category: updatedUser.category,
+        //             profilePicture: updatedUser.profilePicture
+        //         }
+        //     });
+        // }
 
-        res.redirect('/user-app/dashboard');
+        return res.status(200).json({
+            success: true,
+            message: 'Profile updated successfully',
+            user: {
+                f_name: updatedUser.f_name,
+                l_name: updatedUser.l_name,
+                email: updatedUser.email,
+                category: updatedUser.category,
+                profilePicture: updatedUser.profilePicture
+            }
+        });
     } catch (error) {
         console.error('Profile update error:', error);
         const errorMsg = error.message.includes('Only JPEG, PNG, or GIF') || error.message.includes('File too large')

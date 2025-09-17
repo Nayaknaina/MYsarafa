@@ -134,52 +134,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Profile Modal Logic
-    const profileBtn = document.getElementById('profileDetailsBtn');
-    const profileModal = document.getElementById('profileModal');
-    const closeProfileModal = document.getElementById('closeProfileModal');
-    const closeProfileModal2 = document.getElementById('closeProfileModal2');
-    const profileForm = document.getElementById('profileForm');
-
-    if (profileBtn && profileModal && closeProfileModal && closeProfileModal2) {
-        profileBtn.onclick = () => { profileModal.style.display = 'flex'; };
-        closeProfileModal.onclick = () => { profileModal.style.display = 'none'; };
-        closeProfileModal2.onclick = () => { profileModal.style.display = 'none'; };
-        profileModal.onclick = (e) => {
-            if (e.target === profileModal) profileModal.style.display = 'none';
-        };
-    }
-
-    // Profile Form Submission
-    if (profileForm) {
-        profileForm.addEventListener('submit', async function (e) {
-            e.preventDefault();
-            const formData = new FormData(profileForm);
-            const data = Object.fromEntries(formData);
-
-            try {
-                const response = await fetch('/auth/update-profile', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data),
-                    credentials: 'include'
-                });
-
-                const result = await response.json();
-                if (response.ok) {
-                 showNotification('Profile updated successfully!', 'success');
-                profileModal.style.display = 'none';
-                if (result.user?.profilePicture) {
-                    profilePicturePreview.src = result.user.profilePicture;
-                }
-                } else {
-                    showNotification(result.message || 'Failed to update profile', 'error');
-                }
-            } catch (error) {
-                showNotification('Error updating profile: ' + error.message, 'error');
-            }
-        });
-    }
 
     // Notification Function
     function showNotification(message, type = 'info') {
