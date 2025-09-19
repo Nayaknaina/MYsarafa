@@ -736,7 +736,7 @@ body {
     box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
     transition: left 0.3s;
     z-index: 1100;
-    padding-top: 60px;
+    margin-top: 84px;
     display: block;
     flex-direction: column;
   }
@@ -1601,6 +1601,13 @@ body {
     font-size: 0.98rem;
     padding: 9px 0;
   }
+
+  .avatar {
+  width: 41px;
+  height: 30px;
+  border-radius: 50%;
+  object-fit: cover;
+}
 }
 
 .announcement-send-btn {
