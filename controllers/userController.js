@@ -181,7 +181,7 @@ exports.updateProfile = async (req, res) => {
             }
             return res.status(404).send(errorMsg);
         }
-        console.log("user found");
+        // console.log("user found");
 
         const {
             f_name,
@@ -272,7 +272,7 @@ exports.updateProfile = async (req, res) => {
                 const oldFilePath = path.join(__dirname, '../public', user.profilePicture);
                 await fs.unlink(oldFilePath).catch(err => console.error('Failed to delete old file:', err));
             }
-            profilePicture = `/uploads/${req.file.filename}`;
+            profilePicture = `/uploads/${req.file.fieldname}/${req.file.filename}`;
         }
 
         // Build updated fields

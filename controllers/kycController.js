@@ -70,7 +70,7 @@ exports.sendAadhaarOtp = async (req, res) => {
     // Replace with actual Quick eKYC API call
    // const quickEkycApiKey = process.env.QUICK_EKYC_API_KEY;
      const response = await axios.post(
-      'https://sandbox.quickekyc.com/api/v1/aadhaar-v2/generate-otp',
+      'https://api.quickekyc.com/api/v1/aadhaar-v2/generate-otp',
       {
         key: process.env.QUICK_EKYC_API_KEY ,
         id_number: aadhaarNumber
@@ -126,7 +126,7 @@ exports.verifyAadhaarOtp = async (req, res) => {
     // Replace with actual Quick eKYC API call
    // const quickEkycApiKey = process.env.QUICK_EKYC_API_KEY ;
     const response = await axios.post(
-      'https://sandbox.quickekyc.com/api/v1/aadhaar-v2/submit-otp',
+      'https://api.quickekyc.com/api/v1/aadhaar-v2/submit-otp',
       {
         key: process.env.QUICK_EKYC_API_KEY,
         request_id: requestId,
