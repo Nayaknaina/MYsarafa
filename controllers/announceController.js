@@ -111,8 +111,9 @@ exports.createAnnouncement = async (req, res) => {
     let imagePath = '';
     if (req.files && req.files['image']) {
       const file = req.files['image'][0];
-      imagePath = `/uploads/announcement/${file.filename}`;
+      imagePath = `/uploads/${file.fieldname}/${file.filename}`;
     }
+    
 
     // Create new announcement
     const announcement = new Announcement({
