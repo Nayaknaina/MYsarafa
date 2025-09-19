@@ -243,6 +243,12 @@ body {
   background: #e8f1fd;
   color: #2f95ff;
 }
+.avatar{
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
 
 @keyframes fadeIn {
   from {
