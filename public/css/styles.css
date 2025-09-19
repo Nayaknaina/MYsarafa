@@ -1162,13 +1162,7 @@ body {
   font-weight: 600;
 }
 
-.announcement-actions {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-  color: #aaa5a5;
-  font-size: 1.2rem;
-}
+
 
 .announcement-like,
 .announcement-comment {
