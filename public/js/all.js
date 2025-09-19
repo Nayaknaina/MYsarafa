@@ -158,6 +158,7 @@ class OTPInputHandler {
                     badge.hide();
                 }
             }
+            
             // Check if user is an admin and fetch initial pending requests
             $.ajax({
                 url: '/Groups/pending-requests',
@@ -1173,9 +1174,9 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       try {
-        const response = await fetch('/user-app/update-profile', { // Match form action
+        const response = await fetch('/user-app/update-profile', { 
           method: 'POST',
-          body: formData, // FormData handles multipart/form-data
+          body: formData, 
           credentials: 'include'
         });
 
@@ -1200,130 +1201,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // verify mobile number modal and to set new pswd
 document.addEventListener('DOMContentLoaded', function () {
-  //   if (verifyMobileModal && verifyMobileForm) {
-  //     // Prevent modal from being closed
-  //     verifyMobileModal.addEventListener('click', (e) => {
-  //         if (e.target === verifyMobileModal) {
-  //             e.preventDefault();
-  //         }
-  //     });
-
-  //     if (sendOtpBtn) {
-  //         sendOtpBtn.addEventListener('click', async () => {
-  //             const mobile_no = mobileInput.value;
-  //               console.log("mobile_no",mobile_no)
-  //             if (!/^\d{10}$/.test(mobile_no)) {
-  //                 mobileError.textContent = 'Please enter a valid 10-digit mobile number';
-  //                 mobileError.style.display = 'block';
-  //                 return;
-  //             }
-  //              console.log("we are here")
-  //             try {
-  //                 const response = await fetch('/auth/send-otp', {
-  //                     method: 'POST',
-  //                     headers: {
-  //                         'Content-Type': 'application/json'
-  //                     },
-  //                     body: JSON.stringify({ mobile_no }),
-  //                     credentials: 'include'
-  //                 });
-
-  //                 const result = await response.json();
-  //                 if (response.ok) {
-  //                     mobileError.style.display = 'none';
-  //                     mobileInput.style.display = 'none';
-  //                     sendOtpBtn.style.display = 'none';
-  //                     otpLabel.style.display = 'block';
-  //                     otpInput.style.display = 'block';
-  //                     verifyOtpBtn.style.display = 'block';
-  //                 } else {
-  //                     mobileError.textContent = result.message;
-  //                     mobileError.style.display = 'block';
-  //                 }
-  //             } catch (error) {
-  //                 mobileError.textContent = 'Error sending OTP: ' + error.message;
-  //                 mobileError.style.display = 'block';
-  //             }
-  //         });
-  //     }
-
-  //     if (verifyOtpBtn) {
-  //         verifyOtpBtn.addEventListener('click', async () => {
-  //             const otp = otpInput.value;
-  //             if (!otp || otp.length !== 6) {
-  //                 mobileError.textContent = 'Please enter a valid 6-digit OTP';
-  //                 mobileError.style.display = 'block';
-  //                 return;
-  //             }
-
-  //             try {
-  //                 const response = await fetch('/auth/verify-otp', {
-  //                     method: 'POST',
-  //                     headers: {
-  //                         'Content-Type': 'application/json'
-  //                     },
-  //                     body: JSON.stringify({ otp }),
-  //                     credentials: 'include'
-  //                 });
-
-  //                 const result = await response.json();
-  //                 if (response.ok) {
-  //                     mobileError.style.display = 'none';
-  //                     window.location.reload(); // Reload to update modal state
-  //                 } else {
-  //                     mobileError.textContent = result.message;
-  //                     mobileError.style.display = 'block';
-  //                 }
-  //             } catch (error) {
-  //                 mobileError.textContent = 'Error verifying OTP: ' + error.message;
-  //                 mobileError.style.display = 'block';
-  //             }
-  //         });
-  //     }
-
-  //     if (setPasswordBtn) {
-  //         verifyMobileForm.addEventListener('submit', async (e) => {
-  //             e.preventDefault();
-  //             const password = document.getElementById('newPassword').value;
-  //             const confirmPassword = document.getElementById('confirmPassword').value;
-
-  //             if (password !== confirmPassword) {
-  //                 passwordError.textContent = 'Passwords do not match';
-  //                 passwordError.style.display = 'block';
-  //                 return;
-  //             }
-
-  //             if (password.length < 6) {
-  //                 passwordError.textContent = 'Password must be at least 6 characters';
-  //                 passwordError.style.display = 'block';
-  //                 return;
-  //             }
-
-  //             try {
-  //                 const response = await fetch('/auth/set-password', {
-  //                     method: 'POST',
-  //                     headers: {
-  //                         'Content-Type': 'application/json'
-  //                     },
-  //                     body: JSON.stringify({ password }),
-  //                     credentials: 'include'
-  //                 });
-
-  //                 const result = await response.json();
-  //                 if (response.ok) {
-  //                     passwordError.style.display = 'none';
-  //                     window.location.reload(); // Reload to close modal
-  //                 } else {
-  //                     passwordError.textContent = result.message;
-  //                     passwordError.style.display = 'block';
-  //                 }
-  //             } catch (error) {
-  //                 passwordError.textContent = 'Error setting password: ' + error.message;
-  //                 passwordError.style.display = 'block';
-  //             }
-  //         });
-  //     }
-  // }
   if (verifyMobileModal && verifyMobileForm) {
     const otpInput = new OTPInputHandler('.otp-input');
 
@@ -1636,7 +1513,7 @@ document.addEventListener('DOMContentLoaded', function () {
         credentials: 'include'
       });
       const result = await response.json();
-      console.log(result);
+      console.log("groups",result);
       if (response.ok) {
         const groupSelect = document.getElementById('groupSelect');
         groupSelect.innerHTML = '<option value="">Select Group</option>';
@@ -1665,6 +1542,16 @@ document.addEventListener('DOMContentLoaded', function () {
             option.value = group._id;
             option.textContent = group.g_name;
             downloadGroupSelect.appendChild(option);
+          });
+        }
+         const announcementGroupSelect = document.getElementById('announceGroupSelect');
+        if (announcementGroupSelect) {
+          announcementGroupSelect.innerHTML = '<option value="">Select Group</option>';
+          result.groups.forEach(group => {
+            const option = document.createElement('option');
+            option.value = group._id;
+            option.textContent = group.g_name;
+            announcementGroupSelect.appendChild(option);
           });
         }
 

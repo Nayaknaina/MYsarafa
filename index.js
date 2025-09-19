@@ -17,6 +17,7 @@ const userRoutes = require('./routes/user');
 const groupRoutes = require('./routes/group');
 const kycRoutes = require('./routes/kyc');
 const membershipRoute = require('./routes/membership');
+const announcementsRoute = require('./routes/announcements')
 
 const { engine } = require('express-handlebars');
 const jwt = require('jsonwebtoken');
@@ -61,6 +62,7 @@ app.use('/user-app', userRoutes);
 app.use('/Groups',groupRoutes);
 app.use('/kyc',kycRoutes);
 app.use('/pay',membershipRoute);
+app.use('/announcements',announcementsRoute);
 
 
 // Serve HTML files

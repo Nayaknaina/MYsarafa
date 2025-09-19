@@ -257,14 +257,14 @@ exports.submitKyc = async (req, res, next) => {
 exports.getLocationByPincode = async (req, res) => {
   try {
     const { pincode } = req.query;
-    console.log('getLocationByPincode query:', { pincode }); // Debug log
+    console.log('getLocationByPincode query:', { pincode });
 
     if (!pincode || !/^\d{6}$/.test(pincode)) {
-      return res.status(400).json({ success: false, message: 'Invalid PIN code. Must be 6 digits.' });
+      return res.status(400).json({ success: false, message: 'Invalid PIN code. Must be 6 digits' });
     }
 
     const response = await axios.get(`https://api.postalpincode.in/pincode/${pincode}`);
-    console.log('PostalPincode API response:', response.data); // Debug log
+    console.log('PostalPincode API response:', response.data); 
 
     if (response.data[0].Status !== 'Success') {
       return res.status(404).json({ success: false, message: 'PIN code not found.' });

@@ -7,7 +7,7 @@ const User = require('../models/user.model');
 const Group = require('../models/group.model');
 const Payment = require('../models/payReceive.model');
 const Gmem = require('../models/groupMem.model');
-  
+
 
 // exports.dashboard = async (req, res,next) => {  
 //     try {
@@ -170,7 +170,7 @@ exports.dashboard = async (req, res, next) => {
 };
 
 exports.updateProfile = async (req, res) => {
-    console.log('Incoming form body:', req.body, 'File:', req.file);
+    // console.log('Incoming form body:', req.body, 'File:', req.file);
     try {
         const user = await User.findById(req.user.id);
         if (!user) {
@@ -338,8 +338,6 @@ exports.updateProfile = async (req, res) => {
 };
 exports.getMemberDetails = async (req, res, next) => {
   try {
-   
-
     // Fetch user by ID
     const userId = req.params.id;
     const user = await User.findById(userId).lean();
@@ -443,66 +441,3 @@ exports.notifications = async (req, res, next) => {
   }
 };
 
-exports.Announcement = async (req, res, next) => {
-  try {
-    console.log("/user/Announcement");
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
-    }
-    const user = await User.findById(req.user.id).lean();
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
-
-    
-
-    res.render("Announcement", {
-      user: {
-        ...user,
-        has_password: !!user.password
-      },
-      
-      layout: false
-    });
-  } catch (error) {
-    console.error('Error rendering dashboard:', error);
-    res.status(500).json({ success: false, message: 'Server error: ' + error.message });
-  }
-};
-
-exports.Announcementform = async (req, res, next) => {
-  try {
-    console.log("/user/Announcementform");
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
-    }
-    const user = await User.findById(req.user.id).lean();
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
-
-    const memberships = await Gmem.find({ user: user._id })
-      .populate('group').lean();
-      console.log(memberships,"all groups above under this ",user._id);
-    
-      //   const myGroups = memberships
-      // .filter(m => m.group) 
-      // .map(m => ({
-      //   ...m.group,
-      //   membershipType: m.type  
-      // })).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-
-     
-    res.render("Announcement-form", {
-      user: {
-        ...user,
-        has_password: !!user.password
-      },
-      
-      layout: false
-    });
-  } catch (error) {
-    console.error('Error rendering dashboard:', error);
-    res.status(500).json({ success: false, message: 'Server error: ' + error.message });
-  }
-};

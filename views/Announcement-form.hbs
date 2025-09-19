@@ -1,23 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Announcement - Sarafa Community</title>
-   <link rel="stylesheet" href="/css/styles.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
-<style>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+
+  <style>
     body {
       background: #f6f7fb;
       font-family: 'Segoe UI', Arial, sans-serif;
       margin: 0;
       min-height: 100vh;
     }
+
     .announcement-main-wrapper {
       display: flex;
       justify-content: center;
@@ -27,27 +31,31 @@
       max-width: 1200px;
       margin: 0 auto;
     }
+
     .announcement-form-panel {
       background: #fff;
       border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(60,60,60,0.12);
+      box-shadow: 0 8px 32px rgba(60, 60, 60, 0.12);
       padding: 32px 28px 24px 28px;
       min-width: 340px;
       max-width: 400px;
       flex: 1;
     }
+
     .announcement-form-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 24px;
     }
+
     .announcement-form-header h2 {
       font-size: 22px;
       font-weight: 600;
       margin: 0;
       color: #222;
     }
+
     .announcement-form-header .close-btn {
       background: none;
       border: none;
@@ -58,13 +66,16 @@
       padding: 4px 8px;
       transition: background 0.2s;
     }
+
     .announcement-form-header .close-btn:hover {
       background: #f2f3f5;
     }
+
     .announcement-form-group {
       margin-bottom: 18px;
       position: relative;
     }
+
     .announcement-form-label {
       font-size: 15px;
       font-weight: 500;
@@ -72,6 +83,7 @@
       display: block;
       color: #374151;
     }
+
     .announcement-form-input,
     .announcement-form-textarea {
       width: 100%;
@@ -83,16 +95,19 @@
       transition: border-color 0.2s;
       margin-bottom: 0;
     }
+
     .announcement-form-input:focus,
     .announcement-form-textarea:focus {
       border-color: #2f95ff;
       background: #fff;
       outline: none;
     }
+
     .announcement-form-textarea {
       min-height: 80px;
       resize: vertical;
     }
+
     .announcement-upload-box {
       background: #f7f8fa;
       border: 1.5px dashed #d1d5db;
@@ -106,32 +121,41 @@
       transition: border-color 0.2s;
       position: relative;
     }
+
     .announcement-upload-box:hover {
       border-color: #2f95ff;
       color: #2f95ff;
     }
+
     .announcement-upload-box input[type="file"] {
       opacity: 0;
       position: absolute;
-      left: 0; top: 0; width: 100%; height: 100%;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
       cursor: pointer;
     }
+
     .announcement-upload-preview {
       margin-bottom: 10px;
       text-align: center;
     }
+
     .announcement-upload-preview img {
       max-width: 100%;
       max-height: 120px;
       border-radius: 8px;
       margin-bottom: 6px;
     }
+
     .announcement-form-footer {
       display: flex;
       gap: 10px;
       justify-content: flex-end;
       margin-top: 18px;
     }
+
     .announcement-form-btn {
       padding: 10px 24px;
       border: none;
@@ -141,58 +165,73 @@
       cursor: pointer;
       transition: background 0.2s;
     }
+
     .announcement-form-btn.primary {
       background: #2f95ff;
       color: #fff;
     }
+
     .announcement-form-btn.primary:hover {
       background: #1d7dd8;
     }
+
     .announcement-form-btn.secondary {
       background: #e4e6ea;
       color: #1c1e21;
     }
+
     .announcement-form-btn.secondary:hover {
       background: #d8dadf;
     }
+
     .switch-row {
       display: flex;
       align-items: center;
       gap: 8px;
       margin-bottom: 14px;
     }
+
     .switch-label {
       font-size: 15px;
       color: #374151;
       font-weight: 500;
     }
+
     .switch-info {
       font-size: 13px;
       color: #888;
       margin-left: 4px;
     }
+
     .switch-toggle {
       position: relative;
       width: 38px;
       height: 22px;
       display: inline-block;
     }
+
     .switch-toggle input {
       opacity: 0;
       width: 0;
       height: 0;
     }
+
     .switch-slider {
       position: absolute;
       cursor: pointer;
-      top: 0; left: 0; right: 0; bottom: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       background: #e4e6ea;
       border-radius: 22px;
       transition: background 0.2s;
     }
-    .switch-toggle input:checked + .switch-slider {
+
+    .switch-toggle input:checked+.switch-slider {
       background: #2f95ff;
     }
+
     .switch-slider:before {
       position: absolute;
       content: "";
@@ -203,16 +242,18 @@
       background: #fff;
       border-radius: 50%;
       transition: transform 0.2s;
-      box-shadow: 0 1px 4px rgba(60,60,60,0.10);
+      box-shadow: 0 1px 4px rgba(60, 60, 60, 0.10);
     }
-    .switch-toggle input:checked + .switch-slider:before {
+
+    .switch-toggle input:checked+.switch-slider:before {
       transform: translateX(16px);
     }
+
     /* Preview panel */
     .announcement-preview-panel {
       background: #fff;
       border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(60,60,60,0.12);
+      box-shadow: 0 8px 32px rgba(60, 60, 60, 0.12);
       padding: 32px 24px 24px 24px;
       min-width: 320px;
       max-width: 360px;
@@ -221,6 +262,7 @@
       flex-direction: column;
       align-items: center;
     }
+
     .preview-phone {
       background: #f7f8fa;
       border: 2px solid #e4e6ea;
@@ -229,20 +271,22 @@
       min-height: 420px;
       padding: 24px 18px 24px 18px;
       box-sizing: border-box;
-      box-shadow: 0 2px 8px rgba(60,60,60,0.07);
+      box-shadow: 0 2px 8px rgba(60, 60, 60, 0.07);
       display: flex;
       flex-direction: column;
       align-items: center;
       position: relative;
     }
+
     .preview-img {
       width: 100%;
       max-height: 120px;
       border-radius: 12px;
       margin-bottom: 10px;
       object-fit: cover;
-      
+
     }
+
     .preview-title {
       font-size: 18px;
       font-weight: 600;
@@ -251,6 +295,7 @@
       text-align: left;
       width: 100%;
     }
+
     .preview-message {
       font-size: 15px;
       color: #444;
@@ -259,6 +304,7 @@
       text-align: left;
       line-height: 1.5;
     }
+
     .preview-btn {
       width: 90%;
       padding: 12px 0;
@@ -272,6 +318,7 @@
       margin-bottom: 8px;
       cursor: pointer;
     }
+
     .preview-pause {
       font-size: 13px;
       color: #e41e3f;
@@ -281,6 +328,7 @@
       text-align: left;
       display: none;
     }
+
     @media (max-width: 900px) {
       .announcement-main-wrapper {
         flex-direction: column;
@@ -288,30 +336,36 @@
         padding: 24px 0;
         align-items: center;
       }
+
       .announcement-form-panel,
       .announcement-preview-panel {
         max-width: 98vw;
         min-width: unset;
       }
+
       .preview-phone {
         width: 98vw;
         max-width: 320px;
       }
     }
+
     @media (max-width: 600px) {
       .announcement-main-wrapper {
         padding: 8px 0;
       }
+
       .announcement-form-panel,
       .announcement-preview-panel {
         padding: 16px 8px 12px 8px;
       }
+
       .preview-phone {
         padding: 14px 8px 14px 8px;
       }
     }
+
     .back-btn {
-      position:absolute;
+      position: absolute;
       top: 20px;
       left: 20px;
       background: none;
@@ -330,24 +384,32 @@
     }
   </style>
 </head>
+
 <body>
- 
+
   <div class="announcement-main-wrapper">
-     <button class="back-btn">
-    <i class="fas fa-arrow-left"></i> Back
-  </button
-    <!-- Left: Announcement Form -->
+    <button class="back-btn" onclick="goBack()">
+      <i class="fas fa-arrow-left"></i> Back
+    </button <!-- Left: Announcement Form -->
     <div class="announcement-form-panel">
       <div class="announcement-form-header">
         <h2>New announcement</h2>
-        <button class="close-btn" onclick="window.location.href='Announcement.html'">&times;</button>
+
       </div>
       <form id="announcementForm" autocomplete="off">
         <div class="announcement-form-group">
           <label class="announcement-form-label" for="announcementTitle">
             <i class="fas fa-pen"></i> Announcement title
           </label>
-          <input type="text" id="announcementTitle" class="announcement-form-input" required placeholder="Announcement title">
+          <input type="text" id="announcementTitle" class="announcement-form-input" required
+            placeholder="Announcement title">
+        </div>
+        <div class="announcement-form-group">
+          <label class="announcement-form-label" for="announceGroupSelect"><i class="fas fa-pen"></i> Group</label>
+
+          <select id="announceGroupSelect" class="announcement-form-input" name="groupSelect">
+            <option value="">Select Group</option>
+          </select>
         </div>
         <div class="announcement-form-group">
           <label class="announcement-form-label" for="Meetinglink">
@@ -360,136 +422,224 @@
             <i class="fas fa-camera"></i> Image
           </label>
           <div class="announcement-upload-box" id="uploadBox">
-            <span id="uploadText">Drag and drop an image here, or <span style="color:#2f95ff;cursor:pointer;">click to upload</span></span>
+            <span id="uploadText">Drag and drop an image here, or <span style="color:#2f95ff;cursor:pointer;">click to
+                upload</span></span>
             <input type="file" id="announcementImage" accept="image/*">
           </div>
           <div class="announcement-upload-preview" id="imagePreview"></div>
         </div>
-          <div class="announcement-form-group">
-    <label class="announcement-form-label" for="announcementMessage">
-      <i class="fas fa-align-left"></i> Description
-    </label>
-    <textarea id="announcementMessage" class="announcement-form-textarea" required placeholder="Add description"></textarea>
-  </div>
+        <div class="announcement-form-group">
+          <label class="announcement-form-label" for="announcementMessage">
+            <i class="fas fa-align-left"></i> Description
+          </label>
+          <textarea id="announcementMessage" name="message" class="announcement-form-textarea"
+            placeholder="Add description"></textarea>
+        </div>
 
         <div class="announcement-form-footer">
-          <button type="button" class="announcement-form-btn secondary" onclick="window.location.href='Announcement.html'">Cancel</button>
+          <button type="button" class="announcement-form-btn secondary">Cancel</button>
           <button type="submit" class="announcement-form-btn primary">Save</button>
         </div>
       </form>
     </div>
     <!-- Right: Announcement Preview -->
     <div class="announcement-preview-panel">
-  <div class="preview-phone">
-    <div id="previewImgContainer" style="width:100%;margin-bottom:10px;display:none;">
-      <img id="previewImg" class="preview-img" alt="Announcement Image">
+      <div class="preview-phone">
+        <div id="previewImgContainer" style="width:100%;margin-bottom:10px;display:none;">
+          <img id="previewImg" class="preview-img" alt="Announcement Image">
+        </div>
+        <div class="preview-title" id="previewTitle">Announcement title</div>
+        <div class="preview-message" id="previewMessage">
+          Your announcement text will display here. It's best to keep it as brief as possible to make sure it gets read.
+          An emoji or two can help 👍<br><br>
+          If you add an image it will display at the top of the screen.
+        </div>
+        <div class="preview-pause" id="previewPause">Announcement is paused</div>
+      </div>
     </div>
-    <div class="preview-title" id="previewTitle">Announcement title</div>
-    <div class="preview-message" id="previewMessage">
-      Your announcement text will display here. It's best to keep it as brief as possible to make sure it gets read. An emoji or two can help 👍<br><br>
-      If you add an image it will display at the top of the screen.
-    </div>
-    <div class="preview-pause" id="previewPause">Announcement is paused</div>
-  </div>
-</div>
   </div>
   <script>
-const titleInput = document.getElementById('announcementTitle');
-const messageInput = document.getElementById('announcementMessage');
-const previewTitle = document.getElementById('previewTitle');
-const previewMessage = document.getElementById('previewMessage');
-const previewPause = document.getElementById('previewPause');
-const previewImg = document.getElementById('previewImg');
-const previewImgContainer = document.getElementById('previewImgContainer');
-const uploadBox = document.getElementById('uploadBox');
-const uploadInput = document.getElementById('announcementImage');
-
-// Title and message preview
-titleInput.addEventListener('input', () => {
-  previewTitle.textContent = titleInput.value || 'Announcement title';
-});
-messageInput.addEventListener('input', () => {
-  previewMessage.textContent = messageInput.value || "Your announcement text will display here. It's best to keep it as brief as possible to make sure it gets read. An emoji or two can help 👍\n\nIf you add an image it will display at the top of the screen.";
-});
-
-// Pause preview logic (if you add the switch in your form)
-const pauseCheckbox = document.getElementById('pauseAnnouncement');
-if (pauseCheckbox) {
-  pauseCheckbox.addEventListener('change', () => {
-    previewPause.style.display = pauseCheckbox.checked ? 'block' : 'none';
-  });
-}
-
-// Custom image preview logic
-uploadInput.addEventListener('change', function() {
-  if (this.files && this.files[0]) {
-    const file = this.files[0];
-    if (file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        previewImg.src = e.target.result;
-        previewImgContainer.style.display = 'block';
-      };
-      reader.readAsDataURL(file);
-    } else {
-      previewImg.src = '';
-      previewImgContainer.style.display = 'none';
-    }
-  } else {
-    previewImg.src = '';
-    previewImgContainer.style.display = 'none';
-  }
-});
-
-// Drag & drop for upload box
-uploadBox.addEventListener('dragover', function(e) {
-  e.preventDefault();
-  uploadBox.style.borderColor = '#2f95ff';
-  uploadBox.style.color = '#2f95ff';
-});
-uploadBox.addEventListener('dragleave', function(e) {
-  e.preventDefault();
-  uploadBox.style.borderColor = '#d1d5db';
-  uploadBox.style.color = '#888';
-});
-uploadBox.addEventListener('drop', function(e) {
-  e.preventDefault();
-  uploadBox.style.borderColor = '#d1d5db';
-  uploadBox.style.color = '#888';
-  if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-    uploadInput.files = e.dataTransfer.files;
-    const event = new Event('change');
-    uploadInput.dispatchEvent(event);
-  }
-});
-
-// Clicking upload box triggers file input
-uploadBox.addEventListener('click', function() {
-  uploadInput.click();
-});
-
-// Form submit
-document.getElementById('announcementForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  alert('Announcement saved!');
-  window.location.href = 'Announcement.html';
-});
+    let editorInstance;
+    const titleInput = document.getElementById('announcementTitle');
+    const messageInput = document.getElementById('announcementMessage');
+    const groupSelect = document.getElementById('announceGroupSelect');
+    const meetingLinkInput = document.getElementById('Meetinglink');
+    const previewTitle = document.getElementById('previewTitle');
+    const previewMessage = document.getElementById('previewMessage');
+    const previewImg = document.getElementById('previewImg');
+    const previewImgContainer = document.getElementById('previewImgContainer');
+    const uploadBox = document.getElementById('uploadBox');
+    const uploadInput = document.getElementById('announcementImage');
 
    
-  ClassicEditor.create(document.querySelector('#announcementMessage'), {
-        toolbar: ['bold', 'italic', 'underline', '|', 'link', 'bulletedList', 'numberedList']
-      })
+    ClassicEditor.create(document.querySelector('#announcementMessage'), {
+      toolbar: ['bold', 'italic', 'underline', '|', 'link', 'bulletedList', 'numberedList']
+    })
       .then(editor => {
         console.log('Editor ready', editor);
+        editorInstance = editor;
+      
+        editor.model.document.on('change:data', () => {
+          previewMessage.innerHTML = editor.getData() || "Your announcement text will display here. It's best to keep it as brief as possible to make sure it gets read. An emoji or two can help 👍<br><br>If you add an image it will display at the top of the screen.";
+        });
       })
       .catch(error => {
-        console.error(error);
+        console.error('CKEditor error:', error);
+        toastr.error('Failed to initialize editor');
       });
+
+   
+    titleInput.addEventListener('input', () => {
+      previewTitle.textContent = titleInput.value || 'Announcement title';
+    });
+
   
-</script>
+    uploadInput.addEventListener('change', function () {
+      if (this.files && this.files[0]) {
+        const file = this.files[0];
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            previewImg.src = e.target.result;
+            previewImgContainer.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        } else {
+          previewImg.src = '';
+          previewImgContainer.style.display = 'none';
+          toastr.error('Please upload an image file');
+        }
+      } else {
+        previewImg.src = '';
+        previewImgContainer.style.display = 'none';
+      }
+    });
+
+   
+    uploadBox.addEventListener('dragover', function (e) {
+      e.preventDefault();
+      uploadBox.style.borderColor = '#2f95ff';
+      uploadBox.style.color = '#2f95ff';
+    });
+    uploadBox.addEventListener('dragleave', function (e) {
+      e.preventDefault();
+      uploadBox.style.borderColor = '#d1d5db';
+      uploadBox.style.color = '#888';
+    });
+    uploadBox.addEventListener('drop', function (e) {
+      e.preventDefault();
+      uploadBox.style.borderColor = '#d1d5db';
+      uploadBox.style.color = '#888';
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        uploadInput.files = e.dataTransfer.files;
+        const event = new Event('change');
+        uploadInput.dispatchEvent(event);
+      }
+    });
+
+  
+    uploadBox.addEventListener('click', function () {
+      uploadInput.click();
+    });
+
+    
+    document.getElementById('announcementForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const groupId = groupSelect.value;
+      const title = titleInput.value.trim();
+      const message = editorInstance ? editorInstance.getData().trim() : '';
+
+    
+      if (!groupId) {
+        toastr.error('Please select a group');
+        return;
+      }
+      if (!title) {
+        toastr.error('Announcement title is required');
+        return;
+      }
+      if (!message) {
+        toastr.error('Announcement description is required');
+        return;
+      }
+      const formData = new FormData();
+      formData.append('title', titleInput.value.trim());
+      formData.append('message', messageInput.value.trim());
+      formData.append('meetingLink', meetingLinkInput.value.trim());
+      formData.append('groupId', groupId);
+      if (uploadInput.files[0]) {
+        formData.append('image', uploadInput.files[0]);
+      }
+
+      try {
+        const response = await fetch('/announcements/create', {
+          method: 'POST',
+          body: formData,
+          credentials: 'include'
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+          toastr.success(result.message || 'Announcement created successfully!');
+          window.location.href = `/announcements/Announcement`;
+        } else {
+          toastr.error(result.message || 'Failed to create announcement');
+        }
+      } catch (error) {
+        console.error('Error submitting announcement:', error);
+        toastr.error('Error submitting announcement: ' + error.message);
+      }
+    });
+
+    // Back button
+    function goBack() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const groupId = urlParams.get('groupId');
+      window.location.href = `/user-app/Announcement?groupId=${groupId}`;
+    }
+  </script>
 
 
-</script>
- <script src="/js/all.js"></script>
+  </script>
+  <script src="/js/all.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      async function populateGroups() {
+        try {
+          const response = await fetch('/Groups/groups', {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+          });
+          const result = await response.json();
+          console.log("groups", result);
+          if (response.ok) {
+
+
+
+            const announcementGroupSelect = document.getElementById('announceGroupSelect');
+            if (announcementGroupSelect) {
+              announcementGroupSelect.innerHTML = '<option value="">Select Group</option>';
+              result.groups.forEach(group => {
+                const option = document.createElement('option');
+                option.value = group._id;
+                option.textContent = group.g_name;
+                announcementGroupSelect.appendChild(option);
+              });
+            }
+
+          } else {
+            showNotification('Failed to load groups', 'error');
+          }
+        } catch (error) {
+          showNotification('Error loading groups: ' + error.message, 'error');
+        }
+      }
+
+      populateGroups();
+    });
+
+  </script>
 </body>
+
 </html>
