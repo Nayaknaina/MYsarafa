@@ -41,4 +41,8 @@ router.get('/groups/:groupId', authMiddleware, async (req, res) => {
   if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
   res.status(200).json({ success: true, group });
 });
+
+router.get('/search/discover', authMiddleware, groupController.searchDiscoverGroups);
+router.get('/search/my', authMiddleware, groupController.searchMyGroups);
+
 module.exports = router;

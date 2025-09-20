@@ -9,58 +9,6 @@ const Payment = require('../models/payReceive.model');
 const Gmem = require('../models/groupMem.model');
 
 
-// exports.dashboard = async (req, res,next) => {  
-//     try {
-//         console.log(" /user/dashboard");
-//         const user = await User.findById(req.user.id).lean();
-//         if (!user) {
-//             return res.status(404).json({ success: false, message: 'User not found' });
-//         }
-
-//         //discover and myGroups shown
-//         const myGroups = await Group.find({ user: user._id }).lean();
-//          const discoverGroups = await Group.find({
-//             user: { $ne: user._id } 
-//         }).lean();
-//         console.log("discover",discoverGroups);
-       
-// const recentThreshold = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // 7 days ago
-//     const groupsWithPendingAmount = await Group.find({
-//       user: user._id,
-//       amount: { $gt: 0 },
-//       updatedAt: { $gte: recentThreshold }
-//     }).lean();
-
-//     let pendingGroup = null;
-//     for (const group of groupsWithPendingAmount) {
-//       const payment = await Payment.findOne({
-//         user: user._id,
-//         group: group._id,
-        
-//       }).lean();
-//      if (!payment || (payment && group.updatedAt > payment.uploadedAt)) {
-//         pendingGroup = group; 
-//         break;
-//       }
-//     }
-
-//         res.render("dashboard", {
-//             user: {
-//                 ...user,
-//                 has_password: !!user.password,
-              
-//             },
-//             myGroups,
-//             discoverGroups,
-//             // groups,
-//               pendingGroup,
-//             layout: false
-//         });
-//     } catch (error) {
-//         next(error);
-//     }
-// };
-
 exports.dashboard = async (req, res, next) => {
   try {
     console.log("/user/dashboard");
@@ -72,86 +20,81 @@ exports.dashboard = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    const memberships = await Gmem.find({ user: user._id })
-      .populate('group').lean();
-      console.log(memberships,"all groups above under this ",user._id);
     
-      //   const myGroups = memberships
-      // .filter(m => m.group) 
-      // .map(m => ({
-      //   ...m.group,
-      //   membershipType: m.type  
-      // })).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const memberships = await Gmem.find({ user: user._id })
+      .populate({
+        path: 'group',
+        select: 'g_name g_cover description g_type total_mem user createdAt amount'
+      })
+      .lean();
 
-      const myGroups = memberships
-   .filter(m => m.group && m.type !== 'pending')
-  .map(m => ({
-    ...m.group,
-    membershipType: m.type,
-    joinedAt: m.createdAt   
-  }))
-  .sort((a, b) => {
-    // If both groups were created by the user → sort by group createdAt
-    if (a.user.toString() === user._id.toString() && b.user.toString() === user._id.toString()) {
-      return new Date(b.createdAt) - new Date(a.createdAt);
-    }
-    // Otherwise → sort by join date (recently joined first)
-    return new Date(b.joinedAt) - new Date(a.joinedAt);
-  });
+    // Map myGroups with membership details
+    const myGroups = memberships
+      .filter(m => m.group && m.type !== 'pending')
+      .map(m => ({
+        _id: m.group._id,
+        g_name: m.group.g_name,
+        g_cover: m.group.g_cover,
+        description: m.group.description,
+        g_type: m.group.g_type,
+        total_mem: m.group.total_mem,
+        user: m.group.user,
+        createdAt: m.group.createdAt,
+        membershipType: m.type,
+        joinedAt: m.createdAt
+      }))
+      .sort((a, b) => {
+        if (a.user.toString() === user._id.toString() && b.user.toString() === user._id.toString()) {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        }
+        return new Date(b.joinedAt) - new Date(a.joinedAt);
+      });
 
-      if (!myGroups.length) {
-          console.log('No groups found for user');
-      }
-       // console.log("🚀 myGroups with membershipType:", myGroups);
-
-    // Find public groups not owned by the user
-    let discoverGroups = await Group.find({
-      user: { $ne: user._id },
-      // g_type: 'public'|| 'private'
-    })
-     .sort({ createdAt: -1 }).limit(4).lean();
-     const joinedGroupIds = myGroups.map(g => g._id.toString());
-     const pendingGroupIds = memberships
+    // Fetch public/private groups not joined by the user
+    const joinedGroupIds = myGroups.map(g => g._id.toString());
+    const pendingGroupIds = memberships
       .filter(m => m.group && m.type === 'pending')
       .map(m => m.group._id.toString());
 
-      discoverGroups = discoverGroups.map(g => ({
-        ...g,
-        isJoined: joinedGroupIds.includes(g._id.toString()),
-        isPending : pendingGroupIds.includes(g._id.toString())
-      }));
+    let discoverGroups = await Group.find({
+      $and: [
+        { user: { $ne: user._id } },
+        { _id: { $nin: joinedGroupIds } },
+        { g_type: { $in: ['public', 'private'] } }
+      ]
+    })
+      .select('g_name g_cover description g_type total_mem user createdAt')
+      .sort({ createdAt: -1 })
+      .limit(4)
+      .lean();
 
-    // Find groups with pending amount where user is a member (not admin)
-    const recentThreshold = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // 7 days ago
+    discoverGroups = discoverGroups.map(g => ({
+      ...g,
+      isJoined: joinedGroupIds.includes(g._id.toString()),
+      isPending: pendingGroupIds.includes(g._id.toString())
+    }));
+
+    // Find groups with pending amount
+    const recentThreshold = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     let pendingGroup = null;
     for (const membership of memberships) {
       const group = membership.group;
       if (!group || group.amount <= 0 || group.updatedAt < recentThreshold) {
-        continue; // Skip groups with no pending amount or outdated
+        continue;
       }
-
-      // Skip if user is admin for this group
       if (membership.type === 'admin') {
         console.log(`Skipping modal for group ${group.g_name}: User is admin`);
         continue;
       }
-
-      // Check for existing payment (verified or unverified)
       const payment = await Payment.findOne({
         user: user._id,
         group: group._id
       }).lean();
-
-      // Show modal if no payment or group amount changed after payment
       if (!payment || (payment && group.updatedAt > payment.uploadedAt)) {
         pendingGroup = group;
-        // console.log(`Pending group found: ${group.g_name}`);
         break;
       }
     }
-
-    // console.log("discover", discoverGroups);
-    // console.log("pending group", pendingGroup);
 
     res.render("dashboard", {
       user: {
@@ -168,6 +111,113 @@ exports.dashboard = async (req, res, next) => {
     res.status(500).json({ success: false, message: 'Server error: ' + error.message });
   }
 };
+// exports.dashboard = async (req, res, next) => {
+//   try {
+//     console.log("/user/dashboard");
+//     if (!req.user || !req.user.id) {
+//       return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
+//     }
+//     const user = await User.findById(req.user.id).lean();
+//     if (!user) {
+//       return res.status(404).json({ success: false, message: 'User not found' });
+//     }
+
+//     const memberships = await Gmem.find({ user: user._id })
+//       .populate('group').lean();
+//       console.log(memberships,"all groups above under this ",user._id);
+    
+//       //   const myGroups = memberships
+//       // .filter(m => m.group) 
+//       // .map(m => ({
+//       //   ...m.group,
+//       //   membershipType: m.type  
+//       // })).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+//       const myGroups = memberships
+//    .filter(m => m.group && m.type !== 'pending')
+//   .map(m => ({
+//     ...m.group,
+//     membershipType: m.type,
+//     joinedAt: m.createdAt   
+//   }))
+//   .sort((a, b) => {
+//     // If both groups were created by the user → sort by group createdAt
+//     if (a.user.toString() === user._id.toString() && b.user.toString() === user._id.toString()) {
+//       return new Date(b.createdAt) - new Date(a.createdAt);
+//     }
+//     // Otherwise → sort by join date (recently joined first)
+//     return new Date(b.joinedAt) - new Date(a.joinedAt);
+//   });
+
+//       if (!myGroups.length) {
+//           console.log('No groups found for user');
+//       }
+//        // console.log("🚀 myGroups with membershipType:", myGroups);
+
+//     // Find public groups not owned by the user
+//     let discoverGroups = await Group.find({
+//       user: { $ne: user._id },
+//       // g_type: 'public'|| 'private'
+//     })
+//      .sort({ createdAt: -1 }).limit(4).lean();
+//      const joinedGroupIds = myGroups.map(g => g._id.toString());
+//      const pendingGroupIds = memberships
+//       .filter(m => m.group && m.type === 'pending')
+//       .map(m => m.group._id.toString());
+
+//       discoverGroups = discoverGroups.map(g => ({
+//         ...g,
+//         isJoined: joinedGroupIds.includes(g._id.toString()),
+//         isPending : pendingGroupIds.includes(g._id.toString())
+//       }));
+
+//     // Find groups with pending amount where user is a member (not admin)
+//     const recentThreshold = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000); // 7 days ago
+//     let pendingGroup = null;
+//     for (const membership of memberships) {
+//       const group = membership.group;
+//       if (!group || group.amount <= 0 || group.updatedAt < recentThreshold) {
+//         continue; // Skip groups with no pending amount or outdated
+//       }
+
+//       // Skip if user is admin for this group
+//       if (membership.type === 'admin') {
+//         console.log(`Skipping modal for group ${group.g_name}: User is admin`);
+//         continue;
+//       }
+
+//       // Check for existing payment (verified or unverified)
+//       const payment = await Payment.findOne({
+//         user: user._id,
+//         group: group._id
+//       }).lean();
+
+//       // Show modal if no payment or group amount changed after payment
+//       if (!payment || (payment && group.updatedAt > payment.uploadedAt)) {
+//         pendingGroup = group;
+//         // console.log(`Pending group found: ${group.g_name}`);
+//         break;
+//       }
+//     }
+
+//     // console.log("discover", discoverGroups);
+//     // console.log("pending group", pendingGroup);
+
+//     res.render("dashboard", {
+//       user: {
+//         ...user,
+//         has_password: !!user.password
+//       },
+//       myGroups,
+//       discoverGroups,
+//       pendingGroup,
+//       layout: false
+//     });
+//   } catch (error) {
+//     console.error('Error rendering dashboard:', error);
+//     res.status(500).json({ success: false, message: 'Server error: ' + error.message });
+//   }
+// };
 
 exports.updateProfile = async (req, res) => {
     // console.log('Incoming form body:', req.body, 'File:', req.file);

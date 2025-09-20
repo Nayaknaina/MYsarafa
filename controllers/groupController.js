@@ -12,6 +12,8 @@ const fs = require('fs');
 const path = require('path');
 const upload = require('../middleware/multer');
 const axios = require("axios");
+const sanitize = require('mongo-sanitize');
+
 
 
 exports.communityCreation = async (req, res, next) => {
@@ -1072,4 +1074,103 @@ exports.uploadMembersCSV = async (req, res) => {
         console.error('Error uploading members CSV:', error);
         res.status(500).json({ success: false, message: 'Error uploading members' });
     }
+};
+
+
+exports.searchDiscoverGroups = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const query = sanitize(req.query.query || '');
+
+    // Fetch joined and pending group IDs
+    const memberships = await GMem.find({ user: userId }).select('group type').lean();
+    const joinedGroupIds = memberships.filter(m => m.type !== 'pending').map(m => m.group.toString());
+    const pendingGroupIds = memberships.filter(m => m.type === 'pending').map(m => m.group.toString());
+
+    // Build query
+    const searchQuery = query ? { g_name: { $regex: query, $options: 'i' } } : {};
+    const groups = await Group.find({
+      $and: [
+        searchQuery,
+        { user: { $ne: userId } },
+        { _id: { $nin: joinedGroupIds } },
+        { g_type: { $in: ['public', 'private'] } }
+      ]
+    })
+      .select('g_name g_cover description g_type total_mem user createdAt')
+      .sort({
+        // Sort by match score (exact match first, then partial match)
+        // $score: {
+        //   $meta: 'textScore'
+        // },
+        createdAt: -1
+      })
+      .limit(4)
+      .lean();  
+
+    const formattedGroups = groups.map(g => ({
+      _id: g._id,
+      g_name: g.g_name,
+      g_cover: g.g_cover,
+      description: g.description,
+      g_type: g.g_type,
+      total_mem: g.total_mem,
+      user: g.user,
+      createdAt: g.createdAt,
+      isJoined: joinedGroupIds.includes(g._id.toString()),
+      isPending: pendingGroupIds.includes(g._id.toString())
+    }));
+
+    res.status(200).json({ success: true, groups: formattedGroups });
+  } catch (error) {
+    console.error('Error searching discover groups:', error);
+    res.status(500).json({ success: false, message: 'Error searching groups', error: error.message });
+  }
+};
+
+// Search user's groups
+exports.searchMyGroups = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const query = sanitize(req.query.query || '');
+
+    // Fetch memberships with populated group data
+    const memberships = await GMem.find({ user: userId, type: { $ne: 'pending' } })
+      .populate({
+        path: 'group',
+        select: 'g_name g_cover description g_type total_mem user createdAt',
+        match: query ? { g_name: { $regex: query, $options: 'i' } } : {}
+      })
+      .lean();
+
+    const groups = memberships
+      .filter(m => m.group)
+      .map(m => ({
+        _id: m.group._id,
+        g_name: m.group.g_name,
+        g_cover: m.group.g_cover,
+        description: m.group.description,
+        g_type: m.group.g_type,
+        total_mem: m.group.total_mem,
+        user: m.group.user,
+        createdAt: m.group.createdAt,
+        membershipType: m.type,
+        joinedAt: m.createdAt,
+        matchScore: query ? (m.group.g_name.toLowerCase() === query.toLowerCase() ? 2 : m.group.g_name.toLowerCase().includes(query.toLowerCase()) ? 1 : 0) : 0
+      }))
+      .sort((a, b) => {
+        if (a.matchScore !== b.matchScore) {
+          return b.matchScore - a.matchScore;
+        }
+        if (a.user.toString() === userId && b.user.toString() === userId) {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        }
+        return new Date(b.joinedAt) - new Date(a.joinedAt);
+      });
+
+    res.status(200).json({ success: true, groups });
+  } catch (error) {
+    console.error('Error searching my groups:', error);
+    res.status(500).json({ success: false, message: 'Error searching groups', error: error.message });
+  }
 };

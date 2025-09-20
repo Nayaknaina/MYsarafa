@@ -7,6 +7,7 @@
   "description": "community groups interconnected with this webapp",
   "main": "index.js",
   "dependencies": {
+    "@types/mongo-sanitize": "^1.0.3",
     "axios": "^1.11.0",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
@@ -20,6 +21,7 @@
     "express-session": "^1.18.2",
     "hbs": "^4.2.0",
     "jsonwebtoken": "^9.0.0",
+    "mongo-sanitize": "^1.1.0",
     "mongoose": "^8.18.0",
     "multer": "^2.0.2",
     "node-exiftool": "^2.3.0",
