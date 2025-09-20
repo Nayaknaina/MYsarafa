@@ -3,3 +3,4 @@ node_modules
 .vscode
 uploads
 public/login.html
+signup.html

@@ -63,16 +63,10 @@ exports.Announcementform = async (req, res, next) => {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    // const { groupId } = req.query;
-    // if (!groupId || !mongoose.isValidObjectId(groupId)) {
-    //   return res.status(400).render('error', { errorMessage: 'Valid Group ID is required', layout: false });
-    // }
-
-    // Check if user is an admin of the group
-    // const groupMember = await GMem.findOne({ group: groupId, user: req.user.id, type: 'admin' });
-    // if (!groupMember) {
-    //   return res.status(403).render('error', { errorMessage: 'You are not authorized to create announcements for this group', layout: false });
-    // }
+  const groupMember = await GMem.findOne({ user: req.user.id, type: 'admin' });
+    if (!groupMember) {
+      return res.status(403).render('error', { errorMessage: 'You are not authorized to create announcements', layout: false });
+    }
 
     res.render("Announcement-form", {
       user: {
@@ -94,7 +88,7 @@ exports.createAnnouncement = async (req, res) => {
     console.log('createAnnouncement Body:', req.body);
     console.log('createAnnouncement Files:', req.files);
 
-    const { title, message, meetingLink, groupId, isPaused } = req.body;
+    const { title, message, meetingLink, groupId } = req.body;
 
     // Validate required fields
     if (!title || !message || !groupId) {
@@ -123,7 +117,7 @@ exports.createAnnouncement = async (req, res) => {
       image: imagePath,
       createdBy: req.user.id,
       group: groupId,
-      isPaused: isPaused === 'true'
+  
     });
 
     await announcement.save();
@@ -172,8 +166,9 @@ exports.getAnnouncements = async (req, res) => {
         name: announcement.group.g_name
       },
       createdAt: announcement.createdAt,
-      isPaused: announcement.isPaused
+ 
     }));
+    // console.log(formattedAnnouncements)
 
     res.status(200).json({ success: true, announcements: formattedAnnouncements });
   } catch (error) {

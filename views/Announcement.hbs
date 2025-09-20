@@ -11,9 +11,13 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-      <script src="/socket.io/socket.io.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
 
   <style>
+    .announcement-copy:active,
+.announcement-share:active {
+  transform: scale(1.2);
+}
     .chat-container {
       display: flex;
       flex-direction: column;
@@ -323,21 +327,21 @@
 
     .Announcement-btn {
       position: absolute;
-  top: 100px;
-  right: 35px;
-  width: 91px;
-  height: 40px;
-  background: linear-gradient(245deg, #D324A8 -67.04%, #551DFF 129.05%);
-  border-radius: 9px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.2s;
-  color: white;
-  font-size: 1.2rem;
-  font-weight: 600;
+      top: 100px;
+      right: 35px;
+      width: 91px;
+      height: 40px;
+      background: linear-gradient(245deg, #D324A8 -67.04%, #551DFF 129.05%);
+      border-radius: 9px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.2s;
+      color: white;
+      font-size: 1.2rem;
+      font-weight: 600;
 
-   
+
     }
     .announcement-img{
       width: 50%;
@@ -381,100 +385,172 @@
 </html>
 
 <script>
-        // Show notification
-        function showNotification(message, type = 'info') {
-            toastr.options = { timeOut: 3000, positionClass: 'toast-top-right' };
-            if (type === 'success') toastr.success(message);
-            else if (type === 'error') toastr.error(message);
-            else toastr.info(message);
+    // Show notification
+    function showNotification(message, type = 'info') {
+      toastr.options = { timeOut: 3000, positionClass: 'toast-top-right' };
+      if (type === 'success') toastr.success(message);
+      else if (type === 'error') toastr.error(message);
+      else toastr.info(message);
+    }
+    function isValidUrl(string) {
+      try {
+        new URL(string);
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }
+
+    // Format announcement for copy/share
+   function formatAnnouncement(announcement) {
+      let text = `Announcement: ${announcement.title}\n`;
+      text += `Group: ${announcement.group.name}\n`;
+      text += `Message: ${announcement.message}\n`;
+      if (announcement.meetingLink && isValidUrl(announcement.meetingLink)) {
+        text += `Meeting Link: ${announcement.meetingLink}\n`;
+      }
+      if (announcement.image) {
+        text += `Image: ${announcement.image}\n`;
+      }
+      text += `Posted by: ${announcement.createdBy.name} at ${new Date(announcement.createdAt).toLocaleString()}`;
+      return text;
+    }
+
+    // Copy announcement to clipboard
+   async function copyAnnouncement(announcement) {
+      try {
+        const text = formatAnnouncement(announcement);
+        await navigator.clipboard.writeText(text);
+        showNotification('Announcement copied to clipboard!', 'success');
+      } catch (error) {
+        console.error('Error copying announcement:', error);
+        showNotification('Failed to copy announcement', 'error');
+      }
+    }
+
+    // Share announcement
+    async function shareAnnouncement(announcement) {
+     const text = formatAnnouncement(announcement);
+      const baseUrl = window.location.origin; 
+      const announcementUrl = `${baseUrl}/announcements/${announcement._id}`;
+      const shareData = {
+        title: announcement.title,
+        text: text,
+       // url: announcement.meetingLink && isValidUrl(announcement.meetingLink) ? announcement.meetingLink : announcementUrl
+      };
+
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+       try {
+          await navigator.share(shareData);
+          //showNotification('Announcement shared successfully!', 'success');
+        } catch (error) {
+          if (error.name !== 'AbortError') {
+            console.error('Error sharing announcement:', error);
+            showNotification('Failed to share announcement. Copied to clipboard instead.', 'info');
+            await copyAnnouncement(announcement);
+          }
         }
+      } else {
+        // Fallback: Copy to clipboard
+        copyAnnouncement(announcement);
+        showNotification('Share not supported. Copied to clipboard instead.', 'info');
+      }
+    }
 
-        // Fetch announcements
-        async function fetchAnnouncements() {
-            
-
-            try {
-                const response = await fetch(`/announcements/list`, {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include'
-                });
-
-                const result = await response.json();
-                if (response.ok) {
-                    renderAnnouncements(result.announcements);
-                } else {
-                    showNotification(result.message || 'Failed to fetch announcements', 'error');
-                }
-            } catch (error) {
-                console.error('Error fetching announcements:', error);
-                showNotification('Error fetching announcements: ' + error.message, 'error');
-            }
-        }
-
-        // Render announcements
-        function renderAnnouncements(announcements) {
-            const announcementList = document.getElementById('announcementList');
-            announcementList.innerHTML = '';
-
-            if (announcements.length === 0) {
-                announcementList.innerHTML = '<p>No announcements found.</p>';
-                return;
-            }
-
-            announcements.forEach(announcement => {
-                const announcementCard = document.createElement('div');
-                announcementCard.className = 'announcement-card';
-                announcementCard.setAttribute('data-announcement-id', announcement._id);
-
-                // Format date
-                const createdAt = new Date(announcement.createdAt);
-                const timeString = createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                announcementCard.innerHTML = `
-                    ${announcement.image ? `<img src="${announcement.image}" alt="Announcement Image" class="announcement-img">` : ''}
-                    <div class="announcement-content">
-                        <div class="announcement-message">${announcement.message}</div>
-                        ${announcement.meetingLink ? `<a href="${announcement.meetingLink}" class="announcement-meeting-link" target="_blank">Join Meeting</a>` : ''}
-                        <div class="announcement-actions">
-                            
-                            <span class="annoucement-share"> <i class="fa-solid fa-share"></i>
-                            </span>
-                            <span class="announcement-copy">
-                            <i class="fa-solid fa-copy"></i>
-                            </span>
-                            
-                        </div>
-                        <div class="announcement-meta">
-                            <span class="announcement-user"><i class="fas fa-user-circle"></i> ${announcement.createdBy.name}</span>
-                            <span class="announcement-time">${timeString}</span>
-                        </div>
-                        
-                    </div>
-                    
-                `;
-
-                announcementList.appendChild(announcementCard);
-            });
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchAnnouncements();
-
-            // Handle comment toggle
-            document.getElementById('announcementList').addEventListener('click', (e) => {
-                if (e.target.closest('.comment-toggle')) {
-                    const card = e.target.closest('.announcement-card');
-                    const commentsSection = card.querySelector('.comments-section');
-                    commentsSection.style.display = commentsSection.style.display === 'none' ? 'block' : 'none';
-                }
-            });
+    // Fetch announcements
+    async function fetchAnnouncements() {
+      try {
+        const response = await fetch('/announcements/list', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include'
         });
-    </script>
+
+        const result = await response.json();
+        if (response.ok) {
+          renderAnnouncements(result.announcements);
+          console.log(result);
+        } else {
+          showNotification(result.message || 'Failed to fetch announcements', 'error');
+        }
+      } catch (error) {
+        console.error('Error fetching announcements:', error);
+        showNotification('Error fetching announcements: ' + error.message, 'error');
+      }
+    }
+
+    // Render announcements
+    function renderAnnouncements(announcements) {
+      const announcementList = document.getElementById('announcementList');
+      announcementList.innerHTML = '';
+
+      if (announcements.length === 0) {
+        announcementList.innerHTML = '<p>No announcements found.</p>';
+        return;
+      }
+
+      announcements.forEach(announcement => {
+        const announcementCard = document.createElement('div');
+        announcementCard.className = 'announcement-card';
+        announcementCard.setAttribute('data-announcement-id', announcement._id);
+
+        // Format date
+        const createdAt = new Date(announcement.createdAt);
+        const timeString = createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        announcementCard.innerHTML = `
+          <div class="announcement-group">Group: ${announcement.group.name}</div>
+          <div class="announcement-title">${announcement.title}</div>
+          ${announcement.image ? `<img src="${announcement.image}" alt="Announcement Image" class="announcement-img">` : ''}
+          <div class="announcement-content">
+            <div class="announcement-message">${announcement.message}</div>
+            ${announcement.meetingLink ? `<a href="${announcement.meetingLink}" class="announcement-meeting-link" target="_blank">Join Meeting</a>` : ''}
+            <div class="announcement-meta">
+              <span class="announcement-user"><i class="fas fa-user-circle"></i> ${announcement.createdBy.name}</span>
+              <span class="announcement-time">${timeString}</span>
+            </div>
+            <div class="announcement-actions">
+              <span class="announcement-copy" data-announcement='${JSON.stringify(announcement)}'><i class="fa-solid fa-copy"></i></span>
+              <span class="announcement-share" data-announcement='${JSON.stringify(announcement)}'><i class="fa-solid fa-share"></i></span>
+            </div>
+          </div>
+          <div class="comments-section" style="display: none">
+            <div class="comments-list"></div>
+            <form class="comment-form" autocomplete="off">
+              <input type="text" class="comment-input" placeholder="Write a comment..." required />
+              <button type="submit" class="comment-send-btn"><i class="fas fa-paper-plane"></i></button>
+            </form>
+          </div>
+        `;
+
+        announcementList.appendChild(announcementCard);
+      });
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchAnnouncements();
+
+      // Handle copy and share clicks
+      document.getElementById('announcementList').addEventListener('click', (e) => {
+        const copyButton = e.target.closest('.announcement-copy');
+        const shareButton = e.target.closest('.announcement-share');
+
+        if (copyButton) {
+          const announcement = JSON.parse(copyButton.getAttribute('data-announcement'));
+          copyAnnouncement(announcement);
+        }
+
+        if (shareButton) {
+          const announcement = JSON.parse(shareButton.getAttribute('data-announcement'));
+          shareAnnouncement(announcement);
+        }
+      });
+    });
+  </script>
 <script src="/js/all.js"></script>
 <script src="/js/communityGroup.js"></script>
- {{> profile}}
+{{> profile}}
 </body>
 
 </html>
