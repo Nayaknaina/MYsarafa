@@ -386,7 +386,10 @@
 </head>
 
 <body>
-
+{{> header}}
+<div class="main-container">
+  {{> sidebar}}
+  <main class="main-content">
   <div class="announcement-main-wrapper">
     <button class="back-btn" onclick="goBack()">
       <i class="fas fa-arrow-left"></i> Back
@@ -457,6 +460,8 @@
         <div class="preview-pause" id="previewPause">Announcement is paused</div>
       </div>
     </div>
+  </div>
+  </main>
   </div>
   <script>
     let editorInstance;
@@ -640,6 +645,8 @@
     });
 
   </script>
+
+   {{> profile}}
 </body>
 
 </html>

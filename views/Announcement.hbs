@@ -181,131 +181,31 @@
       position: relative;
     }
 
-    .announcement-message {
+/*.announcement-message {
       font-size: 1.1rem;
       margin-bottom: 18px;
     }
-
-    .announcement-meta {
+*/
+   /* .announcement-meta {
       display: flex;
       align-items: center;
       gap: 16px;
       margin-bottom: 12px;
     }
-
-    .announcement-user {
+*/
+   /* .announcement-user {
       font-weight: bold;
       color: #2f95ff;
       display: flex;
       align-items: center;
       gap: 6px;
-    }
+    }*/
 
-    .announcement-time {
+    /*.announcement-time {
       color: #aaa;
       font-size: 1rem;
       font-weight: 600;
-    }
-
-    
-    .announcement-like,
-    .announcement-comment {
-      cursor: pointer;
-      transition: color 0.2s;
-    }
-
-    .announcement-like:hover {
-      color: #ff2f2f;
-    }
-
-    .announcement-comment:hover {
-      color: #2f95ff;
-    }
-
-    .announcement-comments-count {
-      color: #bbb;
-      font-size: 1rem;
-      margin-left: auto;
-    }
-
-    .comments-section {
-      background: #f6faff;
-      border-radius: 8px;
-      margin-top: 10px;
-      padding: 10px 12px 6px 12px;
-    }
-
-    .comments-list {
-      max-height: 120px;
-      overflow-y: auto;
-      margin-bottom: 8px;
-    }
-
-    .comment-item {
-      background: #e3f0ff;
-      border-radius: 6px;
-      padding: 6px 10px;
-      margin-bottom: 6px;
-      font-size: 0.97rem;
-      color: #222;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .comment-avatar {
-      color: #007bff;
-      font-size: 1.1rem;
-    }
-
-    .comment-delete {
-      margin-left: auto;
-      color: #e74c3c;
-      background: none;
-      border: none;
-      font-size: 1.1rem;
-      cursor: pointer;
-      transition: color 0.2s;
-    }
-
-    .comment-delete:hover {
-      color: #c0392b;
-    }
-
-    .comment-form {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .comment-input {
-      flex: 1;
-      border: none;
-      outline: none;
-      background: #fff;
-      border-radius: 5px;
-      padding: 7px 10px;
-      font-size: 1rem;
-      color: #222;
-    }
-
-    .comment-input::placeholder {
-      color: #a0aec0;
-      opacity: 1;
-    }
-
-    .comment-send-btn {
-      background: none;
-      border: none;
-      color: #222;
-      font-size: 1.3rem;
-      cursor: pointer;
-      transition: color 0.2s;
-    }
-
-    .comment-send-btn:hover {
-      color: #007bff;
-    }
+    }*/
 
     .new-event-btn {
       background: linear-gradient(245deg, #D324A8 -67.04%, #551DFF 129.05%);
@@ -343,7 +243,7 @@
 
 
     }
-    .announcement-img{
+    /*.announcement-img{
       width: 50%;
       height: auto;
       border-radius: 12px;
@@ -355,7 +255,164 @@
     }
     .announcement-content{
       margin-left: 10px;
-    }
+    }*/
+
+    .announcement-group {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px 8px 0 0;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.announcement-title {
+  background: #f8fafc;
+  padding: 1px 20px;
+  font-size: 20px;
+  font-weight: 700;
+  color: #1e293b;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.announcement-content {
+  padding: 20px;
+  background: white;
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.announcement-img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 8px;
+  float: left;
+  margin: 0 16px 16px 0;
+  border: 2px solid #e2e8f0;
+}
+
+.announcement-message {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #475569;
+  margin-bottom: 16px;
+  text-align: justify;
+}
+
+.announcement-meeting-link {
+  display: inline-block;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+.announcement-meeting-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
+}
+
+.announcement-actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  justify-content: flex-end;
+}
+
+.announcement-copy,
+.announcement-share {
+
+  color: #64748b;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 16px;
+}
+
+.announcement-copy:hover {
+  background: #e0f2fe;
+  color: #0369a1;
+  transform: scale(1.05);
+}
+
+.announcement-share:hover {
+  background: #fef3c7;
+  color: #d97706;
+  transform: scale(1.05);
+}
+
+.announcement-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  /*padding-top: 16px;
+  border-top: 1px solid #e2e8f0;*/
+  font-size: 14px;
+  color: #64748b;
+}
+
+.announcement-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+
+.announcement-user i {
+  color: #667eea;
+  font-size: 16px;
+}
+
+.announcement-time {
+  font-weight: 400;
+  color: #94a3b8;
+}
+
+/* Container styling for the entire announcement card */
+.announcement-card {
+  max-width: 600px;
+  /*margin: 20px auto; Center the card*/
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  background: white;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.announcement-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .announcement-img {
+    width: 100%;
+    height: 200px;
+    float: none;
+    margin: 0 0 16px 0;
+  }
+  
+  .announcement-meta {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+  
+  .announcement-actions {
+    justify-content: center;
+  }
+}
   </style>
 </head>
 
@@ -421,7 +478,7 @@
       try {
         const text = formatAnnouncement(announcement);
         await navigator.clipboard.writeText(text);
-        showNotification('Announcement copied to clipboard!', 'success');
+       // showNotification('Announcement copied to clipboard!', 'success');
       } catch (error) {
         console.error('Error copying announcement:', error);
         showNotification('Failed to copy announcement', 'error');
@@ -504,9 +561,10 @@
           ${announcement.image ? `<img src="${announcement.image}" alt="Announcement Image" class="announcement-img">` : ''}
           <div class="announcement-content">
             <div class="announcement-message">${announcement.message}</div>
-            ${announcement.meetingLink ? `<a href="${announcement.meetingLink}" class="announcement-meeting-link" target="_blank">Join Meeting</a>` : ''}
+            
            
             <div class="announcement-actions">
+            ${announcement.meetingLink ? `<a href="${announcement.meetingLink}" class="announcement-meeting-link" target="_blank">Join Meeting</a>` : ''}
               <span class="announcement-copy" data-announcement='${JSON.stringify(announcement)}'><i class="fa-solid fa-copy"></i></span>
               <span class="announcement-share" data-announcement='${JSON.stringify(announcement)}'><i class="fa-solid fa-share"></i></span>
             </div>
@@ -544,7 +602,7 @@
     });
   </script>
 <script src="/js/all.js"></script>
-<script src="/js/communityGroup.js"></script>
+
 {{> profile}}
 </body>
 
