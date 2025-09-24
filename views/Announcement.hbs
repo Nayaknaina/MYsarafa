@@ -284,6 +284,14 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
+.Delete-btn {
+  top: 20px;
+  right: 20px;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 18px;
+  transition: color 0.3s ease;
+}
 .announcement-img {
   width: 120px;
   height: 120px;
@@ -310,7 +318,7 @@
   border-radius: 6px;
   text-decoration: none;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 12px;
   margin-bottom: 20px;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
@@ -404,7 +412,7 @@
   }
   
   .announcement-meta {
-    flex-direction: column;
+    /*.announcement-actions: column;*/
     gap: 8px;
     align-items: flex-start;
   }
@@ -538,47 +546,82 @@
 
     // Render announcements
     function renderAnnouncements(announcements) {
-      const announcementList = document.getElementById('announcementList');
-      announcementList.innerHTML = '';
+  const announcementList = document.getElementById('announcementList');
+  announcementList.innerHTML = '';
 
-      if (announcements.length === 0) {
-        announcementList.innerHTML = '<p>No announcements found.</p>';
-        return;
-      }
+  if (announcements.length === 0) {
+    announcementList.innerHTML = '<p>No announcements found.</p>';
+    return;
+  }
 
-      announcements.forEach(announcement => {
-        const announcementCard = document.createElement('div');
-        announcementCard.className = 'announcement-card';
-        announcementCard.setAttribute('data-announcement-id', announcement._id);
+  const messageLimit = 150; // number of characters before "Read More"
 
-        // Format date
-        const createdAt = new Date(announcement.createdAt);
-        const timeString = createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  announcements.forEach(announcement => {
+    const announcementCard = document.createElement('div');
+    announcementCard.className = 'announcement-card';
+    announcementCard.setAttribute('data-announcement-id', announcement._id);
 
-        announcementCard.innerHTML = `
-          <div class="announcement-group">Group: ${announcement.group.name}</div>
-          <div class="announcement-title">${announcement.title}</div>
-          ${announcement.image ? `<img src="${announcement.image}" alt="Announcement Image" class="announcement-img">` : ''}
-          <div class="announcement-content">
-            <div class="announcement-message">${announcement.message}</div>
-            
-           
-            <div class="announcement-actions">
-            ${announcement.meetingLink ? `<a href="${announcement.meetingLink}" class="announcement-meeting-link" target="_blank">Join Meeting</a>` : ''}
-              <span class="announcement-copy" data-announcement='${JSON.stringify(announcement)}'><i class="fa-solid fa-copy"></i></span>
-              <span class="announcement-share" data-announcement='${JSON.stringify(announcement)}'><i class="fa-solid fa-share"></i></span>
-            </div>
-             <div class="announcement-meta">
-              <span class="announcement-user"><i class="fas fa-user-circle"></i> ${announcement.createdBy.name}</span>
-              <span class="announcement-time">${timeString}</span>
-            </div>
-          </div>
-         
-        `;
+    // Format date
+    const createdAt = new Date(announcement.createdAt);
+    const timeString = createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-        announcementList.appendChild(announcementCard);
+    // Truncate message
+    let messageHtml = announcement.message;
+    let needsTruncate = false;
+
+    if (announcement.message.length > messageLimit) {
+      const shortMessage = announcement.message.slice(0, messageLimit);
+      const longMessage = announcement.message.slice(messageLimit);
+      messageHtml = `
+        ${shortMessage}<span class="dots">...</span>
+        <span class="more" style="display:none;">${longMessage}</span>
+      `;
+      needsTruncate = true;
+    }
+
+    announcementCard.innerHTML = `
+      <div class="announcement-group">Group: ${announcement.group.name}</div>
+      <div class="announcement-title">${announcement.title}</div>
+      ${announcement.image ? `<img src="${announcement.image}" alt="Announcement Image" class="announcement-img">` : ''}
+      <div class="announcement-content">
+        <div class="announcement-message">${messageHtml}</div>
+        ${needsTruncate ? `<span class="read-more-btn">Read More</span>` : ""}
+        
+        <div class="announcement-actions">
+          ${announcement.meetingLink ? `<a href="${announcement.meetingLink}" class="announcement-meeting-link" target="_blank">Join Meeting</a>` : ''}
+          <span class="announcement-copy" data-announcement='${JSON.stringify(announcement)}'><i class="fa-solid fa-copy"></i></span>
+          <span class="announcement-share" data-announcement='${JSON.stringify(announcement)}'><i class="fa-solid fa-share"></i></span>
+        </div>
+        <div class="announcement-meta">
+          <span class="announcement-user"><i class="fas fa-user-circle"></i> ${announcement.createdBy.name}</span>
+          <span class="announcement-time">${timeString}</span>
+          <span class ="Delete-btn"><i class="fa fa-trash" aria-hidden="true"></i></span>
+        </div>
+      </div>
+    `;
+
+    // Toggle Read More / Read Less
+    const readMoreBtn = announcementCard.querySelector(".read-more-btn");
+    if (readMoreBtn) {
+      readMoreBtn.addEventListener("click", function () {
+        const dots = announcementCard.querySelector(".dots");
+        const moreText = announcementCard.querySelector(".more");
+
+        if (moreText.style.display === "none") {
+          moreText.style.display = "inline";
+          dots.style.display = "none";
+          readMoreBtn.textContent = "Read Less";
+        } else {
+          moreText.style.display = "none";
+          dots.style.display = "inline";
+          readMoreBtn.textContent = "Read More";
+        }
       });
     }
+
+    announcementList.appendChild(announcementCard);
+  });
+}
 
     // Initialize on page load
     document.addEventListener('DOMContentLoaded', () => {
