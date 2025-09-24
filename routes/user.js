@@ -13,4 +13,8 @@ router.get('/user/:id', authMiddleware, isAdmin, userController.getMemberDetails
 router.post('/user/:id/verify', authMiddleware, isAdmin, userController.verifyMember);
 
 router.get('/notifs',authMiddleware,userController.notifications);
+
+
+
+router.get('/sign-out',userController.signout);
 module.exports = router;

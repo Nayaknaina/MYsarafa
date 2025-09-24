@@ -136,120 +136,125 @@ class OTPInputHandler {
     });
   }
 }
-        $(document).ready(function () {
-            $('.manage-group-btn').click(function () {
-                const groupId = $(this).data('group-id');
-                window.location.href = `/Groups/community/${groupId}`;
-            });
-            const socket = io();
-            socket.emit('joinRoom', '{{user._id}}');
-            socket.on('connect', () => {
-                console.log("✅ Connected to socket server:", socket.id);
-            });
+$(document).ready(function () {
+  $('.manage-group-btn').click(function () {
+    const groupId = $(this).data('group-id');
+    window.location.href = `/Groups/community/${groupId}`;
+  });
+  const socket = io();
+  const userId = document.body.getAttribute("data-user-id");
+  socket.emit('joinRoom', '{{user._id}}');
+  // console.log("Emitting userId:", '{{user._id.toString}}');
 
-            
-
-            let notificationCount = 0;
-            function updateNotificationBadge(count) {
-                const badge = $('.notification-badge');
-                if (count > 0) {
-                    badge.text(count).show();
-                } else {
-                    badge.hide();
-                }
-            }
-            
-            // Check if user is an admin and fetch initial pending requests
-            $.ajax({
-                url: '/Groups/pending-requests',
-                method: 'GET',
-                xhrFields: { withCredentials: true },
-               success: function (response) {
-                    if (response.success && response.requests.length > 0) {
-                        notificationCount = response.requests.length;
-                        updateNotificationBadge(notificationCount);
-                    }
-                },
-                error: function (err) {
-                    console.error('Error fetching pending requests:', err);
-                }
-            });
-
-           
-           socket.on('membershipRequest', function (data) {
-                console.log("📩 membershipRequest received:", data);
-                notificationCount++;
-                updateNotificationBadge(notificationCount);
-                toastr.info(`${data.userName} requested to join ${data.groupName}`, 'New Membership Request');
-            });
+  socket.on('connect', () => {
+    console.log("✅ Connected to socket server:", socket.id);
+    console.log("Joining room with userId:", userId);
+    socket.emit("joinRoom", userId);
+  });
 
 
-            // Existing join group logic
-                $('.join-group-btn').click(function () {
-                    const $btn = $(this);
-                    const groupId = $(this).data('group-id');
-                    const groupName = $(this).closest('.group-card').find('.group-title').text();
-                    $.ajax({
-                        url: '/Groups/join',
-                        method: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ groupId }),
-                        xhrFields: { withCredentials: true },
-                        success: function (response) {
-                            if (response.success) {
-                                showNotification(response.message, 'success');
-                                    if (response.status === 'joined') {
-                                     $btn.text('Joined')
-                                    .removeClass('join-group-btn')
-                                    .addClass('joined-btn')
-                                    .prop('disabled', true);
-                            } else if (response.status === 'pending') {
-                                $btn.text('Pending')
-                                    .removeClass('join-group-btn')
-                                    .addClass('pending-btn')
-                                    .prop('disabled', true);
-                            }
-                            } else {
-                                showNotification(response.message || 'Failed to join group', 'error');
-                            }
-                        },
-                        error: function (err) {
-                            showNotification('Error joining group: ' + (err.responseJSON?.message || 'Server error'), 'error');
-                        }
-                    });
-                });
 
-            const duePaymentModal = $('#duePaymentModal');
-            const closeDuePaymentModal = $('#closeDuePaymentModal');
-            const payNowBtn = $('#payNowBtn');
+  let notificationCount = 0;
+  function updateNotificationBadge(count) {
+    const badge = $('.notification-badge');
+    if (count > 0) {
+      badge.text(count).show();
+    } else {
+      badge.hide();
+    }
+  }
 
-            if (duePaymentModal.length) {
-                // Close modal
-                closeDuePaymentModal.click(function () {
-                    duePaymentModal.hide();
-                });
+  // Check if user is an admin and fetch initial pending requests
+  $.ajax({
+    url: '/Groups/pending-requests',
+    method: 'GET',
+    xhrFields: { withCredentials: true },
+    success: function (response) {
+      if (response.success && response.requests.length > 0) {
+        notificationCount = response.requests.length;
+        updateNotificationBadge(notificationCount);
+      }
+    },
+    error: function (err) {
+      console.error('Error fetching pending requests:', err);
+    }
+  });
 
-                // Handle clicks outside the modal content
-                duePaymentModal.click(function (e) {
-                    if (e.target === duePaymentModal[0]) {
-                        duePaymentModal.hide();
-                    }
-                });
 
-                // Pay Now button redirect
-                payNowBtn.click(function () {
-                    const groupId = $(this).data('group-id');
-                    window.location.href = `/pay/Membership-QR`;
-                });
-            }
+  socket.on('membershipRequest', function (data) {
+    console.log("📩 membershipRequest received:", data);
+    notificationCount++;
+    updateNotificationBadge(notificationCount);
+    toastr.info(`${data.userName} requested to join ${data.groupName}`, 'New Membership Request');
+  });
 
-          
-            function showNotification(message, type) {
-                toastr[type](message);
-            }
-          
-        });
-        
+
+  // Existing join group logic
+  $('.join-group-btn').click(function () {
+    const $btn = $(this);
+    const groupId = $(this).data('group-id');
+    const groupName = $(this).closest('.group-card').find('.group-title').text();
+    $.ajax({
+      url: '/Groups/join',
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ groupId }),
+      xhrFields: { withCredentials: true },
+      success: function (response) {
+        if (response.success) {
+          showNotification(response.message, 'success');
+          if (response.status === 'joined') {
+            $btn.text('Joined')
+              .removeClass('join-group-btn')
+              .addClass('joined-btn')
+              .prop('disabled', true);
+          } else if (response.status === 'pending') {
+            $btn.text('Pending')
+              .removeClass('join-group-btn')
+              .addClass('pending-btn')
+              .prop('disabled', true);
+          }
+        } else {
+          showNotification(response.message || 'Failed to join group', 'error');
+        }
+      },
+      error: function (err) {
+        showNotification('Error joining group: ' + (err.responseJSON?.message || 'Server error'), 'error');
+      }
+    });
+  });
+
+  const duePaymentModal = $('#duePaymentModal');
+  const closeDuePaymentModal = $('#closeDuePaymentModal');
+  const payNowBtn = $('#payNowBtn');
+
+  if (duePaymentModal.length) {
+    // Close modal
+    closeDuePaymentModal.click(function () {
+      duePaymentModal.hide();
+    });
+
+    // Handle clicks outside the modal content
+    duePaymentModal.click(function (e) {
+      if (e.target === duePaymentModal[0]) {
+        duePaymentModal.hide();
+      }
+    });
+
+    // Pay Now button redirect
+    payNowBtn.click(function () {
+      const groupId = $(this).data('group-id');
+      window.location.href = `/pay/Membership-QR`;
+    });
+  }
+
+
+  function showNotification(message, type) {
+    toastr[type](message);
+  }
+
+});
+
 const searchInput = document.querySelector('.search-input');
 const joinBtn = document.querySelector('.join-btn');
 const communityDropdown = document.querySelector('.community-name');
@@ -328,6 +333,7 @@ const invitationLinkLabel = document.getElementById('invitationLinkLabel');
 const invitationPasswordLabel = document.getElementById('invitationPasswordLabel');
 const modalTitle = document.getElementById('modalTitle');
 const blacklistModal = document.getElementById('blacklistModal');
+const logoutBtn = document.getElementById("logoutBtn");
 let currentBlacklistData = {};
 // Search Functionality
 document.addEventListener('DOMContentLoaded', () => {
@@ -344,6 +350,8 @@ document.addEventListener('DOMContentLoaded', () => {
       item.classList.remove('active');
     }
   });
+
+
 });
 
 searchInput.addEventListener('input', function () {
@@ -1111,6 +1119,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const profilePictureInput = document.getElementById('profilePicture');
   const profilePicturePreview = document.getElementById('profilePicturePreview');
   const profileForm = document.getElementById('profileForm');
+  const logoutBtn = document.getElementById("logoutBtn");
+  console.log("Found logoutBtn:", logoutBtn); // Debug
 
   if (profileBtn && profileModal && closeProfileModal) {
     profileBtn.onclick = () => { profileModal.style.display = 'flex'; };
@@ -1131,7 +1141,7 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     });
   }
- if (profileForm) {
+  if (profileForm) {
     profileForm.addEventListener('submit', async function (e) {
       e.preventDefault();
       const formData = new FormData(profileForm);
@@ -1174,9 +1184,9 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       try {
-        const response = await fetch('/user-app/update-profile', { 
+        const response = await fetch('/user-app/update-profile', {
           method: 'POST',
-          body: formData, 
+          body: formData,
           credentials: 'include'
         });
 
@@ -1194,6 +1204,14 @@ document.addEventListener('DOMContentLoaded', function () {
         console.error('Fetch error:', error);
         showNotification('Error updating profile: ' + error.message, 'error');
       }
+    });
+  }
+
+
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      console.log("Logout clicked!");
+      window.location.href = "/user-app/sign-out";
     });
   }
 });
@@ -1544,7 +1562,7 @@ document.addEventListener('DOMContentLoaded', function () {
             downloadGroupSelect.appendChild(option);
           });
         }
-         const announcementGroupSelect = document.getElementById('announceGroupSelect');
+        const announcementGroupSelect = document.getElementById('announceGroupSelect');
         if (announcementGroupSelect) {
           announcementGroupSelect.innerHTML = '<option value="">Select Group</option>';
           result.groups.forEach(group => {
@@ -2211,6 +2229,6 @@ document.querySelector('.toggle-btn').addEventListener('click', function () {
   document.querySelector('.actions').classList.toggle('show');
 });
 
-  function goBack() {
-    window.history.back(); 
+function goBack() {
+  window.history.back();
 }

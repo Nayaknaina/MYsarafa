@@ -83,8 +83,8 @@ exports.createGroup = async (req, res) => {
 
     try {
         console.log("we are adding groups");
-       
-        const { communityName, communityType, kycRequired, description, amount, amountDescription, questions } = req.body;
+
+        const { communityName, communityType, kycRequired, description, amount, amountDescription, questions, upiId } = req.body;
 
         const user = await User.findById(req.user.id);
         if (!user) {
@@ -129,7 +129,8 @@ exports.createGroup = async (req, res) => {
             amount_description: amountDescription || '',
             qr_code: qrCode,
             total_mem: 1,
-            total_post: 0
+            total_post: 0,
+            upiId: upiId
         });
 
         await group.save();
@@ -197,7 +198,7 @@ exports.createGroup = async (req, res) => {
 exports.updateGroup = async (req, res) => {
     try {
         const groupId = req.params.groupId;
-        const { communityName, communityType, kycRequired, description, amount, amountDescription, questions } = req.body;
+        const { communityName, communityType, kycRequired, description, amount, amountDescription, questions, upiId } = req.body;
         const user = await User.findById(req.user.id);
 
         if (!mongoose.isValidObjectId(groupId)) {
@@ -221,7 +222,7 @@ exports.updateGroup = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid community type' });
         }
 
-        const existingGroup = await Group.findOne({ g_name: communityName.trim() });
+        const existingGroup = await Group.findOne({ g_name: communityName.trim(), _id: { $ne: groupId } });
         if (existingGroup) {
             return res.status(400).json({
                 success: false,
@@ -268,6 +269,7 @@ exports.updateGroup = async (req, res) => {
         group.amount_description = amountDescription || '';
         group.g_cover = coverPhoto;
         group.qr_code = qrCode;
+        group.upiId = upiId;
 
         await group.save();
 
@@ -341,6 +343,26 @@ exports.deleteGroup = async (req, res) => {
     }
 };
 
+
+exports.fetchgroup = async (req, res, next) => {
+    try {
+        const group = await require('../models/group.model')
+            .findById(req.params.groupId)
+            .populate('user', 'mobile_no');
+        if (!group) { return res.status(404).json({ success: false, message: 'Group not found' }); }
+
+        res.status(200).json({
+            success: true,
+            group,
+            mobile: group.user?.mobile_no || null
+        });
+    } catch (error) {
+        next(error);
+    }
+
+};
+
+
 exports.joinGroup = async (req, res) => {
     try {
         console.log("🔹 [joinGroup] Request body:", req.body);
@@ -392,7 +414,7 @@ exports.joinGroup = async (req, res) => {
 
             return res.status(201).json({
                 success: true,
-                status :'joined',
+                status: 'joined',
                 message: `Successfully joined ${group.g_name}!`,
                 group: {
                     id: group._id,
@@ -402,7 +424,7 @@ exports.joinGroup = async (req, res) => {
                     total_mem: group.total_mem
                 }
             });
-        }  else if (group.g_type === 'private'){
+        } else if (group.g_type === 'private') {
             console.log("ℹ️ [joinGroup] Private group request flow triggered");
 
             const adminMember = await GMem.findOne({ group: groupId, type: 'admin' });
@@ -423,7 +445,7 @@ exports.joinGroup = async (req, res) => {
             const message = `New membership request for ${group.g_name} from ${userName} (${user.email}). Please review in the MySarafa admin panel.`;
             let adminMobile = admin.mobile_no.toString().trim();
             if (!adminMobile.startsWith("91")) {
-            adminMobile = "91" + adminMobile;
+                adminMobile = "91" + adminMobile;
             }
 
             console.log("📤 [joinGroup] Sending WhatsApp request via AiSensy:", {
@@ -431,8 +453,8 @@ exports.joinGroup = async (req, res) => {
                 campaignName,
                 userName: "MySarafa",
                 destination: adminMobile,
-                 parameters: [
-                    { name: "user_name", value: userName } 
+                parameters: [
+                    { name: "user_name", value: userName }
                 ],
                 message
             });
@@ -443,9 +465,9 @@ exports.joinGroup = async (req, res) => {
                     campaignName: campaignName,
                     destination: admin.mobile_no,
                     source: 'MySarafa',
-                    userName:'Mysarafa',
+                    userName: 'Mysarafa',
                     templateParams: [
-                     userName 
+                        userName
                     ],
                     message
                 });
@@ -477,7 +499,7 @@ exports.joinGroup = async (req, res) => {
 
                     return res.status(201).json({
                         success: true,
-                        status :'pending',
+                        status: 'pending',
                         message: `Membership request sent for ${group.g_name}!`
                     });
                 } else {
@@ -531,16 +553,16 @@ exports.approveRequest = async (req, res) => {
         const group = await Group.findById(membershipRequest.group._id);
         group.total_mem += 1;
         await group.save();
-            
-         const approvedUser = await User.findById(membershipRequest.user);
+
+        const approvedUser = await User.findById(membershipRequest.user);
         if (approvedUser && approvedUser.mobile_no) {
             let approvedUserMobile = approvedUser.mobile_no.toString().trim();
             if (!approvedUserMobile.startsWith("91")) {
                 approvedUserMobile = "91" + approvedUserMobile;
             }
 
-            const aisensyApiKey = process.env.AISENSY_API_KEY ;
-            const approvalCampaign = process.env.AISENSY_APPROVAL_CAMPAIGN ;
+            const aisensyApiKey = process.env.AISENSY_API_KEY;
+            const approvalCampaign = process.env.AISENSY_APPROVAL_CAMPAIGN;
             const approvedUserName = approvedUser.f_name + (approvedUser.l_name ? ' ' + approvedUser.l_name : '');
 
             console.log("📤 [approveRequest] Sending approval WhatsApp notification via AiSensy:", {
@@ -663,7 +685,7 @@ exports.getMyGroups = async (req, res) => {
 exports.addGroupMember = async (req, res) => {
     try {
         console.log("addGroupMember input:", req.body);
-        const { groupId, memberEmail, name, mobileNumber, l_name,category } = req.body;
+        const { groupId, memberEmail, name, mobileNumber, l_name, category } = req.body;
         const user = await User.findById(req.user.id);
 
         if (!user) {
@@ -1078,99 +1100,99 @@ exports.uploadMembersCSV = async (req, res) => {
 
 
 exports.searchDiscoverGroups = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const query = sanitize(req.query.query || '');
+    try {
+        const userId = req.user.id;
+        const query = sanitize(req.query.query || '');
 
-    // Fetch joined and pending group IDs
-    const memberships = await GMem.find({ user: userId }).select('group type').lean();
-    const joinedGroupIds = memberships.filter(m => m.type !== 'pending').map(m => m.group.toString());
-    const pendingGroupIds = memberships.filter(m => m.type === 'pending').map(m => m.group.toString());
+        // Fetch joined and pending group IDs
+        const memberships = await GMem.find({ user: userId }).select('group type').lean();
+        const joinedGroupIds = memberships.filter(m => m.type !== 'pending').map(m => m.group.toString());
+        const pendingGroupIds = memberships.filter(m => m.type === 'pending').map(m => m.group.toString());
 
-    // Build query
-    const searchQuery = query ? { g_name: { $regex: query, $options: 'i' } } : {};
-    const groups = await Group.find({
-      $and: [
-        searchQuery,
-        { user: { $ne: userId } },
-        { _id: { $nin: joinedGroupIds } },
-        { g_type: { $in: ['public', 'private'] } }
-      ]
-    })
-      .select('g_name g_cover description g_type total_mem user createdAt')
-      .sort({
-        // Sort by match score (exact match first, then partial match)
-        // $score: {
-        //   $meta: 'textScore'
-        // },
-        createdAt: -1
-      })
-      .limit(4)
-      .lean();  
+        // Build query
+        const searchQuery = query ? { g_name: { $regex: query, $options: 'i' } } : {};
+        const groups = await Group.find({
+            $and: [
+                searchQuery,
+                { user: { $ne: userId } },
+                { _id: { $nin: joinedGroupIds } },
+                { g_type: { $in: ['public', 'private'] } }
+            ]
+        })
+            .select('g_name g_cover description g_type total_mem user createdAt')
+            .sort({
+                // Sort by match score (exact match first, then partial match)
+                // $score: {
+                //   $meta: 'textScore'
+                // },
+                createdAt: -1
+            })
+            .limit(4)
+            .lean();
 
-    const formattedGroups = groups.map(g => ({
-      _id: g._id,
-      g_name: g.g_name,
-      g_cover: g.g_cover,
-      description: g.description,
-      g_type: g.g_type,
-      total_mem: g.total_mem,
-      user: g.user,
-      createdAt: g.createdAt,
-      isJoined: joinedGroupIds.includes(g._id.toString()),
-      isPending: pendingGroupIds.includes(g._id.toString())
-    }));
+        const formattedGroups = groups.map(g => ({
+            _id: g._id,
+            g_name: g.g_name,
+            g_cover: g.g_cover,
+            description: g.description,
+            g_type: g.g_type,
+            total_mem: g.total_mem,
+            user: g.user,
+            createdAt: g.createdAt,
+            isJoined: joinedGroupIds.includes(g._id.toString()),
+            isPending: pendingGroupIds.includes(g._id.toString())
+        }));
 
-    res.status(200).json({ success: true, groups: formattedGroups });
-  } catch (error) {
-    console.error('Error searching discover groups:', error);
-    res.status(500).json({ success: false, message: 'Error searching groups', error: error.message });
-  }
+        res.status(200).json({ success: true, groups: formattedGroups });
+    } catch (error) {
+        console.error('Error searching discover groups:', error);
+        res.status(500).json({ success: false, message: 'Error searching groups', error: error.message });
+    }
 };
 
 // Search user's groups
 exports.searchMyGroups = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const query = sanitize(req.query.query || '');
+    try {
+        const userId = req.user.id;
+        const query = sanitize(req.query.query || '');
 
-    // Fetch memberships with populated group data
-    const memberships = await GMem.find({ user: userId, type: { $ne: 'pending' } })
-      .populate({
-        path: 'group',
-        select: 'g_name g_cover description g_type total_mem user createdAt',
-        match: query ? { g_name: { $regex: query, $options: 'i' } } : {}
-      })
-      .lean();
+        // Fetch memberships with populated group data
+        const memberships = await GMem.find({ user: userId, type: { $ne: 'pending' } })
+            .populate({
+                path: 'group',
+                select: 'g_name g_cover description g_type total_mem user createdAt',
+                match: query ? { g_name: { $regex: query, $options: 'i' } } : {}
+            })
+            .lean();
 
-    const groups = memberships
-      .filter(m => m.group)
-      .map(m => ({
-        _id: m.group._id,
-        g_name: m.group.g_name,
-        g_cover: m.group.g_cover,
-        description: m.group.description,
-        g_type: m.group.g_type,
-        total_mem: m.group.total_mem,
-        user: m.group.user,
-        createdAt: m.group.createdAt,
-        membershipType: m.type,
-        joinedAt: m.createdAt,
-        matchScore: query ? (m.group.g_name.toLowerCase() === query.toLowerCase() ? 2 : m.group.g_name.toLowerCase().includes(query.toLowerCase()) ? 1 : 0) : 0
-      }))
-      .sort((a, b) => {
-        if (a.matchScore !== b.matchScore) {
-          return b.matchScore - a.matchScore;
-        }
-        if (a.user.toString() === userId && b.user.toString() === userId) {
-          return new Date(b.createdAt) - new Date(a.createdAt);
-        }
-        return new Date(b.joinedAt) - new Date(a.joinedAt);
-      });
+        const groups = memberships
+            .filter(m => m.group)
+            .map(m => ({
+                _id: m.group._id,
+                g_name: m.group.g_name,
+                g_cover: m.group.g_cover,
+                description: m.group.description,
+                g_type: m.group.g_type,
+                total_mem: m.group.total_mem,
+                user: m.group.user,
+                createdAt: m.group.createdAt,
+                membershipType: m.type,
+                joinedAt: m.createdAt,
+                matchScore: query ? (m.group.g_name.toLowerCase() === query.toLowerCase() ? 2 : m.group.g_name.toLowerCase().includes(query.toLowerCase()) ? 1 : 0) : 0
+            }))
+            .sort((a, b) => {
+                if (a.matchScore !== b.matchScore) {
+                    return b.matchScore - a.matchScore;
+                }
+                if (a.user.toString() === userId && b.user.toString() === userId) {
+                    return new Date(b.createdAt) - new Date(a.createdAt);
+                }
+                return new Date(b.joinedAt) - new Date(a.joinedAt);
+            });
 
-    res.status(200).json({ success: true, groups });
-  } catch (error) {
-    console.error('Error searching my groups:', error);
-    res.status(500).json({ success: false, message: 'Error searching groups', error: error.message });
-  }
+        res.status(200).json({ success: true, groups });
+    } catch (error) {
+        console.error('Error searching my groups:', error);
+        res.status(500).json({ success: false, message: 'Error searching groups', error: error.message });
+    }
 };

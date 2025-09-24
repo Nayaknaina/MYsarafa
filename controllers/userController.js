@@ -491,3 +491,23 @@ exports.notifications = async (req, res, next) => {
   }
 };
 
+
+
+
+
+
+exports.signout = async (req, res, next)=>{
+  try {
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict',
+        });
+
+        return res.redirect('/');
+
+    } catch (error) {
+        console.error('Error in signout:', error);
+        next(error);
+    }
+};

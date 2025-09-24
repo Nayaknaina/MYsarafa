@@ -36,11 +36,7 @@ router.post('/blacklist-member', authMiddleware, groupController.blacklistMember
 router.get('/download-members-csv', authMiddleware, groupController.downloadMembersCSV);
 router.post('/upload-members-csv', authMiddleware, upload.single('csvFile'), groupController.uploadMembersCSV);
 
-router.get('/groups/:groupId', authMiddleware, async (req, res) => {
-  const group = await require('../models/group.model').findById(req.params.groupId);
-  if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
-  res.status(200).json({ success: true, group });
-});
+router.get('/groups/:groupId', authMiddleware,groupController.fetchgroup);
 
 router.get('/search/discover', authMiddleware, groupController.searchDiscoverGroups);
 router.get('/search/my', authMiddleware, groupController.searchMyGroups);

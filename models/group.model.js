@@ -52,6 +52,10 @@ const groupSchema = new mongoose.Schema({
     qr_code: {
         type: String,
         default: '/Assets/Images/default-qr.png'
+    },
+    upiId:{
+        type:String,
+        default:''
     }
 
 }, {

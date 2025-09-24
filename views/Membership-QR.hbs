@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <style>
     .upload-wrapper { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
@@ -74,11 +75,12 @@
                         {{/each}}
                     </select>
                     <div class="group-details">
-                        Upi-Id: <a href="#"><h2 id="groupNamePreview">{{#if group}}{{group.amount_description}}{{else}}Not provided{{/if}}</h2></a> 
+                        Upi-Id: <h3 id="groupNamePreview"></h3>
+                        Mobile No: <h4 id="groupMobilePreview"></h4>
                     </div>
                       <button class="QR-btn" ><a href="/pay/SS-upload">Upload QR</a>  </button>
       
-                    <div id="groupDescriptionPreview">{{#if group}}{{group.amount_description}}{{else}}No description available{{/if}}</div>
+                    <div id="groupDescriptionPreview">{{#if group}}{{group.amount_description}}{{else}}Select Group first{{/if}}</div>
                 </div>
                 <div class="membership-card right creative-card">
                     <div class="membership-title"><i class="fas fa-gem"></i> Monthly Membership Benefits</div>
@@ -131,6 +133,7 @@
                         coverImagePreview.parentElement.appendChild(downloadLink);
                     }
                     groupNamePreview.textContent = result.group.upiId;
+                    groupMobilePreview.textContent = result.mobile;
                     groupDescriptionPreview.textContent = result.group.amount_description;
                 } else {
                     showNotification(result.message || 'Failed to load group details', 'error');
