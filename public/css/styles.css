@@ -2230,7 +2230,7 @@ body {
    width: 100vw;
     height: auto;
     max-height: 100vh;
-    border-radius: 31px;
+    border-radius: 5px;
     margin: 25px 20px auto;
     padding: 20px;
   }
@@ -2665,6 +2665,7 @@ body {
     border: none;
     cursor: pointer;
     transition: transform 0.3s;
+    font-size: 12px;
 }
 
 .join-group-btn:hover,

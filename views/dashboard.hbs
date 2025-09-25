@@ -97,6 +97,24 @@
             transform: translateY(-50%);
             color: #6b7280;
         }
+        .Leave-btn{
+            background-color: #ff4d4f;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            margin-left: 114px;
+        }
+    @media (max-width: 768px) {
+        .Leave-btn{
+            margin-left: 0px;
+            margin-top: 10px;
+        }
+    }
 </style>
 
 <body data-user-id="{{user._id}}">
@@ -209,6 +227,8 @@
                                 {{#if (eq this.membershipType "admin")}}
                                       <button class="manage-group-btn" data-group-id="{{this._id}}">Manage Community</button>
                                 {{/if}}
+                                <button class="Leave-btn">Leave Button</button>
+                                
                             </div>
                         </div>
                        
@@ -517,8 +537,12 @@
                               group.isPending ? '<button class="pending-btn" disabled>Pending</button>' : 
                               `<button class="join-group-btn" data-group-id="${group._id}">Join Community</button>`}
                         ` : `
-                            ${group.membershipType === 'admin' ? `<button class="manage-group-btn" data-group-id="${group._id}">Manage Community</button>` : ''}
-                        `}
+                            ${group.membershipType === 'admin' ? `<button class="manage-group-btn" data-group-id="${group._id}">Manage Community</button>` : ''
+                            }
+                        `
+                        <button class="manage-group-btn" data-group-id="${group._id}">Manage Community</button>
+                        }
+
                     </div>
                 `;
                 container.appendChild(groupCard);
