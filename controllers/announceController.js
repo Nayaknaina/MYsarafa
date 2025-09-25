@@ -30,9 +30,9 @@ exports.Announcement = async (req, res, next) => {
 
     // Check if user is a member or admin of any group
     const groupMemberships = await GMem.find({ user: req.user.id }).select('group type').lean();
-    if (!groupMemberships.length) {
-      return res.status(403).render('error', { errorMessage: 'You are not a member of any groups', layout: false });
-    }
+    // if (!groupMemberships.length) {
+    //   return res.status(403).render('error', { errorMessage: 'You are not a member of any groups', layout: false });
+    // }
 
     // Check if user is an admin of any group
     const isAdmin = groupMemberships.some(membership => membership.type === 'admin');
@@ -134,7 +134,7 @@ exports.getAnnouncements = async (req, res) => {
   try {
     // Fetch all groups where the user is a member or admin
     const groupMemberships = await GMem.find({ user: req.user.id })
-      .select('group')
+      .select('group type')
       .lean();
 
     if (!groupMemberships.length) {
@@ -143,11 +143,14 @@ exports.getAnnouncements = async (req, res) => {
 
     // Extract group IDs
     const groupIds = groupMemberships.map(membership => membership.group);
+    const adminGroupIds = groupMemberships
+      .filter(m => m.type === 'admin')
+      .map(m => m.group.toString());
 
     // Fetch announcements for these groups
     const announcements = await Announcement.find({ group: { $in: groupIds } })
       .populate('createdBy', 'f_name l_name')
-      .populate('group', 'g_name') // Populate group name for display
+      .populate('group', 'g_name') 
       .sort({ createdAt: -1 })
       .lean();
 
@@ -166,6 +169,7 @@ exports.getAnnouncements = async (req, res) => {
         name: announcement.group.g_name
       },
       createdAt: announcement.createdAt,
+      canDelete: req.user.role === 'super_admin' || adminGroupIds.includes(announcement.group._id.toString())
  
     }));
     // console.log(formattedAnnouncements)
@@ -174,5 +178,35 @@ exports.getAnnouncements = async (req, res) => {
   } catch (error) {
     console.error('Error fetching announcements:', error);
     res.status(500).json({ success: false, message: 'Error fetching announcements', error: error.message });
+  }
+};
+
+
+exports.deleteAnnouncement = async (req, res, next) => {
+  try {
+    const announcementId = req.params.id;
+    const user = req.user; 
+
+   
+    const announcement = await Announcement.findById(announcementId);
+    if (!announcement) {
+      return res.status(404).json({ success: false, message: 'Announcement not found' });
+    }
+    const membership = await GMem.findOne({
+      user: user._id,
+      group: announcement.group,
+      type: 'admin'
+    });
+    if ( !membership) {
+      return res.status(403).json({ success: false, message: 'Unauthorized to delete this announcement' });
+    }
+   
+
+  
+    await Announcement.findByIdAndDelete(announcementId);
+    return res.status(200).json({ success: true, message: 'Announcement deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting announcement:', error);
+    return res.status(500).json({ success: false, message: 'Server error while deleting announcement' });
   }
 };

@@ -112,7 +112,7 @@ exports.createGroup = async (req, res) => {
             // const file = req.files.coverImage;
             // coverPhoto = `/uploads/${Date.now()}_${file.name}`;
             // await file.mv(`./public${coverPhoto}`);
-            coverPhoto = `/uploads/${req.files.coverImage[0].filename}`;
+            coverPhoto = `/uploads/coverImage/${req.files.coverImage[0].filename}`;
         }
         if (req.files && req.files.qrCode) {
             qrCode = `/uploads/${req.files.qrCode[0].filename}`;
@@ -240,7 +240,7 @@ exports.updateGroup = async (req, res) => {
 
         let coverPhoto = group.g_cover;
         if (req.files && req.files.coverImage) {
-            coverPhoto = `/uploads/${req.files.coverImage[0].filename}`;
+            coverPhoto = `/uploads/coverImage/${req.files.coverImage[0].filename}`;
             if (group.g_cover && group.g_cover !== './assets/images/demo.jpg') {
                 try {
                     fs.unlinkSync(path.join(__dirname, '..', 'public', group.g_cover));
@@ -869,9 +869,13 @@ exports.searchGroupMembers = async (req, res) => {
             blacklistReason: member.user.blacklistReason || '',
             invitationToken: member.user.invitationToken
         }));
+                let existing = await User.findOne({ email:req.user.email  });
+                const isExistingUser = !!existing;
 
+
+        
         console.log('Formatted members:', formattedMembers);
-        res.status(200).json({ success: true, members: formattedMembers });
+        res.status(200).json({ success: true, members: formattedMembers,isExistingUser });
     } catch (error) {
         console.error('Error searching group members:', error);
         res.status(500).json({ success: false, message: 'Error searching members' });

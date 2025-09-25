@@ -548,80 +548,11 @@ document.addEventListener('click', function (e) {
   }
 });
 
-console.log('Community Dashboard initialized successfully!');
 
-// document.addEventListener('DOMContentLoaded', function () {
-//   // console.log('DOMContentLoaded fired');
-//   // console.log('kycForm element:', document.getElementById('kycForm'));
 
-//   // Initialize KYC form if on KYC page
-//   // if (document.getElementById('kycForm')) {
-//   //   console.log('Initializing KYC form...');
-//   //   showStep(1);
-//   //   updateProgress();
-
-//   //   // Handle form submission
-//   //   document.getElementById('kycForm').addEventListener('submit', function (e) {
-//   //     e.preventDefault();
-
-//   //     if (validateStep(3)) {
-//   //       // Submit the form
-//   //       alert('KYC form submitted successfully!');
-//   //       // Here you would typically send the data to your server
-//   //     }
-//   //   });
-//   // } else {
-//   //   console.log('KYC form not found on this page');
-//   // }
-// });
 
 
 const membersTable = document.querySelector('.members-table tbody');
-
-// if (addNewBtn && addMemberModal && closeAddMemberModal && addMemberForm) {
-//   addNewBtn.onclick = () => { addMemberModal.style.display = 'flex'; };
-//   closeAddMemberModal.onclick = () => { addMemberModal.style.display = 'none'; };
-//   addMemberModal.onclick = (e) => {
-//     if (e.target === addMemberModal) addMemberModal.style.display = 'none';
-//   };
-
-//   addMemberForm.onsubmit = function (e) {
-//     e.preventDefault();
-
-//     // Get form values
-//     const name = document.getElementById('memberName').value.trim();
-//     const mobileNumber = document.getElementById('memberNumber').value.trim();
-//     const email = document.getElementById('memberEmail').value.trim();
-
-//     // Validate required fields
-//     if (!name || !mobileNumber || !email) {
-//       alert('Please fill in all required fields');
-//       return;
-//     }
-
-//     // Validate email format
-//     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-//     if (!emailRegex.test(email)) {
-//       alert('Please enter a valid email address');
-//       return;
-//     }
-
-//     // Generate invitation link
-//     const invitationLink = generateInvitationLink(name, email);
-//   showInvitationModal(name, email, invitationLink);
-//     // // Send invitation email
-//     // sendInvitationEmail(name, email, invitationLink);
-
-//     // Show success message
-//     alert(`Invitation sent successfully to ${email}!`);
-
-//     // Close modal and reset form
-//     addMemberModal.style.display = 'none';
-//     addMemberForm.reset();
-//   };
-// }
-
-// Email invitation functions
 function generateInvitationLink(name, email) {
   // Generate a unique token for the invitation
   const token = btoa(`${name}-${email}-${Date.now()}`).replace(/[^a-zA-Z0-9]/g, '');
@@ -1120,7 +1051,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const profilePicturePreview = document.getElementById('profilePicturePreview');
   const profileForm = document.getElementById('profileForm');
   const logoutBtn = document.getElementById("logoutBtn");
-  console.log("Found logoutBtn:", logoutBtn); // Debug
+
 
   if (profileBtn && profileModal && closeProfileModal) {
     profileBtn.onclick = () => { profileModal.style.display = 'flex'; };
@@ -2138,6 +2069,8 @@ document.addEventListener('DOMContentLoaded', function () {
           console.log("memebers coming result", result)
           if (response.ok && result.members.length) {
             const member = result.members[0];
+
+            const isExistingUser = result.isExistingUser;
             invitationName.textContent = name;
             invitationEmail.textContent = email;
             invitationLinkDisplay.textContent = `${window.location.origin}/signup?invite=${member.invitationToken}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`;
@@ -2152,6 +2085,34 @@ document.addEventListener('DOMContentLoaded', function () {
             if (groupResponse.ok) {
               document.querySelector('#invitationGroupName').textContent = groupResult.group.g_name;
             }
+
+            if (isExistingUser) {
+        modalTitle.textContent = 'Share Member Details';
+        existingUserMessage.style.display = 'block';
+        existingUserMessage.style.display = 'block';
+        newUserRecipient.style.display = 'none';
+        newUserGroup.style.display = 'none';
+        invitationLinkLabel.style.display = 'none';
+        invitationLinkDisplay.style.display = 'none';
+        invitationPasswordLabel.style.display = 'none';
+        invitationPassword.style.display = 'none';
+        copyLinkBtn.style.display = 'none';
+      } else {
+        modalTitle.textContent = 'Invitation Link Generated';
+        existingUserMessage.style.display = 'none';
+        newUserRecipient.style.display = 'block';
+        newUserGroup.style.display = 'block';
+        invitationLinkLabel.style.display = 'block';
+        invitationLinkDisplay.style.display = 'block';
+        invitationPasswordLabel.style.display = 'block';
+        invitationPassword.style.display = 'block';
+        copyLinkBtn.style.display = 'inline-block';
+        
+        // Set new user specifics (if needed)
+        invitationNameNew.textContent = name;
+        invitationLinkDisplay.textContent = `${window.location.origin}/signup?invite=${member.invitationToken || ''}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`;
+        invitationPassword.textContent = member.tempPassword || 'N/A';
+      }
             invitationModal.style.display = 'flex';
           } else {
             showNotification('Failed to load member invitation details', 'error');
@@ -2222,11 +2183,6 @@ document.addEventListener('DOMContentLoaded', function () {
       window.open("/share-page", "_blank");
     }
   });
-});
-
-
-document.querySelector('.toggle-btn').addEventListener('click', function () {
-  document.querySelector('.actions').classList.toggle('show');
 });
 
 function goBack() {

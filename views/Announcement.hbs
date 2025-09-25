@@ -486,7 +486,7 @@
       try {
         const text = formatAnnouncement(announcement);
         await navigator.clipboard.writeText(text);
-       // showNotification('Announcement copied to clipboard!', 'success');
+        showNotification('Announcement copied to clipboard!', 'success');
       } catch (error) {
         console.error('Error copying announcement:', error);
         showNotification('Failed to copy announcement', 'error');
@@ -595,7 +595,7 @@
         <div class="announcement-meta">
           <span class="announcement-user"><i class="fas fa-user-circle"></i> ${announcement.createdBy.name}</span>
           <span class="announcement-time">${timeString}</span>
-          <span class ="Delete-btn"><i class="fa fa-trash" aria-hidden="true"></i></span>
+         ${announcement.canDelete ? `<span class="Delete-btn" data-announcement-id="${announcement._id}"><i class="fa fa-trash" aria-hidden="true"></i></span>` : ''}
         </div>
       </div>
     `;
@@ -624,25 +624,58 @@
 }
 
     // Initialize on page load
-    document.addEventListener('DOMContentLoaded', () => {
-      fetchAnnouncements();
+  document.addEventListener('DOMContentLoaded', () => {
+    fetchAnnouncements();
 
-      // Handle copy and share clicks
-      document.getElementById('announcementList').addEventListener('click', (e) => {
-        const copyButton = e.target.closest('.announcement-copy');
-        const shareButton = e.target.closest('.announcement-share');
+    // Handle copy, share, and delete clicks
+    document.getElementById('announcementList').addEventListener('click', async (e) => {
+      const copyButton = e.target.closest('.announcement-copy');
+      const shareButton = e.target.closest('.announcement-share');
+      const deleteButton = e.target.closest('.announcement-delete'); // ✅ added delete button selector
 
-        if (copyButton) {
-          const announcement = JSON.parse(copyButton.getAttribute('data-announcement'));
-          copyAnnouncement(announcement);
+      if (copyButton) {
+        const announcement = JSON.parse(copyButton.getAttribute('data-announcement'));
+        copyAnnouncement(announcement);
+      }
+
+      if (shareButton) {
+        const announcement = JSON.parse(shareButton.getAttribute('data-announcement'));
+        shareAnnouncement(announcement);
+      }
+
+      if (deleteButton) {
+        const announcementId = deleteButton.getAttribute('data-announcement-id');
+        if (!announcementId) {
+          showNotification('No announcement selected for deletion', 'error');
+          return;
         }
 
-        if (shareButton) {
-          const announcement = JSON.parse(shareButton.getAttribute('data-announcement'));
-          shareAnnouncement(announcement);
+        if (!confirm('Are you sure you want to delete this announcement? This cannot be undone.')) {
+          return;
         }
-      });
+
+        try {
+          const response = await fetch(`/announcements/delete/${announcementId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include'
+          });
+
+          const result = await response.json();
+          if (response.ok && result.success) {
+            showNotification('Announcement deleted successfully!', 'success');
+            fetchAnnouncements(); 
+          } else {
+            showNotification(result.message || 'Failed to delete announcement', 'error');
+          }
+        } catch (error) {
+          console.error('Error deleting announcement:', error);
+          showNotification('Error deleting announcement: ' + error.message, 'error');
+        }
+      }
     });
+});
+
   </script>
 <script src="/js/all.js"></script>
 
