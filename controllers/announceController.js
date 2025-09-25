@@ -30,9 +30,9 @@ exports.Announcement = async (req, res, next) => {
 
     // Check if user is a member or admin of any group
     const groupMemberships = await GMem.find({ user: req.user.id }).select('group type').lean();
-    if (!groupMemberships.length) {
-      return res.status(403).render('error', { errorMessage: 'You are not a member of any groups', layout: false });
-    }
+    // if (!groupMemberships.length) {
+    //   return res.status(403).render('error', { errorMessage: 'You are not a member of any groups', layout: false });
+    // }
 
     // Check if user is an admin of any group
     const isAdmin = groupMemberships.some(membership => membership.type === 'admin');

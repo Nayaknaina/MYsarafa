@@ -17,3 +17,8 @@ app = "mysarafa-app"
   [[services.ports]]
     port = 443
     handlers = ["tls", "http"]
+
+
+[mounts]
+  source = "uploads"
+  destination ="/app/public/uploads"
