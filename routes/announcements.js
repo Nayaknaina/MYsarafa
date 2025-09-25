@@ -13,4 +13,6 @@ router.get('/Announcementform',authMiddleware,announcementController.Announcemen
 router.post('/create', authMiddleware, announcementUpload, announcementController.createAnnouncement);
 router.get('/list', authMiddleware, announcementController.getAnnouncements);
 
+router.delete('/delete/:id', authMiddleware, announcementController.deleteAnnouncement);
+
 module.exports = router;

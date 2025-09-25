@@ -64,9 +64,9 @@ exports.renderSSupload = async (req, res, next) => {
       user: user || {},
       groups: groups || [],
        layout: false,
-      group: null // No group selected initially
+      group: null 
     });
-  } catch (error) {
+  } catch (error) {     
     console.error('Error rendering membership page:', error);
     next(error);
   }

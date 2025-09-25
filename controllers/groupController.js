@@ -869,9 +869,13 @@ exports.searchGroupMembers = async (req, res) => {
             blacklistReason: member.user.blacklistReason || '',
             invitationToken: member.user.invitationToken
         }));
+                let existing = await User.findOne({ email:req.user.email  });
+                const isExistingUser = !!existing;
 
+
+        
         console.log('Formatted members:', formattedMembers);
-        res.status(200).json({ success: true, members: formattedMembers });
+        res.status(200).json({ success: true, members: formattedMembers,isExistingUser });
     } catch (error) {
         console.error('Error searching group members:', error);
         res.status(500).json({ success: false, message: 'Error searching members' });
