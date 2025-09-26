@@ -215,6 +215,14 @@
   <div class="main-container">
     <!-- Sidebar -->
     {{> sidebar}}
+        {{#if disabledSidebar}}
+      <style>
+        .sidebar {
+          pointer-events: none !important;
+          opacity: 0.5 !important;
+        }
+      </style>
+      {{/if}}
     <main class="main-content">
       <h1 class="page-title">KYC Verification</h1>
 

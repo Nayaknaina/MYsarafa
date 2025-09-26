@@ -5,14 +5,20 @@ const fs = require('fs').promises;
 const path = require('path');
 const axios = require('axios');
 
+const { userRequiresKyc } = require('../middleware/kycCheck');
+
 
 exports.KYCverification = async (req, res) => {
     try {
         console.log("we are in a kyc");
         const user = await User.findById(req.user.id).lean();
 
+        const requiresKyc = await userRequiresKyc(user._id);
+        const disabledSidebar = requiresKyc && user.kyc_status === 'pending';
+
         res.render("KYC-verification", {
             user,
+            disabledSidebar,
             layout: false
         });
     } catch (error) {
@@ -282,4 +288,15 @@ exports.getLocationByPincode = async (req, res) => {
     console.error('Error fetching PIN code data:', error.message);
     res.status(500).json({ success: false, message: 'Error fetching location data', error: error.message });
   }
+};
+
+exports.checkKycRequired =async(req ,res ,next) =>{
+    try {
+        const user = req.user;
+        const requiresKyc = await userRequiresKyc(user._id);
+        const needsKyc = requiresKyc && user.kyc_status === 'pending';
+        res.json({ needsKyc });
+    } catch (error) {
+        next(error);
+    }
 };

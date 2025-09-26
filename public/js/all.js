@@ -900,7 +900,7 @@ function saveStepData(step) {
 }
 
 // KYC Form Functionality
-document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener('DOMContentLoaded', async () => {
   // Add Worker functionality
   const addWorkerBtn = document.getElementById('addWorkerBtn');
   const workersContainer = document.getElementById('workersContainer');
@@ -920,14 +920,35 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // KYC Form submission
-  const kycForm = document.getElementById('kycForm');
-  if (kycForm) {
-    kycForm.addEventListener('submit', function (e) {
-      e.preventDefault();
-      // handleKYCSubmission();
-    });
-  }
+  // // KYC Form submission
+  // const kycForm = document.getElementById('kycForm');
+  // if (kycForm) {
+  //   kycForm.addEventListener('submit', function (e) {
+  //     e.preventDefault();
+  //     // handleKYCSubmission();
+  //  
+    try {
+        const response = await fetch('/kyc/checkKyc-Required', {
+            method: 'GET',
+            credentials: 'include'
+        });
+        const result = await response.json();
+        console.log("result of kyc",result)
+        if (result.needsKyc) {
+            document.getElementById('Kycmodel').style.display = 'flex';
+        }
+    } catch (error) {
+        console.error('Error checking KYC:', error);
+    }
+
+    // Handle Get KYC button
+    const kycBtn = document.querySelector('.kyc-required-btn');
+    if (kycBtn) {
+        kycBtn.addEventListener('click', () => {
+            window.location.href = '/kyc/KYC-verification';
+        });
+    }
+
 });
 
 // Function to add a worker field

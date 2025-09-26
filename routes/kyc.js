@@ -18,4 +18,5 @@ router.get('/pincode', authMiddleware, kycController.getLocationByPincode);
 router.post('/send-otp', authMiddleware, kycController.sendAadhaarOtp);
 router.post('/verify-otp', authMiddleware, kycController.verifyAadhaarOtp);
 
+router.get('/checkKyc-Required',authMiddleware,kycController.checkKycRequired);
 module.exports = router;
