@@ -113,6 +113,19 @@
             margin-top: 10px;
         }
     }
+.kyc-required-btn{
+    background-color: #2f95ff;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    margin-top: 20px;   
+    font-weight: 500;
+margin-left: 35%;    
+}
 </style>
 
 <body data-user-id="{{user._id}}">
@@ -478,12 +491,23 @@
             </form>
         </div>
     </div>
+    <div id="Kycmodel" class="modal-overlay" style="display:flex;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>First You have to do KYC than you get the access!!</span>
+              
+            </div>
+            <button class="kyc-required-btn">Get KYC</button>
+        </div>
+    </div>
 
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
     <script src="/js/all.js"></script>
     <script>
+
+     
         // Show notification
         function showNotification(message, type = 'info') {
             toastr.options = { timeOut: 3000, positionClass: 'toast-top-right' };
