@@ -1817,10 +1817,11 @@ body {
 
 .modal-header {
   padding: 24px 32px 16px 32px;
-
+  border-bottom: 1px solid #e5e7eb;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  
   border-radius: 16px 16px 0 0;
 }
 
@@ -2199,7 +2200,7 @@ body {
 
   .modal-header {
     padding: 20px 24px 12px 24px;
-    
+    border-radius: 10px;
   }
 
   .modal-header h3 {
