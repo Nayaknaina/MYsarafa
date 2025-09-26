@@ -1200,3 +1200,26 @@ exports.searchMyGroups = async (req, res) => {
         res.status(500).json({ success: false, message: 'Error searching groups', error: error.message });
     }
 };
+
+exports.leaveGroup = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { groupId } = req.params;
+
+    
+        const membership = await GMem.findOne({ user: userId, group: groupId });
+        if (!membership) {
+            return res.status(404).json({ success: false, message: 'Membership not found' });
+        }
+
+        if (membership.type === 'admin') {
+            return res.status(403).json({ success: false, message: 'Admin cannot leave their own group' });
+        }
+        await GMem.deleteOne({ user: userId, group: groupId });
+
+        res.status(200).json({ success: true, message: 'You left the group successfully' });
+    } catch (error) {
+        console.error('Error leaving group:', error);
+        res.status(500).json({ success: false, message: 'Error leaving group', error: error.message });
+    }
+};

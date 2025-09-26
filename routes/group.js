@@ -41,4 +41,6 @@ router.get('/groups/:groupId', authMiddleware,groupController.fetchgroup);
 router.get('/search/discover', authMiddleware, groupController.searchDiscoverGroups);
 router.get('/search/my', authMiddleware, groupController.searchMyGroups);
 
+router.delete('/groups/:groupId/leave', authMiddleware,groupController.leaveGroup);
+
 module.exports = router;

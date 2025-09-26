@@ -141,6 +141,8 @@ $(document).ready(function () {
     const groupId = $(this).data('group-id');
     window.location.href = `/Groups/community/${groupId}`;
   });
+
+
   const socket = io();
   const userId = document.body.getAttribute("data-user-id");
   socket.emit('joinRoom', '{{user._id}}');
@@ -224,6 +226,38 @@ $(document).ready(function () {
     });
   });
 
+  $('.leave-group-btn').click(function () {
+    const $btn = $(this);
+    const groupId = $btn.data('group-id');
+    const groupCard = $btn.closest('.group-card');
+
+    if (!confirm('Are you sure you want to leave this group?')) return;
+
+    $.ajax({
+      url: `/Groups/groups/${groupId}/leave`,
+      type: 'DELETE',
+      xhrFields: { withCredentials: true },
+      success: function (response) {
+        if (response.success) {
+          showNotification(response.message, 'success');
+          // Option 1: fade out the group card without reload
+          groupCard.fadeOut(500, function () {
+            $(this).remove();
+          });
+          // Option 2: refresh list (if you prefer)
+          // fetchGroups('/Groups/search/my', '', 'myGroupsList', 'myGroupsNoResults', false);
+        } else {
+          showNotification(response.message || 'Failed to leave group', 'error');
+        }
+      },
+      error: function (xhr) {
+        const errMsg = xhr.responseJSON?.message || 'Error leaving group';
+        showNotification(errMsg, 'error');
+      }
+    });
+
+
+  });
   const duePaymentModal = $('#duePaymentModal');
   const closeDuePaymentModal = $('#closeDuePaymentModal');
   const payNowBtn = $('#payNowBtn');
@@ -1462,7 +1496,7 @@ document.addEventListener('DOMContentLoaded', function () {
         credentials: 'include'
       });
       const result = await response.json();
-      console.log("groups",result);
+      console.log("groups", result);
       if (response.ok) {
         const groupSelect = document.getElementById('groupSelect');
         groupSelect.innerHTML = '<option value="">Select Group</option>';
@@ -2087,32 +2121,32 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             if (isExistingUser) {
-        modalTitle.textContent = 'Share Member Details';
-        existingUserMessage.style.display = 'block';
-        existingUserMessage.style.display = 'block';
-        newUserRecipient.style.display = 'none';
-        newUserGroup.style.display = 'none';
-        invitationLinkLabel.style.display = 'none';
-        invitationLinkDisplay.style.display = 'none';
-        invitationPasswordLabel.style.display = 'none';
-        invitationPassword.style.display = 'none';
-        copyLinkBtn.style.display = 'none';
-      } else {
-        modalTitle.textContent = 'Invitation Link Generated';
-        existingUserMessage.style.display = 'none';
-        newUserRecipient.style.display = 'block';
-        newUserGroup.style.display = 'block';
-        invitationLinkLabel.style.display = 'block';
-        invitationLinkDisplay.style.display = 'block';
-        invitationPasswordLabel.style.display = 'block';
-        invitationPassword.style.display = 'block';
-        copyLinkBtn.style.display = 'inline-block';
-        
-        // Set new user specifics (if needed)
-        invitationNameNew.textContent = name;
-        invitationLinkDisplay.textContent = `${window.location.origin}/signup?invite=${member.invitationToken || ''}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`;
-        invitationPassword.textContent = member.tempPassword || 'N/A';
-      }
+              modalTitle.textContent = 'Share Member Details';
+              existingUserMessage.style.display = 'block';
+              existingUserMessage.style.display = 'block';
+              newUserRecipient.style.display = 'none';
+              newUserGroup.style.display = 'none';
+              invitationLinkLabel.style.display = 'none';
+              invitationLinkDisplay.style.display = 'none';
+              invitationPasswordLabel.style.display = 'none';
+              invitationPassword.style.display = 'none';
+              copyLinkBtn.style.display = 'none';
+            } else {
+              modalTitle.textContent = 'Invitation Link Generated';
+              existingUserMessage.style.display = 'none';
+              newUserRecipient.style.display = 'block';
+              newUserGroup.style.display = 'block';
+              invitationLinkLabel.style.display = 'block';
+              invitationLinkDisplay.style.display = 'block';
+              invitationPasswordLabel.style.display = 'block';
+              invitationPassword.style.display = 'block';
+              copyLinkBtn.style.display = 'inline-block';
+
+              // Set new user specifics (if needed)
+              invitationNameNew.textContent = name;
+              invitationLinkDisplay.textContent = `${window.location.origin}/signup?invite=${member.invitationToken || ''}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`;
+              invitationPassword.textContent = member.tempPassword || 'N/A';
+            }
             invitationModal.style.display = 'flex';
           } else {
             showNotification('Failed to load member invitation details', 'error');
