@@ -945,7 +945,7 @@ function saveStepData(step) {
     const kycBtn = document.querySelector('.kyc-required-btn');
     if (kycBtn) {
         kycBtn.addEventListener('click', () => {
-            window.location.href = '/kyc/KYC-verification';
+            window.location.href = '/kyc/KYCverification';
         });
     }
 

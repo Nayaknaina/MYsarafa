@@ -214,8 +214,7 @@
 
   <div class="main-container">
     <!-- Sidebar -->
-    {{> sidebar}}
-        {{#if disabledSidebar}}
+     {{#if disabledSidebar}}
       <style>
         .sidebar {
           pointer-events: none !important;
@@ -223,6 +222,8 @@
         }
       </style>
       {{/if}}
+    {{> sidebar}}
+       
     <main class="main-content">
       <h1 class="page-title">KYC Verification</h1>
 

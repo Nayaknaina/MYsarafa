@@ -14,12 +14,13 @@ exports.KYCverification = async (req, res) => {
         const user = await User.findById(req.user.id).lean();
 
         const requiresKyc = await userRequiresKyc(user._id);
-        const disabledSidebar = requiresKyc && user.kyc_status === 'pending';
+        // const disabledSidebar = requiresKyc && user.kyc_status === 'pending';
+        const disabledSidebar = requiresKyc ;
 
         res.render("KYC-verification", {
             user,
             disabledSidebar,
-            layout: false
+            layout: false 
         });
     } catch (error) {
         res.status(500).render("500", { errorMessage: "Something went wrong, please try again later." });
@@ -294,7 +295,7 @@ exports.checkKycRequired =async(req ,res ,next) =>{
     try {
         const user = req.user;
         const requiresKyc = await userRequiresKyc(user._id);
-        const needsKyc = requiresKyc && user.kyc_status === 'pending';
+        const needsKyc = requiresKyc ;
         res.json({ needsKyc });
     } catch (error) {
         next(error);
