@@ -18,6 +18,7 @@ const groupRoutes = require('./routes/group');
 const kycRoutes = require('./routes/kyc');
 const membershipRoute = require('./routes/membership');
 const announcementsRoute = require('./routes/announcements')
+const superAdminRoutes = require('./routes/superAdmin');
 
 const { engine } = require('express-handlebars');
 const jwt = require('jsonwebtoken');
@@ -63,7 +64,10 @@ app.use('/Groups',groupRoutes);
 app.use('/kyc',kycRoutes);
 app.use('/pay',membershipRoute);
 app.use('/announcements',announcementsRoute);
+app.use('/superadmin', superAdminRoutes);
 
+// Serve superadmin frontend if needed
+app.use('/superadmin-frontend', express.static(path.join(__dirname, 'superadmin-frontend')));
 
 // Serve HTML files
 app.get('/', (req, res) => {

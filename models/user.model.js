@@ -93,7 +93,13 @@ const userSchema = new mongoose.Schema({
       'Trader',
       'Artisan/Craftsman'
     ],
-    default: null 
+    default: null
+  },
+
+  role: {
+    type: String,
+    enum: ['user', 'super_admin'],
+    default: 'user'
   }
 
 }, { timestamps: true });

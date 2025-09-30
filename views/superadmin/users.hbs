@@ -1,0 +1,33 @@
+<div class="users-management">
+    <h2>Manage Users</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>KYC Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each users}}
+            <tr>
+                <td>{{f_name}} {{l_name}}</td>
+                <td>{{email}}</td>
+                <td>{{role}}</td>
+                <td>{{kyc_status}}</td>
+                <td>
+                    <form action="/superadmin/users/{{_id}}" method="POST" style="display:inline;">
+                        <button type="submit">Edit</button>
+                    </form>
+                    <form action="/superadmin/users/{{_id}}?_method=DELETE" method="POST" style="display:inline;">
+                        <button type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    <a href="/superadmin/dashboard">Back to Dashboard</a>
+</div>
