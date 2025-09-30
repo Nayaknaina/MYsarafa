@@ -936,6 +936,10 @@ function saveStepData(step) {
         console.log("result of kyc",result)
         if (result.needsKyc) {
             document.getElementById('Kycmodel').style.display = 'flex';
+            document.querySelector('.main-content').style.pointerEvents = 'none';
+            document.querySelector('.main-content').style.opacity = '0.5';
+            document.querySelector('.sidebar').style.pointerEvents = 'none';
+            document.querySelector('.sidebar').style.opacity = '0.5';
         }
     } catch (error) {
         console.error('Error checking KYC:', error);
@@ -1187,7 +1191,7 @@ document.addEventListener('DOMContentLoaded', function () {
           showNotification(result.message || 'Failed to update profile', 'error');
         }
       } catch (error) {
-        console.error('Fetch error:', error);
+        // console.error('Fetch error:', error);
         showNotification('Error updating profile: ' + error.message, 'error');
       }
     });

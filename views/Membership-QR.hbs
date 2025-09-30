@@ -1,38 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sarafa Community Dashboard</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <style>
-    .upload-wrapper { display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
-    .upload-card {
-      background: #fff; border-radius: 12px; box-shadow: 0 6px 24px rgba(47,149,255,0.13);
-      padding: 22px; flex: 1 1 340px; max-width: 520px; border-bottom: 4px solid #551DFF;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sarafa Community Dashboard</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <style>
+    .upload-wrapper {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      flex-wrap: wrap;
     }
-    .upload-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-    .upload-input { width: 100%; padding: 10px 12px; border: 1.5px solid #bdbdbd; border-radius: 8px; font-size: 1rem; }
-    .upload-input:focus { outline: none; border-color: #2f95ff; box-shadow: 0 0 0 3px rgba(47,149,255,0.12); }
-    .upload-hint { color: #6b7280; font-size: 0.95rem; margin-top: 6px; }
-    .upload-actions { display: flex; gap: 10px; align-items: center; margin-top: 12px; }
-    .upload-btn { background: linear-gradient(245deg, #D324A8 -67.04%, #551DFF 129.05%); color: #fff; border: none; 
-      border-radius: 22px; padding: 10px 18px; cursor: pointer; font-weight: 600; }
-    .upload-btn:hover { filter: brightness(1.05);}
-    .qr-preview{
-            /* width: 100%; */
-    height: 250px;
-    background: #f0f2f5;
-    border-radius: 8px;
-    overflow: hidden;
-    margin-bottom: 16px;
-   }
-    .QR-btn{
+
+    .upload-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 6px 24px rgba(47, 149, 255, 0.13);
+      padding: 22px;
+      flex: 1 1 340px;
+      max-width: 520px;
+      border-bottom: 4px solid #551DFF;
+    }
+
+    .upload-title {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .upload-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #bdbdbd;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    .upload-input:focus {
+      outline: none;
+      border-color: #2f95ff;
+      box-shadow: 0 0 0 3px rgba(47, 149, 255, 0.12);
+    }
+
+    .upload-hint {
+      color: #6b7280;
+      font-size: 0.95rem;
+      margin-top: 6px;
+    }
+
+    .upload-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .upload-btn {
+      background: linear-gradient(245deg, #D324A8 -67.04%, #551DFF 129.05%);
+      color: #fff;
+      border: none;
+      border-radius: 22px;
+      padding: 10px 18px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .upload-btn:hover {
+      filter: brightness(1.05);
+    }
+
+    .qr-preview {
+      /* width: 100%; */
+      height: 250px;
+      background: #f0f2f5;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .QR-btn {
       background: linear-gradient(245deg, #D324A8 -67.04%, #551DFF 129.05%);
       color: #fff;
       border: none;
@@ -46,236 +102,242 @@
       text-align: center;
     }
 
-    .qr-title{
+    .qr-title {
       font-size: 12px;
       font-weight: 450;
-        text-align: center;
-        color: white;
-        background:linear-gradient(90deg, #D324A8, #551DFF);
-        border-radius: 10px;
-        padding: 10px;
-    }
-    .upload-input{
-        background: linear-gradient(90deg, #fff 80%, #e3f0ff 100%);
-  border: 2px solid #D324A8;
-  border-radius: 8px;
-  font-size: 1.05rem;
-  color: #551DFF;
-  box-shadow: 0 1px 6px #D324A822;
-  transition: border 0.2s, box-shadow 0.2s;
-  width: 100%;
-  padding: 8px 12px;
-  border: 1.5px solid #bdbdbd;
-  border-radius: 6px;
-  margin-top: 4px;
-  font-size: 1rem;
-  outline: none;
-  transition: border 0.2s;
+      text-align: center;
+      color: white;
+      background: linear-gradient(90deg, #D324A8, #551DFF);
+      border-radius: 10px;
+      padding: 10px;
     }
 
+    .upload-input {
+      background: linear-gradient(90deg, #fff 80%, #e3f0ff 100%);
+      border: 2px solid #D324A8;
+      border-radius: 8px;
+      font-size: 1.05rem;
+      color: #551DFF;
+      box-shadow: 0 1px 6px #D324A822;
+      transition: border 0.2s, box-shadow 0.2s;
+      width: 100%;
+      padding: 8px 12px;
+      border: 1.5px solid #bdbdbd;
+      border-radius: 6px;
+      margin-top: 4px;
+      font-size: 1rem;
+      outline: none;
+      transition: border 0.2s;
+    }
 
-/* Main card container */
-.group-create-preview-section {
-  background: #fff;
-  padding: 30px 25px;
-  border-radius: 20px;
-  max-width: 380px;
-  width: 100%;
-  text-align: center;
-  box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.15);
-}
+
+    /* Main card container */
+    .group-create-preview-section {
+      background: #fff;
+      padding: 30px 25px;
+      border-radius: 20px;
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0px 10px 25px rgba(0, 0, 0, 0.15);
+    }
 
 
 
-/* QR Preview */
-.qr-preview {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: linear-gradient(135deg, #7b2ff7, #f107a3);
-  padding: 20px;
-  border-radius: 16px;
-  margin: 15px 0 25px 0;
-}
+    /* QR Preview */
+    .qr-preview {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #7b2ff7, #f107a3);
+      padding: 20px;
+      border-radius: 16px;
+      margin: 15px 0 25px 0;
+    }
 
-.qr-preview img.cover-img {
-  width: 220px;
-  height: 220px;
-  object-fit: contain;
-  background: #fff;
-  border-radius: 12px;
-  padding: 10px;
-}
+    .qr-preview img.cover-img {
+      width: 220px;
+      height: 220px;
+      object-fit: contain;
+      background: #fff;
+      border-radius: 12px;
+      padding: 10px;
+    }
 
-/* Dropdown */
-#Communityselection.upload-input {
-  width: 100%;
-  margin: 15px 0;
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  font-size: 14px;
-  color: #444;
-  background: #fafafa;
-  outline: none;
-  transition: border 0.3s;
-}
+    /* Dropdown */
+    #Communityselection.upload-input {
+      width: 100%;
+      margin: 15px 0;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      font-size: 14px;
+      color: #444;
+      background: #fafafa;
+      outline: none;
+      transition: border 0.3s;
+    }
 
-#Communityselection.upload-input:focus {
-  border-color: #6366f1;
-}
+    #Communityselection.upload-input:focus {
+      border-color: #6366f1;
+    }
 
-/* Group Details */
-.group-details {
-  margin: 1px 0;
-  text-align: left;
-  font-size: 14px;
-  color: #555;
-}
+    /* Group Details */
+    .group-details {
+      margin: 1px 0;
+      text-align: left;
+      font-size: 14px;
+      color: #555;
+    }
 
-.group-details h3,
-.group-details h4 {
-  display: inline-block;
-  margin-left: 8px;
-  color: #111827;
-  font-weight: 600;
-}
+    .group-details h3,
+    .group-details h4 {
+      display: inline-block;
+      margin-left: 8px;
+      color: #111827;
+      font-weight: 600;
+    }
 
-/* Upload Button */
-.QR-btn {
-  display: inline-block;
-  margin: 20px 0;
-  width: 100%;
-  background: linear-gradient(135deg, #6366f1, #9333ea);
-  border: none;
-  padding: 14px 0;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
+    /* Upload Button */
+    .QR-btn {
+      display: inline-block;
+      margin: 20px 0;
+      width: 100%;
+      background: linear-gradient(135deg, #6366f1, #9333ea);
+      border: none;
+      padding: 14px 0;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
 
-.QR-btn a {
-  text-decoration: none;
-  color: white;
-  font-weight: 600;
-  font-size: 15px;
-  display: block;
-}
+    .QR-btn a {
+      text-decoration: none;
+      color: white;
+      font-weight: 600;
+      font-size: 15px;
+      display: block;
+    }
 
-.QR-btn:hover {
-  background: linear-gradient(135deg, #4f46e5, #7e22ce);
-  transform: translateY(-2px);
-}
+    .QR-btn:hover {
+      background: linear-gradient(135deg, #4f46e5, #7e22ce);
+      transform: translateY(-2px);
+    }
 
-/* Group Description */
-#groupDescriptionPreview {
-  margin-top: 15px;
-  font-size: 13px;
-  font-style: italic;
-  color: #6b7280;
-}
-
-    </style>
+    /* Group Description */
+    #groupDescriptionPreview {
+      margin-top: 15px;
+      font-size: 13px;
+      font-style: italic;
+      color: #6b7280;
+    }
+  </style>
 </head>
+
 <body data-user-id="{{user._id}}">
-    {{> header}}
+  {{> header}}
 
-    <div class="main-container">
-        {{> sidebar}}
+  <div class="main-container">
+    {{> sidebar}}
 
-        <main class="main-content">
-            <div class="membership-cards creative-cards">
-                <div class="group-create-preview-section">
-             <div class="qr-title">Scan the QR code to Pay Monthly Membership Fee</div><br><br>
+    <main class="main-content">
+      <div class="membership-cards creative-cards">
+        <div class="group-create-preview-section">
+          <div class="qr-title">Scan the QR code to Pay Monthly Membership Fee</div><br><br>
 
-                    <div class="qr-preview">
-                        {{#if group.qr_code}}
-                           
-                                <img src="{{group.qr_code}}" alt="QR Code" class="cover-img" id="coverImagePreview">
-                            
-                        
-                        {{else}}
-                            <img src="/assets/images/default-qr.jpg" alt="QR Code" class="cover-img" id="coverImagePreview">
-                        {{/if}}
-                    </div>
-                    <label for="Communityselection">Select Community</label>
-                    <select name="community" id="Communityselection" class="upload-input">
-                        <option value="">Select</option>
-                        {{#each groups}}
-                            <option value="{{this._id}}">{{this.g_name}}</option>
-                        {{/each}}
-                    </select>
-                    <div class="group-details">
-                        Upi-Id: <h3 id="groupNamePreview"></h3>
-                        Mobile No: <h4 id="groupMobilePreview"></h4>
-                    </div>
-                      <button class="QR-btn" ><a href="/pay/SS-upload">Upload QR</a>  </button>
-      
-                    <div id="groupDescriptionPreview">{{#if group}}{{group.amount_description}}{{else}}Select Group first{{/if}}</div>
-                </div>
-                <div class="membership-card right creative-card">
-                    <div class="membership-title"><i class="fas fa-gem"></i> Monthly Membership Benefits</div>
-                    <div class="membership-section-title"><i class="fas fa-gift"></i> What's Included:</div>
-                    <div class="membership-benefit"><span class="benefit-badge"><i class="fas fa-check"></i></span> Access to exclusive community discussions</div>
-                    <div class="membership-benefit"><span class="benefit-badge"><i class="fas fa-check"></i></span> Direct messaging with community leaders</div>
-                    <div class="membership-benefit"><span class="benefit-badge"><i class="fas fa-star"></i></span> Priority support & event invites</div>
-                    <div style="margin-top: 32px; font-weight: 600; font-size: 1.1rem; text-align: center;">Let's Make Better Community&nbsp; Together</div>
-                </div>
-            </div>
-        </main>
-    </div>
-<script src="/js/all.js"></script>
-    <script>
+          <div class="qr-preview">
+            {{#if group.qr_code}}
+
+            <img src="{{group.qr_code}}" alt="QR Code" class="cover-img" id="coverImagePreview">
+
+
+            {{else}}
+            <img src="/assets/images/default-qr.jpg" alt="QR Code" class="cover-img" id="coverImagePreview">
+            {{/if}}
+          </div>
+          <label for="Communityselection">Select Community</label>
+          <select name="community" id="Communityselection" class="upload-input">
+            <option value="">Select</option>
+            {{#each groups}}
+            <option value="{{this._id}}">{{this.g_name}}</option>
+            {{/each}}
+          </select>
+          <div class="group-details">
+            Upi-Id: <h3 id="groupNamePreview"></h3>
+            Mobile No: <h4 id="groupMobilePreview"></h4>
+          </div>
+          <button class="QR-btn"><a href="/pay/SS-upload">Upload QR</a> </button>
+
+          <div id="groupDescriptionPreview">{{#if group}}{{group.amount_description}}{{else}}Select Group first{{/if}}
+          </div>
+        </div>
+        <div class="membership-card right creative-card">
+          <div class="membership-title"><i class="fas fa-gem"></i> Monthly Membership Benefits</div>
+          <div class="membership-section-title"><i class="fas fa-gift"></i> What's Included:</div>
+          <div class="membership-benefit"><span class="benefit-badge"><i class="fas fa-check"></i></span> Access to
+            exclusive community discussions</div>
+          <div class="membership-benefit"><span class="benefit-badge"><i class="fas fa-check"></i></span> Direct
+            messaging with community leaders</div>
+          <div class="membership-benefit"><span class="benefit-badge"><i class="fas fa-star"></i></span> Priority
+            support & event invites</div>
+          <div style="margin-top: 32px; font-weight: 600; font-size: 1.1rem; text-align: center;">Let's Make Better
+            Community&nbsp; Together</div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="/js/all.js"></script>
+  <script>
     const communitySelection = document.getElementById('Communityselection');
     const coverImagePreview = document.getElementById('coverImagePreview');
     const groupNamePreview = document.getElementById('groupNamePreview');
     const groupDescriptionPreview = document.getElementById('groupDescriptionPreview');
 
     function showNotification(message, type) {
-        toastr[type](message);
+      toastr[type](message);
     }
 
     if (communitySelection) {
-        communitySelection.addEventListener('change', async () => {
-            const groupId = communitySelection.value;
-            if (!groupId) {
-                groupNamePreview.textContent = 'Not provided';
-                groupDescriptionPreview.textContent = 'No description available';
-                return;
-            }
+      if (communitySelection && communitySelection.options.length === 2) {
+        
+        communitySelection.selectedIndex = 1; 
 
-            try {
-                const response = await fetch(`/Groups/groups/${groupId}`, {
-                    method: 'GET',
-                    credentials: 'include',
-                    headers: { 'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0]}` }
-                });
-                const result = await response.json();   
-                console.log(result)
-                if (response.ok && result.success) {
-                     if (/\.(jpg|jpeg|png)$/i.test(result.group.qr_code)) {
-                        coverImagePreview.src = result.group.qr_code;
-                    } else {
-                        coverImagePreview.style.display = 'none';
-                        const downloadLink = document.createElement('a');
-                        downloadLink.href = result.group.qr_code;
-                        downloadLink.download = 'qrCode';
-                        downloadLink.textContent = 'Download QR Code File';
-                        coverImagePreview.parentElement.appendChild(downloadLink);
-                    }
-                    groupNamePreview.textContent = result.group.upiId;
-                    groupMobilePreview.textContent = result.mobile;
-                    groupDescriptionPreview.textContent = result.group.amount_description;
-                } else {
-                    showNotification(result.message || 'Failed to load group details', 'error');
-                }
-            } catch (error) {
-                showNotification('Error loading group details: ' + error.message, 'error');
-            }
-        });
+        // Trigger your existing change event so details load immediately
+        communitySelection.dispatchEvent(new Event('change'));
+      }
+      communitySelection.addEventListener('change', async () => {
+        const groupId = communitySelection.value;
+        if (!groupId) {
+          groupNamePreview.textContent = 'Not provided';
+          groupDescriptionPreview.textContent = 'No description available';
+          return;
+        }
+
+        try {
+          const response = await fetch(`/Groups/groups/${groupId}`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: { 'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0]}` }
+          });
+          const result = await response.json();
+          console.log(result)
+          if (response.ok && result.success) {
+
+            coverImagePreview.src = result.group.qr_code;
+            groupNamePreview.textContent = result.group.upiId;
+            groupMobilePreview.textContent = result.mobile;
+            groupDescriptionPreview.textContent = result.group.amount_description;
+          } else {
+            showNotification(result.message || 'Failed to load group details', 'err+or');
+          }
+        } catch (error) {
+          showNotification('Error loading group details: ' + error.message, 'error');
+        }
+      });
     }
-    </script>
-     <script src="/js/all.js"></script>
-      {{> profile}}
+  </script>
+
+  {{> profile}}
 </body>
+
 </html>

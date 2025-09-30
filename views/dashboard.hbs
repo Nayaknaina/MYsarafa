@@ -563,9 +563,8 @@ margin-left: 35%;
                         ` : `
                             ${group.membershipType === 'admin' ? `<button class="manage-group-btn" data-group-id="${group._id}">Manage Community</button>` :  `<button class="leave-btn" data-group-id="${group._id}">Leave Community</button>`
                             }
-                        `
-                        <button class="manage-group-btn" data-group-id="${group._id}">Manage Community</button>
-                        }
+                        `}
+                        
 
                     </div>
                 `;
@@ -584,6 +583,7 @@ margin-left: 35%;
                     credentials: 'include'
                 });
                 const result = await response.json();
+               
                 if (response.ok) {
                     renderGroups(containerId, result.groups, noResultsId, isDiscover);
                 } else {

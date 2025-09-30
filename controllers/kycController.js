@@ -14,8 +14,10 @@ exports.KYCverification = async (req, res) => {
         const user = await User.findById(req.user.id).lean();
 
         const requiresKyc = await userRequiresKyc(user._id);
-        // const disabledSidebar = requiresKyc && user.kyc_status === 'pending';
-        const disabledSidebar = requiresKyc ;
+        const disabledSidebar = requiresKyc && user.kyc_status === 'pending';
+        // const disabledSidebar = requiresKyc ;
+        console.log(disabledSidebar);
+        
 
         res.render("KYC-verification", {
             user,
@@ -66,6 +68,8 @@ exports.getKycData = async (req, res) => {
     res.status(500).json({ success: false, message: 'Error fetching KYC data', error: error.message });
   }
 };
+
+
 const aadhaarRequestStore = {};
 exports.sendAadhaarOtp = async (req, res) => {
   try {
@@ -74,8 +78,7 @@ exports.sendAadhaarOtp = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid Aadhaar number. Must be 12 digits.' });
     }
 
-    // Replace with actual Quick eKYC API call
-   // const quickEkycApiKey = process.env.QUICK_EKYC_API_KEY;
+   
      const response = await axios.post(
       'https://api.quickekyc.com/api/v1/aadhaar-v2/generate-otp',
       {
@@ -114,24 +117,73 @@ exports.sendAadhaarOtp = async (req, res) => {
 };
 }
 
+// exports.verifyAadhaarOtp = async (req, res) => {
+//   try {
+//     const { otp } = req.body;
+//     if (!otp || otp.length !== 6) {
+//       return res.status(400).json({ success: false, message: 'Invalid OTP. Must be 6 digits.' });
+//     }
+
+//     const user = await User.findById(req.user.id);
+//     // if (!user.temp_aadhaar_request_id) {
+//     //   return res.status(400).json({ success: false, message: 'No OTP request found for this session' });
+//     // }
+//      const requestId = aadhaarRequestStore[req.user.id];
+//        if (!requestId) {
+//       return res.status(400).json({ success: false, message: 'No OTP request found for this user' });
+//     }
+
+//     // Replace with actual Quick eKYC API call
+//    // const quickEkycApiKey = process.env.QUICK_EKYC_API_KEY ;
+//     const response = await axios.post(
+//       'https://api.quickekyc.com/api/v1/aadhaar-v2/submit-otp',
+//       {
+//         key: process.env.QUICK_EKYC_API_KEY,
+//         request_id: requestId,
+//         otp: otp
+//       },
+//       { headers: { 'Content-Type': 'application/json' } }
+//     );
+
+//     console.log("Verify OTP response:", response.data);
+
+//     // Clear request_id from memory after verification attempt
+  
+
+//     if (response.data.status === 'success') {
+//       user.kyc_status = 'approved';
+//       user.user_status = 'verified';
+//       user.temp_aadhaar_request_id= null; // Clear temporary data
+//       await user.save();
+//         delete aadhaarRequestStore[req.user.id];
+
+//       res.status(200).json({ success: true, message: 'Aadhaar OTP verified successfully',data: response.data.data });
+//     } else {
+//       res.status(400).json({ success: false, message: response.data.message || 'Invalid OTP' });
+//     }
+    
+//   } catch (error) {
+//      console.error('Error verifying Aadhaar OTP:', error.response?.data || error.message);
+//     return res.status(error.response?.status || 500).json({
+//       success: false,
+//       message: error.response?.data?.message || 'Error verifying OTP'
+//     });
+//   }
+// };
 exports.verifyAadhaarOtp = async (req, res) => {
   try {
-    const { otp } = req.body;
+    const { otp, fullName, dob, address } = req.body; 
     if (!otp || otp.length !== 6) {
       return res.status(400).json({ success: false, message: 'Invalid OTP. Must be 6 digits.' });
     }
 
     const user = await User.findById(req.user.id);
-    // if (!user.temp_aadhaar_request_id) {
-    //   return res.status(400).json({ success: false, message: 'No OTP request found for this session' });
-    // }
-     const requestId = aadhaarRequestStore[req.user.id];
-       if (!requestId) {
+    const requestId = aadhaarRequestStore[req.user.id];
+    if (!requestId) {
       return res.status(400).json({ success: false, message: 'No OTP request found for this user' });
     }
 
-    // Replace with actual Quick eKYC API call
-   // const quickEkycApiKey = process.env.QUICK_EKYC_API_KEY ;
+    
     const response = await axios.post(
       'https://api.quickekyc.com/api/v1/aadhaar-v2/submit-otp',
       {
@@ -144,29 +196,58 @@ exports.verifyAadhaarOtp = async (req, res) => {
 
     console.log("Verify OTP response:", response.data);
 
-    // Clear request_id from memory after verification attempt
-  
-
     if (response.data.status === 'success') {
+      const aadhaarData = response.data.data; 
+      console.log("aadhar data coming ",aadhaarData);
+      
+    
+      const normalize = str => str?.trim().toLowerCase();
+
+  
+      let mismatch = [];
+      if (fullName && normalize(fullName) !== normalize(aadhaarData.name)) {
+        mismatch.push('Name');
+      }
+      if (dob && normalize(dob) !== normalize(aadhaarData.dob)) {
+        mismatch.push('DOB');
+      }
+      if (address && !normalize(aadhaarData.address).includes(normalize(address))) {
+        mismatch.push('Address');
+      }
+
+      if (mismatch.length > 0) {
+        return res.status(400).json({
+          success: false,
+          message: `Aadhaar verification failed. Mismatched fields: ${mismatch.join(', ')}`
+        });
+      }
+
+      // ✅ If everything matches, update user
       user.kyc_status = 'approved';
       user.user_status = 'verified';
-      user.temp_aadhaar_request_id= null; // Clear temporary data
+     
       await user.save();
-        delete aadhaarRequestStore[req.user.id];
 
-      res.status(200).json({ success: true, message: 'Aadhaar OTP verified successfully',data: response.data.data });
+      delete aadhaarRequestStore[req.user.id];
+
+      return res.status(200).json({ 
+        success: true, 
+        message: 'Aadhaar OTP verified & details matched successfully', 
+        data: aadhaarData 
+      });
     } else {
-      res.status(400).json({ success: false, message: response.data.message || 'Invalid OTP' });
+      return res.status(400).json({ success: false, message: response.data.message || 'Invalid OTP' });
     }
     
   } catch (error) {
-     console.error('Error verifying Aadhaar OTP:', error.response?.data || error.message);
+    console.error('Error verifying Aadhaar OTP:', error.response?.data || error.message);
     return res.status(error.response?.status || 500).json({
       success: false,
       message: error.response?.data?.message || 'Error verifying OTP'
     });
   }
 };
+
 
 exports.submitKyc = async (req, res, next) => {
   try {
@@ -295,7 +376,7 @@ exports.checkKycRequired =async(req ,res ,next) =>{
     try {
         const user = req.user;
         const requiresKyc = await userRequiresKyc(user._id);
-        const needsKyc = requiresKyc ;
+        const needsKyc = requiresKyc && user.kyc_status === 'pending';
         res.json({ needsKyc });
     } catch (error) {
         next(error);

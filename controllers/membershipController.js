@@ -158,7 +158,7 @@ exports.uploadScreenshot = async (req, res, next) => {
     const payment = new Payment({
       user: req.user.id,
       group: groupId,
-      screenshotUrl: `/Uploads/${file.filename}`,
+      screenshotUrl: `/uploads/pay-screenshot/${file.filename}`,
       upiId,
       amount,
       method,

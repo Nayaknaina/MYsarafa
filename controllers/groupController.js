@@ -115,7 +115,7 @@ exports.createGroup = async (req, res) => {
             coverPhoto = `/uploads/coverImage/${req.files.coverImage[0].filename}`;
         }
         if (req.files && req.files.qrCode) {
-            qrCode = `/uploads/${req.files.qrCode[0].filename}`;
+            qrCode = `/uploads/qrCode/${req.files.qrCode[0].filename}`;
         }
 
         const group = new Group({
@@ -251,7 +251,7 @@ exports.updateGroup = async (req, res) => {
         }
         let qrCode = group.qr_code;
         if (req.files && req.files.qrCode) {
-            qrCode = `/uploads/${req.files.qrCode[0].filename}`;
+            qrCode = `/uploads/qrCode/${req.files.qrCode[0].filename}`;
             if (group.qr_code && group.qr_code !== '/assets/images/default-qr.png') {
                 try {
                     fs.unlinkSync(path.join(__dirname, '..', 'public', group.qr_code));
