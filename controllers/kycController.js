@@ -54,6 +54,7 @@ exports.getKycData = async (req, res) => {
       shopAddress: user.shopadd || '',
       numWorkers: user.no_of_emp || 0,
       workers: formattedWorkers,
+      adhar_no: user.adhar_no || '',
       adhar_photo: user.adhar_photo || '',
       shop_licence: user.shop_licence || '',
       pan_photo: user.pan_photo || '',
@@ -101,6 +102,7 @@ exports.sendAadhaarOtp = async (req, res) => {
       // user.temp_aadhaar_request_id = response.data.request_id;
       // await user.save();
         aadhaarRequestStore[req.user.id] = response.data.request_id;
+        await User.updateOne({ _id: req.user.id }, { adhar_no: aadhaarNumber });
       res.status(200).json({ success: true, message: 'OTP sent to registered mobile number' });
     } else {
       res.status(400).json({ success: false, message: response.data.message || 'Failed to send OTP' });
@@ -225,7 +227,8 @@ exports.verifyAadhaarOtp = async (req, res) => {
       // ✅ If everything matches, update user
       user.kyc_status = 'approved';
       user.user_status = 'verified';
-     
+      user.adhar_no = aadhaarData.aadhaar_number || user.adhar_no; 
+    
       await user.save();
 
       delete aadhaarRequestStore[req.user.id];

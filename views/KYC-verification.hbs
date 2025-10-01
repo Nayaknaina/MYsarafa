@@ -520,8 +520,17 @@
           document.getElementById('shopName').value = data.shopName || '';
           document.getElementById('shopAddress').value = data.shopAddress || '';
           document.getElementById('numWorkers').value = data.numWorkers || 0;
-          document.getElementById('adhar_no').value = data.adhar_no || '';
+         const adharInput = document.getElementById('adhar_no');
+          adharInput.value = data.adhar_no || '';
 
+          if (data.kyc_status === 'approved') {
+            adharInput.disabled = true;
+            document.getElementById('getOtpBtn').style.display = 'none';
+            document.getElementById('otpFields').style.display = 'none';
+            document.getElementById('verifyOtpBtn').style.display = 'none';
+            document.getElementById('aadhaarVerificationMessage').textContent = 'Aadhaar already verified';
+            document.getElementById('aadhaarVerificationMessage').style.color = '#47ff53';
+          }
           const aadhaarCardCurrent = document.getElementById('aadhaarCardCurrent');
           const shopLicenceCurrent = document.getElementById('shopLicenceCurrent');
           const panCardCurrent = document.getElementById('panCardCurrent');
