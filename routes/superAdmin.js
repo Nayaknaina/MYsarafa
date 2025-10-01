@@ -15,7 +15,7 @@ router.delete('/users/:id',superAdminAuth, superAdminController.deleteUser);
 router.get('/groups',superAdminAuth, superAdminController.getAllGroups);
 router.post('/groups/:id',superAdminAuth, superAdminController.updateGroup);
 
-router.post('/contact',superAdminController.superadmincontact)
+
 
 // Add logout route
 router.post('/logout',superAdminAuth, (req, res) => {
@@ -23,4 +23,5 @@ router.post('/logout',superAdminAuth, (req, res) => {
     res.redirect('/superadmin/login');
 });
 
+router.post('/contact',superAdminController.superadmincontact);
 module.exports = router;
