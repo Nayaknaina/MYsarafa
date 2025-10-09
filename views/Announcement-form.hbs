@@ -414,12 +414,12 @@
             <option value="">Select Group</option>
           </select>
         </div>
-        <div class="announcement-form-group">
+        {{!-- <div class="announcement-form-group">
           <label class="announcement-form-label" for="Meetinglink">
             <i class="fa fa-users"></i> Meeting Link
           </label>
           <input type="text" id="Meetinglink" class="announcement-form-input" required placeholder="Meeting Link">
-        </div>
+        </div> --}}
         <div class="announcement-form-group">
           <label class="announcement-form-label" for="announcementImage">
             <i class="fas fa-camera"></i> Image
@@ -468,7 +468,7 @@
     const titleInput = document.getElementById('announcementTitle');
     const messageInput = document.getElementById('announcementMessage');
     const groupSelect = document.getElementById('announceGroupSelect');
-    const meetingLinkInput = document.getElementById('Meetinglink');
+    //const meetingLinkInput = document.getElementById('Meetinglink');
     const previewTitle = document.getElementById('previewTitle');
     const previewMessage = document.getElementById('previewMessage');
     const previewImg = document.getElementById('previewImg');
@@ -570,7 +570,7 @@
       const formData = new FormData();
       formData.append('title', titleInput.value.trim());
       formData.append('message', messageInput.value.trim());
-      formData.append('meetingLink', meetingLinkInput.value.trim());
+      //formData.append('meetingLink', meetingLinkInput.value.trim());
       formData.append('groupId', groupId);
       if (uploadInput.files[0]) {
         formData.append('image', uploadInput.files[0]);

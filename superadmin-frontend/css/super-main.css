@@ -1,0 +1,11 @@
+.login-logo img {
+  width: 120px; /* Adjust size as needed (e.g. 60px, 100px, etc.) */
+  height: auto; /* Keeps aspect ratio */
+  display: inline-block;
+}  
+  
+  .table#usersTable .blacklisted td {
+    background-color: #f9f0d6 !important; 
+    
+    color: #721c24 !important;
+  }

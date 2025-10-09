@@ -34,7 +34,7 @@ exports.Announcement = async (req, res, next) => {
     //   return res.status(403).render('error', { errorMessage: 'You are not a member of any groups', layout: false });
     // }
 
-    // Check if user is an admin of any group
+   
     const isAdmin = groupMemberships.some(membership => membership.type === 'admin');
 
     res.render("Announcement", {
@@ -88,7 +88,7 @@ exports.createAnnouncement = async (req, res) => {
     console.log('createAnnouncement Body:', req.body);
     console.log('createAnnouncement Files:', req.files);
 
-    const { title, message, meetingLink, groupId } = req.body;
+    const { title, message,  groupId } = req.body;
 
     // Validate required fields
     if (!title || !message || !groupId) {
@@ -113,7 +113,7 @@ exports.createAnnouncement = async (req, res) => {
     const announcement = new Announcement({
       title,
       message,
-      meetingLink: meetingLink || '',
+      meetingLink:  '',
       image: imagePath,
       createdBy: req.user.id,
       group: groupId,

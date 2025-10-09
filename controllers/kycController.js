@@ -14,7 +14,7 @@ exports.KYCverification = async (req, res) => {
         const user = await User.findById(req.user.id).lean();
 
         const requiresKyc = await userRequiresKyc(user._id);
-        const disabledSidebar = requiresKyc && user.kyc_status === 'pending';
+        const disabledSidebar = requiresKyc && user.kyc_status === 'unsubmitted';
         // const disabledSidebar = requiresKyc ;
         console.log(disabledSidebar);
         
@@ -58,7 +58,7 @@ exports.getKycData = async (req, res) => {
       adhar_photo: user.adhar_photo || '',
       shop_licence: user.shop_licence || '',
       pan_photo: user.pan_photo || '',
-      kyc_status: user.kyc_status || 'pending',
+      kyc_status: user.kyc_status || 'unsubmitted',
       user_status: user.user_status || 'unverified',
     };
 
@@ -78,6 +78,11 @@ exports.sendAadhaarOtp = async (req, res) => {
     if (!/^\d{12}$/.test(aadhaarNumber)) {
       return res.status(400).json({ success: false, message: 'Invalid Aadhaar number. Must be 12 digits.' });
     }
+
+       const existingUser = await User.findOne({ adhar_no: aadhaarNumber, _id: { $ne: req.user.id } });
+        if (existingUser) {
+          return res.status(400).json({ success: false, message: 'Aadhaar number already linked with another account.' });
+        }
 
    
      const response = await axios.post(
@@ -172,11 +177,95 @@ exports.sendAadhaarOtp = async (req, res) => {
 //     });
 //   }
 // };
+// exports.verifyAadhaarOtp = async (req, res) => {
+//   try {
+//     const { otp, fullName, dob, address } = req.body; 
+//     if (!otp || otp.length !== 6) {
+//       return res.status(400).json({ success: false, message: 'Invalid OTP. Must be 6 digits.' });
+//     }
+
+//     const user = await User.findById(req.user.id);
+//     const requestId = aadhaarRequestStore[req.user.id];
+//     if (!requestId) {
+//       return res.status(400).json({ success: false, message: 'No OTP request found for this user' });
+//     }
+
+    
+//     const response = await axios.post(
+//       'https://api.quickekyc.com/api/v1/aadhaar-v2/submit-otp',
+//       {
+//         key: process.env.QUICK_EKYC_API_KEY,
+//         request_id: requestId,
+//         otp: otp
+//       },
+//       { headers: { 'Content-Type': 'application/json' } }
+//     );
+
+//     console.log("Verify OTP response:", response.data);
+
+//     if (response.data.status === 'success') {
+//       const aadhaarData = response.data.data; 
+//       console.log("aadhar data coming ",aadhaarData);
+      
+    
+//       const normalize = str => str?.trim().toLowerCase();
+
+  
+//       let mismatch = [];
+//       if (fullName && normalize(fullName) !== normalize(aadhaarData.full_name)) {
+//         mismatch.push('Name');
+//       }
+//       if (dob && normalize(dob) !== normalize(aadhaarData.dob)) {
+//         mismatch.push('DOB');
+//       }
+//       if (address && !normalize(aadhaarData.address).includes(normalize(address))) {
+//         mismatch.push('Address');
+//       }
+
+//       if (mismatch.length > 0) {
+//         return res.status(400).json({
+//           success: false,
+//           message: `Aadhaar verification failed. Mismatched fields: ${mismatch.join(', ')}`
+//         });
+//       }
+
+//       // ✅ If everything matches, update user
+//       user.kyc_status = 'approved';
+//       user.user_status = 'verified';
+//       user.adhar_no = aadhaarData.aadhaar_number || user.adhar_no; 
+    
+//       await user.save();
+
+//       delete aadhaarRequestStore[req.user.id];
+
+//       return res.status(200).json({ 
+//         success: true, 
+//         message: 'Aadhaar OTP verified & details matched successfully', 
+//         data: aadhaarData 
+//       });
+//     } else {
+//       return res.status(400).json({ success: false, message: response.data.message || 'Invalid OTP' });
+//     }
+    
+//   } catch (error) {
+//     console.error('Error verifying Aadhaar OTP:', error.response?.data || error.message);
+//     return res.status(error.response?.status || 500).json({
+//       success: false,
+//       message: error.response?.data?.message || 'Error verifying OTP'
+//     });
+//   }
+// };
 exports.verifyAadhaarOtp = async (req, res) => {
   try {
-    const { otp, fullName, dob, address } = req.body; 
+    const { otp, fullName, dob } = req.body; 
+    console.log("Request body for verifyAadhaarOtp:", req.body);
+
     if (!otp || otp.length !== 6) {
       return res.status(400).json({ success: false, message: 'Invalid OTP. Must be 6 digits.' });
+    }
+
+    if (!fullName || !dob) {
+      return res.status(400).json({ success: false, message: 'Full name and DOB are required for verification.' });
     }
 
     const user = await User.findById(req.user.id);
@@ -185,7 +274,6 @@ exports.verifyAadhaarOtp = async (req, res) => {
       return res.status(400).json({ success: false, message: 'No OTP request found for this user' });
     }
 
-    
     const response = await axios.post(
       'https://api.quickekyc.com/api/v1/aadhaar-v2/submit-otp',
       {
@@ -196,25 +284,38 @@ exports.verifyAadhaarOtp = async (req, res) => {
       { headers: { 'Content-Type': 'application/json' } }
     );
 
-    console.log("Verify OTP response:", response.data);
+    // console.log("Verify OTP response:", response.data);
 
     if (response.data.status === 'success') {
       const aadhaarData = response.data.data; 
-      console.log("aadhar data coming ",aadhaarData);
-      
-    
-      const normalize = str => str?.trim().toLowerCase();
+      console.log("aadhar data coming ", aadhaarData);
 
-  
+      // --- Normalization helpers ---
+      const normalize = str => String(str || '').trim().toLowerCase();
+      const normalizeName = str => String(str || '').toLowerCase().replace(/\s+/g, ' ').trim();
+      const formatDob = (dobStr) => {
+        dobStr = String(dobStr || '');
+        if (!dobStr) return '';
+        // Convert DD-MM-YYYY → YYYY-MM-DD
+        if (/^\d{2}-\d{2}-\d{4}$/.test(dobStr)) {
+          const [day, month, year] = dobStr.split('-');
+          return `${year}-${month}-${day}`;
+        }
+        return dobStr; // Already YYYY-MM-DD
+      };
+
       let mismatch = [];
-      if (fullName && normalize(fullName) !== normalize(aadhaarData.name)) {
+
+      // ✅ Compare full name from form
+      if (!normalizeName(aadhaarData.full_name).includes(normalizeName(fullName))) {
         mismatch.push('Name');
       }
-      if (dob && normalize(dob) !== normalize(aadhaarData.dob)) {
+
+      // ✅ Compare DOB from form
+      const formDob = dob; // Already YYYY-MM-DD from form
+      const aadhaarDob = formatDob(aadhaarData.dob);
+      if (formDob && normalize(formDob) !== normalize(aadhaarDob)) {
         mismatch.push('DOB');
-      }
-      if (address && !normalize(aadhaarData.address).includes(normalize(address))) {
-        mismatch.push('Address');
       }
 
       if (mismatch.length > 0) {
@@ -224,11 +325,10 @@ exports.verifyAadhaarOtp = async (req, res) => {
         });
       }
 
-      // ✅ If everything matches, update user
+     
       user.kyc_status = 'approved';
       user.user_status = 'verified';
       user.adhar_no = aadhaarData.aadhaar_number || user.adhar_no; 
-    
       await user.save();
 
       delete aadhaarRequestStore[req.user.id];
@@ -254,51 +354,84 @@ exports.verifyAadhaarOtp = async (req, res) => {
 
 exports.submitKyc = async (req, res, next) => {
   try {
-    // console.log('submitkyc Headers:', req.headers);
-    // console.log('submitKyc body:', req.body);
-    // console.log('submitKyc files:', req.files);
-
     const user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    const { fullName, dob, state, city, postalCode, address, shopName, shopAddress, numWorkers, aadhaarVerified, adhar_no } = req.body;
-
-    // Validate required fields
-    const requiredFields = ['fullName', 'dob', 'state', 'city', 'postalCode', 'address', 'shopName', 'shopAddress', 'adhar_no'];
-    const missingFields = requiredFields.filter(field => !req.body[field] || req.body[field].trim() === '');
-    if (missingFields.length > 0) {
-      return res.status(400).json({ success: false, message: `Missing required fields: ${missingFields.join(', ')}` });
+    // Prevent re-submission if already approved or pending
+    if (user.kyc_status === 'approved' || user.kyc_status === 'pending') {
+      return res.status(400).json({ success: false, message: `KYC is already ${user.kyc_status}. No changes allowed.` });
     }
 
-    // Validate Aadhaar number
+    const {
+      fullName,
+      dob,
+      state,
+      city,
+      postalCode,
+      address,
+      shopName,
+      shopAddress,
+      numWorkers,
+      aadhaarVerified,
+      adhar_no
+    } = req.body;
+
+    // Check required fields
+    const requiredFields = [
+      'fullName', 'dob', 'state', 'city', 'postalCode', 'address',
+      'shopName', 'shopAddress', 'adhar_no'
+    ];
+    const missingFields = requiredFields.filter(
+      field => !req.body[field] || req.body[field].trim() === ''
+    );
+    if (missingFields.length > 0) {
+      return res.status(400).json({
+        success: false,
+        message: `Missing required fields: ${missingFields.join(', ')}`
+      });
+    }
+
+    // Validate Aadhaar
     if (!/^\d{12}$/.test(adhar_no)) {
       return res.status(400).json({ success: false, message: 'Invalid Aadhaar number. Must be 12 digits.' });
     }
 
-    // Validate Aadhaar file
-    if (!req.files || !req.files['aadhaarCard']) {
-      return res.status(400).json({ success: false, message: 'Aadhaar card is required for KYC submission.' });
+    const existingUser = await User.findOne({ adhar_no, _id: { $ne: req.user.id } });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: 'Aadhaar number already in use' });
     }
 
-    // Split fullName
+    if (aadhaarVerified !== 'true') {
+      return res.status(400).json({ success: false, message: 'Aadhaar must be verified before submission.' });
+    }
+
+    if (!req.files || !req.files['aadhaarCard']) {
+      return res.status(400).json({ success: false, message: 'Aadhaar card is required.' });
+    }
+
+    // Validate worker details
+    const workerCount = parseInt(numWorkers) || 0;
+    if (workerCount > 0) {
+      for (let i = 0; i < workerCount; i++) {
+        const name = req.body[`workerName${i}`]?.trim();
+        const phone = req.body[`workerPhone${i}`]?.trim();
+        if (!name || !/^\d{10}$/.test(phone)) {
+          return res.status(400).json({
+            success: false,
+            message: `Invalid worker ${i + 1} details: Name and 10-digit phone required.`
+          });
+        }
+      }
+    }
+
+    // ✅ Split full name and update user name fields
     const nameParts = fullName.trim().split(' ');
     const f_name = nameParts[0];
     const l_name = nameParts.slice(1).join(' ') || '';
 
-    // Handle file uploads
-    const fileFields = ['aadhaarCard', 'shopLicence', 'panCard'];
-    const filePaths = {};
-
-    for (const field of fileFields) {
-      if (req.files && req.files[field]) {
-        const file = req.files[field][0]; 
-        filePaths[field] = `/uploads/kyc/${file.filename}`;
-      }
-    }
-
-    // Update user fields
+    // ✅ Update basic user details
     user.f_name = f_name;
     user.l_name = l_name;
     user.dob = new Date(dob);
@@ -311,38 +444,86 @@ exports.submitKyc = async (req, res, next) => {
     user.no_of_emp = parseInt(numWorkers) || 0;
     user.adhar_no = adhar_no;
 
+    // Handle S3 file uploads
+    const fileFields = ['aadhaarCard', 'shopLicence', 'panCard'];
+    const filePaths = {};
+
+    for (const field of fileFields) {
+      if (req.files && req.files[field]) {
+        const file = req.files[field][0];
+        const oldFileKey = user[
+          field === 'aadhaarCard'
+            ? 'adhar_photo'
+            : field === 'shopLicence'
+            ? 'shop_licence'
+            : 'pan_photo'
+        ];
+
+        // Delete old S3 file if exists
+        if (oldFileKey) {
+          try {
+            await s3
+              .deleteObject({
+                Bucket: process.env.AWS_BUCKET_NAME,
+                Key: oldFileKey
+              })
+              .promise();
+          } catch (err) {
+            console.error(`Failed to delete old S3 file for ${field}:`, err);
+          }
+        }
+
+        filePaths[field] = file.key;
+      }
+    }
+
+    // Assign file paths
     if (filePaths.aadhaarCard) user.adhar_photo = filePaths.aadhaarCard;
     if (filePaths.shopLicence) user.shop_licence = filePaths.shopLicence;
     if (filePaths.panCard) user.pan_photo = filePaths.panCard;
 
-    user.kyc_status = aadhaarVerified === 'true' ? 'approved' : 'pending';
-    user.user_status = aadhaarVerified === 'true' ? 'verified' : 'unverified';
+    // ✅ KYC status updates
+    user.kyc_status = 'pending'; 
+    user.user_status = 'verified';
 
     await user.save();
 
-    // Handle worker details
+    // Save worker details
     await WorkerDetails.deleteMany({ user: req.user.id });
-    const workerCount = parseInt(numWorkers) || 0;
     for (let i = 0; i < workerCount; i++) {
       const workerName = req.body[`workerName${i}`]?.trim();
       const workerPhone = req.body[`workerPhone${i}`]?.trim();
       if (workerName && workerPhone) {
-        const worker = new WorkerDetails({
+        await new WorkerDetails({
           user: req.user.id,
           worker_name: workerName,
           worker_mobile_no: workerPhone
-        });
-        await worker.save();
+        }).save();
       }
     }
 
-    console.log('submitKyc success for user:', user._id);
-    res.status(200).json({ success: true, message: 'KYC submitted successfully! Your application is under review.', kyc_status: user.kyc_status });
+    // Prepare updated data with signed URLs
+    const updatedData = {
+      ...user.toObject(),
+      fullName: `${user.f_name} ${user.l_name}`.trim(),
+      workers: await WorkerDetails.find({ user: req.user.id }).lean(),
+      adhar_photo_url: user.adhar_photo ? getSignedUrl(user.adhar_photo) : null,
+      shop_licence_url: user.shop_licence ? getSignedUrl(user.shop_licence) : null,
+      pan_photo_url: user.pan_photo ? getSignedUrl(user.pan_photo) : null
+    };
+
+    res.status(200).json({
+      success: true,
+      message: 'KYC submitted successfully! Your application is under review.',
+      kyc_status: user.kyc_status,
+      data: updatedData
+    });
   } catch (error) {
     console.error('Error submitting KYC:', error);
     next(error);
   }
-}
+};
+
 
 
 exports.getLocationByPincode = async (req, res) => {
@@ -379,7 +560,7 @@ exports.checkKycRequired =async(req ,res ,next) =>{
     try {
         const user = req.user;
         const requiresKyc = await userRequiresKyc(user._id);
-        const needsKyc = requiresKyc && user.kyc_status === 'pending';
+        const needsKyc = requiresKyc && user.kyc_status === 'unsubmitted';
         res.json({ needsKyc });
     } catch (error) {
         next(error);

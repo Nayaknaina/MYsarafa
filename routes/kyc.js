@@ -3,12 +3,15 @@ const router = express.Router();
 const kycController = require('../controllers/kycController');
 const {authMiddleware,isAdmin} = require('../middleware/auth');
 const  monthlyMembershipCheck  = require('../middleware/monthlymembershipVisible');
+const profileImageMiddleware = require('../middleware/profileImageMiddleware');
+const { getSignedUrl} = require('../middleware/multer');
 
-const upload = require('../middleware/multer');
 
-router.get('/KYCverification',authMiddleware,monthlyMembershipCheck,kycController.KYCverification);
+const {upload} = require('../middleware/multer');
 
-router.get('/data', authMiddleware, kycController.getKycData);
+router.get('/KYCverification',authMiddleware,monthlyMembershipCheck,profileImageMiddleware,kycController.KYCverification);
+
+router.get('/data', authMiddleware, profileImageMiddleware, kycController.getKycData);
 router.post('/submit', authMiddleware,upload.fields([
   { name: 'aadhaarCard', maxCount: 1 },
   { name: 'shopLicence', maxCount: 1 },

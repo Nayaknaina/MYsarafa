@@ -1,0 +1,514 @@
+<div class="page-wrapper">
+    <header class="header-mobile d-block d-lg-none">
+            <div class="header-mobile__bar">
+                <div class="container-fluid">
+                    <div class="header-mobile-inner">
+                        <a class="logo" href="/superadmin/dashboard">
+                            <img src="/assets/logo/mysarafa_logo.png" alt="CoolAdmin" />
+                        </a>
+                        <button class="hamburger hamburger--slider" type="button">
+                            <span class="hamburger-box">
+                                <span class="hamburger-inner"></span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <nav class="navbar-mobile">
+                <div class="container-fluid">
+                    <ul class="navbar-mobile__list list-unstyled">
+                        <li class="has-sub">
+                            <a class="js-arrow" href="#">
+                                <i class="fas fa-tachometer-alt"></i>Dashboard</a>
+                            <ul class="navbar-mobile-sub__list list-unstyled js-sub-list">
+                                <li>
+                                    <a href="index.html">Dashboard 1</a>
+                                </li>
+                                <li>
+                                    <a href="index2.html">Dashboard 2</a>
+                                </li>
+                                <li>
+                                    <a href="index3.html">Dashboard 3</a>
+                                </li>
+                                <li>
+                                    <a href="index4.html">Dashboard 4</a>
+                                </li>
+                            </ul>
+                        </li>
+                        {{!-- <li>
+                            <a href="chart.html">
+                                <i class="fas fa-chart-bar"></i>Charts</a>
+                        </li> --}}
+                        <li>
+                            <a href="/superadmin/users">
+                                <i class="fas fa-table"></i>Users</a>
+                        </li>
+                        <li>
+                            <a href="form.html">
+                                <i class="far fa-check-square"></i>Groups</a>
+                        </li>
+                        <li>
+                            <a href="calendar.html">
+                                <i class="fas fa-calendar-alt"></i>KYC</a>
+                        </li>
+                        {{!-- <li>
+                            <a href="map.html">
+                                <i class="fas fa-map-marker-alt"></i>Maps</a>
+                        </li> --}}
+                        {{!-- <li class="has-sub">
+                            <a class="js-arrow" href="#">
+                                <i class="fas fa-copy"></i>Pages</a>
+                            <ul class="navbar-mobile-sub__list list-unstyled js-sub-list">
+                                <li>
+                                    <a href="login.html">Login</a>
+                                </li>
+                                <li>
+                                    <a href="register.html">Register</a>
+                                </li>
+                                <li>
+                                    <a href="forget-pass.html">Forget Password</a>
+                                </li>
+                            </ul>
+                        </li> --}}
+                        {{!-- <li class="has-sub">
+                            <a class="js-arrow" href="#">
+                                <i class="fas fa-desktop"></i>UI Elements</a>
+                            <ul class="navbar-mobile-sub__list list-unstyled js-sub-list">
+                                <li>
+                                    <a href="button.html">Button</a>
+                                </li>
+                                <li>
+                                    <a href="badge.html">Badges</a>
+                                </li>
+                                <li>
+                                    <a href="tab.html">Tabs</a>
+                                </li>
+                                <li>
+                                    <a href="card.html">Cards</a>
+                                </li>
+                                <li>
+                                    <a href="alert.html">Alerts</a>
+                                </li>
+                                <li>
+                                    <a href="progress-bar.html">Progress Bars</a>
+                                </li>
+                                <li>
+                                    <a href="modal.html">Modals</a>
+                                </li>
+                                <li>
+                                    <a href="switch.html">Switchs</a>
+                                </li>
+                                <li>
+                                    <a href="grid.html">Grids</a>
+                                </li>
+                                <li>
+                                    <a href="fontawesome.html">Fontawesome Icon</a>
+                                </li>
+                                <li>
+                                    <a href="typo.html">Typography</a>
+                                </li>
+                            </ul>
+                        </li> --}}
+                    </ul>
+                </div>
+            </nav>
+        </header>
+        <!-- END HEADER MOBILE-->
+
+        <!-- MENU SIDEBAR-->
+        {{> superSidebar}}
+
+    <!-- PAGE CONTAINER -->
+    <div class="page-container">
+        {{> superdesktopheader}}
+        <!-- HEADER DESKTOP: Unchanged -->
+        <div class="main-content">
+            <div class="section__content section__content--p30">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="overview-wrap">
+                                <h2 class="title-1">Manage KYC</h2>
+                                <button class="au-btn au-btn-icon au-btn--blue">
+                                    <i class="zmdi zmdi-plus"></i>Create New KYC</button>
+                            </div>
+                            <!-- NEW: Filter Buttons -->
+                            <div class="mb-3">
+                                <button class="btn btn-outline-primary filter-btn" data-status="pending">Pending</button>
+                                <button class="btn btn-outline-success filter-btn" data-status="approved">Approved</button>
+                                <button class="btn btn-outline-danger filter-btn" data-status="rejected">Rejected</button>
+                                <button class="btn btn-outline-secondary filter-btn" data-status="all">All</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h2 class="title-1 m-b-25">KYC Requests</h2>
+                            <div class="table-responsive table--no-card m-b-40">
+                                <table id="kycTable" class="table table-borderless table-striped table-earning">
+                                    <thead>
+                                        <tr>
+                                            <th>User Name</th>
+                                            <th>Email</th>
+                                            <th>KYC Status</th>
+                                            <th>Aadhaar No</th>
+                                            <th>PAN No</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {{#each users}}
+                                        <tr>
+                                            <td>{{f_name}} {{l_name}}</td>
+                                            <td>{{email}}</td>
+                                            <td><span class="badge {{#if (eq kyc_status 'pending')}}bg-warning{{else if (eq kyc_status 'approved')}}bg-success{{else}}bg-danger{{/if}}">{{kyc_status}}</span></td>
+                                            <td>{{adhar_no}}</td>
+                                            <td>{{pan_no}}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-info view-btn" data-id="{{_id}}" title="View KYC"><i class="fas fa-eye"></i></button>
+                                                <button class="btn btn-sm btn-primary edit-btn" data-id="{{_id}}">Edit</button>
+                                                <button class="btn btn-sm btn-danger delete-btn" data-id="{{_id}}">Delete KYC</button>
+                                            </td>
+                                        </tr>
+                                        {{/each}}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                   
+                </div>
+            </div>
+             <!-- NEW: Create KYC Modal -->
+                    <div class="modal fade" id="createModal" tabindex="-1" data-bs-backdrop="static">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Create New KYC</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="createForm" enctype="multipart/form-data">
+                                        <div class="mb-3">
+                                            <label class="form-label">Select User *</label>
+                                            <select class="form-control" name="userId" required>
+                                                <option value="">Select User</option>
+                                                {{#each allUsers}}
+                                                <option value="{{_id}}">{{f_name}} {{l_name}} ({{email}})</option>
+                                                {{/each}}
+                                            </select>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Aadhaar No</label>
+                                                <input type="text" class="form-control" name="adhar_no">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Upload Aadhaar Photo</label>
+                                                <input type="file" class="form-control" name="adhar_photo" accept="image/*">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">PAN No</label>
+                                                <input type="text" class="form-control" name="pan_no">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Upload PAN Photo</label>
+                                                <input type="file" class="form-control" name="pan_photo" accept="image/*">
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Upload Shop Licence</label>
+                                            <input type="file" class="form-control" name="shop_licence" accept="image/*,application/pdf">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Initial KYC Status</label>
+                                            <select class="form-control" name="kyc_status">
+                                                {{#each kycOptions}}
+                                                <option value="{{this}}">{{this}}</option>
+                                                {{/each}}
+                                            </select>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                    <button type="button" class="btn btn-primary" id="saveCreate">Create KYC</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NEW: Edit KYC Modal -->
+                    <div class="modal fade" id="editModal" tabindex="-1" data-bs-backdrop="static">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Edit KYC</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="editForm" enctype="multipart/form-data">
+                                        <input type="hidden" id="editUserId" name="_id">
+                                        <div class="mb-3">
+                                            <label class="form-label">User Name</label>
+                                            <p class="form-control-plaintext" id="editUserName"></p>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Aadhaar No</label>
+                                                <input type="text" class="form-control" name="adhar_no">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Current Aadhaar Photo</label>
+                                                <img id="currentAdharPhoto" src="" alt="Current Aadhaar" style="max-width:100px;" class="img-thumbnail d-none">
+                                                <label class="form-label mt-2">Upload New Aadhaar Photo</label>
+                                                <input type="file" class="form-control" name="adhar_photo" accept="image/*">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">PAN No</label>
+                                                <input type="text" class="form-control" name="pan_no">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Current PAN Photo</label>
+                                                <img id="currentPanPhoto" src="" alt="Current PAN" style="max-width:100px;" class="img-thumbnail d-none">
+                                                <label class="form-label mt-2">Upload New PAN Photo</label>
+                                                <input type="file" class="form-control" name="pan_photo" accept="image/*">
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Current Shop Licence</label>
+                                            <a id="currentShopLicence" href="" target="_blank" class="d-none">View Current</a>
+                                            <label class="form-label mt-2">Upload New Shop Licence</label>
+                                            <input type="file" class="form-control" name="shop_licence" accept="image/*,application/pdf">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">KYC Status *</label>
+                                            <select class="form-control" name="kyc_status" required>
+                                                {{#each kycOptions}}
+                                                <option value="{{this}}">{{this}}</option>
+                                                {{/each}}
+                                            </select>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                    <button type="button" class="btn btn-primary" id="saveEdit">Save Changes</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NEW: View KYC Modal -->
+                    <div class="modal fade" id="viewModal" tabindex="-1">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">KYC Details</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body" id="kycDetailsBody">
+                                    <!-- Populated via JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+        </div>
+    </div>
+</div>
+
+            <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+
+            <!-- DataTables JS -->
+
+            <script src="https://cdn.datatables.net/2.3.4/js/dataTables.js"></script>
+            <script src="https://cdn.datatables.net/2.3.4/js/dataTables.bootstrap5.js"></script>
+
+            <script>
+                const jq = jQuery.noConflict(false);
+                jq(document).ready(function () {
+                    // Init DataTable
+                    const table = jq('#kycTable').DataTable();
+
+                    // Filter Buttons
+                    jq('.filter-btn').on('click', function () {
+                        const status = jq(this).data('status');
+                        window.location.href = `/superadmin/kyc?status=${status}`;
+                    });
+
+                    // Create Modal Open
+                    jq('.au-btn--blue').on('click', function (e) {
+                        e.preventDefault();
+                        jq('#createForm')[0].reset();
+                        jq('#createModal').modal('show');
+                    });
+
+                    // Create KYC (AJAX POST with files - use FormData)
+                    jq('#saveCreate').on('click', function () {
+                        const formData = new FormData(jq('#createForm')[0]); // Handles files
+                        jq.ajax({
+                            url: '/superadmin/kyc',
+                            method: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function (data) {
+                                if (data.success) {
+                                    jq('#createModal').modal('hide');
+                                    location.reload(); // Reload to show new KYC
+                                    alert(data.message);
+                                } else {
+                                    alert(data.message || 'Create failed');
+                                }
+                            },
+                            error: function (xhr) {
+                                alert(xhr.responseJSON ? xhr.responseJSON.message : 'Error creating KYC');
+                            }
+                        });
+                    });
+
+                    // View KYC Details
+                    jq(document).on('click', '.view-btn', function () {
+                        const id = jq(this).data('id');
+                        if (!id) return alert('User ID missing');
+                        jq.ajax({
+                            url: `/superadmin/kyc/${id}`,
+                            method: 'GET',
+                            success: function (data) {
+                                if (data.success) {
+                                    const u = data.user;
+                                    let detailsHtml = `
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <h6>User Info</h6>
+                                                <p><strong>Name:</strong> ${u.f_name} ${u.l_name}</p>
+                                                <p><strong>Email:</strong> ${u.email}</p>
+                                                <p><strong>KYC Status:</strong> <span class="badge bg-${u.kyc_status === 'pending' ? 'warning' : u.kyc_status === 'approved' ? 'success' : 'danger'}">${u.kyc_status}</span></p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <h6>KYC Details</h6>
+                                                <p><strong>Aadhaar No:</strong> ${u.adhar_no || 'N/A'}</p>
+                                                <p><strong>PAN No:</strong> ${u.pan_no || 'N/A'}</p>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-md-12">
+                                                <h6>Documents</h6>
+                                                ${u.adhar_photo ? `<img src="${u.adhar_photo}" alt="Aadhaar" style="max-width:200px;"> <a href="${u.adhar_photo}" target="_blank">Download</a>` : 'No Aadhaar Photo'}
+                                                ${u.pan_photo ? `<img src="${u.pan_photo}" alt="PAN" style="max-width:200px;"> <a href="${u.pan_photo}" target="_blank">Download</a>` : 'No PAN Photo'}
+                                                ${u.shop_licence ? `<a href="${u.shop_licence}" target="_blank">View Shop Licence</a>` : 'No Shop Licence'}
+                                            </div>
+                                        </div>
+                                    `;
+                                    jq('#kycDetailsBody').html(detailsHtml);
+                                    jq('#viewModal').modal('show');
+                                }
+                            },
+                            error: function () { alert('Error fetching details'); }
+                        });
+                    });
+
+                    // Edit KYC
+                    jq(document).on('click', '.edit-btn', function () {
+                        const id = jq(this).data('id');
+                        jq('#editUserId').val(id);
+                        jq.ajax({
+                            url: `/superadmin/kyc/${id}`,
+                            method: 'GET',
+                            success: function (data) {
+                                if (data.success) {
+                                    const u = data.user;
+                                    jq('#editForm input[name="adhar_no"]').val(u.adhar_no || '');
+                                    jq('#editForm input[name="pan_no"]').val(u.pan_no || '');
+                                    jq('#editForm select[name="kyc_status"]').val(u.kyc_status);
+                                    jq('#editUserName').text(`${u.f_name} ${u.l_name}`);
+                                    // Show current images
+                                    if (u.adhar_photo) {
+                                        jq('#currentAdharPhoto').attr('src', u.adhar_photo).removeClass('d-none');
+                                    } else {
+                                        jq('#currentAdharPhoto').addClass('d-none');
+                                    }
+                                    if (u.pan_photo) {
+                                        jq('#currentPanPhoto').attr('src', u.pan_photo).removeClass('d-none');
+                                    } else {
+                                        jq('#currentPanPhoto').addClass('d-none');
+                                    }
+                                    if (u.shop_licence) {
+                                        jq('#currentShopLicence').attr('href', u.shop_licence).removeClass('d-none').text('View Current Shop Licence');
+                                    } else {
+                                        jq('#currentShopLicence').addClass('d-none');
+                                    }
+                                    jq('#editModal').modal('show');
+                                }
+                            },
+                            error: function () { alert('Error fetching KYC'); }
+                        });
+                    });
+
+                    // Save Edit KYC (FormData for files)
+                    jq('#saveEdit').on('click', function () {
+                        const id = jq('#editUserId').val();
+                        const formData = new FormData(jq('#editForm')[0]);
+                        jq.ajax({
+                            url: `/superadmin/kyc/${id}`,
+                            method: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function (data) {
+                                if (data.success) {
+                                    jq('#editModal').modal('hide');
+                                    location.reload();
+                                    alert(data.message);
+                                } else {
+                                    alert(data.message || 'Update failed');
+                                }
+                            },
+                            error: function (xhr) {
+                                alert(xhr.responseJSON ? xhr.responseJSON.message : 'Error updating KYC');
+                            }
+                        });
+                    });
+
+                    // Delete KYC
+                    jq(document).on('click', '.delete-btn', function () {
+                        const id = jq(this).data('id');
+                        if (!id) return alert('User ID missing');
+                        if (!confirm('Delete this KYC? (Clears documents and sets status to pending)')) return;
+                        jq.ajax({
+                            url: `/superadmin/kyc/${id}`,
+                            method: 'DELETE',
+                            success: function (data) {
+                                if (data.success) {
+                                    location.reload();
+                                    alert(data.message);
+                                } else {
+                                    alert(data.message || 'Delete failed');
+                                }
+                            },
+                            error: function (xhr) {
+                                alert(xhr.responseJSON ? xhr.responseJSON.message : 'Error deleting KYC');
+                            }
+                        });
+                    });
+                });
+            </script>
+
+             <script src="/superadmin-frontend/js/vanilla-utils.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+            <script src="/superadmin-frontend/vendor/perfect-scrollbar/perfect-scrollbar-1.5.6.min.js"></script>
+            <script src="/superadmin-frontend/vendor/chartjs/chart.umd.js-4.5.0.min.js"></script>
+
+            <!-- Main JS-->
+            <script src="/superadmin-frontend/vendor/bootstrap-5.3.8.bundle.min.js"></script>
+            <script src="/superadmin-frontend/js/bootstrap5-init.js"></script>
+            <script src="/superadmin-frontend/js/main-vanilla.js"></script>
+            <script src="/superadmin-frontend/js/swiper-bundle-11.2.10.min.js"></script>
+            <script src="/superadmin-frontend/js/aos.js"></script>
+            <script src="/superadmin-frontend/js/modern-plugins.js"></script>

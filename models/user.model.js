@@ -53,12 +53,13 @@ const userSchema = new mongoose.Schema({
   shop_licence: { type: String, default: '' },
   pan_no: { type: String, sparse: true },
   pan_photo: { type: String, default: '' },
-
   kyc_status: {
-    type: String,
-    enum: ['pending', 'approved', 'rejected'],
-    default: 'pending'
-  },
+  type: String,
+  enum: ['unsubmitted', 'pending', 'approved', 'rejected'],
+  default: 'unsubmitted'
+},
+
+
 
   user_status: {
     type: String,

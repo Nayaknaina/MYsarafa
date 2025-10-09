@@ -1,21 +1,24 @@
 const express = require('express');
 const router = express.Router();
 const {authMiddleware,isAdmin} = require('../middleware/auth');
+const profileImageMiddleware = require('../middleware/profileImageMiddleware');
+
 const  monthlyMembershipCheck  = require('../middleware/monthlymembershipVisible');
-const upload = require('../middleware/multer');
+const {upload} = require('../middleware/multer');
 
 const userController = require('../controllers/userController');
 const GMem = require('../models/groupMem.model');
 
-router.get('/dashboard',authMiddleware,monthlyMembershipCheck,userController.dashboard);
+router.get('/dashboard',authMiddleware,monthlyMembershipCheck,profileImageMiddleware,userController.dashboard);
 router.post('/update-profile',authMiddleware, upload.single('profilePicture'),userController.updateProfile);
 
-router.get('/user/:id', authMiddleware, isAdmin, userController.getMemberDetails);
+router.get('/user/:id', authMiddleware, isAdmin,profileImageMiddleware, userController.getMemberDetails);
 router.post('/user/:id/verify', authMiddleware, isAdmin, userController.verifyMember);
 
-router.get('/notifs',authMiddleware,userController.notifications);
+router.get('/notifs',authMiddleware,profileImageMiddleware,userController.notifications);
 
 
 
 router.get('/sign-out',userController.signout);
+
 module.exports = router;

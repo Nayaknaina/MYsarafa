@@ -20,7 +20,7 @@ exports.signup = async (req, res ,next) => {
 
         //const hashedPassword = await bcrypt.hash(password, 10);
         const user = new User({
-            f_name, l_name, password, email,kyc_status: 'pending',
+            f_name, l_name, password, email, kyc_status: 'unsubmitted',
             user_status: 'unverified',  profilePicture: '/images/default-profile.png'
         });
         await user.save();

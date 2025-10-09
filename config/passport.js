@@ -23,10 +23,10 @@ passport.use(new GoogleStrategy({
                 user = new User({
                     googleId: profile.id,
                     f_name: profile.name?.givenName || profile.displayName?.split(' ')[0] || '',
-                    l_name: profile.name?.familyName || (profile.displayName?.split(' ')[1] || ''),
+                    l_name: profile.name?.familyName || (profile.displayName?.split(' ')[1] || 'User'),
 
                     email: profile.emails[0].value,
-                 kyc_status: 'pending',
+                    kyc_status: 'unsubmitted',
                     user_status: 'unverified',
                     profilePicture: profile.photos?.[0]?.value || '/images/default-profile.png'
                 });

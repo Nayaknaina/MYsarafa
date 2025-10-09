@@ -423,11 +423,11 @@ if (joinBtn) {
 }
 
 // Dropdown Handlers
-communityDropdown.addEventListener('click', function () {
-  console.log('Community dropdown clicked');
-  // Here you would show a dropdown menu
-  showDropdown(this, ['Sarafa Community', 'Tech Community', 'Business Community']);
-});
+// communityDropdown.addEventListener('click', function () {
+//   console.log('Community dropdown clicked');
+//   // Here you would show a dropdown menu
+//   showDropdown(this, ['Sarafa Community', 'Tech Community', 'Business Community']);
+// });
 
 moreDropdown.addEventListener('click', function () {
   console.log('More dropdown clicked');

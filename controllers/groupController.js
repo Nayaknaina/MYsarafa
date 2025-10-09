@@ -1052,7 +1052,7 @@ exports.uploadMembersCSV = async (req, res) => {
                             mobile_no: MobileNumber || '',
                             mobile_verified: false,
                             user_status: 'unverified',
-                            kyc_status: 'pending',
+                            kyc_status: 'unsubmitted',
                             invitationToken
                         });
                         await member.save();
@@ -1129,6 +1129,7 @@ exports.searchDiscoverGroups = async (req, res) => {
                 // $score: {
                 //   $meta: 'textScore'
                 // },
+                
                 createdAt: -1
             })
             .limit(4)

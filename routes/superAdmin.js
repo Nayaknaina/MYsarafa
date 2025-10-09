@@ -3,22 +3,47 @@ const router = express.Router();
 const superAdminController = require('../controllers/superAdminController');
 const { superAdminAuth } = require('../middleware/superAdmin');
 
-// Public routes
-router.get('/login',superAdminAuth, superAdminController.getLoginPage);
-router.post('/login',superAdminAuth, superAdminController.login);
+const upload = require('../middleware/multer');
 
+// Public routes
+router.get('/login', superAdminController.getLoginPage);
+router.post('/login', superAdminController.login);
 
 router.get('/dashboard',superAdminAuth, superAdminController.getDashboard);
-router.get('/users',superAdminAuth, superAdminController.getAllUsers);
-router.post('/users/:id',superAdminAuth, superAdminController.updateUser);
-router.delete('/users/:id',superAdminAuth, superAdminController.deleteUser);
-router.get('/groups',superAdminAuth, superAdminController.getAllGroups);
-router.post('/groups/:id',superAdminAuth, superAdminController.updateGroup);
+router.get('/userspage',superAdminAuth, superAdminController.getUserpage);
 
+router.post('/users', superAdminAuth, superAdminController.createUser);
+router.get('/users/:id',superAdminAuth, superAdminController.getUserById);
+router.put('/users/:id',superAdminAuth, superAdminController.updateUser);
+router.delete('/users/:id',superAdminAuth, superAdminController.deleteUser);
+
+router.get('/groups', superAdminAuth, superAdminController.getAllGroups);
+router.post('/groups', superAdminAuth, superAdminController.createGroup); 
+router.get('/groups/:id', superAdminAuth, superAdminController.getGroupById); 
+router.post('/groups/:id', superAdminAuth, superAdminController.updateGroup); 
+router.delete('/groups/:id', superAdminAuth, superAdminController.deleteGroup); 
+
+router.get('/kyc', superAdminAuth, superAdminController.getAllKYC);
+// router.post('/kyc', superAdminAuth, upload.fields([
+//     { name: 'adhar_photo', maxCount: 1 },
+//     { name: 'pan_photo', maxCount: 1 },
+//     { name: 'shop_licence', maxCount: 1 }
+// ]), superAdminController.createKYC);
+// router.get('/kyc/:id', superAdminAuth, superAdminController.getUserKYCById);
+// router.post('/kyc/:id', superAdminAuth, upload.fields([  { name: 'adhar_photo', maxCount: 1 },
+//     { name: 'pan_photo', maxCount: 1 },
+//     { name: 'shop_licence', maxCount: 1 }]), superAdminController.updateKYC);
+router.delete('/kyc/:id', superAdminAuth, superAdminController.deleteKYC);
+
+
+router.get('/contact', superAdminAuth, superAdminController.getAllContacts);
+router.get('/contact/:id', superAdminAuth, superAdminController.getContactById);
+router.post('/contact/:id/read', superAdminAuth, superAdminController.markAsRead);
+router.delete('/contact/:id', superAdminAuth, superAdminController.deleteContact);
 
 
 // Add logout route
-router.post('/logout',superAdminAuth, (req, res) => {
+router.get('/logout',superAdminAuth, (req, res) => {
     res.clearCookie('superadmin_token');
     res.redirect('/superadmin/login');
 });

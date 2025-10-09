@@ -25,7 +25,7 @@
     overflow: hidden;
   }
 
-  
+
   .kyc-form.colorful .kyc-section {
     background: white;
     border-radius: 14px;
@@ -135,77 +135,113 @@
     font-size: 0.95em;
     margin-top: 2px;
   }
+
   /* Style for OTP input boxes */
-.otp-fields {
-  display: flex;
-  gap: 10px;
-  margin-top: 8px;
-}
+  .otp-fields {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+  }
 
-.otp-box {
-  width: 40px;
-  height: 40px;
-  font-size: 1.5rem;
-  text-align: center;
-  border: 2px solid #551DFF;
-  border-radius: 8px;
-  background: #fffbe6;
-  color: #D324A8;
-  box-shadow: 0 1px 6px #D324A822;
-  transition: border 0.2s, box-shadow 0.2s;
-}
+  .otp-box {
+    width: 40px;
+    height: 40px;
+    font-size: 1.5rem;
+    text-align: center;
+    border: 2px solid #551DFF;
+    border-radius: 8px;
+    background: #fffbe6;
+    color: #D324A8;
+    box-shadow: 0 1px 6px #D324A822;
+    transition: border 0.2s, box-shadow 0.2s;
+  }
 
-.otp-box:focus {
-  border: 2px solid #D324A8;
-  box-shadow: 0 2px 12px #551DFF33;
-  outline: none;
-}
+  .otp-box:focus {
+    border: 2px solid #D324A8;
+    box-shadow: 0 2px 12px #551DFF33;
+    outline: none;
+  }
 
-.verify-btn {
-  background: linear-gradient(90deg, #551DFF 0%, #D324A8 100%);
-  color: #fff;
-  font-weight: 550px;
-  border: none;
-  border-radius: 8px;
-  padding: 0px 10px;
-  margin-left: 0px;
-  font-size: 15px;
-  height: 40px;
-  box-shadow: 0 2px 8px #551DFF22;
-  cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s;
-  max-width: 84px;
-}
+  .verify-btn {
+    background: linear-gradient(90deg, #551DFF 0%, #D324A8 100%);
+    color: #fff;
+    font-weight: 550px;
+    border: none;
+    border-radius: 8px;
+    padding: 0px 10px;
+    margin-left: 0px;
+    font-size: 15px;
+    height: 40px;
+    box-shadow: 0 2px 8px #551DFF22;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    max-width: 84px;
+  }
 
-/*
+  /*
 .custom-input{
   width: 70%;
 }*/
 
-.get-otp-btn {
- background: linear-gradient(90deg, #47ff53 0%, #2f95ff 100%);
-  color: #fff;
-  font-weight: 550;
-  border: none;
-  border-radius: 8px;
-  padding: 0 5px;
-  margin-left: 0px;
-  font-size: 1rem;
- /* height: 32px;*/
-  box-shadow: 0 2px 8px #47ff5322;
-  cursor: pointer;
-  transition: background 0.2s, box-shadow 0.2s;
-  max-width: 95px;
-}
-    @media (max-width: 480px){
-      .kyc-form.colorful::before {
-    display: none;
+  .get-otp-btn {
+    background: linear-gradient(90deg, #47ff53 0%, #2f95ff 100%);
+    color: #fff;
+    font-weight: 550;
+    border: none;
+    border-radius: 8px;
+    padding: 0 5px;
+    margin-left: 0px;
+    font-size: 1rem;
+    /* height: 32px;*/
+    box-shadow: 0 2px 8px #47ff5322;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s;
+    max-width: 95px;
   }
 
-  .kyc-form.colorful::after {
-   display: none;
-  }
+  @media (max-width: 480px) {
+    .kyc-form.colorful::before {
+      display: none;
     }
+
+    .kyc-form.colorful::after {
+      display: none;
+    }
+  }
+
+  /* Loader Styles */
+  .loader {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 10;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .loader::after {
+    content: '';
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 </style>
 
 <body data-user-id="{{user._id}}">
@@ -214,16 +250,16 @@
 
   <div class="main-container">
     <!-- Sidebar -->
-     {{#if disabledSidebar}}
-      <style>
-        .sidebar {
-          pointer-events: none !important;
-          opacity: 0.5 !important;
-        }
-      </style>
-      {{/if}}
+    {{#if disabledSidebar}}
+    <style>
+      .sidebar {
+        pointer-events: none !important;
+        opacity: 0.5 !important;
+      }
+    </style>
+    {{/if}}
     {{> sidebar}}
-       
+
     <main class="main-content">
       <h1 class="page-title">KYC Verification</h1>
 
@@ -244,7 +280,7 @@
                 <label for="dob">Date of Birth *</label>
                 <input type="date" id="dob" name="dob" class="kyc-input" required>
               </div>
-               <div class="form-group">
+              <div class="form-group">
                 <label for="postalCode">Postal Code *</label>
                 <input type="text" id="postalCode" name="postalCode" class="kyc-input" placeholder="Postal Code"
                   required>
@@ -258,7 +294,7 @@
                 <label for="city">City *</label>
                 <input type="text" id="city" name="city" class="kyc-input" placeholder="City" required>
               </div>
-             
+
               <div class="form-group full-width">
                 <label for="address">Full Address *</label>
                 <textarea id="address" name="address" class="kyc-input" placeholder="Full Address" rows="3"
@@ -320,21 +356,21 @@
                 <label for="adhar_no">Aadhaar Number *</label>
                 <input type="text" maxlength="12" id="adhar_no" name="adhar_no" class="kyc-input custom-input"
                   placeholder="Enter 12-digit Aadhaar number" pattern="\d{12}" required>
-                  <button class="get-otp-btn" id="getOtpBtn" type="button" style="display: none;">Get OTP</button>
+                <button class="get-otp-btn" id="getOtpBtn" type="button" style="display: none;">Get OTP</button>
                 <small id="aadhaarVerificationMessage" style="color: #551DFF;"></small>
-                 <div class="otp-fields" id="otpFields" style="display: none;">
-            <input type="text" maxlength="1" class="otp-box"/>
-            <input type="text" maxlength="1" class="otp-box"/>
-            <input type="text" maxlength="1" class="otp-box"/>
-            <input type="text" maxlength="1" class="otp-box"/>
-            <input type="text" maxlength="1" class="otp-box"/>
-            <input type="text" maxlength="1" class="otp-box"/>
+                <div class="otp-fields" id="otpFields" style="display: none;">
+                  <input type="text" maxlength="1" class="otp-box" />
+                  <input type="text" maxlength="1" class="otp-box" />
+                  <input type="text" maxlength="1" class="otp-box" />
+                  <input type="text" maxlength="1" class="otp-box" />
+                  <input type="text" maxlength="1" class="otp-box" />
+                  <input type="text" maxlength="1" class="otp-box" />
 
-            <button class="verify-btn" type="button" id="verifyOtpBtn"><span>Verify</span></button>
-          </div>
-          
+                  <button class="verify-btn" type="button" id="verifyOtpBtn"><span>Verify</span></button>
+                </div>
+
               </div>
-              
+
               <div class="form-group">
                 <label for="aadhaarCard">Aadhaar Card *</label>
                 <input type="file" id="aadhaarCard" name="aadhaarCard" class="kyc-input"
@@ -428,6 +464,8 @@
     }
     async function verifyAadhaarImage(file, adharNo) {
       const aadhaarVerificationMessage = document.getElementById('aadhaarVerificationMessage');
+      const formLoader = document.getElementById('formLoader');
+      formLoader.style.display = 'flex';
       aadhaarVerificationMessage.textContent = 'Verifying Aadhaar...';
       try {
         const { data: { text } } = await Tesseract.recognize(file, 'eng', {
@@ -449,10 +487,14 @@
         aadhaarVerificationMessage.textContent = 'Error verifying Aadhaar image';
         aadhaarVerificationMessage.style.color = '#ef4444';
         return false;
+      } finally {
+        formLoader.style.display = 'none';
       }
     }
 
     async function sendAadhaarOtp(aadhaarNumber) {
+      const formLoader = document.getElementById('formLoader');
+      formLoader.style.display = 'flex';
       try {
         const response = await fetch('/kyc/send-otp', {
           method: 'POST',
@@ -473,34 +515,43 @@
         console.error('Error sending OTP:', error);
         showNotification('Error sending OTP: ' + error.message, 'error');
         return false;
+      } finally {
+        formLoader.style.display = 'none';
       }
     }
 
     async function verifyAadhaarOtp(otp) {
+      const formLoader = document.getElementById('formLoader');
+      formLoader.style.display = 'flex';
       try {
+        const fullName = document.getElementById('fullName').value.trim();
+        const dob = document.getElementById('dob').value;
         const response = await fetch('/kyc/verify-otp', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           credentials: 'include',
-          body: JSON.stringify({ otp })
+          body: JSON.stringify({ otp, fullName, dob })
         });
         const result = await response.json();
         console.log('verifyAadhaarOtp response:', result);
         if (response.ok) {
           showNotification(result.message || 'OTP verified successfully!', 'success');
-          return true;
+          return {success: true, message: result.message || 'OTP verified successfully!'};
         } else {
-          showNotification(result.message || 'Invalid OTP', 'error');
-          return false;
+          showNotification(result.message , 'error');
+          return {success: false, message: result.message};
         }
       } catch (error) {
         console.error('Error verifying OTP:', error);
         showNotification('Error verifying OTP: ' + error.message, 'error');
-        return false;
+        return {success: false, message: 'Error verifying OTP: ' + error.message};
+      } finally {
+        formLoader.style.display = 'none';
       }
     }
-
     async function fetchKycData() {
+      const formLoader = document.getElementById('formLoader');
+      formLoader.style.display = 'flex';
       try {
         const response = await fetch('/kyc/data', {
           method: 'GET',
@@ -520,7 +571,7 @@
           document.getElementById('shopName').value = data.shopName || '';
           document.getElementById('shopAddress').value = data.shopAddress || '';
           document.getElementById('numWorkers').value = data.numWorkers || 0;
-         const adharInput = document.getElementById('adhar_no');
+          const adharInput = document.getElementById('adhar_no');
           adharInput.value = data.adhar_no || '';
 
           if (data.kyc_status === 'approved') {
@@ -536,8 +587,8 @@
           const panCardCurrent = document.getElementById('panCardCurrent');
 
           if (aadhaarCardCurrent) {
-          /*   aadhaarCardCurrent.textContent = data.adhar_photo ? path.basename(data.adhar_photo) : 'None';*/
-          aadhaarCardCurrent.textContent = data.adhar_photo ? data.adhar_photo.split('/').pop() : 'None';
+            /*   aadhaarCardCurrent.textContent = data.adhar_photo ? path.basename(data.adhar_photo) : 'None';*/
+            aadhaarCardCurrent.textContent = data.adhar_photo ? data.adhar_photo.split('/').pop() : 'None';
 
 
           } else {
@@ -564,15 +615,20 @@
       } catch (error) {
         console.error('Error in fetchKycData:', error);
         showNotification('Error loading KYC data: ' + error.message, 'error');
+      } finally {
+        formLoader.style.display = 'none';
       }
     }
 
 
     async function fetchLocationByPincode(pincode) {
       const postalCodeMessage = document.getElementById('postalCodeMessage');
+      const formLoader = document.getElementById('formLoader');
+      formLoader.style.display = 'flex';
       postalCodeMessage.textContent = '';
       if (!/^\d{6}$/.test(pincode)) {
         postalCodeMessage.textContent = 'Please enter a valid 6-digit PIN code';
+        formLoader.style.display = 'none';
         return;
       }
       try {
@@ -597,6 +653,8 @@
         postalCodeMessage.textContent = 'Error fetching location';
         postalCodeMessage.style.color = '#ef4444';
         console.error('Error fetching PIN code:', error);
+      } finally {
+        formLoader.style.display = 'none';
       }
     }
     document.addEventListener('DOMContentLoaded', function () {
@@ -703,15 +761,17 @@
         verifyOtpBtn.addEventListener('click', async () => {
           const otp = Array.from(otpBoxes).map(box => box.value).join('');
           if (otp.length === otpBoxes.length) {
-            const success = await verifyAadhaarOtp(otp);
-            if (success) {
+            const result = await verifyAadhaarOtp(otp);
+            if (result.success) {
               aadhaarVerified = true;
-              document.getElementById('aadhaarVerificationMessage').textContent = 'Aadhaar OTP verified successfully!';
+              document.getElementById('aadhaarVerificationMessage').textContent =
+                result.message || 'Aadhaar OTP verified successfully!';
               document.getElementById('aadhaarVerificationMessage').style.color = '#47ff53';
               otpFields.style.display = 'none';
               verifyOtpBtn.style.display = 'none';
             } else {
-              document.getElementById('aadhaarVerificationMessage').textContent = 'Invalid OTP. Please try again.';
+              document.getElementById('aadhaarVerificationMessage').textContent =
+                result.message || 'Invalid OTP. Please try again.';
               document.getElementById('aadhaarVerificationMessage').style.color = '#ef4444';
             }
           } else {
@@ -719,7 +779,8 @@
           }
         });
       }
-       
+
+
       const postalCodeInput = document.getElementById("postalCode");
       if (postalCodeInput) {
         let timeOut;
@@ -807,98 +868,98 @@
 
       // Form Submission
       const kycForm = document.getElementById('kycForm');
-     if (kycForm) {
-      kycForm.addEventListener('submit', async function (e) {
-        e.preventDefault();
-        if (!validateStep(2)) {
-          showNotification('Please upload all required documents.', 'error');
-          return;
-        }
-
-        // Validate Aadhaar number
-        const adharNo = document.getElementById('adhar_no').value.trim();
-        if (!/^\d{12}$/.test(adharNo)) {
-          showNotification('Please enter a valid 12-digit Aadhaar number.', 'error');
-          document.getElementById('adhar_no').classList.add('input-error');
-          return;
-        }
-
-        formLoader.style.display = 'block';
-        const formData = new FormData();
-        // Add text fields
-        const textFields = ['fullName', 'dob', 'state', 'city', 'postalCode', 'address', 'shopName', 'shopAddress', 'numWorkers', 'adhar_no'];
-        textFields.forEach(field => {
-          const value = document.getElementById(field)?.value.trim();
-          if (value) formData.append(field, value);
-        });
-        formData.append('aadhaarVerified', aadhaarVerified.toString());
-
-        // Add worker fields only if valid
-        const workersContainer = document.getElementById('workersContainer');
-        const workerInputs = workersContainer.querySelectorAll('.worker-field');
-        workerInputs.forEach((worker, index) => {
-          const nameInput = worker.querySelector(`[name="workerName${index}"]`);
-          const phoneInput = worker.querySelector(`[name="workerPhone${index}"]`);
-          if (nameInput?.value.trim() && phoneInput?.value.trim()) {
-            formData.append(`workerName${index}`, nameInput.value.trim());
-            formData.append(`workerPhone${index}`, phoneInput.value.trim());
+      if (kycForm) {
+        kycForm.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          if (!validateStep(2)) {
+            showNotification('Please upload all required documents.', 'error');
+            return;
           }
-        });
 
-        // Add files
-        const fileFields = ['aadhaarCard', 'shopLicence', 'panCard'];
-        fileFields.forEach(field => {
-          const input = document.getElementById(field);
-          if (input?.files?.length > 0) {
-            formData.append(field, input.files[0]);
+          // Validate Aadhaar number
+          const adharNo = document.getElementById('adhar_no').value.trim();
+          if (!/^\d{12}$/.test(adharNo)) {
+            showNotification('Please enter a valid 12-digit Aadhaar number.', 'error');
+            document.getElementById('adhar_no').classList.add('input-error');
+            return;
           }
-        });
 
-        try {
-          const controller = new AbortController();
-          const timeoutId = setTimeout(() => controller.abort(), 60000); // Increased to 60s
-          console.log('Submitting FormData:', Array.from(formData.entries()));
-          const response = await fetch('/kyc/submit', {
-            method: 'POST',
-            body: formData,
-            credentials: 'include',
-            signal: controller.signal
+          formLoader.style.display = 'flex';
+          const formData = new FormData();
+          // Add text fields
+          const textFields = ['fullName', 'dob', 'state', 'city', 'postalCode', 'address', 'shopName', 'shopAddress', 'numWorkers', 'adhar_no'];
+          textFields.forEach(field => {
+            const value = document.getElementById(field)?.value.trim();
+            if (value) formData.append(field, value);
           });
-          clearTimeout(timeoutId);
-          const result = await response.json();
-          console.log('kycForm submit response:', result);
-          if (response.ok) {
-            showNotification(result.message || 'KYC form submitted successfully!', 'success');
-            kycForm.reset();
-            document.getElementById('workersContainer').innerHTML = '';
-            document.getElementById('aadhaarCardCurrent').textContent = 'None';
-            document.getElementById('shopLicenceCurrent').textContent = 'None';
-            document.getElementById('panCardCurrent').textContent = 'None';
-            document.getElementById('aadhaarVerificationMessage').textContent = '';
-            aadhaarVerified = false;
-            showStep(0);
-          } else {
-            showNotification(result.message || 'Failed to submit KYC', 'error');
+          formData.append('aadhaarVerified', aadhaarVerified.toString());
+
+          // Add worker fields only if valid
+          const workersContainer = document.getElementById('workersContainer');
+          const workerInputs = workersContainer.querySelectorAll('.worker-field');
+          workerInputs.forEach((worker, index) => {
+            const nameInput = worker.querySelector(`[name="workerName${index}"]`);
+            const phoneInput = worker.querySelector(`[name="workerPhone${index}"]`);
+            if (nameInput?.value.trim() && phoneInput?.value.trim()) {
+              formData.append(`workerName${index}`, nameInput.value.trim());
+              formData.append(`workerPhone${index}`, phoneInput.value.trim());
+            }
+          });
+
+          // Add files
+          const fileFields = ['aadhaarCard', 'shopLicence', 'panCard'];
+          fileFields.forEach(field => {
+            const input = document.getElementById(field);
+            if (input?.files?.length > 0) {
+              formData.append(field, input.files[0]);
+            }
+          });
+
+          try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 60000); // Increased to 60s
+            console.log('Submitting FormData:', Array.from(formData.entries()));
+            const response = await fetch('/kyc/submit', {
+              method: 'POST',
+              body: formData,
+              credentials: 'include',
+              signal: controller.signal
+            });
+            clearTimeout(timeoutId);
+            const result = await response.json();
+            console.log('kycForm submit response:', result);
+            if (response.ok) {
+              showNotification(result.message || 'KYC form submitted successfully!', 'success');
+              kycForm.reset();
+              document.getElementById('workersContainer').innerHTML = '';
+              document.getElementById('aadhaarCardCurrent').textContent = 'None';
+              document.getElementById('shopLicenceCurrent').textContent = 'None';
+              document.getElementById('panCardCurrent').textContent = 'None';
+              document.getElementById('aadhaarVerificationMessage').textContent = '';
+              aadhaarVerified = false;
+              showStep(0);
+            } else {
+              showNotification(result.message || 'Failed to submit KYC', 'error');
+            }
+          } catch (error) {
+            console.error('Error submitting KYC:', error);
+            if (error.name === 'AbortError') {
+              showNotification('Submission timed out. Please try again.', 'error');
+            } else {
+              showNotification('Error submitting KYC: ' + error.message, 'error');
+            }
+          } finally {
+            formLoader.style.display = 'none';
           }
-        } catch (error) {
-          console.error('Error submitting KYC:', error);
-          if (error.name === 'AbortError') {
-            showNotification('Submission timed out. Please try again.', 'error');
-          } else {
-            showNotification('Error submitting KYC: ' + error.message, 'error');
-          }
-        } finally {
-          formLoader.style.display = 'none';
-        }
-      });
-    }
+        });
+      }
 
       // Show first step on load
       showStep(0);
     });
   </script>
   {{> profile}}
-<script src="/js/all.js"></script>
+  <script src="/js/all.js"></script>
 </body>
 
 </html>
