@@ -3,11 +3,13 @@ const router = express.Router();
 const groupController = require('../controllers/groupController');
 const {authMiddleware,isAdmin} = require('../middleware/auth');
 const  monthlyMembershipCheck  = require('../middleware/monthlymembershipVisible');
+const profileImageMiddleware = require('../middleware/profileImageMiddleware');
 
-const upload = require('../middleware/multer');
 
-router.get('/community/:groupId?', authMiddleware,monthlyMembershipCheck, groupController.communityCreation);
-router.get('/group-member',authMiddleware,monthlyMembershipCheck, groupController.groupMemberPage);
+const {upload} = require('../middleware/multer');
+
+router.get('/community/:groupId?', authMiddleware,monthlyMembershipCheck, profileImageMiddleware, groupController.communityCreation);
+router.get('/group-member',authMiddleware,monthlyMembershipCheck, profileImageMiddleware, groupController.groupMemberPage);
 
 router.post('/create', authMiddleware,upload.fields([
   { name: 'coverImage', maxCount: 1 },

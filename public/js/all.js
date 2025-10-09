@@ -292,7 +292,7 @@ $(document).ready(function () {
 const searchInput = document.querySelector('.search-input');
 const joinBtn = document.querySelector('.join-btn');
 const communityDropdown = document.querySelector('.community-name');
-const moreDropdown = document.querySelector('.nav-item.dropdown');
+//const moreDropdown = document.querySelector('.nav-item.dropdown');
 
 // console.log('Community Dropdown Element:', communityDropdown);
 // console.log('More Dropdown Element:', moreDropdown);
@@ -423,17 +423,17 @@ if (joinBtn) {
 }
 
 // Dropdown Handlers
-// communityDropdown.addEventListener('click', function () {
-//   console.log('Community dropdown clicked');
-//   // Here you would show a dropdown menu
-//   showDropdown(this, ['Sarafa Community', 'Tech Community', 'Business Community']);
-// });
-
-moreDropdown.addEventListener('click', function () {
-  console.log('More dropdown clicked');
+communityDropdown.addEventListener('click', function () {
+  console.log('Community dropdown clicked');
   // Here you would show a dropdown menu
-  showDropdown(this, ['Settings', 'Help', 'About', 'Logout']);
+  showDropdown(this, ['Sarafa Community', 'Tech Community', 'Business Community']);
 });
+
+// moreDropdown.addEventListener('click', function () {
+//   console.log('More dropdown clicked');
+//   // Here you would show a dropdown menu
+//   showDropdown(this, ['Settings', 'Help', 'About', 'Logout']);
+// });
 
 // Generic Dropdown Function
 function showDropdown(element, items) {

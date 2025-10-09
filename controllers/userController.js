@@ -35,7 +35,7 @@ exports.dashboard = async (req, res, next) => {
       .map(m => ({
         _id: m.group._id,
         g_name: m.group.g_name,
-        g_cover: m.group.g_cover,
+      g_cover: m.group.g_cover ? getSignedUrl(m.group.g_cover) : '/assets/images/demo.jpg',
         description: m.group.description,
         g_type: m.group.g_type,
         total_mem: m.group.total_mem,
@@ -71,6 +71,7 @@ exports.dashboard = async (req, res, next) => {
 
     discoverGroups = discoverGroups.map(g => ({
       ...g,
+      g_cover: g.g_cover ? getSignedUrl(g.g_cover) : '/assets/images/demo.jpg',
       isJoined: joinedGroupIds.includes(g._id.toString()),
       isPending: pendingGroupIds.includes(g._id.toString())
     }));
@@ -92,7 +93,10 @@ exports.dashboard = async (req, res, next) => {
         group: group._id
       }).lean();
       if (!payment || (payment && group.updatedAt > payment.uploadedAt)) {
-        pendingGroup = group;
+       pendingGroup = {
+          ...group,
+          qr_code: group.qr_code ? getSignedUrl(group.qr_code) : '/assets/images/demo.jpg'
+        };
         break;
       }
     }

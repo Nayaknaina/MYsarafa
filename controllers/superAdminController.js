@@ -5,6 +5,9 @@ const Group = require('../models/group.model');
 const Contact = require('../models/contact.model');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const {getSignedUrl} = require('../middleware/multer')
+
+
 
 exports.login = async (req, res) => {
     try {
@@ -46,15 +49,13 @@ exports.getLoginPage = (req, res) => {
 //**  Updated Dashboard    */
 exports.getDashboard = async (req, res) => {
     try {
-         if (!req.user || !req.user.id) {
-              return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
-            }
-            const user = await User.find().lean();
+         if (!req.user || !req.user.id) return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
+        const user = await User.find().lean();
         const totalUsers = await User.countDocuments();
         const totalGroups = await Group.countDocuments();
         const pendingKYC = await User.countDocuments({ kyc_status: 'pending' });
         const blacklist = await User.countDocuments({ blacklistStatus: 'true' });
-            const superadmin=await User.findById(req.user.id).lean();
+        const superadmin=await User.findById(req.user.id).lean();
 
            
         res.render('superadmin/dashboard', {
@@ -328,13 +329,19 @@ exports.getAllKYC = async (req, res) => {
         const users = await User.find(filter).select('-password').lean();
         const allUsers = await User.find({ role: { $ne: 'super_admin' } }).select('f_name l_name _id email').lean();
 
-        // Extract enums
+        const usersWithUrls = users.map(user => ({
+            ...user,
+            adhar_photo_url: user.adhar_photo ? getSignedUrl(user.adhar_photo) : null,
+            pan_photo_url: user.pan_photo ? getSignedUrl(user.pan_photo) : null,
+            shop_licence_url: user.shop_licence ? getSignedUrl(user.shop_licence) : null
+        }));
+
         const userSchema = User.schema;
         const kycOptions = userSchema.path('kyc_status').enumValues || [];
 
         res.render('superadmin/kyc', {
             superadmin,
-            users,
+            users: usersWithUrls,
             allUsers,
             kycOptions,
             currentFilter: status,
@@ -359,10 +366,10 @@ exports.createKYC = async (req, res) => {
             adhar_no,
             pan_no,
             kyc_status,
-            adhar_photo: req.files?.adhar_photo ? `/uploads/kyc/${req.files.adhar_photo[0].filename}` : '',
-            pan_photo: req.files?.pan_photo ? `/uploads/kyc/${req.files.pan_photo[0].filename}` : '',
-            shop_licence: req.files?.shop_licence ? `/uploads/kyc/${req.files.shop_licence[0].filename}` : '',
-            ...kycData // Other fields if any
+            adhar_photo: req.files?.adhar_photo ? req.files.adhar_photo[0].key : '',
+            pan_photo: req.files?.pan_photo ? req.files.pan_photo[0].key : '',
+            shop_licence: req.files?.shop_licence ? req.files.shop_licence[0].key : '',
+            ...kycData
         };
         await User.findByIdAndUpdate(userId, updates);
         const updatedUser = await User.findById(userId).select('-password').lean();
@@ -381,7 +388,13 @@ exports.getUserKYCById = async (req, res) => {
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
-        res.json({ success: true, user });
+       const userWithUrls = {
+            ...user,
+            adhar_photo_url: user.adhar_photo ? getSignedUrl(user.adhar_photo) : null,
+            pan_photo_url: user.pan_photo ? getSignedUrl(user.pan_photo) : null,
+            shop_licence_url: user.shop_licence ? getSignedUrl(user.shop_licence) : null
+        };
+        res.json({ success: true, user: userWithUrls });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: 'Server error' });
@@ -393,11 +406,50 @@ exports.updateKYC = async (req, res) => {
     try {
         const { id } = req.params;
         const updates = req.body;
-        // Handle files
-        if (req.files) {
-            if (req.files.adhar_photo) updates.adhar_photo = `/uploads/kyc/${req.files.adhar_photo[0].filename}`;
-            if (req.files.pan_photo) updates.pan_photo = `/uploads/kyc/${req.files.pan_photo[0].filename}`;
-            if (req.files.shop_licence) updates.shop_licence = `/uploads/kyc/${req.files.shop_licence[0].filename}`;
+        const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+       if (req.files) {
+            if (req.files.adhar_photo) {
+                if (user.adhar_photo) {
+                    try {
+                        await s3.deleteObject({
+                            Bucket: process.env.AWS_BUCKET_NAME,
+                            Key: user.adhar_photo
+                        }).promise();
+                    } catch (err) {
+                        console.error('Error deleting old Aadhaar photo:', err);
+                    }
+                }
+                updates.adhar_photo = req.files.adhar_photo[0].key;
+            }
+            if (req.files.pan_photo) {
+                if (user.pan_photo) {
+                    try {
+                        await s3.deleteObject({
+                            Bucket: process.env.AWS_BUCKET_NAME,
+                            Key: user.pan_photo
+                        }).promise();
+                    } catch (err) {
+                        console.error('Error deleting old PAN photo:', err);
+                    }
+                }
+                updates.pan_photo = req.files.pan_photo[0].key;
+            }
+            if (req.files.shop_licence) {
+                if (user.shop_licence) {
+                    try {
+                        await s3.deleteObject({
+                            Bucket: process.env.AWS_BUCKET_NAME,
+                            Key: user.shop_licence
+                        }).promise();
+                    } catch (err) {
+                        console.error('Error deleting old shop licence:', err);
+                    }
+                }
+                updates.shop_licence = req.files.shop_licence[0].key;
+            }
         }
         await User.findByIdAndUpdate(id, updates);
         const updatedUser = await User.findById(id).select('-password').lean();
@@ -412,6 +464,43 @@ exports.updateKYC = async (req, res) => {
 exports.deleteKYC = async (req, res) => {
     try {
         const { id } = req.params;
+       const user = await User.findById(id);
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        // Delete S3 objects if exist
+        if (user.adhar_photo) {
+            try {
+                await s3.deleteObject({
+                    Bucket: process.env.AWS_BUCKET_NAME,
+                    Key: user.adhar_photo
+                }).promise();
+            } catch (err) {
+                console.error('Error deleting Aadhaar photo:', err);
+            }
+        }
+        if (user.pan_photo) {
+            try {
+                await s3.deleteObject({
+                    Bucket: process.env.AWS_BUCKET_NAME,
+                    Key: user.pan_photo
+                }).promise();
+            } catch (err) {
+                console.error('Error deleting PAN photo:', err);
+            }
+        }
+        if (user.shop_licence) {
+            try {
+                await s3.deleteObject({
+                    Bucket: process.env.AWS_BUCKET_NAME,
+                    Key: user.shop_licence
+                }).promise();
+            } catch (err) {
+                console.error('Error deleting shop licence:', err);
+            }
+        }
+
         await User.findByIdAndUpdate(id, {
             adhar_no: null,
             adhar_photo: '',

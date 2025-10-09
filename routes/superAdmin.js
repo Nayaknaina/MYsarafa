@@ -3,7 +3,7 @@ const router = express.Router();
 const superAdminController = require('../controllers/superAdminController');
 const { superAdminAuth } = require('../middleware/superAdmin');
 
-const upload = require('../middleware/multer');
+const {upload} = require('../middleware/multer');
 
 // Public routes
 router.get('/login', superAdminController.getLoginPage);
@@ -24,15 +24,15 @@ router.post('/groups/:id', superAdminAuth, superAdminController.updateGroup);
 router.delete('/groups/:id', superAdminAuth, superAdminController.deleteGroup); 
 
 router.get('/kyc', superAdminAuth, superAdminController.getAllKYC);
-// router.post('/kyc', superAdminAuth, upload.fields([
-//     { name: 'adhar_photo', maxCount: 1 },
-//     { name: 'pan_photo', maxCount: 1 },
-//     { name: 'shop_licence', maxCount: 1 }
-// ]), superAdminController.createKYC);
-// router.get('/kyc/:id', superAdminAuth, superAdminController.getUserKYCById);
-// router.post('/kyc/:id', superAdminAuth, upload.fields([  { name: 'adhar_photo', maxCount: 1 },
-//     { name: 'pan_photo', maxCount: 1 },
-//     { name: 'shop_licence', maxCount: 1 }]), superAdminController.updateKYC);
+router.post('/kyc', superAdminAuth, upload.fields([
+    { name: 'adhar_photo', maxCount: 1 },
+    { name: 'pan_photo', maxCount: 1 },
+    { name: 'shop_licence', maxCount: 1 }
+]), superAdminController.createKYC);
+router.get('/kyc/:id', superAdminAuth, superAdminController.getUserKYCById);
+router.post('/kyc/:id', superAdminAuth, upload.fields([  { name: 'adhar_photo', maxCount: 1 },
+    { name: 'pan_photo', maxCount: 1 },
+    { name: 'shop_licence', maxCount: 1 }]), superAdminController.updateKYC);
 router.delete('/kyc/:id', superAdminAuth, superAdminController.deleteKYC);
 
 

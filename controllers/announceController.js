@@ -6,6 +6,9 @@ const Group = require('../models/group.model');
 const GMem = require('../models/groupMem.model');
 const GroupQue = require('../models/groupQue.model');
 const Announcement = require('../models/announcement.model');
+
+const {getSignedUrl} = require('../middleware/multer');
+
 const pdfParse = require('pdf-parse');
 const csv = require('csv-parser');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
@@ -105,7 +108,7 @@ exports.createAnnouncement = async (req, res) => {
     let imagePath = '';
     if (req.files && req.files['image']) {
       const file = req.files['image'][0];
-      imagePath = `/uploads/${file.fieldname}/${file.filename}`;
+      imagePath = file.key;
     }
     
 
@@ -159,7 +162,7 @@ exports.getAnnouncements = async (req, res) => {
       title: announcement.title,
       message: announcement.message,
       meetingLink: announcement.meetingLink,
-      image: announcement.image,
+      image: announcement.image ? getSignedUrl(announcement.image) : null,
       createdBy: {
         name: `${announcement.createdBy.f_name || ''} ${announcement.createdBy.l_name || ''}`.trim() || 'Unknown',
         userId: announcement.createdBy._id

@@ -11,6 +11,8 @@ const exiftool = require('node-exiftool');
 const exiftoolBin = require('dist-exiftool');
 
 const ep = new exiftool.ExiftoolProcess(exiftoolBin);
+const { getSignedUrl } = require('../middleware/multer');
+
 
 exports.renderMembershipPage = async (req, res, next) => {
   try {
@@ -97,11 +99,16 @@ exports.rendertabularPayReceived = async (req, res, next) => {
       .populate('user', 'f_name l_name')
       .populate('group', 'g_name')
       .lean();
+
+    const formattedPayments = payments.map(payment => ({
+      ...payment,
+      screenshot_url: payment.screenshotUrl ? getSignedUrl(payment.screenshotUrl) : null
+    }));
     
     res.render('SSpay-received', {
       user: user || {},
          fullName: `${user.f_name || ''} ${user.l_name || ''}`.trim(),
-      payments,
+      payments: formattedPayments,
        layout: false,
       group: null // No group selected initially
     });
@@ -112,43 +119,47 @@ exports.rendertabularPayReceived = async (req, res, next) => {
 };
 
 
-// Handle screenshot upload
 exports.uploadScreenshot = async (req, res, next) => {
   try {
-
-    const { upiId, amount, method,groupId } = req.body;
+    const { upiId, amount, method, groupId } = req.body;
     const file = req.file;
 
     if (!groupId || !file || !upiId || !amount || !method) {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
 
-    // Validate group
-    const membership = await Gmem.findOne({
-      user: req.user.id,
-      group: groupId
-    });
+    // Validate group membership
+    const membership = await Gmem.findOne({ user: req.user.id, group: groupId });
     if (!membership) {
-      return res.status(403).json({ success: false, message: 'Unauthorized: User not a member of this group' });
+      return res.status(403).json({ success: false, message: 'Unauthorized: Not a member of this group' });
     }
 
-    // Validate group existence
     const group = await Group.findById(groupId);
     if (!group) {
       return res.status(404).json({ success: false, message: 'Group not found' });
     }
 
-    // Extract date and time from screenshot metadata
-    await ep.open();
-    const metadata = await ep.readMetadata(file.path);
-    await ep.close();
+    // File key (already uploaded to S3 by Multer-S3)
+    const fileKey = file.key;
+
+    // Try reading metadata (optional)
     let date, time;
-    if (metadata.data[0]?.DateTimeOriginal) {
-      const dateTime = new Date(metadata.data[0].DateTimeOriginal);
-      date = dateTime.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' });
-      time = dateTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-    } else {
-      // Fallback to upload timestamp
+    try {
+      await ep.open();
+      const metadata = await ep.readMetadata(file.path || file.location || '');
+      await ep.close();
+
+      if (metadata.data[0]?.DateTimeOriginal) {
+        const dateTime = new Date(metadata.data[0].DateTimeOriginal);
+        date = dateTime.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' });
+        time = dateTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+      } else {
+        const uploadedAt = new Date();
+        date = uploadedAt.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' });
+        time = uploadedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+      }
+    } catch (err) {
+      console.warn('Metadata read failed, fallback to upload time');
       const uploadedAt = new Date();
       date = uploadedAt.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' });
       time = uploadedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
@@ -158,18 +169,26 @@ exports.uploadScreenshot = async (req, res, next) => {
     const payment = new Payment({
       user: req.user.id,
       group: groupId,
-      screenshotUrl: `/uploads/pay-screenshot/${file.filename}`,
+      screenshotUrl: fileKey, // stored S3 key
       upiId,
       amount,
       method,
       date,
       time,
       isVerified: false,
-      uploadedAt: new Date()
+      uploadedAt: new Date(),
     });
+
     await payment.save();
 
-    res.json({ success: true, message: 'Screenshot uploaded successfully' });
+    res.json({
+      success: true,
+      message: 'Screenshot uploaded successfully',
+      payment: {
+        id: payment._id,
+        screenshotUrl: getSignedUrl(fileKey),
+      },
+    });
   } catch (error) {
     console.error('Error uploading screenshot:', error);
     next(error);

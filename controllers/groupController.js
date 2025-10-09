@@ -14,6 +14,8 @@ const upload = require('../middleware/multer');
 const axios = require("axios");
 const sanitize = require('mongo-sanitize');
 
+const { getSignedUrl } = require('../middleware/multer');
+
 
 
 exports.communityCreation = async (req, res, next) => {
@@ -36,11 +38,7 @@ exports.communityCreation = async (req, res, next) => {
                 return res.status(400).json({ success: false, message: 'Invalid group ID' });
             }
 
-            // // Fetch group for edit mode
-            // group = await Group.findOne({ _id: groupId, user: req.user.id }).lean();
-            // if (!group) {
-            //     return res.status(404).json({ success: false, message: 'Group not found or you do not have permission to edit it' });
-            // }
+         
             group = await Group.findOne({ _id: groupId, user: req.user.id }).lean();
             if (!group) {
                 return res.status(404).json({ success: false, message: 'Group not found or you do not have permission to edit it' });
@@ -52,6 +50,13 @@ exports.communityCreation = async (req, res, next) => {
                 options: q.options
             }));
             console.log("[communityCreation] Loaded questions:", questions);
+
+            if (group.g_cover) {
+                group.g_cover_url = getSignedUrl(group.g_cover);
+            }
+            if (group.qr_code) {
+                group.qr_code_url = getSignedUrl(group.qr_code);
+            }
         }
 
         res.render("Community-creation", {
@@ -106,16 +111,19 @@ exports.createGroup = async (req, res) => {
             });
         }
 
-        let coverPhoto = '/assets/images/demo.jpg';
-        let qrCode = '/assets/images/default-qr.jpg';
+        let coverPhoto = null;
+        let qrCode = null;
         if (req.files && req.files.coverImage) {
             // const file = req.files.coverImage;
             // coverPhoto = `/uploads/${Date.now()}_${file.name}`;
             // await file.mv(`./public${coverPhoto}`);
-            coverPhoto = `/uploads/coverImage/${req.files.coverImage[0].filename}`;
+            // coverPhoto = `/uploads/coverImage/${req.files.coverImage[0].filename}`;
+              coverPhoto = req.files.coverImage[0].key;
+            
         }
         if (req.files && req.files.qrCode) {
-            qrCode = `/uploads/qrCode/${req.files.qrCode[0].filename}`;
+            // qrCode = `/uploads/qrCode/${req.files.qrCode[0].filename}`;
+              qrCode = req.files.qrCode[0].key; 
         }
 
         const group = new Group({
@@ -179,7 +187,8 @@ exports.createGroup = async (req, res) => {
                 id: group._id,
                 name: group.g_name,
                 type: group.g_type,
-                cover: group.g_cover,
+                  cover: coverPhoto ? getSignedUrl(coverPhoto) : '/assets/images/demo.jpg',
+                    qr_code: qrCode ? getSignedUrl(qrCode) : '/assets/images/default-qr.jpg',
                 kycRequired: group.is_kyc_req,
                 description: description || '',
                 amount: group.amount,
@@ -238,23 +247,31 @@ exports.updateGroup = async (req, res) => {
         //     await file.mv(`./public${coverPhoto}`);
         // }
 
-        let coverPhoto = group.g_cover;
+      let coverPhoto = group.g_cover;
         if (req.files && req.files.coverImage) {
-            coverPhoto = `/uploads/coverImage/${req.files.coverImage[0].filename}`;
-            if (group.g_cover && group.g_cover !== './assets/images/demo.jpg') {
+            coverPhoto = req.files.coverImage[0].key;
+        
+            if (group.g_cover) {
                 try {
-                    fs.unlinkSync(path.join(__dirname, '..', 'public', group.g_cover));
+                    await s3.deleteObject({
+                        Bucket: process.env.AWS_BUCKET_NAME,
+                        Key: group.g_cover
+                    }).promise();
                 } catch (err) {
-                    console.error('Error deleting old cover photo:', err);
+                    console.error('Error deleting old cover:', err);
                 }
             }
         }
         let qrCode = group.qr_code;
         if (req.files && req.files.qrCode) {
-            qrCode = `/uploads/qrCode/${req.files.qrCode[0].filename}`;
-            if (group.qr_code && group.qr_code !== '/assets/images/default-qr.png') {
+            qrCode = req.files.qrCode[0].key;
+            
+            if (group.qr_code) {
                 try {
-                    fs.unlinkSync(path.join(__dirname, '..', 'public', group.qr_code));
+                    await s3.deleteObject({
+                        Bucket: process.env.AWS_BUCKET_NAME,
+                        Key: group.qr_code
+                    }).promise();
                 } catch (err) {
                     console.error('Error deleting old QR code:', err);
                 }
@@ -297,7 +314,8 @@ exports.updateGroup = async (req, res) => {
                 id: group._id,
                 name: group.g_name,
                 type: group.g_type,
-                cover: group.g_cover,
+                 cover: coverPhoto ? getSignedUrl(coverPhoto) : '/assets/images/demo.jpg',
+                 qr_code: qrCode ? getSignedUrl(qrCode) : '/assets/images/default-qr.jpg',
                 description: group.description,
                 amount: group.amount,
                 amount_description: group.amount_description,
@@ -325,6 +343,26 @@ exports.deleteGroup = async (req, res) => {
         if (group.user.toString() !== req.user.id) {
             return res.status(403).json({ success: false, message: 'Unauthorized to delete this group' });
         }
+        if (group.g_cover) {
+            try {
+                await s3.deleteObject({
+                    Bucket: process.env.AWS_BUCKET_NAME,
+                    Key: group.g_cover
+                }).promise();
+            } catch (err) {
+                console.error('Error deleting group cover from S3:', err);
+            }
+        }
+        if (group.qr_code) {
+            try {
+                await s3.deleteObject({
+                    Bucket: process.env.AWS_BUCKET_NAME,
+                    Key: group.qr_code
+                }).promise();
+            } catch (err) {
+                console.error('Error deleting group QR code from S3:', err);
+            }
+        }
 
         // Delete related records (optional, based on your schema)
         await Promise.all([
@@ -350,6 +388,14 @@ exports.fetchgroup = async (req, res, next) => {
             .findById(req.params.groupId)
             .populate('user', 'mobile_no');
         if (!group) { return res.status(404).json({ success: false, message: 'Group not found' }); }
+
+        // Add signed URLs if needed
+        if (group.g_cover) {
+            group.g_cover = getSignedUrl(group.g_cover);
+        }
+        if (group.qr_code) {
+            group.qr_code = getSignedUrl(group.qr_code);
+        }
 
         res.status(200).json({
             success: true,
@@ -420,7 +466,8 @@ exports.joinGroup = async (req, res) => {
                     id: group._id,
                     name: group.g_name,
                     type: group.g_type,
-                    cover: group.g_cover,
+                    cover: group.g_cover ? getSignedUrl(group.g_cover) : '/assets/images/demo.jpg',
+                    qr_code: group.qr_code ? getSignedUrl(group.qr_code) : '/assets/images/default-qr.jpg',
                     total_mem: group.total_mem
                 }
             });
@@ -659,7 +706,7 @@ exports.getGroups = async (req, res) => {
 };
 
 exports.getMyGroups = async (req, res) => {
-    try {
+   try {
         const groups = await GMem.find({ user: req.user.id })
             .populate('group', 'g_name g_type g_cover description total_mem is_kyc_req')
             .lean();
@@ -668,7 +715,7 @@ exports.getMyGroups = async (req, res) => {
             id: group.group._id,
             name: group.group.g_name,
             type: group.group.g_type,
-            cover: group.group.g_cover,
+            cover: group.group.g_cover ? getSignedUrl(group.group.g_cover) : '/assets/images/demo.jpg',
             description: group.group.description,
             totalMembers: group.group.total_mem,
             kycRequired: group.group.is_kyc_req,
@@ -1135,10 +1182,10 @@ exports.searchDiscoverGroups = async (req, res) => {
             .limit(4)
             .lean();
 
-        const formattedGroups = groups.map(g => ({
+       const formattedGroups = groups.map(g => ({
             _id: g._id,
             g_name: g.g_name,
-            g_cover: g.g_cover,
+            g_cover: g.g_cover ? getSignedUrl(g.g_cover) : '/assets/images/demo.jpg',
             description: g.description,
             g_type: g.g_type,
             total_mem: g.total_mem,
@@ -1170,12 +1217,12 @@ exports.searchMyGroups = async (req, res) => {
             })
             .lean();
 
-        const groups = memberships
+      const groups = memberships
             .filter(m => m.group)
             .map(m => ({
                 _id: m.group._id,
                 g_name: m.group.g_name,
-                g_cover: m.group.g_cover,
+                g_cover: m.group.g_cover ? getSignedUrl(m.group.g_cover) : '/assets/images/demo.jpg',
                 description: m.group.description,
                 g_type: m.group.g_type,
                 total_mem: m.group.total_mem,
