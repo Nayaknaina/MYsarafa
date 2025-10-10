@@ -5,12 +5,20 @@ const Group = require('../models/group.model');
 const Contact = require('../models/contact.model');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const axios = require("axios");
 const {getSignedUrl} = require('../middleware/multer')
 
 
 
+//** Get Login Page */
+exports.getLoginPage = (req, res) => {
+    res.render('superadmin/login', { error: null, layout: 'supermain' });
+};
+
+
 exports.login = async (req, res) => {
     try {
+         
         const { email, password } = req.body;
         if (!email || !password) {
             return res.status(400).render('superadmin/login', { error: 'Email and password required' });
@@ -18,9 +26,9 @@ exports.login = async (req, res) => {
         console.log(req.body)
         const user = await User.findOne({ email: email.toLowerCase() });
         if (!user || user.role !== 'super_admin') {
-            return res.status(401).render('superadmin/login', { error: 'Invalid credentials or not a super admin' });
+            return res.status(401).json({ message: 'Unauthorized: No user session found' });
         }
-
+      
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).render('superadmin/login', { error: 'Invalid credentials' });
@@ -41,10 +49,90 @@ exports.login = async (req, res) => {
     }
 };
 
-//** Get Login Page */
-exports.getLoginPage = (req, res) => {
-    res.render('superadmin/login', { error: null, layout: 'supermain' });
+
+exports.forgotPasswordPage = (req, res) => {
+    res.render('superadmin/forgot-password', { error: null, layout: 'supermain', success: null });
 };
+exports.sendOTP = async (req, res) => {
+  try {
+    const { mobile_no } = req.body;
+    if (!mobile_no || !/^\d{10}$/.test(mobile_no)) {
+      return res.status(400).json({ message: 'Enter valid 10-digit mobile number' });
+    }
+
+    const user = await User.findOne({ mobile_no, role: 'super_admin' });
+    if (!user) {
+      return res.status(404).json({ message: 'No super admin found with this mobile number' });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    req.session.otp = {
+      code: otp,
+      mobile_no,
+      expires: Date.now() + 10 * 60 * 1000
+    };
+
+    const fast2smsUrl = `https://www.fast2sms.com/dev/bulkV2?authorization=${process.env.FAST2SMS_API_KEY}&route=dlt&sender_id=${process.env.FAST2SMS_SENDER_ID}&message=${process.env.FAST2SMS_SMS_ID}&variables_values=${otp}&flash=0&numbers=${mobile_no}`;
+    const response = await axios.get(fast2smsUrl);
+
+    if (response.data.return === false) {
+      return res.status(400).json({ message: 'Failed to send OTP', error: response.data.message });
+    }
+
+    console.log('OTP Sent:', otp);
+    res.status(200).json({ message: 'OTP sent successfully' });
+  } catch (error) {
+    console.error('sendOTP Error:', error);
+    res.status(500).json({ message: 'Error sending OTP' });
+  }
+};
+
+exports.verifyOTP = (req, res) => {
+  const { mobile_no, otp } = req.body;
+
+  if (!req.session.otp)
+    return res.status(400).json({ message: 'No OTP session found' });
+
+  const { code, expires, mobile_no: savedMobile } = req.session.otp;
+
+  if (Date.now() > expires)
+    return res.status(400).json({ message: 'OTP expired' });
+
+  if (otp !== code || mobile_no !== savedMobile)
+    return res.status(400).json({ message: 'Invalid OTP' });
+
+  req.session.otpVerified = true;
+  res.status(200).json({ message: 'OTP verified successfully' });
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { mobile_no, password, confirmPassword } = req.body;
+
+    if (!req.session.otpVerified) {
+      return res.status(401).json({ message: 'OTP not verified' });
+    }
+
+    if (password !== confirmPassword) {
+      return res.status(400).json({ message: 'Passwords do not match' });
+    }
+
+    const user = await User.findOne({ mobile_no, role: 'super_admin' });
+    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    user.password = password; // ✅ bcrypt handled in model pre-save hook
+    await user.save();
+
+    req.session.otp = null;
+    req.session.otpVerified = null;
+
+    res.status(200).json({ message: 'Password reset successfully' });
+  } catch (error) {
+    console.error('resetPassword Error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 
 //**  Updated Dashboard    */
 exports.getDashboard = async (req, res) => {
