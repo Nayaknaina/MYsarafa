@@ -125,7 +125,6 @@
             justify-content: center;
             margin: 10px 0;
             font-size: 12px;
-           /* font-weight: 600;*/
             width: 100%;
         }
 
@@ -251,26 +250,27 @@
         .container.right-panel-active .overlay-right {
             transform: translateX(20%);
         }
-        
-      .login-with-google-btn {
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path fill='%23FFC107' d='M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z'/><path fill='%23FF3D00' d='M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z'/><path fill='%234CAF50' d='M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z'/><path fill='%231976D2' d='M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z'/></svg>");
-    text-decoration: none;
-    transition: background-color 0.3s, box-shadow 0.3s;
-    padding: 12px 16px 12px 42px;
-    border: none;
-    border-radius: 3px;
-    box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.04), 0 1px 1px rgba(0, 0, 0, 0.25);
-    color: #757575;
-    font-size: 14px;
-    font-weight: 700;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-    background-color: white;
-    background-repeat: no-repeat;
-    background-position: 6px 6px;
-    border: 1px solid #611a79;
-    margin-bottom: 20px;
-    background-size: 30px;
-}
+
+        .login-with-google-btn {
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path fill='%23FFC107' d='M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z'/><path fill='%23FF3D00' d='M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z'/><path fill='%234CAF50' d='M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z'/><path fill='%231976D2' d='M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z'/></svg>");
+            text-decoration: none;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            padding: 12px 16px 12px 42px;
+            border: none;
+            border-radius: 3px;
+            box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.04), 0 1px 1px rgba(0, 0, 0, 0.25);
+            color: #757575;
+            font-size: 14px;
+            font-weight: 700;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+            background-color: white;
+            background-repeat: no-repeat;
+            background-position: 6px 6px;
+            border: 1px solid #611a79;
+            margin-bottom: 20px;
+            background-size: 30px;
+        }
+
         @keyframes show {
 
             0%,
@@ -424,33 +424,76 @@
             color: #611a79;
         }
 
-        
-       @media (max-width: 768px) {
+        .forgot-modal {
+            position: absolute;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .forgot-modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px 30px;
+            border-radius: 12px;
+            width: 350px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .close-btn {
+            float: right;
+            cursor: pointer;
+            font-size: 22px;
+            color: #333;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
             .container {
                 width: 100%;
-                min-height: 600px;
-                flex-direction: row;
+                min-height: 750px;
+                display: flex;
+                flex-direction: column;
                 position: relative;
+                /* overflow: visible;*/
             }
-              form {
-                padding: 0;
+
+            form {
+                /* padding: 15px;*/
+                height: 128%;
             }
+
             .form-container {
-                width: 50%;
-                height: 100%;
+                position: absolute;
+                width: 100%;
+                /* height: 70%;*/
                 padding: 15px;
-                transition: all 0.6s ease-in-out;
+                transition: transform 0.6s ease-in-out, opacity 0.6s ease-in-out;
+                top: 15%;
+                z-index: 5;
+                background-color: #fff;
+                /* Ensure forms are visible */
             }
 
             .sign-in-container {
                 left: 0;
                 opacity: 1;
-                z-index: 2;
+                transform: translateX(0);
+                z-index: 5;
             }
 
             .sign-up-container {
                 left: 100%;
                 opacity: 0;
+                transform: translateX(0);
                 z-index: 1;
             }
 
@@ -467,47 +510,70 @@
             }
 
             .overlay-container {
-               /* left: 0;
-                width: 100%;
-                height: 50%;*/
-                top: auto;
-                bottom: 0;
+                position: relative;
+                /*  width: 100%;*/
+                height: 30%;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
                 z-index: 10;
-                background: #5f006d;
             }
 
             .overlay {
-                width: 200%;
-                height: 100%;
-                left: -100%;
+                width: 100%;
+                /*  height: 100%;*/
+                left: 0;
+                display: flex;
+                flex-direction: column;
+                background: transparent;
+                transform: none;
+                /*transition: none;*/
             }
 
             .overlay-panel {
-                width: 50%;
-                padding: 15px;
+                width: 100%;
+                height: 50%;
+                padding: 10px;
                 font-size: 0.9em;
-                height: 100%;
+                position: absolute;
+                transition: transform 0.6s ease-in-out, opacity 0.6s ease-in-out;
+                background: #5f006d;
             }
 
             .overlay-left {
-                transform: translateX(-20%);
+                top: 0;
+                transform: translateX(100%);
+                opacity: 0;
+                border-radius: 10px;
             }
 
             .overlay-right {
-                right: 0;
+                bottom: 0;
                 transform: translateX(0);
-            }
-
-            .container.right-panel-active .overlay {
-                transform: translateX(50%);
+                opacity: 0;
+                border-radius: 10px;
             }
 
             .container.right-panel-active .overlay-left {
-                transform: translateX(0);
+                transform: translateX(-50%);
+                opacity: 1;
             }
 
-            .container.right-panel-active .overlay-right {
-                transform: translateX(20%);
+            .container.right-panel-active.overlay-right {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+
+            .container:not(.right-panel-active) .overlay-left {
+                transform: translateX(100%);
+                /* Hidden off-screen right when sign-in is active */
+                opacity: 0;
+            }
+
+            .container:not(.right-panel-active) .overlay-right {
+                transform: translateX(0);
+                /* Visible at bottom when sign-in is active */
+                opacity: 1;
             }
 
             h1 {
@@ -515,15 +581,16 @@
                 margin-bottom: 1rem;
             }
 
-            button, .toggle-button {
+            button,
+            .toggle-button {
                 padding: 10px 30px;
                 font-size: 13px;
             }
 
-            input {
+            /* input {
                 padding: 10px;
                 font-size: 13px;
-            }
+            }*/
 
             .login-with-google-btn {
                 padding: 8px 12px 8px 36px;
@@ -554,15 +621,28 @@
             body {
                 padding: 10px;
             }
+
             form {
-                padding: 0;
+                padding: 10px;
             }
-            .container {
-                min-height: 600px;
-            }
+
+            /* .container {
+                min-height: 650px;
+            }*/
 
             .form-container {
                 padding: 10px;
+                height: 60%;
+                /*  top: 12.56%;*/
+            }
+
+            .overlay-container {
+                height: 40%;
+            }
+
+            .overlay-panel {
+                padding: 8px;
+                font-size: 0.8em;
             }
 
             h1 {
@@ -570,20 +650,23 @@
                 margin-bottom: 0.8rem;
             }
 
-            p, span, .checkbox-container {
+            p,
+            span,
+            .checkbox-container {
                 font-size: 11px;
             }
 
-            button, .toggle-button {
+            button,
+            .toggle-button {
                 padding: 8px 25px;
                 font-size: 12px;
             }
 
-            input {
+            /*    input {
                 padding: 8px;
                 font-size: 12px;
                 margin: 6px 0;
-            }
+            }*/
 
             .login-with-google-btn {
                 padding: 8px 10px 8px 29px;
@@ -619,14 +702,7 @@
             .modal-content li {
                 font-size: 12px;
             }
-
-            .overlay-panel {
-                padding: 10px;
-                /*font-size: 0.8em;*/
-            }
         }
-  
-
     </style>
 </head>
 
@@ -637,7 +713,7 @@
             <form action="#" id="signupForm">
                 <h1>Create Account 🚀</h1>
                 <div class="">
-                    <a href="#" type="button" id="googleSignupBtn" class="login-with-google-btn" >SignUp with Google</a>
+                    <a href="#" type="button" id="googleSignupBtn" class="login-with-google-btn">SignUp with Google</a>
                 </div>
                 <span>or use your email for registration</span>
                 <input type="text" id="f_name" name="f_name" placeholder="👤 Name" required />
@@ -645,9 +721,8 @@
                 <input type="email" id="email" name="email" placeholder="📧 Email" required />
                 <input type="password" id="signupPassword" name="password" placeholder="🔒 Password" required />
                 <div class="checkbox-container">
-
-                    <label for="termsCheckbox">By signing up,you agree to the <a id="termsLink">Terms of
-                            Service</a>,including Cookie Use.</label>
+                    <label for="termsCheckbox">By signing up, you agree to the <a id="termsLink">Terms of Service</a>,
+                        including Cookie Use.</label>
                 </div>
                 <button type="submit" id="signupButton">Sign Up</button>
             </form>
@@ -662,9 +737,29 @@
                 <span>or use your account</span>
                 <input type="text" id="loginEmail" name="email" placeholder="📧 Email or 📱 Phone" required />
                 <input type="password" id="loginPassword" name="password" placeholder="🔒 Password" required />
-                <a href="#">Forgot your password? 🤔</a>
+                <a href="#" id="forgotPasswordLink">Forgot your password? 🤔</a>
                 <button type="submit">Sign In</button>
             </form>
+            <!-- Forgot Password Modal -->
+            <div id="forgotPasswordModal" class="forgot-modal hidden">
+                <div class="forgot-modal-content">
+                    <span class="close-btn" id="closeForgotModal">&times;</span>
+                    <h2>Forgot Password</h2>
+                    <p>Enter your registered <b>email</b> or <b>mobile number</b> to reset your password.</p>
+
+                    <input type="text" id="forgotIdentifier" placeholder="📧 Email or 📱 Mobile" required />
+                    <button id="sendResetBtn">Send Reset</button>
+
+                    <div id="resetOtpSection" style="display:none; margin-top:10px;">
+                        <input type="text" id="resetOtp" placeholder="Enter OTP" maxlength="6" />
+                        <input type="password" id="newPassword" placeholder="Enter New Password" />
+                        <button id="verifyResetOtp">Verify & Reset</button>
+                    </div>
+
+                    <p id="forgotMessage" style="margin-top:10px; color:#007bff;"></p>
+                </div>
+            </div>
+
         </div>
         <!-- Overlay Container -->
         <div class="overlay-container">
@@ -672,13 +767,13 @@
                 <!-- Overlay Left Panel (Shown when Sign In is active) -->
                 <div class="overlay-panel overlay-left">
                     <h1>Welcome Back! 🎉</h1>
-                    <p>To keep connected with us please login with your personal info</p>
+                    <p>Login to stay connected</p>
                     <button class="ghost" id="signIn">Sign In</button>
                 </div>
                 <!-- Overlay Right Panel (Shown when Sign Up is active) -->
                 <div class="overlay-panel overlay-right">
                     <h1>Hello, Friend! ✨</h1>
-                    <p>Enter your personal details and start your journey with us</p>
+                    <p>To begin your journey</p>
                     <button class="ghost" id="signUp">Sign Up</button>
                 </div>
             </div>
@@ -754,8 +849,6 @@
             const closeModal = document.getElementById('closeModal');
             const acceptTerms = document.getElementById('acceptTerms');
 
-
-
             // Sign-up/sign-in panel toggle
             if (signUpButton && signInButton && container) {
                 signUpButton.addEventListener('click', () => {
@@ -770,27 +863,6 @@
                 console.error("Could not find one or more elements: #signUp, #signIn, #container");
             }
 
-            // Checkbox and signup button logic
-            /* if (termsCheckbox && signupButton && googleSignupBtn) {
-                 signupButton.disabled = true;
-                 googleSignupBtn.disabled = true;
-                termsCheckbox.addEventListener('change', () => {
-                     console.log('Terms checkbox changed, checked:', termsCheckbox.checked);
-                     signupButton.disabled = !termsCheckbox.checked;
-                     googleSignupBtn.disabled = !termsCheckbox.checked;
-                 });
-                 const signupForm = document.getElementById('signupForm');
-                 signupForm.addEventListener('submit', (e) => {
-                     console.log('Signup form submitted, terms checked:', termsCheckbox.checked);
-                     if (!termsCheckbox.checked) {
-                         e.preventDefault();
-                         toastr.error('You must agree to the Terms and Conditions to sign up.');
-                     }
-                 });
-             } else {
-                 console.error("Could not find termsCheckbox or signupButton");
-             }
- */
             // Modal logic
             if (termsLink && termsModal && closeModal && acceptTerms) {
                 termsLink.addEventListener('click', (e) => {
@@ -799,7 +871,7 @@
                     termsModal.style.display = 'flex';
                     setTimeout(() => {
                         termsModal.classList.add('show');
-                    }, 10); // Small delay to ensure display: flex is applied before transition
+                    }, 10);
                     termsModal.focus();
                 });
                 closeModal.addEventListener('click', () => {
@@ -834,13 +906,90 @@
                         }, 300);
                     }
                 });
-                // Ensure modal is hidden initially
                 termsModal.style.display = 'none';
             } else {
                 console.error("Could not find termsLink, termsModal, closeModal, or acceptTerms");
             }
         });
     </script>
+    <script>
+        document.getElementById("forgotPasswordLink").addEventListener("click", () => {
+            document.getElementById("forgotPasswordModal").style.display = "block";
+        });
+
+        document.getElementById("closeForgotModal").addEventListener("click", () => {
+            document.getElementById("forgotPasswordModal").style.display = "none";
+        });
+
+        document.getElementById("sendResetBtn").addEventListener("click", async () => {
+            const identifier = document.getElementById("forgotIdentifier").value.trim();
+            const msg = document.getElementById("forgotMessage");
+            msg.textContent = "";
+
+            if (!identifier) {
+                msg.textContent = "Please enter your email or mobile number";
+                return;
+            }
+
+            try {
+                const res = await fetch("/auth/forgot-password/send-otp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ identifier, purpose: "forgot_password" })
+                });
+                const data = await res.json();
+                console.log(data);
+
+
+                if (res.ok) {
+                    msg.textContent = data.message;
+                    if (!identifier.includes("@")) {
+                        // If mobile, show OTP section
+                        document.getElementById("resetOtpSection").style.display = "block";
+                    }
+                } else {
+                    msg.textContent = data.message || "Something went wrong.";
+                }
+            } catch (err) {
+                console.error("printing the err", err);
+                msg.textContent = "Error connecting to server.";
+            }
+        });
+
+        document.getElementById("verifyResetOtp").addEventListener("click", async () => {
+            const otp = document.getElementById("resetOtp").value.trim();
+            const newPassword = document.getElementById("newPassword").value.trim();
+            const msg = document.getElementById("forgotMessage");
+
+            if (!otp || !newPassword) {
+                msg.textContent = "Enter OTP and new password.";
+                return;
+            }
+
+            try {
+                const res = await fetch("/auth/forgot-password/verify-otp", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ otp, newPassword, purpose: "forgot_password" })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    msg.textContent = data.message;
+                    msg.style.color = "green";
+                    setTimeout(() => {
+                        document.getElementById("forgotPasswordModal").style.display = "none";
+                    }, 2000);
+                } else {
+                    msg.textContent = data.message || "Invalid OTP.";
+                }
+            } catch (err) {
+                console.error(err);
+                msg.textContent = "Error verifying OTP.";
+            }
+        });
+    </script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="/js/main.js"></script>
 </body>

@@ -194,7 +194,7 @@ margin-left: 35%;
                             </div>
                         </div>
                         <div id="discoverGroupsList">
-                        <p id="discoverNoResults" style="display: none;">No public communities available to join.</p>
+                          <p id="discoverNoResults" style="display: none;">No public communities available to join.</p>
                             {{#each discoverGroups}}
                             <div class="group-card" data-group-name="{{this.g_name}}">
                                 <img src="{{this.g_cover}}" alt="{{this.g_name}} Image" class="group-image">
@@ -209,6 +209,12 @@ margin-left: 35%;
                                     <button class="join-group-btn" data-group-id="{{_id}}">Join Community</button>
                                     {{/if}}
                                 </div>
+                                  <div class="group-actions">
+                                     <button class="more-options-btn" aria-label="More options">•••</button>
+                                     <div class="more-options-menu" style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ddd; border-radius: 8px; padding: 8px;">
+                                     <button class="see-group-btn" data-group-id="{{_id}}">See Group</button>
+                                  </div>
+                                  </div>
                             </div>
                             {{/each}}
                         </div>
@@ -243,6 +249,12 @@ margin-left: 35%;
                                
                                 
                             </div>
+                            <div class="group-actions">
+                                     <button class="more-options-btn" aria-label="More options">•••</button>
+                                     <div class="more-options-menu" style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ddd; border-radius: 8px; padding: 8px;">
+                                     <button class="see-group-btn" data-group-id="{{_id}}">See Group</button>
+                                     </div>
+                             </div>
                         </div>
                        
                         {{/each}}
@@ -567,6 +579,12 @@ margin-left: 35%;
                         
 
                     </div>
+                    <div class="group-actions">
+                        <button class="more-options-btn" aria-label="More options">•••</button>
+                        <div class="more-options-menu" style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ddd; border-radius: 8px; padding: 8px;">
+                            <button class="see-group-btn" data-group-id="${group._id}">See Group</button>
+                        </div>
+                    </div>
                 `;
                 container.appendChild(groupCard);
             });
@@ -611,6 +629,34 @@ margin-left: 35%;
                 const query = e.target.value.trim();
                 fetchGroups('/Groups/search/my', query, 'myGroupsList', 'myGroupsNoResults', false);
             }, 300));
+        });
+
+        // Click on group title to navigate to group details
+        document.querySelectorAll('.group-title').forEach(title => {
+            title.style.cursor = 'pointer';
+            title.addEventListener('click', () => {
+                const groupId = title.closest('.group-card').querySelector('[data-group-id]')?.dataset.groupId;
+                if (groupId) {
+                    window.location.href = `/Groups/group-info/${groupId}`;
+                }
+            });
+        });
+
+        // 3 dots menu
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('more-options-btn')) {
+                const menu = e.target.nextElementSibling;
+                menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            } else if (e.target.classList.contains('see-group-btn')) {
+                const groupId = e.target.dataset.groupId;
+                if (groupId) {
+                    window.location.href = `/Groups/group-info/${groupId}`;
+                }
+            } else {
+                document.querySelectorAll('.more-options-menu').forEach(menu => {
+                    menu.style.display = 'none';
+                });
+            }
         });
     </script>
 

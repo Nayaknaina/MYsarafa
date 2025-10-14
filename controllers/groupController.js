@@ -5,6 +5,7 @@ const User = require('../models/user.model');
 const Group = require('../models/group.model');
 const GMem = require('../models/groupMem.model');
 const GroupQue = require('../models/groupQue.model');
+const Announcement = require('../models/announcement.model');
 const pdfParse = require('pdf-parse');
 const csv = require('csv-parser');
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
@@ -570,6 +571,96 @@ exports.joinGroup = async (req, res) => {
         return res.status(500).json({ success: false, message: 'Something went wrong, please try again later' });
     }
 };
+
+exports.groupDetails = async (req, res) => {
+  try {
+    const groupId = req.params.groupId;
+    const user = await User.findById(req.user.id).lean();
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (!mongoose.isValidObjectId(groupId)) {
+      return res.status(400).json({ success: false, message: 'Invalid group ID' });
+    }
+
+    const group = await Group.findById(groupId).lean();
+    if (!group) {
+      return res.status(404).json({ success: false, message: 'Group not found' });
+    }
+
+   
+    const membership = await GMem.findOne({ group: groupId, user: user._id }).lean();
+    if (group.g_type === 'private' && (!membership || membership.type === 'pending')) {
+      return res.status(403).json({ success: false, message: 'You do not have access to this private group' });
+    }
+    let members = await GMem.find({ group: groupId, type: { $ne: 'pending' } })
+      .populate('user', 'name email mobile profile_pic') // Assuming User model has these fields
+      .lean();
+
+    members = members.map(m => ({
+      ...m,
+      user: {
+        ...m.user,
+        profile_pic: m.user.profile_pic ? getSignedUrl(m.user.profile_pic) : '/assets/images/default-profile.jpg'
+      }
+    }));
+
+
+   let announcements = await Announcement.find({ group: groupId })
+    .sort({ createdAt: -1 })
+    .populate('createdBy', 'f_name l_name profilePicture')
+    .lean();
+
+  announcements = announcements.map(a => {
+  const fullName = `${a.createdBy.f_name || ''} ${a.createdBy.l_name || ''}`.trim() || 'Unknown User';
+
+  return {
+    ...a,
+    createdBy: {
+      ...a.createdBy,
+      full_name: fullName,
+      profile_pic: (a.createdBy.profilePicture && !a.createdBy.profilePicture.startsWith('/assets/'))
+        ? getSignedUrl(a.createdBy.profilePicture)
+        : '/assets/images/default-profile.jpg'
+    },
+    image: (a.image && !a.image.startsWith('/assets/') && !a.image.startsWith('/uploads/'))
+      ? getSignedUrl(a.image)
+      : a.image || '/assets/images/demo.jpg'
+     };
+    });
+    console.log("Fetched announcements:", announcements);
+    
+
+        if (group.g_cover && !group.g_cover.startsWith('/assets/')) {
+        group.g_cover = getSignedUrl(group.g_cover);
+        } else {
+        group.g_cover = '/assets/images/demo.jpg';
+        }
+
+        if (group.qr_code && !group.qr_code.startsWith('/assets/')) {
+        group.qr_code = getSignedUrl(group.qr_code);
+        } else {
+        group.qr_code = '/assets/images/default-qr.jpg';
+        }
+
+    res.render('group-info', {
+      user,
+      group,
+      members,
+      announcements,
+      hasAnnouncements: announcements.length > 0,
+      isMember: !!membership,
+      isAdmin: membership && membership.type === 'admin',
+      layout: false
+    });
+  } catch (error) {
+    console.error('Error rendering group details:', error);
+    res.status(500).json({ success: false, message: 'Server error: ' + error.message });
+  }
+};
+
 
 exports.approveRequest = async (req, res) => {
     try {

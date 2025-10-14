@@ -124,21 +124,21 @@
                                 <div class="account-wrap">
                                     <div class="account-item clearfix js-item-menu">
                                         <div class="image">
-                                            <img src="{{superadmin.profilePicture}}" alt="profile picture" />
+                                            <img src="{{userProfile.profilePicture}}" alt="{{userProfile.name}}" />
                                         </div>
                                         <div class="content">
-                                            <a class="js-acc-btn" href="#">{{superadmin.f_name}}</a>
+                                            <a class="js-acc-btn" href="#">{{userProfile.name}} {{superadmin.l_name}}</a>
                                         </div>
                                         <div class="account-dropdown js-dropdown">
                                             <div class="info clearfix">
                                                 <div class="image">
                                                     <a href="#">
-                                                        <img src="{{superadmin.profilePicture}}" alt="superadmin profile" />
+                                                        <img src="{{userProfile.profilePicture}}" alt="superadmin profile" />
                                                     </a>
                                                 </div>
                                                 <div class="content">
                                                     <h5 class="name">
-                                                        <a href="#">{{superadmin.f_name}}</a>
+                                                        <a href="#">{{userProfile.name}} {{superadmin.l_name}}</a>
                                                     </h5>
                                                     <span class="email">{{superadmin.email}}</span>
                                                 </div>

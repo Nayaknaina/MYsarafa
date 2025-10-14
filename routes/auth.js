@@ -16,6 +16,11 @@ router.get('/google/callback', passport.authenticate('google', { failureRedirect
 
 router.post('/send-otp', authMiddleware, authController.sendOTP);
 router.post('/verify-otp', authMiddleware, authController.verifyOTP);
+
+router.post('/forgot-password/send-otp', authController.sendOTP);
+router.post('/forgot-password/verify-otp', authController.verifyOTP);
+
+
 router.post('/set-password', authMiddleware, authController.setPassword);
 
 module.exports = router;

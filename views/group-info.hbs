@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{group.g_name}} - Group Details</title>
+
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="canonical" href="https://app.mysarafa.com/">
+</head>
+<style>
+    .main-content {
+        flex: 1;
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Group Header */
+    .group-header {
+        position: relative;
+        margin-bottom: 60px;
+    }
+
+    .group-cover {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .group-name {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        color: rgb(0, 0, 0);
+        /*font-size: 2.5em;*/
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .group-type {
+        position: absolute;
+        bottom: 0;
+        left: 20px;
+        color: rgb(103, 100, 100);
+        /*font-size: 1.2em;*/
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .joined-btn,
+    .join-btn {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .join-btn {
+        background: #1877f2;
+        color: white;
+        border: none;
+    }
+
+    .joined-btn {
+        background: #e7e9ed;
+        color: #050505;
+        border: 1px solid #ddd;
+    }
+
+    /* Group Tabs */
+    .group-tabs {
+        position: relative;
+        display: flex;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 20px;
+    }
+
+    .group-tabs a {
+        padding: 12px 20px;
+        color: #65676b;
+        text-decoration: none;
+        font-weight: 600;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s;
+    }
+
+    .group-tabs a:hover,
+    .group-tabs a.active {
+        color: #1877f2;
+        border-bottom: 2px solid #1877f2;
+    }
+
+    /* Layout for Content and Aside */
+    .group-content {
+        display: flex;
+        gap: 20px;
+    }
+
+    .group-about {
+        width: 30%;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .group-about h2 {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+        color: #050505;
+    }
+
+    .group-about p {
+        color: #65676b;
+        font-size: 0.9em;
+    }
+
+    /* Discussion Section */
+    .group-discussion {
+        width: 70%;
+    }
+    .group-layout {
+        
+    display: flex;
+    align-items: flex-start;
+    gap: 25px;
+    margin-top: 20px;
+
+    }
+    .group-about-box {
+       
+    flex: 1;
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: 1px solid #ddd;
+    max-height: 500px;
+    overflow-y: auto;
+    position: sticky;
+    top: 100px; /* stays visible when scrolling */
+
+    }
+
+
+    .group-discussion h2 {
+        font-size: 1.5em;
+        margin-bottom: 15px;
+    }
+
+    /* Announcement Card styled like Facebook Post */
+    .announcement-card {
+        background: white;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .announcement-header {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid #ebedf0;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 12px;
+        object-fit: cover;
+    }
+
+    .announcement-header .user-info {
+        flex: 1;
+    }
+
+    .user-name {
+        font-size: 15px;
+        font-weight: 600;
+        color: #050505;
+        display: block;
+    }
+
+    .post-date {
+        font-size: 13px;
+        color: #65676b;
+        display: block;
+    }
+
+    /* Improved Announcement Post Layout */
+    .announcement-card {
+        background: #fff;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        border: 1px solid #ddd;
+    }
+
+    .announcement-header {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid #ebedf0;
+    }
+
+    .announcement-header .user-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .announcement-header .user-name {
+        font-weight: 600;
+        font-size: 15px;
+        color: #050505;
+    }
+
+    .announcement-header .post-date {
+        font-size: 13px;
+        color: #65676b;
+    }
+
+    .announcement-content {
+        padding: 12px 16px;
+        font-size: 15px;
+        color: #050505;
+        line-height: 1.5;
+    }
+
+    .announcement-content h3 {
+        font-size: 17px;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .announcement-images {
+
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 5px;
+        padding: 10px;
+    }
+
+    .announcement-images img {
+        width: 100%;
+        border-radius: 6px;
+        object-fit: cover;
+
+    }
+
+    /* Buttons like Facebook */
+    .announcement-actions {
+        display: flex;
+        border-top: 1px solid #ebedf0;
+    }
+
+    .announcement-actions button {
+        flex: 1;
+        background: none;
+        border: none;
+        padding: 12px;
+        color: #65676b;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .announcement-actions button:hover {
+        background: #f0f2f5;
+        border-radius: 8px;
+    }
+
+    .announcement-actions i {
+        margin-right: 6px;
+        font-size: 16px;
+    }
+
+
+    /* People Section */
+    .group-people {
+        width: 70%;
+    }
+
+    .group-people h2 {
+        font-size: 1.5em;
+        margin-bottom: 15px;
+    }
+
+    .member-card {
+        display: flex;
+        align-items: center;
+        background: white;
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 10px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .member-card img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        margin-right: 15px;
+    }
+
+    .member-card span:first-of-type {
+        flex: 1;
+        font-weight: bold;
+        color: #050505;
+    }
+
+    .member-card span:last-of-type {
+        color: #65676b;
+        font-size: 0.9em;
+    }
+
+    /* Hide sections by default except discussion */
+    #people,
+    #events,
+    #media,
+    #files {
+        display: none;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+         .group-layout {
+        flex-direction: column;
+    }
+
+    .group-about-box {
+        max-height: none;
+        position: relative;
+        top: 0;
+        width: 100%;
+    }
+        .main-container {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+            border-right: none;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .group-content {
+            flex-direction: column;
+        }
+
+        .group-about,
+        .group-discussion,
+        .group-people {
+            width: 100%;
+        }
+
+        .group-cover {
+            height: 200px;
+        }
+
+        .group-name {
+            font-size: 1.8em;
+        }
+
+        .group-tabs {
+            overflow-x: auto;
+        }
+
+        .announcement-actions {
+            margin: 0;
+        }
+
+        .announcement-actions button {
+            font-size: 13px;
+            padding: 10px;
+        }
+    }
+</style>
+
+
+<body>
+    {{> header}}
+
+    <div class="main-container">
+        {{> sidebar}}
+
+        <main class="main-content">
+            <!-- Group Header -->
+            <div class="group-header">
+                <img src="{{group.g_cover}}" alt="{{group.g_name}} cover" class="group-cover">
+
+                {{#if isMember}}
+                <button class="joined-btn">Joined</button>
+                {{else}}
+                <button class="join-btn">Join Group</button>
+                {{/if}}
+            </div>
+
+
+            <nav class="group-tabs">
+                <h1 class="group-name">{{group.g_name}}</h1>
+                <p class="group-type">{{group.g_type}} group · {{group.total_mem}} members</p>
+            </nav>
+            <!-- Tabs -->
+            <nav class="group-tabs">
+                <a href="#discussion">Discussion</a>
+                <a href="#people">People</a>
+                <a href="#events">Events</a>
+                <a href="#media">Media</a>
+                <a href="#files">Files</a>
+            </nav>
+
+            <div class="group-layout">
+
+                <!-- Main Content: Announcements -->
+                <section id="discussion" class="group-discussion">
+                  
+                    {{#if hasAnnouncements}}
+                    {{#each announcements}}
+                    <div class="announcement-card">
+                        <!-- Header -->
+                        <div class="announcement-header">
+                            <img src="{{this.createdBy.profile_pic}}" alt="{{this.createdBy.full_name}}"
+                                class="user-avatar">
+                            <div class="user-info">
+                                <span class="user-name">{{this.createdBy.full_name}}</span>
+                                <span class="post-date">{{formatDate this.createdAt}}</span>
+                            </div>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="announcement-content">
+                            <h3>{{this.title}}</h3>
+                            {{{this.message}}} <!-- Allows rich text like links, paragraphs -->
+                            {{#if this.meetingLink}}
+                            <p><a href="{{this.meetingLink}}" target="_blank">Join Meeting</a></p>
+                            {{/if}}
+                        </div>
+
+                        <!-- Image Grid -->
+                        {{#if this.image}}
+
+                        <div class="announcement-images">
+
+                            <img src="{{this.image}}" alt="Announcement Image">
+
+                        </div>
+                        {{/if}}
+
+                        <!-- Actions -->
+                        <div class="announcement-actions">
+                            <button class="like"><i class="fa-regular fa-thumbs-up"></i> Like</button>
+                            <button class="comment"><i class="fa-regular fa-comment"></i> Comment</button>
+                            <button class="share"><i class="fa-solid fa-share"></i> Share</button>
+                        </div>
+                    </div>
+                    {{/each}}
+                    {{else}}
+                    <p>No announcements yet.</p>
+                    {{/if}}
+                </section>
+
+                <aside class="group-about-box">
+                    <h2>About</h2>
+                    <p>{{group.description}}</p>
+                    <hr>
+                    <p><strong>Type:</strong> {{group.g_type}}</p>
+                    <p><strong>Members:</strong> {{group.total_mem}}</p>
+                    <p><strong>Created:</strong> {{formatDate group.createdAt}}</p>
+                    <p><strong>Location:</strong> {{group.location}}</p>
+                    <p><strong>Admin:</strong> {{group.createdBy.full_name}}</p>
+                </aside>
+
+                <!-- People Section -->
+                <section id="people" class="group-people" style="display: none;">
+                    <h2>Members ({{group.total_mem}})</h2>
+                    {{#each members}}
+                    <div class="member-card">
+                        <img src="{{this.user.profile_pic}}" alt="{{this.user.name}}">
+                        <span>{{this.user.name}}</span>
+                        <span>{{#if (eq this.type 'admin')}}Admin{{else}}Member{{/if}}</span>
+                    </div>
+                    {{/each}}
+                </section>
+            </div>
+            <!-- Add other sections like Events, Media, Files as needed -->
+
+        </main>
+    </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="/js/all.js"></script>
+
+    <script>
+        // Simple tab switching
+        document.querySelectorAll('.group-tabs a').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = e.target.href.split('#')[1];
+                document.querySelectorAll('.group-content section').forEach(sec => {
+                    sec.style.display = sec.id === targetId ? 'block' : 'none';
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

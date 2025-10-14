@@ -35,7 +35,7 @@ exports.dashboard = async (req, res, next) => {
       .map(m => ({
         _id: m.group._id,
         g_name: m.group.g_name,
-      g_cover: m.group.g_cover ? getSignedUrl(m.group.g_cover) : '/assets/images/demo.jpg',
+        g_cover: m.group.g_cover ? getSignedUrl(m.group.g_cover) : '/assets/images/demo.jpg',
         description: m.group.description,
         g_type: m.group.g_type,
         total_mem: m.group.total_mem,
@@ -394,8 +394,8 @@ exports.dashboard = async (req, res, next) => {
 
 exports.updateProfile = async (req, res) => {
     try {
-        console.log("=== Update Profile Start ===");
-        console.log("User ID from token:", req.user.id);
+        // console.log("=== Update Profile Start ===");
+        // console.log("User ID from token:", req.user.id);
 
         const user = await User.findById(req.user.id);
         if (!user) {
@@ -518,8 +518,6 @@ exports.updateProfile = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error: ' + error.message });
     }
 };
-
-
 
 exports.getMemberDetails = async (req, res, next) => {
   try {

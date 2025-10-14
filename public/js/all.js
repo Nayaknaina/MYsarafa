@@ -1273,9 +1273,9 @@ document.addEventListener('DOMContentLoaded', function () {
           sendOtpBtn.disabled = true;
           sendOtpBtn.textContent = 'Sending...';
           const response = await fetch('/auth/send-otp', {
-            method: 'POST',
+           method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mobile_no }),
+            body: JSON.stringify({ mobile_no, purpose: "verify_mobile" }),
             credentials: 'include'
           });
 
@@ -1318,7 +1318,7 @@ document.addEventListener('DOMContentLoaded', function () {
           const response = await fetch('/auth/send-otp', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ mobile_no }),
+            body: JSON.stringify({ mobile_no, purpose: "verify_mobile" }),
             credentials: 'include'
           });
 

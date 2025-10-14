@@ -25,6 +25,8 @@ router.put('/update/:groupId',authMiddleware,upload.fields([
 router.delete('/group/:id', authMiddleware, groupController.deleteGroup);
 
 router.post('/join', authMiddleware, groupController.joinGroup);
+router.get('/group-info/:groupId',authMiddleware,profileImageMiddleware,groupController.groupDetails);
+
 router.get('/pending-requests', authMiddleware, groupController.pendingRequests);
 router.post('/approve-request/:requestId', authMiddleware, groupController.approveRequest);
 
