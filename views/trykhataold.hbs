@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{customer.name}} - Mysarafa</title>
+  <link rel="stylesheet" href="/css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f5f5;
+      overflow-x: hidden;
+    }
+
+    /* -------------------------------------------------
+       MOBILE 
+       ------------------------------------------------- */
+    .mobile-container {
+      max-width: 480px;
+      margin: 0 auto;
+      background: white;
+      min-height: 100vh;
+    }
+
+    /* Desktop layout – hidden on mobile */
+    .desktop-layout {
+      display: none;
+    /*  height: 100vh;*/
+      width: 100%;
+    }
+
+    /* -------------------------------------------------
+       COMMON STYLES (used by both mobile & desktop)
+       ------------------------------------------------- */
+    .header-mobile,
+    .header-details-panel {
+      background: #1976d2;
+      color: white;
+      padding: 12px 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 18px;
+    }
+
+    .back-btn {
+      color: white;
+      font-size: 20px;
+    }
+
+    .customer-name {
+      font-weight: 600;
+    }
+
+    .balances {
+      display: flex;
+      justify-content: space-around;
+      padding: 15px 10px;
+      background: white;
+      border-bottom: 1px solid #eee;
+    }
+
+    .bal-box {
+      text-align: center;
+      padding: 10px;
+      border-radius: 8px;
+      flex: 1;
+      margin: 0 5px;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .bal-label {
+      font-size: 12px;
+      color: #555;
+      text-transform: uppercase;
+    }
+
+    .bal-value {
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 4px;
+    }
+
+    .cash {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .gold {
+      background: #fff8e1;
+      color: #f9a825;
+    }
+
+    .silver {
+      background: #eceff1;
+      color: #546e7a;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: space-around;
+      padding: 10px;
+      background: #fafafa;
+      border-bottom: 1px solid #eee;
+    }
+
+    .action-btn {
+      padding: 8px 12px;
+      font-size: 14px;
+      border-radius: 6px;
+      background: white;
+      border: 1px solid #ddd;
+      cursor: pointer;
+    }
+
+    .entries {
+      padding: 15px;
+      flex-grow: 1;
+    }
+
+    .entry-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: #fff;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .entry-date {
+      font-size: 12px;
+      color: #777;
+    }
+
+    .entry-bal {
+      font-size: 13px;
+      color: #555;
+    }
+
+    .entry-amount {
+      font-weight: bold;
+      font-size: 16px;
+      color: #c62828;
+    }
+
+    .you-got {
+      color: #2e7d32;
+    }
+
+    .no-entries {
+      text-align: center;
+      padding: 40px 20px;
+      color: #777;
+    }
+
+    .add-hint {
+      color: #1976d2;
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .add-panel {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      padding: 15px;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+      border-top: 1px solid #ddd;
+      display: none;
+    }
+
+    /* ==================== Add Panel (Half Visible When Minimized) ==================== */
+    .add-panel-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-top: 1px solid #ddd;
+      box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .add-panel-header {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
+      min-height: 56px;
+      position: relative;
+    }
+
+    .open-btn {
+      width: 36px;
+      height: 36px;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+      transition: transform 0.2s ease;
+    }
+
+    .open-btn:hover {
+      transform: scale(1.05);
+    }
+
+    .select-type {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .minimize-btn {
+      width: 36px;
+      height: 36px;
+      background: #e9ecef;
+      color: #6c757d;
+      border: none;
+      border-radius: 50%;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-left: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .minimize-btn:hover {
+      background: #dee2e6;
+      color: #495057;
+      transform: scale(1.05);
+    }
+
+    .add-panel-body {
+      padding: 20px 16px 24px;
+      background: white;
+      transition: all 0.3s ease;
+    }
+
+    .type-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      border: 1px solid #ddd;
+      background: #f0f0f0;
+      cursor: pointer;
+    }
+
+    .type-btn.active {
+      background: #1976d2;
+      color: white;
+      border-color: #1976d2;
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .input-group input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    .gave-got-btn {
+      padding: 12px;
+      flex: 1;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .gave {
+      background: #fdecea;
+      color: #c62828;
+      border-color: #ffcdd2;
+    }
+
+    .got {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-color: #c8e6c9;
+    }
+
+    .gave-got-btn.active {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      font-weight: 900;
+      border-width: 2px;
+    }
+
+    .save-btn {
+      background: #1976d2;
+      color: white;
+      border: none;
+      padding: 12px;
+      width: 100%;
+      border-radius: 6px;
+      font-size: 16px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    /* ==================== MINIMIZED STATE ==================== */
+    .add-panel-container.minimized .add-panel-body {
+      transform: translateY(100%);
+      opacity: 0;
+      height: 0;
+      overflow: hidden;
+      padding: 0;
+      margin: 0;
+    }
+
+    /* ==================== DESKTOP ADJUSTMENTS ==================== */
+    @media (min-width: 768px) {
+      .add-panel-container {
+        left: auto;
+        right: 0;
+        width: 50%;
+        max-width: 480px;
+        border-radius: 16px 16px 0 0;
+        box-shadow: -8px -4px 24px rgba(0, 0, 0, 0.12);
+      }
+
+      .add-panel-header {
+        padding: 16px 20px;
+        min-height: 64px;
+      }
+
+      .open-btn,
+      .minimize-btn {
+        width: 40px;
+        height: 40px;
+        font-size: 22px;
+      }
+    }
+
+    /* -------------------------------------------------
+       DESKTOP ONLY – NEW STYLES (exact from screenshot)
+       ------------------------------------------------- */
+    @media (min-width: 768px) {
+      .mobile-container {
+        display: none;
+      }
+
+      .desktop-layout {
+        display: flex;
+      }
+
+      /* ---------- Sidebar ---------- */
+      .sidebar-panel {
+        width: 520px;
+        background: #fff;
+        border-right: 1px solid #eee;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+        position: relative; /* For footer positioning */
+        padding-bottom: 80px;
+      }
+
+      .sidebar-header {
+        background: #1976d2;
+        color: white;
+        padding: 10px;
+       /* font-size: 20px;*/
+        font-weight: 600;
+        text-align: center;
+      }
+        .sidebar-footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 20px;
+    background: white;
+    border-top: 1px solid #eee;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    z-index: 10;
+  }
+
+  .bulk-upload-btn,
+  .add-customer-btn {
+    padding: 10px 16px;
+    font-size: 14px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+
+  .bulk-upload-btn {
+    background: white;
+    color: #1976d2;
+    border: 1.5px solid #1976d2;
+  }
+
+  .bulk-upload-btn:hover {
+    background: #e3f2fd;
+    transform: translateY(-1px);
+  }
+
+  .add-customer-btn {
+    background: #1976d2;
+    color: white;
+    border: none;
+  }
+
+  .add-customer-btn:hover {
+    background: #1565c0;
+    transform: translateY(-1px);
+  }
+      .total-summary {
+        display: flex;
+        justify-content: space-around;
+        padding: 10px;
+        background: #e8f5e9;
+        gap: 0px;
+      }
+
+      .total-item {
+        text-align: center;
+      }
+
+      .total-label-cash {
+        font-size: 24px;
+        font-weight: bold;
+        color: #2e7d32;
+      }
+
+      .total-label-silver {
+        font-size: 24px;
+        font-weight: bold;
+        color: #546e7a;
+      }
+
+      .total-label-gold {
+        font-size: 24px;
+        font-weight: bold;
+        color: #f9a825;
+      }
+
+      .total-value {
+        font-weight: bold;
+        font-size: 18px;
+        margin-top: 4px;
+      }
+
+      .search-filters {
+        padding: 16px 20px;
+        border-bottom: 1px solid #eee;
+        background: #fafafa;
+        display: grid;
+        grid-template-columns: 1fr 120px 120px;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .search-box input {
+        width: 100%;
+        padding: 12px 12px 12px 36px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 15px;
+        background: #fff;
+      }
+
+      .search-box i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+        font-size: 15px;
+      }
+
+      .filter-select,
+      .sort-select {
+        padding: 11px 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        background: #fff;
+        color: #555;
+      }
+
+      .customer-list {
+        flex: 1;
+        overflow-y: auto;
+      }
+
+      .customer-item {
+        display: flex;
+        align-items: center;
+        padding: 5px 15px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+      }
+
+      .customer-item:hover {
+        background: #f9f9f9;
+      }
+
+      .avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #1976d2;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-right: 12px;
+        font-size: 18px;
+      }
+
+      /* ---------- Detail Panel ---------- */
+      .detail-panel {
+        flex: 1;
+        background: #fafafa;
+        overflow-y: auto;
+        padding: 0 0px;
+      }
+
+      .detail-header-name {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 24px;
+        font-weight: 600;
+        padding: 9.5px 5px;
+      }
+
+      .detail-header-name .avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #1976d2;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 18px;
+      }
+
+      .detail-panel .back-btn {
+        font-size: 24px;
+      }
+
+      .detail-panel .customer-name {
+        font-size: 24px;
+      }
+
+      .detail-panel .balances {
+        padding: 19.5px 0;
+        /* gap: 25px; */
+        justify-content: center;
+      }
+
+      .detail-panel .bal-box {
+        flex: 0 1 180px;
+        padding: 4px;
+      }
+
+      .detail-panel .bal-value {
+        font-size: 24px;
+      }
+
+      /* ====================== REMINDER SECTION (exact from screenshot) ====================== */
+      .reminder-section {
+        padding: 0.75rem 1rem 0.375rem;
+        display: flex;
+        -webkit-box-pack: justify;
+        justify-content: space-evenly;
+        background: rgb(239 239 239);
+      }
+
+      .reminder-label {
+        font-size: 15px;
+        color: #555;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        line-height: 1.429;
+        letter-spacing: 0.15px;
+      }
+
+      .reminder-label::before {
+        content: "";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        color: #fb8c00;
+      }
+
+      .reminder-buttons {
+        display: flex;
+        -webkit-box-pack: justify;
+        justify-content: space-between;
+        flex-direction: row;
+        /* display: flex
+; */
+        /* justify-content: center; */
+        gap: 16px;
+        /* flex-wrap: wrap;*/
+      }
+
+      .reminder-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        padding: 12px 20px;
+        border: 1px solid #ddd;
+        background: white;
+        border-radius: 12px;
+        cursor: pointer;
+        min-width: 130px;
+        font-size: 14px;
+        color: #333;
+        transition: all 0.2s ease;
+      }
+
+      .reminder-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .reminder-btn.whatsapp {
+        border-color: #25d366;
+        color: #25d366;
+      }
+
+      .reminder-btn.sms {
+        border-color: #1976d2;
+        color: #1976d2;
+      }
+
+      .reminder-btn i {
+        font-size: 24px;
+        width: 20px !important;
+        height: 20px !important;
+
+      }
+
+      .reminder-btn .from {
+        font-size: 12px;
+        color: #777;
+      }
+
+      .detail-panel .entries {
+        padding: 25px 0;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      .detail-panel .entry-item {
+        padding: 18px 22px;
+      }
+
+      .detail-panel .entry-amount {
+        font-size: 18px;
+      }
+
+      .fab {
+        left: auto;
+        right: 30px;
+        bottom: 30px;
+        width: 64px;
+        height: 64px;
+        font-size: 28px;
+      }
+
+      .add-panel {
+        left: auto;
+        right: 0;
+        width: 50%;
+        max-width: 100%;
+        border-radius: 12px 12px 0 0;
+        box-shadow: -4px -2px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .empty-state-list {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 20px;
+        text-align: center;
+        color: #777;
+        height: 100%;
+      }
+
+      .empty-image {
+        width: 200px;
+        height: 200px;
+        object-fit: contain;
+        margin-bottom: 24px;
+        border-radius: 50%;
+        background: #f0f4f8;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      .empty-text {
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+
+      .empty-subtext {
+        font-size: 14px;
+        color: #999;
+        margin-bottom: 32px;
+      }
+
+      .no-customer {
+        text-align: center;
+        color: #bbb;
+      }
+
+      .no-customer-icon {
+        font-size: 60px;
+        margin-bottom: 12px;
+      }
+
+      .no-customer-text {
+        font-size: 16px;
+      }
+
+      /* NO CUSTOMER SELECTED STATE */
+      .no-customer-state {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #bbb;
+        font-size: 18px;
+        background: #fafafa;
+        height: 100%;
+      }
+
+      .no-customer-icon {
+        font-size: 80px;
+        margin-bottom: 16px;
+        color: #ddd;
+      }
+
+      .no-customer-text {
+        font-weight: 500;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  {{> header}}
+
+  <div class="main-container">
+    <!-- Sidebar -->
+    {{> sidebar}}
+
+    <!-- ==================== MOBILE VIEW (unchanged) ==================== -->
+    <div class="mobile-container">
+      <div class="container">
+        <div class="header-mobile">
+          <a href="/" class="back-btn">Back</a>
+          <div class="customer-name">{{customer.name}}</div>
+          <div></div>
+        </div>
+
+        <div class="balances">
+          <div class="bal-box cash">
+            <div class="bal-label">CASH</div>
+            <div class="bal-value" id="detailCashBal">₹{{formatNumber customer.cash}}</div>
+          </div>
+          <div class="bal-box gold">
+            <div class="bal-label">GOLD</div>
+            <div class="bal-value" id="detailGoldBal">{{formatGold customer.gold}}g</div>
+          </div>
+          <div class="bal-box silver">
+            <div class="bal-label">SILVER</div>
+            <div class="bal-value" id="detailSilverBal">{{formatGold customer.silver}}g</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="action-btn pdf">
+            <i class="fas fa-file-pdf"></i> PDF
+          </button>
+          <button class="action-btn reminder">
+            <i class="fas fa-bell"></i> Reminder
+          </button>
+          <button class="action-btn sms">
+            <i class="fas fa-sms"></i> SMS
+          </button>
+        </div>
+
+        <div class="entries detailEntriesList">
+          {{#if customer.entries.length}}
+          {{#each customer.entries}}
+          <div class="entry-item">
+            <div>
+              <div class="entry-date">{{formatDate date}} • {{timeAgo date}}</div>
+              <div class="entry-bal">Bal. {{formatNumber ../customer.cash}} | {{formatGold ../customer.gold}}g</div>
+            </div>
+            <div class="entry-amount {{#if (eq type " got")}}you-got{{else}}{{/if}}">
+              {{#if (eq type "gave")}}YOU GAVE{{else}}YOU GOT{{/if}}
+              {{#if (eq item "cash")}}₹{{else}}{{/if}}{{amount}}{{#unless (eq item "cash")}}g{{/unless}}
+            </div>
+          </div>
+          {{/each}}
+          {{else}}
+          <div class="no-entries">
+            <p>No entries till now</p>
+            <p class="add-hint">Click down here to add a transaction/entry</p>
+          </div>
+          {{/if}}
+        </div>
+
+        <div class="fab-container"></div>
+        <button class="fab" onclick="toggleAddPanel()">+</button>
+      </div>
+    </div>
+
+    <!-- ==================== DESKTOP: Split View ==================== -->
+    <div class="desktop-layout">
+      <!-- LEFT: Sidebar -->
+      <div class="sidebar-panel">
+        <div class="sidebar-header">Mysarafa KhataBook</div>
+
+        <div class="total-summary">
+          <div class="total-item">
+            <div class="total-label-cash">CASH</div>
+            <div class="total-value">₹{{formatNumber totalCash}}</div>
+          </div>
+          <div class="total-item">
+            <div class="total-label-gold">GOLD</div>
+            <div class="total-value {{#if (gt totalGold 0)}}text-success{{else}}text-danger{{/if}}">
+              {{formatGold totalGold}}g
+            </div>
+          </div>
+          <div class="total-item">
+            <div class="total-label-silver">SILVER</div>
+            <div class="total-value {{#if (gt totalSilver 0)}}text-success{{else}}text-danger{{/if}}">
+              {{formatGold totalSilver}}g
+            </div>
+          </div>
+        </div>
+
+        <div class="search-filters">
+          <div class="search-box" style="position:relative;">
+            <i class="fas fa-search"></i>
+            <input type="text" placeholder="Name or Phone Number" onkeyup="filterCustomers()" />
+          </div>
+          <select class="filter-select" onchange="filterCustomers()">
+            <option>Filter By</option>
+            <option value="gold">Gold</option>
+            <option value="silver">Silver</option>
+            <option value="cash">Cash</option>
+          </select>
+          <select class="sort-select" onchange="sortCustomers()">
+            <option>Sort By</option>
+            <option value="name">Name</option>
+            <option value="recent">Recent</option>
+            <option value="amount">Amount</option>
+          </select>
+        </div>
+
+        <div class="customer-list" id="customerList">
+          {{#if customers.length}}
+          {{#each customers}}
+          <div class="customer-item" onclick="loadCustomer('{{_id}}')">
+            <div class="avatar">{{initials name}}</div>
+            <div class="customer-name">{{name}}</div>
+          </div>
+          {{/each}}
+          {{else}}
+          <!-- EMPTY STATE (Exact from Screenshot) -->
+          <div class="empty-state-list">
+            <!-- Replace src with your actual image path -->
+            <img
+              src="/assets/images/happy-excited-man-holding-laptop-money-make-earn-money-online-internet_199628-239.jpg"
+              alt="No customers" class="empty-image" />
+
+            <div class="empty-text">No party data available for applied filters</div>
+            <div class="empty-subtext">Try adjusting filters or add a new customer</div>
+
+            {{!-- <div class="no-customer">
+              <div class="no-customer-icon"><i class="far fa-user-circle"></i></div>
+              <div class="no-customer-text">No customer selected</div>
+            </div> --}}
+          </div>
+          {{/if}}
+        </div>
+
+        <div class="sidebar-footer">
+          <button class="bulk-upload-btn" onclick="openBulkUpload()">
+            + Bulk Upload Customers
+          </button>
+          <button class="add-customer-btn" onclick="openAddCustomer()">
+            + Add Customer
+          </button>
+        </div>
+      </div>
+
+      <!-- RIGHT: Detail Panel (same markup as mobile) -->
+      <div class="detail-panel" id="detailPanel" style="display: none;">
+        <div class="container">
+          <div class="detail-header-name">
+            <div class="avatar" id="detailAvatar">?</div>
+            <div class="customer-name" id="detailCustomerName">Customer Name</div>
+          </div>
+
+          <div class="balances">
+            <div class="bal-box cash">
+              <div class="bal-label">CASH</div>
+              <div class="bal-value" id="detailCashBal">₹{{formatNumber customer.cash}}</div>
+            </div>
+            <div class="bal-box gold">
+              <div class="bal-label">GOLD</div>
+              <div class="bal-value" id="detailGoldBal">{{formatGold customer.gold}}g</div>
+            </div>
+            <div class="bal-box silver">
+              <div class="bal-label">SILVER</div>
+              <div class="bal-value" id="detailSilverBal">₹{{formatGold customer.silver}}g</div>
+            </div>
+          </div>
+
+
+          {{!-- <div class="reminder-section">
+            <div class="reminder-label">
+              Send Reminder
+            </div>
+            <div class="reminder-buttons">
+              <button class="reminder-btn whatsapp" onclick="sendReminder('whatsapp')">
+                <i class="fab fa-whatsapp"></i> Whatsapp
+                <span class="from">from your number</span>
+              </button>
+              <button class="reminder-btn sms" onclick="sendReminder('sms')">
+                <i class="fas fa-sms"></i> SMS
+                <span class="from">from Khatabook's number</span>
+              </button>
+            </div>
+          </div> --}}
+          <div class="detail-pane__reminder" style="
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    font-family: &quot;Inter&quot;, sans-serif;
+">
+            <div class="detail-pane__reminder-container" style="
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    align-items: center;
+">
+
+              <!-- LEFT SECTION: Label + Info icon -->
+              <div class="detail-pane__reminder-container-left" style="
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    color: #333;
+">
+                <div class="name-container">Send Reminder</div>
+                <div class="info-button" title="Remind your customer via WhatsApp or SMS">
+                  <svg xmlns="http://www.w3.org/2000/svg" height="12" viewBox="0 0 24 24" width="12" fill="black">
+                    <path d="M0 0h24v24H0V0z" fill="none"></path>
+                    <path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 
+          18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- RIGHT SECTION: WhatsApp + SMS buttons -->
+              <div class="detail-pane__reminder-container-right" style="
+    display: flex;
+    align-items: center;
+    gap: 24px;
+">
+
+                <!-- WhatsApp section -->
+                <div class="detail-pane__reminder-container-right-whatsApp-section" style="
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+">
+                  <button class="whatsApp-button" onclick="sendReminder('whatsapp')" style="
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 11px 10px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;s
+    background-color: #fff;
+    border: 1px solid #dcdcdc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M13.3358 2.69419C12.6428 1.99659 11.8182 1.44345 10.9099 1.06681C10.0015 0.690175 9.02749 0.497525 8.04417 0.500024C3.92083 0.500024 0.564167 3.85586 0.5625 7.98086C0.5625 9.29919 0.906666 10.5859 1.56083 11.7209L0.5 15.5967L4.46583 14.5559C5.56283 15.153 6.79183 15.4661 8.04083 15.4667H8.04417C12.1667 15.4667 15.5233 12.1109 15.525 7.98586C15.5278 7.00293 15.3358 6.02918 14.9601 5.12091C14.5843 4.21263 14.0323 3.38783 13.3358 2.69419ZM8.04417 14.2042H8.04167C6.92793 14.2043 5.83469 13.9047 4.87667 13.3367L4.65 13.2017L2.29667 13.8192L2.92417 11.525L2.77667 11.29C2.15399 10.2987 1.82436 9.15151 1.82583 7.98086C1.8275 4.55252 4.61667 1.76336 8.04667 1.76336C8.86354 1.76154 9.67267 1.92176 10.4272 2.23473C11.1818 2.54771 11.8667 3.00723 12.4425 3.58669C13.0214 4.16339 13.4802 4.8491 13.7924 5.60419C14.1047 6.35928 14.2641 7.16876 14.2617 7.98586C14.26 11.4142 11.4708 14.2042 8.04417 14.2042ZM11.455 9.54669C11.2675 9.45252 10.3492 9.00086 10.1775 8.93836C10.0067 8.87586 9.8825 8.84502 9.7575 9.03169C9.6325 9.21836 9.27417 9.63919 9.165 9.76419C9.05583 9.88919 8.94667 9.90419 8.76 9.81086C8.57333 9.71752 7.97083 9.52002 7.25667 8.88336C6.70083 8.38752 6.32583 7.77586 6.21667 7.58836C6.1075 7.40086 6.205 7.30002 6.29917 7.20669C6.38333 7.12336 6.48583 6.98836 6.57917 6.87919C6.6725 6.77002 6.70333 6.69252 6.76583 6.56752C6.82833 6.44252 6.7975 6.33336 6.75 6.24002C6.70333 6.14586 6.32917 5.22586 6.17333 4.85169C6.0225 4.48919 5.86833 4.53752 5.75333 4.53252C5.63423 4.52765 5.51504 4.52543 5.39583 4.52586C5.30105 4.52827 5.20778 4.55025 5.12188 4.5904C5.03599 4.63055 4.95931 4.68801 4.89667 4.75919C4.725 4.94669 4.2425 5.39836 4.2425 6.31836C4.2425 7.23836 4.9125 8.12752 5.00583 8.25252C5.09917 8.37752 6.32417 10.265 8.19917 11.075C8.64583 11.2675 8.99417 11.3825 9.265 11.4692C9.7125 11.6117 10.12 11.5909 10.4425 11.5434C10.8017 11.49 11.5483 11.0917 11.7042 10.655C11.86 10.2184 11.86 9.84419 11.8133 9.76586C11.7667 9.68752 11.6408 9.64002 11.455 9.54669Z"
+                        fill="#737373" style="
+    fill: #25D366;
+    fill: rgb#12b76a(18, 183, 106);
+"></path>
+                    </svg>
+                    <div class="button-text">WhatsApp</div>
+                  </button>
+                  <div class="infoLabel" style="
+    font-size: 11px;
+    color: #888;
+    margin-top: 4px;
+    font-weight: 400;
+">from your number</div>
+                </div>
+
+                <!-- SMS section -->
+                <div class="detail-pane__reminder-container-right-sms-section" style="
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+">
+                  <button class="sms-button" onclick="sendReminder('sms')" style="
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    background-color: #fff;
+    border: 1px solid #dcdcdc;
+    cursor: pointer;
+    transition: all 0.2s ease;
+">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M3.19562 3.4C2.73433 3.4 2.4 3.75625 2.4 4.10764V13.3453C2.4 13.7319 2.0866 14.0453 1.7 14.0453C1.3134 14.0453 1 13.7319 1 13.3453V4.10764C1 2.87544 2.07332 2 3.19562 2H16.3043C17.5423 2 18.4999 2.90147 18.4999 4.10764V13.2573C18.4999 14.5451 17.3634 15.277 16.3043 15.277H6.8027C6.4161 15.277 6.1027 14.9636 6.1027 14.577C6.1027 14.1904 6.4161 13.877 6.8027 13.877H16.3043C16.8288 13.877 17.0999 13.5531 17.0999 13.2573V4.10764C17.0999 3.73022 16.8258 3.4 16.3043 3.4H3.19562Z"
+                        fill="#175CD3"></path>
+                      <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M1.7 12.6453C2.0866 12.6453 2.4 12.9587 2.4 13.3453V17.0832L6.28951 14.1089C6.59661 13.874 7.03593 13.9326 7.27077 14.2397C7.50561 14.5468 7.44704 14.9861 7.13994 15.221L2.63505 18.6659L2.61616 18.6785C2.29036 18.8957 1.87752 18.9368 1.52501 18.741C1.18922 18.5544 1 18.2012 1 17.8321V13.3453C1 12.9587 1.3134 12.6453 1.7 12.6453Z"
+                        fill="#175CD3"></path>
+                      <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M5.09961 7.44319C5.09961 7.0566 5.41301 6.74319 5.79961 6.74319H11.7996C12.1862 6.74319 12.4996 7.0566 12.4996 7.44319C12.4996 7.82979 12.1862 8.14319 11.7996 8.14319H5.79961C5.41301 8.14319 5.09961 7.82979 5.09961 7.44319Z"
+                        fill="#175CD3"></path>
+                      <path fill-rule="evenodd" clip-rule="evenodd"
+                        d="M5.09961 10.4432C5.09961 10.0566 5.41301 9.74319 5.79961 9.74319H13.7996C14.1862 9.74319 14.4996 10.0566 14.4996 10.4432C14.4996 10.8298 14.1862 11.1432 13.7996 11.1432H5.79961C5.41301 11.1432 5.09961 10.8298 5.09961 10.4432Z"
+                        fill="#175CD3"></path>
+                    </svg>
+                    <div class="button-text">SMS</div>
+                  </button>
+                  <div class="infoLabel" style="
+    font-size: 11px;
+    color: #888;
+    margin-top: 4px;
+    font-weight: 400;
+">from Khatabook's number</div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <div class="entries detailEntriesList">
+            {{#if customer.entries.length}}
+            {{#each customer.entries}}
+            <pre>{{json this}}</pre>
+            <div class="entry-item">
+              <div>
+                <div class="entry-date">{{formatDate date}} • {{timeAgo date}}</div>
+                <div class="entry-bal">Bal. {{formatNumber ../customer.cash}} | {{formatGold ../customer.gold}}g</div>
+              </div>
+              <div class="entry-amount {{#if (eq type " got")}}you-got{{else}}{{/if}}">
+                {{#if (eq type "gave")}}YOU GAVE{{else}}YOU GOT{{/if}}
+                {{#if (eq item "cash")}}₹{{else}}{{/if}}{{amount}}{{#unless (eq item "cash")}}g{{/unless}}
+              </div>
+            </div>
+            {{/each}}
+            {{else}}
+            <div class="no-entries">
+              <p>No entries till now</p>
+              <p class="add-hint">Click down here to add a transaction/entry</p>
+            </div>
+            {{/if}}
+          </div>
+
+          <div class="fab-container">
+            <!-- ==================== Minimizable Add Panel ==================== -->
+            <div class="add-panel-container" id="addPanelContainer">
+              <div class="add-panel-header">
+                <!-- + Button (LEFT - Opens full panel) -->
+                <button class="open-btn" onclick="openAddPanel()">+</button>
+
+                <!-- Select Type Buttons -->
+                <div class="select-type">
+                  <button class="type-btn active" data-type="cash">CASH</button>
+                  <button class="type-btn" data-type="gold">GOLD</button>
+                  <button class="type-btn" data-type="silver">SILVER</button>
+                </div>
+
+                <!-- Minimize Button (RIGHT) -->
+                <button class="minimize-btn" onclick="toggleMinimize()">−</button>
+              </div>
+
+              <!-- Full Panel Body (hidden when minimized) -->
+              <div class="add-panel-body" id="addPanelBody">
+                <div class="input-group">
+                  <input type="number" id="amountInput" placeholder="Enter amount/grams" />
+                </div>
+                <div class="input-group">
+                  <button class="gave-got-btn gave active" id="gaveBtn">YOU GAVE ₹</button>
+                  <button class="gave-got-btn got" id="gotBtn">YOU GOT ₹</button>
+                </div>
+                <button class="save-btn" onclick="saveTransaction()">SAVE</button>
+              </div>
+            </div>
+          </div>
+          {{!-- <button class="fab" onclick="toggleAddPanel()">+</button> --}}
+        </div>
+      </div>
+
+      <div class="no-customer-state" id="noCustomerState">
+        <div class="no-customer-icon"><i class="far fa-user-circle"></i></div>
+        <div class="no-customer-text">No customer selected</div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <script>
+    // ──────────────────────────────────────────────────────────────
+    // GLOBAL VARIABLES (declare only once)
+    // ──────────────────────────────────────────────────────────────
+    let selectedType = 'cash';
+    let transactionType = 'gave';
+    let currentCustomerId = null;          // ← ONE declaration only
+
+    // ──────────────────────────────────────────────────────────────
+    // PANEL CONTROL (minimize / open)
+    // ──────────────────────────────────────────────────────────────
+    function toggleMinimize() {
+      const container = document.getElementById('addPanelContainer');
+      container.classList.add('minimized');
+    }
+
+    function openAddPanel() {
+      const container = document.getElementById('addPanelContainer');
+      container.classList.remove('minimized');
+    }
+    function getInitials(name) {
+      if (!name || typeof name !== 'string') return '?';
+      return name
+        .trim()
+        .split(' ')
+        .map(word => word[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+    }
+
+    function sendReminder(type) {
+      if (!currentCustomerId) return alert('Select a customer first');
+
+      const cust = window.preloadedCustomer || {};
+      const mobile = cust.mobile_no || prompt('Enter 10-digit mobile number:');
+      if (!mobile || !/^\d{10}$/.test(mobile)) return alert('Enter valid 10-digit number');
+
+      const name = cust.name || 'Customer';
+      const balance = Math.abs(cust.amount_balance || 0);
+      const item = balance > 0 ? 'cash' : (cust.gold_balance > 0 ? 'gold' : 'silver');
+      const unit = item === 'cash' ? '₹' : 'g';
+      const msg = `Hi ${name}, your balance is ${unit}${balance.toLocaleString()}. Please settle.`;
+
+      const url = type === 'whatsapp'
+        ? `https://wa.me/91${mobile}?text=${encodeURIComponent(msg)}`
+        : `sms:91${mobile}?body=${encodeURIComponent(msg)}`;
+
+      window.open(url, '_blank');
+    }
+
+    function updateBalances(bal) {
+      // Update all elements that may show these balances (mobile + desktop copies)
+      setTextByIdAll('detailCashBal', `₹${(bal.cash || 0).toLocaleString()}`);
+      setTextByIdAll('detailGoldBal', `${(bal.gold || 0).toFixed(2)}g`);
+      setTextByIdAll('detailSilverBal', `${(bal.silver || 0).toFixed(2)}g`);
+
+    }
+
+    // Utility: set text for all elements that (incorrectly) share the same id in DOM
+    function setTextByIdAll(id, text) {
+      try {
+        var els = document.querySelectorAll('[id="' + id + '"]');
+        if (!els || els.length === 0) return;
+        els.forEach(function (el) { el.innerText = text; });
+      } catch (e) { console.error('setTextByIdAll', e); }
+    }
+
+    function addEntry(entry) {
+      // Insert the new entry into all entry lists (mobile + desktop)
+      const lists = document.querySelectorAll('.detailEntriesList');
+      if (!lists || lists.length === 0) return;
+
+      const div = document.createElement('div');
+      div.className = 'entry-item';
+      div.innerHTML = `
+    <div>
+      <div class="entry-date">Just now</div>
+      <div class="entry-bal">Bal. ₹${(entry.balance && entry.balance.cash) || 0} | ${(entry.balance && entry.balance.gold) || 0}g</div>
+    </div>
+    <div class="entry-amount ${entry.transactionType === 'got' ? 'you-got' : ''}">
+      ${entry.transactionType === 'gave' ? 'YOU GAVE' : 'YOU GOT'}
+      ${entry.item === 'cash' ? '₹' : ''}${entry.amount}${entry.item !== 'cash' ? 'g' : ''}
+    </div>`;
+
+      lists.forEach(list => {
+        // remove empty message if present
+        const empty = list.querySelector('.no-entries');
+        if (empty) list.innerHTML = '';
+        list.insertBefore(div.cloneNode(true), list.firstChild);
+      });
+    }
+
+    function renderCustomer(cust) {
+      if (!cust) return;
+
+      // Ensure we don't create multiple overlays
+      if (!document.getElementById('loading-overlay')) {
+        const loadingDiv = document.createElement('div');
+        loadingDiv.id = 'loading-overlay';
+        loadingDiv.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.8);display:flex;justify-content:center;align-items:center;z-index:99999;';
+        loadingDiv.innerHTML = 'Loading...';
+        document.body.appendChild(loadingDiv);
+      }
+
+      try {
+        // Update UI visibility
+        const detailPanel = document.getElementById('detailPanel');
+        const noState = document.getElementById('noCustomerState');
+        if (detailPanel) detailPanel.style.display = 'block';
+        if (noState) noState.style.display = 'none';
+
+        // Update customer info (update all duplicates)
+        setTextByIdAll('detailCustomerName', cust.name || '');
+        setTextByIdAll('detailAvatar', getInitials(cust.name));
+
+        // Update balances first to ensure they're visible (accept multiple key names)
+        const bal = {
+          cash: (cust.cash != null) ? cust.cash : (cust.amount_balance != null ? cust.amount_balance : 0),
+          gold: (cust.gold != null) ? cust.gold : (cust.gold_balance != null ? cust.gold_balance : 0),
+          silver: (cust.silver != null) ? cust.silver : (cust.silver_balance != null ? cust.silver_balance : 0)
+        };
+        updateBalances(bal);
+
+        // Update entries into both lists
+        const entriesLists = document.querySelectorAll('.detailEntriesList');
+
+        if (!cust.entries || cust.entries.length === 0) {
+          entriesLists.forEach(list => {
+            list.innerHTML = `<div class="no-entries"><p>No entries till now</p><p class="add-hint">Click down here to add a transaction/entry</p></div>`;
+          });
+        } else {
+          entriesLists.forEach(list => {
+            let entriesHTML = '';
+            cust.entries.forEach(e => {
+              const cashBal = (e.balance && e.balance.cash) ? (e.balance.cash).toLocaleString() : '0';
+              const goldBal = (e.balance && e.balance.gold) ? (e.balance.gold).toFixed(2) : '0.00';
+              entriesHTML += `
+                <div class="entry-item">
+                  <div>
+                    <div class="entry-date">${new Date(e.date).toLocaleDateString()} • ${timeAgo(e.date)}</div>
+                    <div class="entry-bal">Bal. ₹${cashBal} | ${goldBal}g</div>
+                  </div>
+                  <div class="entry-amount ${e.transactionType === 'got' ? 'you-got' : ''}">
+                    ${e.transactionType === 'gave' ? 'YOU GAVE' : 'YOU GOT'}
+                    ${e.item === 'cash' ? '₹' : ''}${e.amount}${e.item !== 'cash' ? 'g' : ''}
+                  </div>
+                </div>`;
+            });
+            list.innerHTML = entriesHTML;
+          });
+        }
+
+      } catch (e) { console.error('renderCustomer', e); }
+      finally {
+        // Remove loading overlay
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (loadingOverlay) loadingOverlay.remove();
+      }
+    }
+
+    // Helper function for time ago display
+    function timeAgo(date) {
+      const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+      const intervals = {
+        year: 31536000,
+        month: 2592000,
+        week: 604800,
+        day: 86400,
+        hour: 3600,
+        minute: 60
+      };
+
+      for (let [unit, secondsInUnit] of Object.entries(intervals)) {
+        const interval = Math.floor(seconds / secondsInUnit);
+        if (interval >= 1) {
+          return interval === 1 ? `1 ${unit} ago` : `${interval} ${unit}s ago`;
+        }
+      }
+      return 'Just now';
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // SAVE TRANSACTION
+    // ──────────────────────────────────────────────────────────────
+    async function saveTransaction() {
+      if (!currentCustomerId) return alert('Please select a customer first');
+
+      const amount = parseFloat(document.getElementById('amountInput').value);
+      if (!amount || amount <= 0) return alert('Enter a valid amount');
+
+      const payload = {
+        customerId: currentCustomerId,
+        type: selectedType,           // 'cash', 'gold', 'silver'
+        amount,
+        transactionType               // 'gave' or 'got'
+      };
+
+      try {
+        const res = await fetch('/ledger/transaction/new', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        console.log("transaction save response", data);
+        if (!res.ok) throw new Error(data.error || 'Failed to save');
+
+        // Update UI
+        updateBalances(data.balances);
+        addEntry(data.entry);
+        document.getElementById('amountInput').value = '';
+
+        // Auto-minimize
+        setTimeout(toggleMinimize, 800);
+      } catch (e) {
+        alert('Error: ' + e.message);
+      }
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // LOAD CUSTOMER (Desktop only) – THIS IS THE FUNCTION THAT WAS MISSING
+    // ──────────────────────────────────────────────────────────────
+    async function loadCustomer(id) {
+      if (window.innerWidth < 768) {
+        window.location.href = `/ledger/${id}`;
+        return;
+      }
+
+      currentCustomerId = id;
+
+      try {
+        // Show loading state immediately
+        const loadingDiv = document.createElement('div');
+        loadingDiv.id = 'loading-overlay';
+        loadingDiv.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(255,255,255,0.8);display:flex;justify-content:center;align-items:center;z-index:9999;';
+        loadingDiv.innerHTML = 'Loading...';
+        document.body.appendChild(loadingDiv);
+
+        // Clear previous data first
+        document.getElementById('detailCashBal').innerText = '₹0';
+        document.getElementById('detailGoldBal').innerText = '0g';
+        document.getElementById('detailSilverBal').innerText = '0g';
+        document.querySelectorAll('.detailEntriesList').forEach(list => {
+          list.innerHTML = '<div class="no-entries"><p>Loading entries...</p></div>';
+        });
+
+        // Try to get preloaded data first
+        const preloaded = window.preloadedCustomer;
+        if (preloaded && preloaded._id === id) {
+          renderCustomer(preloaded);
+          window.history.pushState({}, '', `/ledger/${id}`);
+          return;
+        }
+
+        // Fetch fresh data
+        const res = await fetch(`/ledger/customer/${id}`);
+        if (!res.ok) throw new Error('Customer not found');
+
+        const cust = await res.json();
+        if (!cust) throw new Error('Invalid customer data');
+
+        // Update the customer data in memory
+        window.preloadedCustomer = cust;
+
+        // Render the customer data
+        renderCustomer(cust);
+        window.history.pushState({}, '', `/ledger/${id}`);
+
+      } catch (err) {
+        console.error('Error loading customer:', err);
+        alert('Failed to load customer data');
+      } finally {
+        // Always remove loading overlay
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (loadingOverlay) loadingOverlay.remove();
+      }
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // TYPE / GAVE-GOT BUTTONS
+    // ──────────────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+      // Type buttons
+      document.querySelectorAll('.type-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          selectedType = btn.dataset.type;
+
+          const input = document.getElementById('amountInput');
+          input.placeholder = selectedType === 'cash'
+            ? 'Enter amount in ₹'
+            : `Enter grams of ${selectedType.toUpperCase()}`;
+
+          document.getElementById('gaveBtn').innerHTML = selectedType === 'cash' ? 'YOU GAVE ₹' : 'YOU GAVE g';
+          document.getElementById('gotBtn').innerHTML = selectedType === 'cash' ? 'YOU GOT ₹' : 'YOU GOT g';
+        });
+      });
+
+      // Gave / Got
+      document.getElementById('gaveBtn').onclick = () => {
+        document.querySelectorAll('.gave-got-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('gaveBtn').classList.add('active');
+        transactionType = 'gave';
+      };
+      document.getElementById('gotBtn').onclick = () => {
+        document.querySelectorAll('.gave-got-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('gotBtn').classList.add('active');
+        transactionType = 'got';
+      };
+
+
+
+    });
+
+    // ──────────────────────────────────────────────────────────────
+    // FILTER / SORT (unchanged – you can keep your own implementation)
+    // ──────────────────────────────────────────────────────────────
+    function filterCustomers() {
+      const term = document.querySelector('.search-box input').value.toLowerCase();
+      document.querySelectorAll('.customer-item').forEach(item => {
+        const name = item.querySelector('.customer-name').innerText.toLowerCase();
+        item.style.display = name.includes(term) ? 'flex' : 'none';
+      });
+    }
+
+    function sortCustomers() { /* implement if you need */ }
+  </script>
+  <script>
+    window.preloadedCustomer = {{{json customer }}};
+  </script>
+
+  <!-- ADD THIS -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const path = window.location.pathname;
+      const match = path.match(/\/ledger\/([a-f0-9]{24})/);
+      if (match) {
+        const id = match[1];
+        currentCustomerId = id;
+        // Always fetch fresh data so entries are loaded — server-side preloaded customer
+        // contains balances but not entries. This ensures both balances and entries appear.
+        loadCustomer(id);
+      }
+    });
+  </script>
+</body>
+
+</html>

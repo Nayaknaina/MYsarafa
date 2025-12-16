@@ -211,7 +211,7 @@ exports.verifyPayment = async (req, res, next) => {
   }
 };
 
-// Mark payment as unverified (Reupload)
+
 exports.unverifyPayment = async (req, res, next) => {
   try {
     const { paymentId } = req.params;

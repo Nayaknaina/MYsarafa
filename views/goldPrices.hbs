@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+ <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+     
+       
+        h1 { color: #000000; margin-bottom: 20px; font-size: 1.5em; }
+        .filter-section { margin-bottom: 20px; text-align: right; }
+        .filter-section select { padding: 8px; border-radius: 6px; border: 1px solid #ddd; }
+        .rates-card { background: white; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); padding: 20px; margin-bottom: 20px; }
+        .rates-table { width: 100%; border-collapse: collapse; }
+        .rates-table th, .rates-table td { padding: 12px; text-align: center; border-bottom: 1px solid #eee; }
+        .rates-table th { background: #f0f2f5; color: #0047ab; }
+        .up { color: #28a745; display: flex; align-items: center; justify-content: center; }
+        .up i { margin-right: 5px; }
+        .down { color: #dc3545; display: flex; align-items: center; justify-content: center; }
+        .down i { margin-right: 5px; }
+        .same { color: #6c757d; }
+        .trend-icon { font-size: 1.2em; }
+        @media (max-width: 768px) {
+            .rates-table { font-size: 0.9em; }
+            .rates-table th, .rates-table td { padding: 8px; }
+        }
+    </style>
+</head>
+
+<body>
+   {{> header}}
+
+    <div class="main-container">
+        {{> sidebar}}
+
+      <div class="main-content">
+        <h1>Live Precious Metal Rates (INR)</h1>
+        <div class="filter-section">
+          <label for="dateFilter">Select Date: </label>
+          <select id="dateFilter" onchange="filterRates()">
+            <option value="latest">Latest</option>
+            {{#each historicalDates}}
+            <option value="{{this}}">{{this}}</option>
+            {{/each}}
+          </select>
+        </div>
+
+        {{#each rates as |rate|}}
+        <div class="rates-card">
+          <h2>{{#if (eq rate.metal 'XAU')}}Gold{{else}}Silver{{/if}} Rates</h2>
+          <table class="rates-table">
+            <thead>
+              <tr>
+                <th>Price (Troy Oz)</th>
+                <th>Prev Close</th>
+                <th>Change</th>
+                <th>Change %</th>
+                <th>Ask</th>
+                <th>Bid</th>
+                <th>24K (g)</th>
+                <th>22K (g)</th>
+                <th>18K (g)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="{{getTrendClass rate.priceTrend}}"><i
+                      class="fas fa-{{getTrendIcon rate.priceTrend}} trend-icon"></i>{{formatNumber rate.price 'en-IN'
+                    maximumFractionDigits=2}}</span></td>
+                <td>{{formatNumber rate.prev_close_price 'en-IN' maximumFractionDigits=2}}</td>
+                <td><span class="{{getTrendClass rate.priceTrend}}"><i
+                      class="fas fa-{{getTrendIcon rate.priceTrend}} trend-icon"></i>{{formatNumber rate.ch 'en-IN'
+                    maximumFractionDigits=2}}</span></td>
+                <td><span class="{{getTrendClass rate.priceTrend}}"><i
+                      class="fas fa-{{getTrendIcon rate.priceTrend}} trend-icon"></i>{{formatNumber rate.chp 'en-IN'
+                    maximumFractionDigits=2}}%</span></td>
+                <td>{{formatNumber rate.ask 'en-IN' maximumFractionDigits=2}}</td>
+                <td>{{formatNumber rate.bid 'en-IN' maximumFractionDigits=2}}</td>
+                <td>{{formatNumber rate.price_gram_24k 'en-IN' maximumFractionDigits=2}}</td>
+                <td>{{formatNumber rate.price_gram_22k 'en-IN' maximumFractionDigits=2}}</td>
+                <td>{{formatNumber rate.price_gram_18k 'en-IN' maximumFractionDigits=2}}</td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="update-time">Updated: {{dateFormat rate.createdAt "MMMM DD, YYYY hh:mm A"}}</p>
+        </div>
+        {{/each}}
+
+        {{#if noData}}
+        <p>No data available for the selected date.</p>
+        {{/if}}
+      </div>
+    </div>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+  <script>
+    function formatNumber(num, locale, options = {}) {
+    return new Intl.NumberFormat(locale, options).format(num);
+}
+
+function getTrendClass(trend) {
+    return trend === 'up' ? 'up' : trend === 'down' ? 'down' : 'same';
+}
+
+function getTrendIcon(trend) {
+    return trend === 'up' ? 'arrow-up' : trend === 'down' ? 'arrow-down' : 'minus';
+}
+
+function dateFormat(dateStr, format) {
+    return moment(dateStr).format(format); 
+}
+    function filterRates() {
+    const date = document.getElementById('dateFilter').value;
+    $.get(`/rates/getRates/?date=${date}`)
+        .done((data) => {
+            console.log('Fetched Data:', data.rates);
+            
+            if (data.noData) {
+                // Show no data message
+                document.querySelector('.main-content').innerHTML = `
+                    <h1>Live Precious Metal Rates (INR)</h1>
+                    <div class="filter-section">
+                        <label for="dateFilter">Select Date: </label>
+                        <select id="dateFilter" onchange="filterRates()">
+                            <option value="latest">Latest</option>
+                            ${data.historicalDates.map(d => `<option value="${d}" ${d === date ? 'selected' : ''}>${d}</option>`).join('')}
+                        </select>
+                    </div>
+                    <p>No data available for the selected date.</p>
+                `;
+                return;
+            }
+
+            // Rebuild the rates cards HTML
+            let ratesHtml = `
+                <h1>Live Precious Metal Rates (INR)</h1>
+                <div class="filter-section">
+                    <label for="dateFilter">Select Date: </label>
+                    <select id="dateFilter" onchange="filterRates()">
+                        <option value="latest" ${date === 'latest' ? 'selected' : ''}>Latest</option>
+                        ${data.historicalDates.map(d => `<option value="${d}" ${d === date ? 'selected' : ''}>${d}</option>`).join('')}
+                    </select>
+                </div>
+            `;
+
+            data.rates.forEach(rate => {
+                const metalName = rate.metal === 'XAU' ? 'Gold' : 'Silver';
+                const trendClass = getTrendClass(rate.priceTrend);
+                const trendIcon = getTrendIcon(rate.priceTrend);
+                const updateTime = dateFormat(rate.createdAt, 'MMMM DD, YYYY hh:mm A');
+
+                ratesHtml += `
+                    <div class="rates-card">
+                        <h2>${metalName} Rates</h2>
+                        <table class="rates-table">
+                            <thead>
+                                <tr>
+                                    <th>Price (Troy Oz)</th>
+                                    <th>Prev Close</th>
+                                    <th>Change</th>
+                                    <th>Change %</th>
+                                    <th>Ask</th>
+                                    <th>Bid</th>
+                                    <th>24K (g)</th>
+                                    <th>22K (g)</th>
+                                    <th>18K (g)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="${trendClass}"><i class="fas fa-${trendIcon} trend-icon"></i>${formatNumber(rate.price, 'en-IN', { maximumFractionDigits: 2 })}</span></td>
+                                    <td>${formatNumber(rate.prev_close_price, 'en-IN', { maximumFractionDigits: 2 })}</td>
+                                    <td><span class="${trendClass}"><i class="fas fa-${trendIcon} trend-icon"></i>${formatNumber(rate.ch, 'en-IN', { maximumFractionDigits: 2 })}</span></td>
+                                    <td><span class="${trendClass}"><i class="fas fa-${trendIcon} trend-icon"></i>${formatNumber(rate.chp, 'en-IN', { maximumFractionDigits: 2 })}%</span></td>
+                                    <td>${formatNumber(rate.ask, 'en-IN', { maximumFractionDigits: 2 })}</td>
+                                    <td>${formatNumber(rate.bid, 'en-IN', { maximumFractionDigits: 2 })}</td>
+                                    <td>${formatNumber(rate.price_gram_24k, 'en-IN', { maximumFractionDigits: 2 })}</td>
+                                    <td>${formatNumber(rate.price_gram_22k, 'en-IN', { maximumFractionDigits: 2 })}</td>
+                                    <td>${formatNumber(rate.price_gram_18k, 'en-IN', { maximumFractionDigits: 2 })}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p class="update-time">Updated: ${updateTime}</p>
+                    </div>
+                `;
+            });
+
+            // Inject the new HTML into the main-content div
+            document.querySelector('.main-content').innerHTML = ratesHtml;
+        })
+        .fail((jqXHR, textStatus, errorThrown) => {
+            console.error('AJAX Error:', textStatus, errorThrown);
+            alert('Error loading rates. Please try again.');
+        });
+}
+</script>
+</body>
+
+</html>

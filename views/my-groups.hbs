@@ -1,0 +1,64 @@
+ {{> header}}
+
+<div class="main-container">
+
+  {{> sidebar}}
+  {{!-- //<h1 class="page-title">My Communities</h1> --}}
+
+  <div class="groups-list my-groups-grid">
+    {{#if groups.length}}
+      {{#each groups}}
+        <div class="group-card" data-group-id="{{id}}">
+          <div class="group-left">
+            <img src="{{cover}}" alt="{{name}} cover" class="group-cover" />
+            <div class="group-info">
+              <h3 class="group-name">{{name}} <small class="group-type">({{type}})</small></h3>
+              <p class="group-desc">{{description}}</p>
+              <p class="group-members">Members: <strong>{{totalMembers}}</strong></p>
+            </div>
+          </div>
+
+          <div class="group-actions">
+            <a class="btn btn-view" href="/Groups/group-info/{{id}}">View</a>
+            <a class="btn btn-edit" href="/Groups/community/{{id}}">Edit</a>
+            <button class="btn btn-delete" data-group-id="{{id}}">Delete</button>
+          </div>
+        </div>
+      {{/each}}
+    {{else}}
+      <p>You are not a member of any community yet.</p>
+    {{/if}}
+  </div>
+</div>
+
+<script>
+  (function () {
+    // delegate delete clicks
+    document.addEventListener('click', async function (e) {
+      if (!e.target.matches('.btn-delete')) return;
+      const btn = e.target;
+      const id = btn.getAttribute('data-group-id');
+      if (!id) return;
+      if (!confirm('Are you sure you want to delete this community? This action cannot be undone.')) return;
+
+      btn.disabled = true;
+      btn.textContent = 'Deleting...';
+
+      try {
+        const resp = await fetch('/Groups/group/' + encodeURIComponent(id), { method: 'DELETE', credentials: 'same-origin' });
+        if (!resp.ok) {
+          const txt = await resp.text();
+          throw new Error(txt || 'Failed to delete');
+        }
+        // remove card from DOM
+        const card = document.querySelector('.group-card[data-group-id="' + id + '"]');
+        if (card) card.remove();
+      } catch (err) {
+        console.error(err);
+        alert('Could not delete community. Please try again.');
+        btn.disabled = false;
+        btn.textContent = 'Delete';
+      }
+    });
+  })();
+</script>

@@ -46,8 +46,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const type = this.value ? this.value.charAt(0).toUpperCase() + this.value.slice(1) : 'Community privacy';
         groupPrivacyPreview.textContent = `${type} · 1 member`;
         if (this.value === 'private') {
-            console.log("[communityTypeSelect] Showing privacyModal");
-            privacyModal.style.display = 'flex';
+            //console.log("[communityTypeSelect] Showing privacyModal");
+            //privacyModal.style.display = 'flex';
         }
     });
 
@@ -95,7 +95,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 const response = await fetch(url, {
                     method: groupId ? 'PUT' : 'POST',
                     body: formData,
-                    credentials: 'include'
+                    credentials: 'include',
+                      headers: {
+                        "Accept": "application/json"
+                    }
                 });
                 const result = await response.json();
                 console.log(result);
@@ -220,30 +223,30 @@ document.addEventListener('DOMContentLoaded', function () {
             const type = this.value ? this.value.charAt(0).toUpperCase() + this.value.slice(1) : 'Community privacy';
             groupPrivacyPreview.textContent = `${type} · 1 member`;
             if (this.value === 'private') {
-                  console.log("[communityTypeSelect] Showing privacyModal");
-                privacyModal.style.display = 'flex';
+                  //console.log("[communityTypeSelect] Showing privacyModal");
+                //privacyModal.style.display = 'flex';
             }
         });
     }
 
     // Privacy modal buttons
-    if (yesBtn) {
-        yesBtn.addEventListener('click', function () {
-            privacyModal.style.display = 'none';
-            questionFormModal.style.display = 'flex';
-            questionForm.reset();
-            updateOptionsSection();
-            deleteQuestionBtn.style.display = 'none';
-            document.getElementById('modalTitle').textContent = 'Create Question';
-        });
-    }
+    // if (yesBtn) {
+    //     yesBtn.addEventListener('click', function () {
+    //         privacyModal.style.display = 'none';
+    //         questionFormModal.style.display = 'flex';
+    //         questionForm.reset();
+    //         updateOptionsSection();
+    //         deleteQuestionBtn.style.display = 'none';
+    //         document.getElementById('modalTitle').textContent = 'Create Question';
+    //     });
+    // }
 
-    if (noBtn) {
-        noBtn.addEventListener('click', function () {
-            privacyModal.style.display = 'none';
-            questionsDisplayModal.style.display = 'flex';
-        });
-    }
+    // if (noBtn) {
+    //     noBtn.addEventListener('click', function () {
+    //         privacyModal.style.display = 'none';
+    //         questionsDisplayModal.style.display = 'flex';
+    //     });
+    // }
 
     // Question form modal
     if (questionTypeSelect) {

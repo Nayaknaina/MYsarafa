@@ -21,7 +21,7 @@ exports.signup = async (req, res ,next) => {
         //const hashedPassword = await bcrypt.hash(password, 10);
         const user = new User({
             f_name, l_name, password, email, kyc_status: 'unsubmitted',
-            user_status: 'unverified',  profilePicture: '/images/default-profile.png'
+            user_status: 'unverified',  profilePicture: 'assets/images/default-avatar.png'
         });
         await user.save();
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '12h' });
@@ -89,7 +89,6 @@ exports.getUser = async (req, res, next) => {
       return res.status(404).json({ message: "User not found" });
     }
 
-    // Check password presence
     const has_password = !!user.password;
 
     // Remove sensitive data
@@ -204,19 +203,19 @@ exports.sendOTP = async (req, res, next) => {
     const { mobile_no, identifier, purpose } = req.body;
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-    if (!purpose) return res.status(400).json({ message: "Purpose is required." });
+    if (!purpose) return res.status(400).json({ message: "Purpose is required" });
 
     let user;
     let mobileToSend;
 
     if (purpose === "verify_mobile") {
-      // must be logged in
+   
       if (!req.user || !req.user._id) {
         return res.status(401).json({ message: "Unauthorized: Login required" });
       }
 
       if (!mobile_no || !/^\d{10}$/.test(mobile_no))
-        return res.status(400).json({ message: "Valid 10-digit mobile required." });
+        return res.status(400).json({ message: "Valid 10-digit mobile required" });
 
       user = await User.findById(req.user._id);
       if (!user) return res.status(404).json({ message: "User not found" });

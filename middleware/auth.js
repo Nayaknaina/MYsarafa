@@ -14,7 +14,7 @@ const authMiddleware = async (req, res, next) => {
                 layout: false
             });
         }
-
+        
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await User.findById(decoded.userId).select('-password');
         if (!user) {
@@ -30,7 +30,18 @@ const authMiddleware = async (req, res, next) => {
         req.user = user;
         next();
     }  catch (error) {
-        next(error);
+      if (error.name === 'TokenExpiredError') {
+     
+        res.clearCookie('token');
+
+        return res.status(401).render('error', {
+            statusCode: 401,
+            title: 'Session Expired',
+            errorMessage: 'Your session has expired. Please log in again.',
+            layout: false
+        });
+      }
+      next(error);
     }
 };
 

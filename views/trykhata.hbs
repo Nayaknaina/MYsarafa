@@ -1,0 +1,3489 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mysarafa KhataBook</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+     font-family: "Noto Sans", sans-serif;
+      background: #f5f5f5;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .main-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    .searchable-select {
+  position: relative;
+  width: 100%;
+}
+#customerSearchInput {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+}
+.dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 300px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-top: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+.dropdown-item {
+  padding: 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+}
+.dropdown-item:hover {
+  background: #f0f8ff;
+}
+.dropdown-item:last-child { border-bottom: none; }
+/* Input error styling */
+.input-error {
+  border: 2px solid #e53935 !important;
+  background: #fff5f5;
+}
+
+.error-text {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+  min-height: 18px;
+}
+
+.modal-input.error {
+  border-color: #e74c3c !important;
+  box-shadow: 0 0 5px rgba(231, 76, 60, 0.3);
+}
+
+/* Button styles */
+#submit-new:disabled {
+  background: #9e9e9e !important;
+  cursor: not-allowed;
+}
+
+#submit-new {
+  background: #1e88e5;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+#submit-new:hover {
+  background: #1565c0;
+}
+
+#cancel-new {
+  background: #eeeeee;
+  color: #333;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+#cancel-new:hover {
+  background: #e0e0e0;
+}
+
+
+    /* ==================== COMMON STYLES ==================== */
+    .action-btn {
+        background:#1976d2; color:white; border:none; padding:14px 20px; border-radius:12px; font-weight:600; font-size:15px; cursor:pointer; display:flex; align-items:center; gap:12px; box-shadow:0 4px 12px rgba(25,118,210,0.3); transition:all 0.3s;
+      }
+      .action-btn:hover { transform:translateY(-2px); color:#fff !important;    background-color: #0a4bcf !important;}
+      #fullReportBtn:disabled { background:#aaa !important; cursor:not-allowed; }
+    .total-label-cash {
+      color: #2e7d32;
+    }
+
+    .total-label-gold {
+      color: #f9a825;
+    }
+
+    .total-label-silver {
+      color: #546e7a;
+    }
+
+    .avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #1976d2;
+      color: white;
+      margin-right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .balances {
+      display: flex;
+      justify-content: space-around;
+      padding: 15px 10px;
+      background: white;
+      border-bottom: 1px solid #eee;
+    }
+
+    .bal-box {
+      text-align: center;
+      padding: 10px;
+      border-radius: 8px;
+      flex: 1;
+      margin: 0 5px;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .bal-label {
+
+      color: #555;
+      text-transform: uppercase;
+    }
+
+    .bal-value {
+      font-weight: bold;
+      font-size: 18px;
+      margin-top: 4px;
+    }
+
+    .cash {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .gold {
+      background: #fff8e1;
+      color: #f9a825;
+    }
+
+    .silver {
+      background: #eceff1;
+      color: #546e7a;
+    }
+
+    .detail-panel{
+    display: flex  ;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    }
+    .detail-header,
+    .detail-pane__reminder,
+    .balances {
+      flex-shrink: 0; /* Don't shrink */
+      z-index: 1;
+    }
+
+    .select-type {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+    .entries{
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 0px 0px;
+    max-height: 250px;
+    -webkit-overflow-scrolling: touch
+    }
+    .entry-item {
+      display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px;
+    background: #fff;
+    margin-bottom: 8px;
+    /* border-radius: 8px; */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .customer-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .you-got {
+      color: #2e7d32;
+    }
+
+
+    .add-panel-body input {
+      width: 100%;
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    .gave-got-btn {
+      padding: 12px;
+      flex: 1;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .gave {
+      background: #fdecea;
+      color: #c62828;
+      border-color: #ffcdd2;
+    }
+
+    .got {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-color: #c8e6c9;
+    }
+      .type-btn.active {
+        background: #1976d2;
+        color: white;
+        border-color: #1976d2;
+      }
+
+    .gave-got-btn.active {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      font-weight: 900;
+      border-width: 2px;
+    }
+
+    .save-btn {
+      background: #1976d2;
+      color: white;
+      border: none;
+      padding: 12px;
+      width: 100%;
+      border-radius: 6px;
+      font-size: 16px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+
+    .no-entries {
+      text-align: center;
+      padding: 40px;
+      color: #777;
+    }
+
+    .add-hint {
+      color: #1976d2;
+      margin-top: 10px;
+    }
+
+    /*togglebar*/
+    .toggle-bar {
+      display: flex;
+      background: white;
+      border-bottom: 1px solid #eee;
+      overflow: hidden;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .user-toggle-btn {
+      flex: 1;
+      padding: 14px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      color: #666;
+    }
+
+    .user-toggle-btn.active {
+      color: #1976d2;
+      background: #e3f2fd;
+    }
+
+    .user-toggle-btn .count {
+      display: inline-block;
+      background: #1976d2;
+      color: white;
+      font-size: 11px;
+      font-weight: bold;
+      min-width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      margin-left: 6px;
+      line-height: 18px;
+    }
+
+    .user-toggle-btn.active .count {
+      background: white;
+      color: #1976d2;
+    }
+      
+
+      .modal-close-btn:hover {
+        background-color: #f3f4f6;
+        color: #374151;
+        transform: scale(1.1);
+      }
+          
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(0,0,0,0.3);
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(0,0,0,0.5);
+      }
+
+      /* Firefox */
+      * {
+        scrollbar-width: thin;
+        scrollbar-color: rgba(0,0,0,0.3) transparent;
+      }
+    /* ==================== MOBILE (≤767px) ==================== */
+    @media (max-width: 767px) {
+      .main-container {
+        overflow: hidden;
+      }
+
+      .sidebar-panel {
+        position: relative;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: white;
+        z-index: 10;
+        transition: transform 0.35s ease;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .total-label-cash,
+      .total-label-gold,
+      .total-label-silver {
+        font-size: 20px;
+        font-weight: bold;
+      }
+
+      .search-filters {
+       /* display: flex;
+        padding: 10px 10px;
+        border-bottom: 1px solid #eee;
+        background: #fafafa;
+        /* display: grid; 
+        grid-template-columns: 1fr 145px 120px;
+        gap: 10px;*/
+        /* align-items: center;*/
+                padding: 16px 20px;
+        display: flex;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .filter-select,
+      .sort-select {
+                flex: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background: #fff;
+      }
+
+      .detail-panel {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        background: #fafafa;
+        z-index: 20;
+        transition: transform 0.35s ease;
+        transform: translateX(100%);
+        overflow-y: auto;
+        padding-bottom: 80px;
+      }
+
+      .mobile-open .sidebar-panel {
+        transform: translateX(-100%);
+      }
+
+      .mobile-open .detail-panel {
+        transform: translateX(0);
+      }
+
+      .detail-header {
+        position: relative;
+        padding: 10px;
+        background: white;
+        border-bottom: 1px solid #eee;
+      }
+
+      .back-btn {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(255, 255, 255, 0.9);
+        color: #1976d2;
+        border: none;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+        cursor: pointer;
+      }
+
+      .detail-header-name {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding-left: 50px;
+      }
+
+      .detail-header-name .avatar {
+        width: 48px;
+        height: 48px;
+        font-size: 18px;
+      }
+      .name-container{
+            font-size: 15px;
+            font-weight: 600;
+            margin-left: 25px;
+      }
+      .info-button svg{
+          height: 1rem;
+          width: 1rem;
+      }
+      .whatsApp-button{
+        padding: 8px 8px;
+      }
+      .sms-button{
+        padding: 5.8px 19px;
+      }
+      .info-label{s
+        font-size: 11px;
+        color: #888;
+        margin-top: 4px;
+        font-weight: 400;
+      }
+      .balances {
+        padding: 16px;
+        background: white;
+        border-bottom: 1px solid #eee;
+      }
+
+      .bal-box {
+        margin: 0 5px;
+      }
+
+      .reminder-section {
+        padding: 16px;
+        background: #f0f0f0;
+        text-align: center;
+      }
+
+      .reminder-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin-top: 12px;
+      }
+
+      .reminder-btn {
+        padding: 12px 20px;
+        border-radius: 12px;
+        border: 1px solid;
+        background: white;
+        min-width: 120px;
+        font-size: 14px;
+      }
+
+      .whatsapp {
+        border-color: #25d366;
+        color: #25d366;
+      }
+
+      .sms {
+        border-color: #1976d2;
+        color: #1976d2;
+      }
+
+     /* .entries {
+        padding: 16px;
+      }*/
+
+      .add-panel-container {
+        position: fixed;
+        bottom: 10%;
+        left: 0;
+        right: 0;
+        background: white;
+        border-top: 1px solid #ddd;
+        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+        z-index: 30;
+        transition: transform 0.3s ease;
+      }
+
+      .add-panel-container.minimized {
+        transform: translateY(calc(100% - 80px));
+      }
+
+      .add-panel-header {
+        padding: 12px 16px;
+        background: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .add-panel-body {
+        padding: 16px;
+      }
+
+      .open-btn,
+      .minimize-btn {
+        width: 20px;
+        height: 20px;
+        font-size: 11px;
+      }
+
+      .type-btn {
+        padding: 8px 16px;
+        border-radius: 20px;
+        border: 1px solid #ddd;
+        background: #f0f0f0;
+        cursor: pointer;
+      }
+
+     
+
+      .gave-got-btn {
+        flex: 1;
+        padding: 12px;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      .gave {
+        background: #fdecea;
+        color: #c62828;
+        border-color: #ffcdd2;
+      }
+
+      .got {
+        background: #e8f5e9;
+        color: #2e7d32;
+        border-color: #c8e6c9;
+      }
+
+      .gave-got-btn.active {
+        transform: scale(1.05);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      }
+
+      .save-btn {
+        background: #1976d2;
+        color: white;
+        border: none;
+        padding: 12px;
+        width: 100%;
+        border-radius: 6px;
+        margin-top: 10px;
+        cursor: pointer;
+      }
+
+      .sidebar-header {
+        background: #1976d2;
+        color: white;
+        padding: 16px;
+        text-align: center;
+        font-weight: 600;
+      }
+
+      .total-summary {
+        display: flex;
+        justify-content: space-around;
+        padding: 12px;
+        background: #e8f5e9;
+      }
+
+      .search-box input {
+        width: 100%;
+        padding: 10px 10px 10px 36px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+      }
+
+      .search-box i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+      }
+
+      .customer-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 12px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+      }
+
+      .customer-name {
+        font-size: 14px;
+
+      }
+
+      .customer-item>div:last-child>div:last-child {
+        font-size: 10px !important;
+        gap: 6px;
+      }
+
+      .sidebar-footer {
+        z-index: 10;
+        bottom: 0;
+        right: 0;
+        position: fixed;
+        left: 0;
+        padding: 16px;
+        background: white;
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+      }
+
+      .bulk-upload-btn,
+      .add-customer-btn {
+        padding: 10px 16px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .bulk-upload-btn {
+        background: white;
+        color: #1976d2;
+        border: 1.5px solid #1976d2;
+      }
+
+      .add-customer-btn {
+        background: #1976d2;
+        color: white;
+        border: none;
+      }
+
+      #detailPanel > div > button[onclick="openAddModal()"],
+  #actionMenuBtn {
+    position: fixed !important;
+    z-index: 999 !important;
+    box-shadow: 0 8px 25px rgba(25, 118, 210, 0.5) !important;
+    border: none !important;
+    outline: none !important;
+  }
+
+  /* Main + Button - Add Transaction */
+  #detailPanel > div > button[onclick="openAddModal()"] {
+   bottom: 15% !important;
+    right: 20px !important;
+    width: 52px !important;
+    height: 52px !important;
+    background: #1976d2 !important;
+    color: white !important;
+    border-radius: 50% !important;
+    font-size: 32px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    animation: pulse 2s infinite;
+  }
+
+  /* 3-Dot Menu Button */
+  #actionMenuBtn {
+    bottom: 10px !important; /* Above the + button */
+    right: 24px !important;
+    width: 52px !important;
+    height: 52px !important;
+    background: #1976d2 !important;
+    color: white !important;
+    border-radius: 50% !important;
+    font-size: 22px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Action Menu - slides up nicely */
+  #actionButtons {
+    position: fixed !important;
+    /*bottom: 20% !important;*/
+    right: 50% !important;
+    left: auto !important;
+    transform: translateX(50%) !important;
+    width: 86% !important;
+    max-width: 320px !important;
+    background: white !important;
+    border-radius: 16px !important;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3) !important;
+    padding: 16px !important;
+    display: none !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    z-index: 999 !important;
+  }
+
+  #actionButtons[style*="display: flex"],
+  #actionButtons.show {
+    display: flex !important;
+  }
+
+  /* Optional: subtle pulse animation for + button */
+  @keyframes pulse {
+    0% { box-shadow: 0 8px 25px rgba(25, 118, 210, 0.5); }
+    50% { box-shadow: 0 12px 35px rgba(25, 118, 210, 0.7); }
+    100% { box-shadow: 0 8px 25px rgba(25, 118, 210, 0.5); }
+  }
+    }
+
+    /* ==================== DESKTOP (≥768px) – EXACT FROM YOUR ORIGINAL ==================== */
+    @media (min-width: 768px) {
+      .main-container {
+        display: flex;
+      }
+
+      .sidebar-panel {
+        width: 400px;
+        background: #fff;
+        border-right: 1px solid #eee;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+        position: relative;
+        padding-bottom: 80px;
+      }
+
+      .filter-select,
+      .sort-select {
+        /*padding: 11px 10px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        background: #fff;
+        color: #555;*/
+        flex: 1;               
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        background: #fff;
+      }
+
+      .detail-panel {
+        flex: 1;
+        background: #fafafa;
+        overflow-y: hidden;
+        padding: 0;
+        display: none;
+      }
+
+      .detail-panel.active {
+        display: flex;
+      }
+
+      .type-btn {
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-size: 14px;
+        border: 1px solid #ddd;
+        background: #f0f0f0;
+        cursor: pointer;
+      }
+
+      .detail-header-name {
+       
+        align-items: center;
+        gap: 12px;
+        font-size: 24px;
+        font-weight: 600;
+        padding: 9.5px 5px;
+      }
+
+      .detail-header-name .avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #1976d2;
+        color: white;
+        font-weight: bold;
+        font-size: 18px;
+      }
+
+      .detail-panel .balances {
+        padding: 11.5px 0;
+        /* gap: 25px; */
+        justify-content: center;
+      }
+
+      .bal-box {
+        flex: 0 1 180px;
+        padding: 4px;
+      }
+
+      .bal-label {
+        font-size: 20px;
+      }
+
+      .bal-value {
+        font-size: 24px;
+      }
+
+      .reminder-section {
+        padding: 0.75rem 1rem 0.375rem;
+        display: flex;
+        justify-content: space-evenly;
+        background: rgb(239, 239, 239);
+      }
+
+      .reminder-label {
+        font-size: 15px;
+        color: #555;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-weight: 600;
+      }
+
+      .reminder-buttons {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .reminder-btn {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        padding: 12px 20px;
+        border: 1px solid #ddd;
+        background: white;
+        border-radius: 12px;
+        cursor: pointer;
+        min-width: 130px;
+        font-size: 14px;
+        color: #333;
+        transition: all 0.2s ease;
+      }
+
+      .reminder-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .reminder-btn.whatsapp {
+        border-color: #25d366;
+        color: #25d366;
+      }
+
+      .reminder-btn.sms {
+        border-color: #1976d2;
+        color: #1976d2;
+      }
+
+      .reminder-btn i {
+        font-size: 24px;
+      }
+
+      .reminder-btn .from {
+        font-size: 12px;
+        color: #777;
+      }
+
+      .entries {
+       /* padding: 0px 10px;
+        max-width: 900px;
+        margin: 0 auto;*/
+      }
+
+      .entry-item {
+     /*   padding: 18px 22px;*/
+      }
+      .entry-date {
+        line-height: 1.729;
+        letter-spacing: 0.15px;
+        /*font-size: large;*/
+        font-weight: 500;
+      }
+
+      .entry-amount {
+        font-size: 18px;
+      }
+
+      .add-panel-container {
+        position: fixed;
+        right: 0;
+        bottom: 0;
+        width: 51%;
+        /* max-width: 480px;*/
+        border-radius: 16px 16px 0 0;
+        box-shadow: -8px -4px 24px rgba(0, 0, 0, 0.12);
+        z-index: 1000;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+
+      .add-panel-header {
+        display: flex;
+        align-items: center;
+        padding: 16px 20px;
+        background: #f8f9fa;
+        border-bottom: 1px solid #e9ecef;
+        min-height: 64px;
+        position: relative;
+      }
+
+      .open-btn,
+      .minimize-btn {
+        width: 40px;
+        height: 40px;
+        background: #1976d2;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        font-size: 22px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+        transition: transform 0.2s ease;
+      }
+
+      .minimize-btn {
+        background: #e9ecef;
+        color: #6c757d;
+      }
+
+      .minimize-btn:hover {
+        background: #dee2e6;
+        color: #495057;
+        transform: scale(1.05);
+      }
+
+      .add-panel-body {
+        padding: 20px 16px 24px;
+        background: white;
+        transition: all 0.3s ease;
+      }
+
+      .add-panel-container.minimized .add-panel-body {
+        transform: translateY(100%);
+        opacity: 0;
+        height: 0;
+        overflow: hidden;
+        padding: 0;
+        margin: 0;
+      }
+
+      .sidebar-header {
+        background: #1976d2;
+        color: white;
+        padding: 10px;
+        font-weight: 600;
+        text-align: center;
+      }
+
+      .total-summary {
+        display: flex;
+        justify-content: space-around;
+        padding: 10px;
+        background: #e8f5e9;
+      }
+
+      .total-label-cash,
+      .total-label-gold,
+      .total-label-silver {
+        font-size: 24px;
+        font-weight: bold;
+      }
+
+
+
+      .search-filters {
+        padding: 16px 20px;
+        /*border-bottom: 1px solid #eee;
+        background: #fafafa;
+        display: grid;
+        grid-template-columns: 1fr 120px 120px;
+        gap: 10px;
+        align-items: center;*/
+        
+        display: flex;
+        gap: 10px;
+        width: 100%;
+
+      }
+
+      .search-box input {
+        width: 100%;
+        padding: 12px 12px 12px 36px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 15px;
+        background: #fff;
+      }
+
+      .search-box i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+        font-size: 15px;
+      }
+
+
+
+      .customer-item {
+        display: flex;
+        align-items: center;
+        padding: 5px 15px;
+        border-bottom: 1px solid #eee;
+        cursor: pointer;
+      }
+
+      .customer-item:hover {
+        background: #f9f9f9;
+      }
+
+      .sidebar-footer {
+        /* position: absolute;*/
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 16px 20px;
+        background: white;
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        z-index: 10;
+      }
+
+      .bulk-upload-btn,
+      .add-customer-btn {
+        padding: 10px 16px;
+        font-size: 14px;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+      }
+
+      .bulk-upload-btn {
+        background: white;
+        color: #1976d2;
+        border: 1.5px solid #1976d2;
+      }
+
+      .bulk-upload-btn:hover {
+        background: #e3f2fd;
+        transform: translateY(-1px);
+      }
+
+      .add-customer-btn {
+        background: #1976d2;
+        color: white;
+        border: none;
+      }
+
+      .add-customer-btn:hover {
+        background: #1565c0;
+        transform: translateY(-1px);
+      }
+
+      .no-customer-state {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #bbb;
+        background: #fafafa;
+        font-size: 18px;
+      }
+
+      .no-customer-icon {
+        font-size: 80px;
+        margin-bottom: 16px;
+        color: #ddd;
+      }
+    }
+  </style>
+  <style>
+  .toggle-btn {
+  width: 100%;
+    padding: 7px 28px;
+  border-radius: 50px;
+  font-weight: bold;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  background: white;
+ 
+  transition: all 0.3s ease;
+}
+.toggle-btn.active {
+  background: #1976d2;
+  color: white;
+  border-color: #1976d2;
+  box-shadow: 0 6px 20px rgba(25,118,210,0.4);
+  transform: translateY(-2px);
+}
+
+.input-group {
+  margin-bottom: 5px;
+}
+.input-group label {
+  display: block;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+.amt-input {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #e0e0e0;
+  border-radius: 14px;
+  font-size: 19px;
+  text-align: center;
+  background: #f8f9fa;
+  transition: all 0.3s;
+}
+.amt-input:focus {
+  outline: none;
+  border-color: #1976d2;
+  background: white;
+  box-shadow: 0 0 0 5px rgba(25,118,210,0.15);
+}
+.preview {
+  text-align: center;
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: bold;
+  min-height: 30px;
+  padding: 8px;
+  border-radius: 12px;
+  background: #f5f5f5;
+}
+.preview.gave { color: #d32f2f; background: #ffebee; }
+.preview.got { color: #2e7d32; background: #e8f5e9; }
+
+/* Mobile Optimization */
+@media (max-width: 480px) {
+  .modal-content {
+    border-radius: 18px;
+  }
+  .amt-input {
+    font-size: 19px;
+    padding: 16px;
+  }
+  .toggle-btn {
+    padding: 14px 0;
+    font-size: 16px;
+  }
+}
+  </style>
+</head>
+
+<body data-user-id="{{user._id}}">
+
+  {{> header}}
+  <div class="main-container" id="mainContainer">
+    {{> sidebar}}
+    <!-- SIDEBAR -->
+    <div class="sidebar-panel">
+      <div class="sidebar-header">Mysarafa KhataBook</div>
+
+      
+      <div class="total-summary">
+        <div class="total-item">
+          <div class="total-label-cash">CASH</div>
+          <div class="total-value" id="totalCashBal"></div>
+        </div>
+        <div class="total-item">
+          <div class="total-label-gold">GOLD</div>
+          <div class="total-value" id="totalGoldBal"></div>
+        </div>
+        <div class="total-item">
+          <div class="total-label-silver">SILVER</div>
+          <div class="total-value" id="totalSilverBal"></div>
+        </div>
+      </div>
+
+      <!-- TOGGLE: Customers / Suppliers -->
+      <div class="toggle-bar">
+        <div class="user-toggle-btn active" data-type="customer">
+          Customers <span class="count" id="customerCount">0</span>
+        </div>
+        <div class="user-toggle-btn" data-type="supplier">
+          Suppliers <span class="count" id="supplierCount">0</span>
+        </div>
+      </div>
+
+      <div class="search-filters">
+        {{!-- <div class="search-box" style="position:relative;">
+          <i class="fas fa-search"></i>
+          <input type="text" placeholder="Name or Phone Number" onkeyup="filterCustomers()" />
+        </div> --}}
+        
+        {{!-- <div class="searchable-select">
+          <input type="text" id="customerSearchInput" placeholder="Search or select customer..." autocomplete="off">
+          <div id="customerDropdown" class="dropdown-list" style="display:none;"></div>
+        </div> --}}
+        <select class="filter-select" onchange="renderCustomerList()">
+          <option value="">All Balances</option>
+          <option value="gold">Gold Only</option>
+          <option value="silver">Silver Only</option>
+          <option value="cash">Cash Only</option>
+        </select> 
+        <select class="sort-select" onchange="renderCustomerList()">
+          <option value="">Sort By</option>
+          <option value="recent">Recent</option>
+          <option value="name">Name (A-Z)</option>
+        </select>
+      </div>
+      <div class="search-box" style="position:relative;">
+          <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#999;"></i>
+          <input 
+            type="text" 
+            id="customerSearchInput"
+            placeholder="Search customer by name or phone..." 
+            autocomplete="off"
+            style="padding-left:36px;"
+          />
+        <div id="customerDropdown" class="dropdown-list" style="display:none;"></div>
+        
+        </div>
+
+      <div class="customer-list" id="customerList">
+        {{!-- {{#each customers}}
+        <div class="customer-item" onclick="loadCustomer('{{_id}}')">
+          <div class="avatar">{{initials name}}</div>
+          <div class="customer-name">{{name}}</div>
+        </div>
+        {{/each}} --}}
+      </div>
+
+      {{!-- <div class="sidebar-footer">
+        <button class="bulk-upload-btn" onclick="openBulkUpload()">+ Bulk Upload Customers</button>
+        <button class="add-customer-btn" id="btn-new-customer">+ Add Customer</button>
+      </div> --}}
+      <!-- REPLACE YOUR ENTIRE .sidebar-footer WITH THIS -->
+      <div class="">
+        <div style="display:flex; justify-content:center; gap:12px; width:100%;">
+          
+          <!-- 3-DOT MENU BUTTON -->
+          <button id="actionMenuBtn" style="position: absolute;
+          bottom: 66px;
+          right: 20px;
+          background: #1976d2;
+          color: white;
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          border: none;
+          font-size: 22px;
+          cursor: pointer;
+          box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);
+          z-index: 10;
+          background: #1976d2;
+          color: white;
+          width: 48px;
+          height: 48px;
+          border-radius: 50%;
+          border: none;
+          font-size: 20px;
+          cursor: pointer;
+          box-shadow: 0 4px 12px rgba(25, 118, 210, 0.4);">
+            <i class="fas fa-ellipsis-v"></i>
+          </button>
+
+          <!-- HIDDEN ACTION BUTTONS (will slide up) -->
+          <div id="actionButtons" style="position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:white; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,0.2); padding:16px; display:none; flex-direction:column; gap:12px; z-index:999; width:90%; max-width:320px;">
+            <button class="action-btn"  id="btn-new-customer">
+              <i class="fas fa-user-plus"></i> Add Customer
+            </button>
+            <button class="action-btn" onclick="openBulkUpload()">
+              <i class="fas fa-upload"></i> Bulk Upload
+            </button>
+            <button class="action-btn" id="fullReportBtn" onclick="openFullReportModal()" >
+              <i class="fas fa-file-export"></i> View Full Report
+            </button>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+
+    <!-- DETAIL PANEL (Desktop: hidden until clicked) -->
+    <div class="detail-panel" id="detailPanel">
+      <div style="position:absolute; bottom:66px; right:20px; z-index:999;">
+      <button onclick="openAddModal()" 
+              style="width:50px; height:50px; background:#1976d2; color:white; border:none; border-radius:50%; font-size:38px; box-shadow:0 10px 30px rgba(25,118,210,0.5); cursor:pointer;">
+        +
+      </button>
+    </div>
+      {{!-- <!-- Mobile Header (Back Button) -->
+      <div class="detail-header" id="mobileHeader" style="display:none;">
+        <button class="back-btn" onclick="closeMobileDetail()">
+          <i class="fas fa-arrow-left"></i>
+        </button>
+        <div class="detail-header-name">
+          <div class="avatar" id="mobileAvatar">?</div>
+          <div class="customer-name" id="mobileName">Customer</div>
+        </div>
+      </div> --}}
+      <div class="detail-header" id="mobileHeader" style="display:none;">
+      <button class="back-btn" onclick="closeMobileDetail()">
+        <i class="fas fa-arrow-left"></i>
+      </button>
+      <div style="display:flex; align-items:center; justify-content:space-around; width:100%; padding:0 10px 0px 24px;">
+        <div style="display:flex; align-items:center; ">
+          <div class="avatar" id="mobileAvatar">?</div>
+          <div class="customer-name" id="mobileName">Customer</div>
+        </div>
+      <button onclick="openReportModal()" style="background:#1976d2; color:white; border:none; padding:6px 12px; border-radius:6px; font-size:13px; font-weight:600;">
+      <i class="fas fa-download"></i> Report
+    </button>
+  </div>
+</div>
+      
+      {{!-- <!-- Desktop Header -->
+      <div class="detail-header-name" id="desktopHeader" style="display: none;background:#fff; ">
+        <div class="avatar" id="desktopAvatar"  style="display: none;">?</div>
+        <div class="customer-name" id="desktopName" style="display: none;">Select a customer</div>
+      </div> --}}
+      <div class="detail-header-name" id="desktopHeader" style="background:#fff; display:flex;justify-content:space-between; padding-right:16px;">
+  <div style="display:flex; align-items:center; gap:12px;">
+    <div class="avatar" id="desktopAvatar">?</div>
+    <div class="customer-name" id="desktopName">Select a customer</div>
+  </div>
+ <button id="viewReportBtn" onclick="openReportModal()" style="display:none; background:#1976d2; color:white; border:none; padding:8px 16px; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer;">
+  <i class="fas fa-chart-line"></i> View Report
+</button>
+</div>
+
+      <div class="balances" id="balances">
+        <div class="bal-box cash">
+          <div class="bal-label">CASH</div>
+          <div class="bal-value" id="cashBal"></div>
+        </div>
+        <div class="bal-box gold">
+          <div class="bal-label">GOLD</div>
+          <div class="bal-value" id="goldBal"></div>
+        </div>
+        <div class="bal-box silver">
+          <div class="bal-label">SILVER</div>
+          <div class="bal-value" id="silverBal"></div>
+        </div>
+      </div>
+
+      <div class="detail-pane__reminder" style="
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    font-family: &quot;Inter&quot;, sans-serif;
+">
+        <div class="detail-pane__reminder-container" style="
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    align-items: center;
+">
+
+          <!-- LEFT SECTION: Label + Info icon -->
+          <div class="detail-pane__reminder-container-left" style="
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                font-weight: 500;
+                color: #333;
+            ">
+            <div class="name-container" style="font-weight: 700;">Send Reminder</div>
+            <div class="info-button" title="Remind your customer via WhatsApp or SMS">
+              <svg xmlns="http://www.w3.org/2000/svg" height="12" viewBox="0 0 24 24" width="12" fill="black">
+                <path d="M0 0h24v24H0V0z" fill="none"></path>
+                <path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 
+                18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path>
+              </svg>
+            </div>
+          </div>
+
+          <!-- RIGHT SECTION: WhatsApp + SMS buttons -->
+          <div class="detail-pane__reminder-container-right" style="
+              display: flex;
+            
+              gap: 24px;
+          ">
+
+            <!-- WhatsApp section -->
+          <div class="detail-pane__reminder-container-right-whatsApp-section" style="
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            ">
+              <button class="whatsApp-button" onclick="sendReminder('whatsapp')" style="
+                    display: flex
+                ;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 6px;
+                    padding: 11px 20px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    background-color: #fff;
+                    border: 1px solid #dcdcdc;
+                    cursor: pointer;
+                    transition: all 0.2s 
+                ease;
+                ">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M13.3358 2.69419C12.6428 1.99659 11.8182 1.44345 10.9099 1.06681C10.0015 0.690175 9.02749 0.497525 8.04417 0.500024C3.92083 0.500024 0.564167 3.85586 0.5625 7.98086C0.5625 9.29919 0.906666 10.5859 1.56083 11.7209L0.5 15.5967L4.46583 14.5559C5.56283 15.153 6.79183 15.4661 8.04083 15.4667H8.04417C12.1667 15.4667 15.5233 12.1109 15.525 7.98586C15.5278 7.00293 15.3358 6.02918 14.9601 5.12091C14.5843 4.21263 14.0323 3.38783 13.3358 2.69419ZM8.04417 14.2042H8.04167C6.92793 14.2043 5.83469 13.9047 4.87667 13.3367L4.65 13.2017L2.29667 13.8192L2.92417 11.525L2.77667 11.29C2.15399 10.2987 1.82436 9.15151 1.82583 7.98086C1.8275 4.55252 4.61667 1.76336 8.04667 1.76336C8.86354 1.76154 9.67267 1.92176 10.4272 2.23473C11.1818 2.54771 11.8667 3.00723 12.4425 3.58669C13.0214 4.16339 13.4802 4.8491 13.7924 5.60419C14.1047 6.35928 14.2641 7.16876 14.2617 7.98586C14.26 11.4142 11.4708 14.2042 8.04417 14.2042ZM11.455 9.54669C11.2675 9.45252 10.3492 9.00086 10.1775 8.93836C10.0067 8.87586 9.8825 8.84502 9.7575 9.03169C9.6325 9.21836 9.27417 9.63919 9.165 9.76419C9.05583 9.88919 8.94667 9.90419 8.76 9.81086C8.57333 9.71752 7.97083 9.52002 7.25667 8.88336C6.70083 8.38752 6.32583 7.77586 6.21667 7.58836C6.1075 7.40086 6.205 7.30002 6.29917 7.20669C6.38333 7.12336 6.48583 6.98836 6.57917 6.87919C6.6725 6.77002 6.70333 6.69252 6.76583 6.56752C6.82833 6.44252 6.7975 6.33336 6.75 6.24002C6.70333 6.14586 6.32917 5.22586 6.17333 4.85169C6.0225 4.48919 5.86833 4.53752 5.75333 4.53252C5.63423 4.52765 5.51504 4.52543 5.39583 4.52586C5.30105 4.52827 5.20778 4.55025 5.12188 4.5904C5.03599 4.63055 4.95931 4.68801 4.89667 4.75919C4.725 4.94669 4.2425 5.39836 4.2425 6.31836C4.2425 7.23836 4.9125 8.12752 5.00583 8.25252C5.09917 8.37752 6.32417 10.265 8.19917 11.075C8.64583 11.2675 8.99417 11.3825 9.265 11.4692C9.7125 11.6117 10.12 11.5909 10.4425 11.5434C10.8017 11.49 11.5483 11.0917 11.7042 10.655C11.86 10.2184 11.86 9.84419 11.8133 9.76586C11.7667 9.68752 11.6408 9.64002 11.455 9.54669Z"
+                    fill="#737373" style="
+    fill: #25D366;
+    fill: rgb#12b76a(18, 183, 106);
+"></path>
+                </svg>
+                <div class="button-text">WhatsApp</div>
+              </button>
+              <div class="infoLabel" style="
+              font-size: 13px;
+                color: #888;
+                margin-top: 4px;
+                font-weight: 400;
+            ">from your number</div>
+            </div>
+
+            <!-- SMS section -->
+            <div class="detail-pane__reminder-container-right-sms-section" style="
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            ">
+              <button class="sms-button" onclick="sendReminder('sms')" style="
+                  display: flex
+                ;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 6px;
+                    padding: 9px 24px;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    background-color: #fff;
+                    border: 1px solid #dcdcdc;
+                    cursor: pointer;
+                    transition: all 0.2s 
+                ease;
+                ">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M3.19562 3.4C2.73433 3.4 2.4 3.75625 2.4 4.10764V13.3453C2.4 13.7319 2.0866 14.0453 1.7 14.0453C1.3134 14.0453 1 13.7319 1 13.3453V4.10764C1 2.87544 2.07332 2 3.19562 2H16.3043C17.5423 2 18.4999 2.90147 18.4999 4.10764V13.2573C18.4999 14.5451 17.3634 15.277 16.3043 15.277H6.8027C6.4161 15.277 6.1027 14.9636 6.1027 14.577C6.1027 14.1904 6.4161 13.877 6.8027 13.877H16.3043C16.8288 13.877 17.0999 13.5531 17.0999 13.2573V4.10764C17.0999 3.73022 16.8258 3.4 16.3043 3.4H3.19562Z"
+                    fill="#175CD3"></path>
+                  <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M1.7 12.6453C2.0866 12.6453 2.4 12.9587 2.4 13.3453V17.0832L6.28951 14.1089C6.59661 13.874 7.03593 13.9326 7.27077 14.2397C7.50561 14.5468 7.44704 14.9861 7.13994 15.221L2.63505 18.6659L2.61616 18.6785C2.29036 18.8957 1.87752 18.9368 1.52501 18.741C1.18922 18.5544 1 18.2012 1 17.8321V13.3453C1 12.9587 1.3134 12.6453 1.7 12.6453Z"
+                    fill="#175CD3"></path>
+                  <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M5.09961 7.44319C5.09961 7.0566 5.41301 6.74319 5.79961 6.74319H11.7996C12.1862 6.74319 12.4996 7.0566 12.4996 7.44319C12.4996 7.82979 12.1862 8.14319 11.7996 8.14319H5.79961C5.41301 8.14319 5.09961 7.82979 5.09961 7.44319Z"
+                    fill="#175CD3"></path>
+                  <path fill-rule="evenodd" clip-rule="evenodd"
+                    d="M5.09961 10.4432C5.09961 10.0566 5.41301 9.74319 5.79961 9.74319H13.7996C14.1862 9.74319 14.4996 10.0566 14.4996 10.4432C14.4996 10.8298 14.1862 11.1432 13.7996 11.1432H5.79961C5.41301 11.1432 5.09961 10.8298 5.09961 10.4432Z"
+                    fill="#175CD3"></path>
+                </svg>
+                <div class="button-text">SMS</div>
+              </button>
+                  <div class="infoLabel" style="
+                  font-size: 13px;
+                    color: #888;
+                    margin-top: 4px;
+                    font-weight: 400;
+                ">from Khatabook's number</div>
+                </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="entries" id="entriesList">
+        <div class="no-entries">Select a customer to view entries</div>
+      </div>
+
+    
+<!-- ADD TRANSACTION POPUP - KHATABOOK 2025 STYLE -->
+<div id="addTransactionModal" class="modal-overlay" style="display:none; align-items:center; justify-content:center; z-index:1000; background:rgba(0,0,0,0.5);">
+  <div class="modal-content" style="width:92%; max-width:420px; border-radius:22px; overflow:hidden; background:white; box-shadow:0 30px 80px rgba(0,0,0,0.4); display:flex; flex-direction:column; max-height:90vh;border: none;">
+    
+    <!-- Header -->
+    <div style="background:#1976d2; color:white; padding:18px; font-size:19px; font-weight:700; text-align:center; position:relative;">
+      Add Transaction
+      <button onclick="closeAddModal()" style="position:absolute; right:16px; top:14px; background:none; border:none; color:white; font-size:34px; cursor:pointer;">×</button>
+    </div>
+    {{!-- <div class="current-customer" id="currentCustomerName">
+      <!-- JS will fill this: "Rajesh Jewellers" -->
+    </div> --}}
+
+    <!-- Body (Scrollable if needed) -->
+    <div style="flex:1; overflow-y:auto; padding:20px;">
+      
+      <!-- Final Balance Box -->
+      <div style="background:#e3f2fd; border:2px solid #1976d2; border-radius:16px; padding:10px; margin-bottom:10px; text-align:center;">
+        <div style="font-size:15px; color:#1565c0; font-weight:600; margin-bottom:10px;">Final Balance After Entry</div>
+        <div style="display:flex; justify-content:space-around; font-size:19px; font-weight:bold;">
+          <div><span style="color:#2e7d32;">₹<span id="finalCash">0</span></span></div>
+          <div><span style="color:#f9a825;"><span id="finalGold">0.00</span>g</span></div>
+          <div><span style="color:#546e7a;"><span id="finalSilver">0.00</span>g</span></div>
+        </div>
+      </div>
+
+      <!-- Toggle: YOU GAVE / YOU GOT -->
+      <div style="display:flex; justify-content:center; margin-bottom:5px;">
+        <button id="btnGave" class="toggle-btn active">YOU GAVE</button>
+        <button id="btnGot" class="toggle-btn">YOU GOT</button>
+      </div>
+
+      <!-- Cash Input -->
+      <div class="input-group">
+        <label>Cash Amount</label>
+        <input type="number"  data-gave="0" data-got="0" id="amtCash" placeholder="Enter amount in ₹" class="amt-input">
+        <div id="previewCash" class="preview">—</div>
+      </div>
+
+      <!-- Gold Input -->
+      <div class="input-group">
+        <label>Gold (grams)</label>
+        <input type="number"  data-gave="0" data-got="0" step="0.01" id="amtGold" placeholder="Enter grams" class="amt-input">
+        <div id="previewGold" class="preview">—</div>
+      </div>
+
+      <!-- Silver Input -->
+      <div class="input-group">
+        <label>Silver (grams)</label>
+        <input type="number"  data-gave="0" data-got="0" step="0.01" id="amtSilver" placeholder="Enter grams" class="amt-input">
+        <div id="previewSilver" class="preview">—</div>
+      </div>
+
+      <!-- Save Button -->
+      <button onclick="saveAllEntries()" 
+              style="margin-top:10px; display:block;margin:0 auto; background:#1976d2; color:white; border:none; padding: 7px 28px; border-radius:16px; font-weight:700; font-size:18px; box-shadow:0 8px 30px rgba(25,118,210,0.5);">
+        SAVE 
+      </button>
+    </div>
+  </div>
+</div>
+    </div>
+
+    <!-- Desktop: No customer state -->
+    <div class="no-customer-state" id="noCustomerState">
+      <div class="no-customer-icon"><i class="far fa-user-circle"></i></div>
+      <div class="no-customer-text">No customer selected</div>
+    </div>
+  </div>
+  <div id="modal-new-customer" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>New Party Detail</h3>
+        <button class="modal-close-btn" id="modal-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-new-customer" class="modal-form">
+          <div class="modal-form-group">
+            <label class="required">Type</label>
+            <select name="type_of_customer" id="type_of_customer" class="modal-input modal-select">
+              <option value="customer" >Customer</option>
+              <option value="supplier">Supplier</option>
+            </select>
+          </div>
+
+          <div class="modal-form-group">
+            <label class="required">Customer Name</label>
+            <input type="text" name="name" id="name" class="modal-input" required />
+            <span class="error-text" id="error-name"></span>
+          </div>
+
+          <div class="modal-form-group">
+            <label>Customer Mobile Number<span class="text-gray">(10 digits)</span></label>
+            <input type="tel" name="mobile_no" id="mobile_no" class="modal-input" placeholder="e.g.. 9876543210" maxlength="10" pattern="[0-9]{10}" />
+            <span class="error-text" id="error-mobile"></span>
+          </div>
+
+          <div class="modal-form-group">
+            <label>Customer E-Mail Address<span class="text-gray">(optional)</span></label>
+            <input type="email" name="email" id="email" class="modal-input" placeholder="example@domain.com" />
+            <span class="error-text" id="error-email"></span>
+          </div>
+
+          <div class="modal-form-group">
+            <label>Customer Address</label>
+            <textarea name="address" id="address" class="modal-input modal-textarea"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer" style="justify-content:space-between !important">
+        <button  id="submit-new">Add</button>
+        <button  id="cancel-new">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- REPORT MODAL - EXACT KHATABOOK -->
+<div id="reportModal" class="modal-overlay" style="display:none; align-items:center; justify-content:center; z-index:999;">
+    <div class="modal-content" style="width:90%; max-width:420px; border-radius:16px; overflow:hidden; background:white; box-shadow:0 20px 50px rgba(0,0,0,0.25);">
+      
+    <!-- HEADER -->
+    <div style="background:#1976d2; color:white; padding:16px 20px; font-size:18px; font-weight:600; display:flex; justify-content:space-between; align-items:center;">
+      <span>Customer Name</span>
+      <button onclick="closeReportModal()" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">×</button>
+    </div>
+
+    <!-- BODY -->
+    <div style="padding:20px;">
+      {{!-- <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+        <div style="width:48px; height:48px; background:#ffebee; border-radius:12px; display:flex; align-items:center; justify-content:center;">
+          <i class="fas fa-file-pdf" style="font-size:24px; color:#d32f2f;"></i>
+        </div>
+        <div>
+          <strong style="font-size:16px;">Download PDF</strong>
+          <div style="font-size:13px; color:#666; margin-top:4px;">Report will be downloaded to your device</div>
+        </div>
+      </div> --}}
+
+      <!-- OPTIONS -->
+      <div style="margin:20px 0;">
+        <label style="display:flex; align-items:center; gap:12px; font-size:15px; cursor:pointer; user-select:none;">
+          <input type="checkbox" id="includeEntries" checked style="width:18px; height:18px; accent-color:#1976d2;">
+          <span>Entry Details</span>
+        </label>
+      </div>
+
+      <!-- FORMAT BUTTONS -->
+      <div style="display:flex; gap:12px; margin-top:24px;">
+        <button onclick="downloadReport('pdf')" style="flex:1; background:#1976d2; color:white; border:none; padding:14px; border-radius:12px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(25,118,210,0.3);">
+          PDF
+        </button>
+        <button onclick="downloadReport('excel')" style="flex:1; background:#2e7d32; color:white; border:none; padding:14px; border-radius:12px; font-weight:600; cursor:pointer;">
+          Excel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FULL REPORT MODAL -->
+<div id="fullReportModal" class="modal-overlay" style="display:none; align-items:center; justify-content:center; z-index:999;">
+  <div class="modal-content" style="width:90%; max-width:420px; border-radius:16px; overflow:hidden; background:white; box-shadow:0 20px 50px rgba(0,0,0,0.25);">
+    <div style="background:#2e7d32; color:white; padding:16px 20px; font-size:18px; font-weight:600; display:flex; justify-content:space-between; align-items:center;">
+      <span>Full Business Report</span>
+      <button onclick="closeFullReportModal()" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">×</button>
+    </div>
+    <div style="padding:20px;">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:20px;">
+        <div style="width:48px; height:48px; background:#e8f5e9; border-radius:12px; display:flex; align-items:center; justify-content:center;">
+          <i class="fas fa-building" style="font-size:24px; color:#2e7d32;"></i>
+        </div>
+        <div>
+          <strong style="font-size:16px;">All Customers Report</strong>
+          <div style="font-size:13px; color:#666; margin-top:4px;">Export complete business data</div>
+        </div>
+      </div>
+
+      <label style="display:flex; align-items:center; gap:12px; font-size:15px; margin:20px 0;">
+        <input type="checkbox" id="fullIncludeEntries" checked style="width:18px; height:18px; accent-color:#2e7d32;">
+        <span>Include All Entry Details</span>
+      </label>
+
+      <div style="display:flex; gap:12px; margin-top:24px;">
+        <button onclick="downloadFullReport('pdf')" style="flex:1; background:#d32f2f; color:white; border:none; padding:14px; border-radius:12px; font-weight:600;">
+          PDF
+        </button>
+        <button onclick="downloadFullReport('excel')" style="flex:1; background:#2e7d32; color:white; border:none; padding:14px; border-radius:12px; font-weight:600;">
+          Excel
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====================== BULK UPLOAD MODALS ====================== -->
+  
+<!-- 1. FIRST MODAL - "Bulk Import" Info -->
+<div id="bulkUploadModal" class="modal-overlay" style="display:none; align-items:center; justify-content:center;">
+  <div class="modal-content" style="width:90%; max-width:500px; border-radius:16px; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.15);">
+    <div style="background:#1976d2; color:white; padding:16px 20px; font-size:18px; font-weight:600; display:flex; justify-content:space-between; align-items:center;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <i class="fas fa-arrow-left" style="cursor:pointer;" onclick="closeBulkUpload()"></i>
+        <span>Bulk Import</span>
+      </div>
+    </div>
+
+    <div style="padding:20px; background:white;">
+      <p style="margin-bottom:20px; color:#444; font-size:15px;">Bulk upload customers in 3 Simple steps</p>
+
+      <div style="display:flex; flex-direction:column; gap:20px;">
+        <div style="display:flex; align-items:center; gap:16px;">
+        <div style="background:#e3f2fd; border-radius:12px; display:flex; align-items:center; justify-content:center;">
+            <img src="/assets/images/xlsx-icon.png" alt="xlsx" style="width:32px;">
+          </div>
+          <div>
+            <strong>Step 1:</strong><br>
+            <a href="/assets/downloads/sample-customers.xlsx" download style="color:#1976d2; text-decoration:none;">Download the Sample Excel sheet format</a>
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:16px;">
+          <div style="background:#e8f5e9;  border-radius:12px; display:flex; align-items:center; justify-content:center;">
+            <img src="/assets/images/xlsx-icon.png" alt="xlsx" style="width:32px;">
+          </div>
+          <div>
+            <strong>Step 2:</strong><br>
+            Upload your Excel sheet with your customers details by clicking upload excel sheet button
+          </div>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:16px;">
+          <div style="background:#fff3e0; width:31px; height:31px; border-radius:12px; display:flex; align-items:center; justify-content:center;">
+            <i class="fas fa-check-circle" style="color:#1976d2; font-size:24px;"></i>
+          </div>
+          <div>
+            <strong>Step 3:</strong><br>
+            Click on "Upload Button"
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top:30px; text-align:center;">
+        <button onclick="openFileUploadModal()" style="background:#1976d2; color:white; border:none; padding:14px 32px; border-radius:50px; font-size:16px; font-weight:600; cursor:pointer; box-shadow:0 4px 12px rgba(25,118,210,0.3);">
+          Upload excel sheet
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. SECOND MODAL - File Upload Picker -->
+<div id="fileUploadModal" class="modal-overlay" style="display:none; align-items:flex-end;">
+  <div class="modal-content" style="width:100%; border-radius:16px 16px 0 0; background:white; max-height:90vh; overflow-y:auto;">
+    <div style="padding:20px; text-align:center; border-bottom:1px solid #eee;">
+      <h3 style="margin:0; font-weight:600;">Upload excel sheet</h3>
+      <button onclick="closeFileUploadModal()" style="position:absolute; right:16px; top:16px; background:none; border:none; font-size:28px; color:#999; cursor:pointer;">&times;</button>
+    </div>
+
+    <div style="padding:30px 20px; text-align:center;">
+      <div style="margin-bottom:30px;">
+        <div style="width:80px; height:80px; margin:0 auto 20px; background:#f0f0f0; border-radius:16px; display:flex; align-items:center; justify-content:center;">
+          <i class="fas fa-cloud-upload-alt" style="font-size:40px; color:#bbb;"></i>
+        </div>
+        <p style="color:#666; margin:10px 0;">Browse and chose the files you want to upload from your computer</p>
+      </div>
+
+      <label style="display:inline-block; background:#1976d2; color:white; padding:16px 40px; border-radius:50px; cursor:pointer; font-weight:600; box-shadow:0 4px 12px rgba(25,118,210,0.3);">
+        <input type="file" id="excelFileInput" accept=".xlsx,.xls" style="display:none;" onchange="handleFileSelect(event)">
+        Choose File
+      </label>
+
+      <div id="selectedFileName" style="margin-top:20px; color:#1976d2; font-weight:600;"></div>
+
+      <button id="uploadNowBtn" onclick="uploadExcelFile()" disabled style="margin-top:20px; background:#1976d2; color:white; border:none; padding:14px 40px; border-radius:50px; font-size:16px; font-weight:600; cursor:not-allowed; opacity:0.6;">
+        Upload now
+      </button>
+
+      <p id="uploadStatus" style="margin-top:15px; color:#888; font-size:14px;"></p>
+    </div>
+  </div>
+</div>
+
+  <script src="/js/all.js"></script>
+  <script>
+    let currentCustomerId = null;
+    let selectedType = 'cash';
+    let transactionType = 'gave';
+    let currentFilterType = 'customer';
+    let allCustomers = {{{ json customers }}};
+
+    const customerCount = allCustomers.filter(c => c.type === 'customer').length;
+    const supplierCount = allCustomers.filter(c => c.type === 'supplier').length;
+    document.getElementById('customerCount').innerText = customerCount; 
+    document.getElementById('supplierCount').innerText = supplierCount;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlType = urlParams.get('type');
+    const storedType = localStorage.getItem('khataToggle');
+    currentFilterType = urlType || storedType || 'customer';
+
+    
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.type === currentFilterType);
+    });
+
+    localStorage.setItem('khataToggle', currentFilterType);
+
+    function formatBalance(value, type = 'cash') {
+      if (!value) value = 0;
+      const abs = Math.abs(value);
+      const sign = value > 0 ? '+' : value < 0 ? '−' : '';
+      const color = value > 0 ? '#2e7d32' : value < 0 ? '#c62828' : '#666';
+      const formatted = type === 'cash' ? abs.toLocaleString() : abs.toFixed(2);
+
+      if (type === 'cash') {
+
+        return `<span style="color:${color};font-weight:bold;">${sign}₹${formatted}</span>`;
+      } else {
+
+        return `<span style="color:${color};font-weight:bold;">${sign}${formatted}g</span>`;
+      }
+    }
+   
+    function showReportButton() {
+      document.getElementById('viewReportBtn').style.display = 'block';
+    }
+
+    function renderCustomerList() {
+      const list = document.getElementById('customerList');
+      const searchTerm = document.querySelector('.search-box input').value.toLowerCase().trim();
+      
+      const filterValue = document.querySelector('.filter-select').value; // gold, silver, cash
+      const sortValue = document.querySelector('.sort-select').value;
+      list.innerHTML = '';
+      
+     /* let filtered = allCustomers.filter(c => {
+        if (c.type !== currentFilterType) return false;
+        const isSearching = searchTerm.length > 0;
+
+        const hasBalance = c.amount_balance !== 0 || c.gold_balance !== 0 || c.silver_balance !== 0;
+        if (!isSearching) {
+        
+          if (!hasBalance) return false;
+        }
+
+        const matches =  c.name.toLowerCase().includes(searchTerm) || (c.mobile_no && c.mobile_no.toString().includes(searchTerm));
+        return hasBalance || matches;
+      });
+      console.log("filmtered",filtered)
+  
+      filtered.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+      if (filtered.length === 0) {
+        list.innerHTML = `<div style="padding:20px; text-align:center; color:#999;">
+            No ${currentFilterType}s with balance yet<br>
+            <small style="color:#1976d2;">Start adding transactions to see them here</small>
+          </div>`;
+        return;
+      }*/
+      let filtered = allCustomers.filter(c => {
+        // 1. Match current tab (customer/supplier)
+        if (c.type !== currentFilterType) return false;
+
+        const isSearching = searchTerm.length > 0;
+        const hasBalance = c.amount_balance !== 0 || c.gold_balance !== 0 || c.silver_balance !== 0;
+        if (!isSearching) {
+        
+          if (!hasBalance) return false;
+        }
+
+        // 2. Search by name or mobile
+        const matchesSearch = !searchTerm || 
+          c.name.toLowerCase().includes(searchTerm) || 
+          (c.mobile_no && c.mobile_no.includes(searchTerm));
+
+        // 3. Filter by balance type (gold/silver/cash)
+        if (filterValue === 'gold' && c.gold_balance === 0) return false;
+        if (filterValue === 'silver' && c.silver_balance === 0) return false;
+        if (filterValue === 'cash' && c.amount_balance === 0) return false;
+
+        return hasBalance||matchesSearch;
+       });
+
+      // SORTING
+      if (sortValue === 'recent') {
+        filtered.sort((a, b) => new Date(b.createdAt || b.updatedAt || 0) - new Date(a.createdAt || a.updatedAt || 0));
+      } else if (sortValue === 'name') {
+        filtered.sort((a, b) => a.name.localeCompare(b.name));
+      }
+
+  // EMPTY STATE
+  if (filtered.length === 0) {
+    let message = '';
+    if (allCustomers.filter(c => c.type === currentFilterType).length === 0) {
+      message = `
+        <div style="padding:40px 20px; text-align:center; color:#999;">
+          <div style="font-size:60px; margin-bottom:16px;">No customers yet</div>
+          <p style="font-size:16px; margin:10px 0;">Start by adding your first ${currentFilterType}</p>
+          <button class="action-btn" onclick="document.getElementById('btn-new-customer').click()" style="margin-top:16px; padding:12px 24px;">
+            Add First ${currentFilterType.charAt(0).toUpperCase() + currentFilterType.slice(1)}
+          </button>
+        </div>`;
+    } else if (filterValue) {
+      const labels = { cash: 'Cash', gold: 'Gold', silver: 'Silver' };
+      message = `<div style="text-align:center; padding:40px; color:#888;">
+        No ${currentFilterType}s with <strong>${labels[filterValue]}</strong> balance
+        <br><small style="color:#1976d2; margin-top:8px; display:block;">Try changing filter</small>
+      </div>`;
+    } else {
+      message = `<div style="text-align:center; padding:40px; color:#888;">
+        No ${currentFilterType}s with balance yet<br>
+        <small style="color:#1976d2;">Start search and adding transactions to see them here</small>
+      </div>`;
+    }
+    list.innerHTML = message;
+    return;
+  }
+
+      //RENDER CUSTOMERS
+      filtered.forEach(c => {
+        const div = document.createElement('div');
+        div.className = 'customer-item';
+        div.onclick = () => loadCustomer(c._id);
+
+        const miniCash = formatBalance(c.amount_balance, 'cash');
+        const miniGold = formatBalance(c.gold_balance, 'gold');
+        const miniSilver = formatBalance(c.silver_balance, 'silver');
+
+        div.innerHTML = `
+        <div class="avatar">${getInitials(c.name)}</div>
+        <div style="flex:1; min-width:0;">
+          <div class="customer-name" style="font-weight:600; margin-bottom:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+            ${c.name}
+          </div>
+          <div style="display:flex; gap:8px; font-size:11px; color:#555; flex-wrap:wrap;">
+
+            <!-- cash COIN ICON -->
+            <span style="display:flex; align-items:center; gap:5px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="6" width="16" height="12" rx="2" fill="#4caf50"/>
+              <rect x="6" y="8" width="12" height="8" fill="#81c784"/>
+              <path d="M8 12h8M8 14h8" stroke="#2e7d32" stroke-width="1.5"/>
+              <circle cx="12" cy="12" r="2" fill="#2e7d32"/>
+              <path d="M12 10v4" stroke="#fff" stroke-width="1.5"/>
+            </svg>
+            <span style="color:#2e7d32;">${miniCash}</span>
+            </span>
+
+            <!-- GOLD COIN ICON -->
+            <span style="display:flex; align-items:center; gap:5px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="9" fill="#fdd835" stroke="#f9a825" stroke-width="2"/>
+              <circle cx="12" cy="12" r="6" fill="#ffb300"/>
+              <text x="12" y="15" text-anchor="middle" font-size="10" fill="#c68400" font-weight="bold">G</text>
+            </svg>
+            <span style="color:#f9a825;">${miniGold}</span>
+            </span>
+
+            <!-- SILVER COIN ICON -->
+            <span style="display:flex; align-items:center; gap:5px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="9" fill="#e0e0e0" stroke="#9e9e9e" stroke-width="2"/>
+              <circle cx="12" cy="12" r="6" fill="#eeeeee"/>
+              <text x="12" y="15" text-anchor="middle" font-size="10" fill="#616161" font-weight="bold">S</text>
+            </svg>
+            <span style="color:#546e7a;">${miniSilver}</span>
+            </span>
+          </div>
+        </div>
+        `;
+          list.appendChild(div);
+      });
+    }
+
+   
+    document.querySelector('.search-box input').addEventListener('input', renderCustomerList);
+    document.querySelector('.filter-select').addEventListener('change', renderCustomerList);
+    document.querySelector('.sort-select').addEventListener('change', renderCustomerList);
+
+    document.querySelectorAll('.user-toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.user-toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilterType = btn.dataset.type;
+        renderCustomerList();
+      });
+    });
+
+
+    renderCustomerList();
+
+    function updateLayout() {
+      const isMobile = window.innerWidth <= 767;
+      console.log("isit mobile view",isMobile);
+      //console.log("here",isMobile)
+      document.getElementById('mobileHeader').style.display = isMobile ? 'flex' : 'none';
+      document.getElementById('desktopHeader').style.display = isMobile ? 'none' : 'flex';
+      document.getElementById('noCustomerState').style.display = isMobile ? 'none' : (currentCustomerId ? 'none' : 'flex');
+      document.body.classList.toggle('mobile-open', isMobile && currentCustomerId);
+      // After page load
+      document.getElementById('totalCashBal').innerHTML = formatBalance({{{ totalCash }}}, 'cash');
+      document.getElementById('totalGoldBal').innerHTML = formatBalance({{{ totalGold }}}, 'gold');
+      document.getElementById('totalSilverBal').innerHTML = formatBalance({{{ totalSilver }}}, 'silver');
+    }
+
+    function loadCustomer(id) {
+      currentCustomerId = id;
+      const detailPanel = document.getElementById('detailPanel');
+      if (window.innerWidth <= 767) {
+        document.body.classList.add('mobile-open');
+      } else {
+        detailPanel.classList.add('active');
+        document.getElementById('desktopAvatar').style.display = 'flex';
+        document.getElementById('desktopName').style.display = 'flex';
+       // document.getElementById('addPanel').classList.add('minimized');
+        document.getElementById('noCustomerState').style.display = 'none';
+        showReportButton();
+        
+      }
+      fetchCustomer(id);
+    }
+
+    function closeMobileDetail() {
+      document.body.classList.remove('mobile-open');
+      currentCustomerId = null;
+    }
+
+    async function fetchCustomer(id) {
+      try {
+        const res = await fetch(`/ledger/customer/${id}`);
+        const cust = await res.json();
+
+        ['mobile', 'desktop'].forEach(prefix => {
+          document.getElementById(prefix + 'Avatar').innerText = getInitials(cust.name);
+          document.getElementById(prefix + 'Name').innerText = cust.name;
+        });
+        /*
+        document.getElementById('cashBal').innerText = `₹${(cust.cash || 0).toLocaleString()}`;
+        document.getElementById('goldBal').innerText = `${(cust.gold || 0).toFixed(2)}g`;
+        document.getElementById('silverBal').innerText = `${(cust.silver || 0).toFixed(2)}g`;
+        */
+        document.getElementById('cashBal').innerHTML = formatBalance(cust.cash, 'cash');
+        document.getElementById('goldBal').innerHTML = formatBalance(cust.gold, 'gold');
+        document.getElementById('silverBal').innerHTML = formatBalance(cust.silver, 'silver');
+        const list = document.getElementById('entriesList');
+        list.innerHTML = cust.entries?.length ? '' : '<div class="no-entries"><p>No entries till now</p><p class="add-hint">Click + to add</p></div>';
+        cust.entries?.forEach(e => {
+          const div = document.createElement('div');
+          div.className = 'entry-item';
+          const amount = e.item === 'cash' ? e.amount.toLocaleString() : e.amount.toFixed(2);
+          const sign = e.transactionType === 'got' ? '+' : '−';
+          const color = e.transactionType === 'got' ? '#2e7d32' : '#c62828';
+          const unit = e.item === 'cash' ? '₹' : 'g';
+          const displayAmount = e.item === 'cash'
+            ? `${sign}${unit}${amount}`
+            : `${sign}${amount}${unit}`;
+
+          div.innerHTML = `
+          <div>
+            <div class="entry-date">${new Date(e.date).toLocaleDateString()} • ${timeAgo(e.date)}</div>
+              <div class="entry-bal" style="font-size:13.5px; color:#555; display:flex; gap:14px; align-items:center; flex-wrap:wrap; font-weight:500;">
+        <!-- CASH BUNDLE ICON -->
+        <span style="display:flex; align-items:center; gap:5px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="6" width="16" height="12" rx="2" fill="#4caf50"/>
+            <rect x="6" y="8" width="12" height="8" fill="#81c784"/>
+            <path d="M8 12h8M8 14h8" stroke="#2e7d32" stroke-width="1.5"/>
+            <circle cx="12" cy="12" r="2" fill="#2e7d32"/>
+            <path d="M12 10v4" stroke="#fff" stroke-width="1.5"/>
+          </svg>
+          <span style="color:#2e7d32;">${formatBalance(Math.abs(e.balance?.cash || 0))}</span>
+        </span>
+
+        <!-- GOLD COIN ICON -->
+        <span style="display:flex; align-items:center; gap:5px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="9" fill="#fdd835" stroke="#f9a825" stroke-width="2"/>
+            <circle cx="12" cy="12" r="6" fill="#ffb300"/>
+            <text x="12" y="15" text-anchor="middle" font-size="10" fill="#c68400" font-weight="bold">G</text>
+          </svg>
+          <span style="color:#f9a825;">${formatBalance(e.balance?.gold, 'gold')}</span>
+        </span>
+
+        <!-- SILVER COIN ICON -->
+        <span style="display:flex; align-items:center; gap:5px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="9" fill="#e0e0e0" stroke="#9e9e9e" stroke-width="2"/>
+            <circle cx="12" cy="12" r="6" fill="#eeeeee"/>
+            <text x="12" y="15" text-anchor="middle" font-size="10" fill="#616161" font-weight="bold">S</text>
+          </svg>
+          <span style="color:#546e7a;">${formatBalance(e.balance?.silver, 'silver')}</span>
+        </span>
+      </div>
+          </div>
+          <div style="font-weight:bold; color:${color};">
+            ${displayAmount}
+          </div>
+        `;
+          list.appendChild(div);
+        });
+      } catch (e) {console.error(" error:", e);
+    }
+    }
+
+    function getInitials(n) { return n ? n.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2) : '?'; }
+    function timeAgo(date) {
+      const seconds = Math.floor((new Date() - new Date(date)) / 1000);
+      const intervals = { year: 31536000, month: 2592000, week: 604800, day: 86400, hour: 3600, minute: 60 };
+      for (let [unit, secondsInUnit] of Object.entries(intervals)) {
+        const interval = Math.floor(seconds / secondsInUnit);
+        if (interval >= 1) return interval === 1 ? `1 ${unit} ago` : `${interval} ${unit}s ago`;
+      }
+      return 'Just now';
+    }
+
+   // function openAddPanel() { document.getElementById('addPanel').classList.remove('minimized'); }
+    //function minimizeAddPanel() { document.getElementById('addPanel').classList.add('minimized'); }
+
+    
+
+    
+
+    async function saveTransaction() {
+      const amount = parseFloat(document.getElementById('amountInput').value);
+      if (!amount || !currentCustomerId) return alert('Invalid');
+
+      const payload = { customerId: currentCustomerId, type: selectedType, amount, transactionType };
+      const res = await fetch('/ledger/transaction/new', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+      const data = await res.json();
+      if (res.ok) {
+        console.log("total blc",data)
+       // document.getElementById('cashBal').innerText = `₹${data.balances.cash.toLocaleString()}`;
+       // document.getElementById('goldBal').innerText = `${data.balances.gold.toFixed(2)}g`;
+       // document.getElementById('silverBal').innerText = `${data.balances.silver.toFixed(2)}g`;
+       document.getElementById('cashBal').innerHTML = formatBalance(data.balances.cash, 'cash');
+        document.getElementById('goldBal').innerHTML = formatBalance(data.balances.gold, 'gold');
+        document.getElementById('silverBal').innerHTML = formatBalance(data.balances.silver, 'silver');
+
+         document.getElementById('totalCashBal').innerHTML = formatBalance(data.totals.totalCash, 'cash');
+        document.getElementById('totalGoldBal').innerHTML = formatBalance(data.totals.totalGold, 'totalGold');
+        document.getElementById('totalSilverBal').innerHTML = formatBalance(data.totals.totalSilver, 'silver');
+    
+          const list = document.getElementById('entriesList');
+          const amountVal = data.entry.item === 'cash' ? data.entry.amount.toLocaleString() : data.entry.amount.toFixed(2);
+          const sign = data.entry.transactionType === 'got' ? '+' : '−';
+          const color = data.entry.transactionType === 'got' ? '#2e7d32' : '#c62828';
+          const unit = data.entry.item === 'cash' ? '₹' : 'g';
+          const displayAmount = data.entry.item === 'cash' ? `${sign}${unit}${amountVal}` : `${sign}${amountVal}${unit}`;
+
+          const div = document.createElement('div');
+          div.className = 'entry-item';
+          div.innerHTML = `
+            <div>
+              <div class="entry-date">Just now</div>
+             
+              <div class="entry-bal" style="font-size:13.5px; color:#555; display:flex; gap:14px; align-items:center; flex-wrap:wrap; margin-top:6px; font-weight:500;">
+                <span style="display:flex; align-items:center; gap:5px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="4" y="6" width="16" height="12" rx="2" fill="#4caf50"/><rect x="6" y="8" width="12" height="8" fill="#81c784"/><path d="M8 12h8M8 14h8" stroke="#2e7d32" stroke-width="1.5"/><circle cx="12" cy="12" r="2" fill="#2e7d32"/><path d="M12 10v4" stroke="#fff" stroke-width="1.5"/></svg>
+                  <span style="color:#2e7d32;">${formatBalance(data.balances.cash, 'cash')}</span>
+                </span>
+                <span style="display:flex; align-items:center; gap:5px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="#fdd835" stroke="#f9a825" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="#ffb300"/><text x="12" y="15" text-anchor="middle" font-size="10" fill="#c68400" font-weight="bold">G</text></svg>
+                  <span style="color:#f9a825;"> ${formatBalance(data.balances.gold, 'gold')}</span>
+                </span>
+                <span style="display:flex; align-items:center; gap:5px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="#e0e0e0" stroke="#9e9e9e" stroke-width="2"/><circle cx="12" cy="12" r="6" fill="#eeeeee"/><text x="12" y="15" text-anchor="middle" font-size="10" fill="#616161" font-weight="bold">S</text></svg>
+                  <span style="color:#546e7a;">${formatBalance(data.balances.silver, 'silver')}</span>
+                </span>
+              </div>
+            </div>
+            <div style="font-weight:bold; color:${color};">${displayAmount}</div>
+          `;
+          list.insertBefore(div, list.firstChild);
+        document.getElementById('amountInput').value = '';
+        minimizeAddPanel();
+
+       
+      }
+    }
+
+    const modalOverlay = document.getElementById('modal-new-customer');
+    const btnNew = document.getElementById('btn-new-customer');
+    const btnClose = document.getElementById('modal-close');
+    const btnCancel = document.getElementById('cancel-new');
+    const btnSubmit = document.getElementById('submit-new');
+    const form = document.getElementById('form-new-customer');
+
+document.getElementById('mobile_no').addEventListener('input', function(e) {
+  const input = e.target;
+  const value = input.value.replace(/\D/g, '').substring(0, 10); // Only digits, max 10
+  input.value = value;
+
+  const error = document.getElementById('error-mobile');
+  if (value.length > 0 && value.length < 10) {
+    error.textContent = 'Mobile number must be exactly 10 digits';
+    input.classList.add('error');
+  } else {
+    error.textContent = '';
+    input.classList.remove('error');
+  }
+});
+
+document.getElementById('email').addEventListener('input', function(e) {
+  const input = e.target;
+  const error = document.getElementById('error-email');
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (input.value && !emailRegex.test(input.value)) {
+    error.textContent = 'Please enter a valid email address';
+    input.classList.add('error');
+  } else {
+    error.textContent = '';
+    input.classList.remove('error');
+  }
+});
+
+    btnSubmit.addEventListener('click', async (e) => {
+      
+      console.log("here")
+      e.preventDefault();
+      let hasError = false;
+
+      document.querySelectorAll('.error-text').forEach(el => el.textContent = '');
+      document.querySelectorAll('.modal-input').forEach(el => el.classList.remove('error'));
+
+      const name = document.getElementById('name').value.trim();
+      const mobile = document.getElementById('mobile_no').value;
+      const email = document.getElementById('email').value.trim();
+
+      if (!name) {
+        document.getElementById('error-name').textContent = 'Name is required';
+        document.getElementById('name').classList.add('error');
+        hasError = true;
+      }
+
+      if (mobile && mobile.length !== 10) {
+        document.getElementById('error-mobile').textContent = 'Mobile must be exactly 10 digits';
+        document.getElementById('mobile_no').classList.add('error');
+        hasError = true;
+      }
+
+      if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        document.getElementById('error-email').textContent = 'Invalid email format';
+        document.getElementById('email').classList.add('error');
+        hasError = true;
+      }
+
+      if (hasError) {
+        toastr.error('Please fix the errors above');
+        return;
+      }
+      const data = {
+        name: form.name.value.trim(),
+        mobile_no: form.mobile_no.value.trim(),
+        email: form.email.value.trim(),
+        address: form.address.value.trim(),
+        type_of_customer: form.type_of_customer.value
+      };
+      const exists = allCustomers.some(
+      c => c.name.toLowerCase() === data.name.toLowerCase() &&
+            c.mobile_no === data.mobile_no
+      );
+
+      if (exists) {
+       // showError(form.mobile_no, "Customer with same Name & Mobile already exists");
+        toastr.error("Duplicate customer found");
+        return;
+      }
+
+      try {
+        const resp = await fetch('/ledger/customer/new', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+        const json = await resp.json();
+        console.log('Add customer resp', json);
+        if (!resp.ok) { toastr.error((json && json.message) ? json.message : 'Failed to add'); return; }
+        toastr.success('Customer added');
+        closeModal(); form.reset();
+        const newCust = json.data; 
+        allCustomers.unshift(newCust);
+
+     
+      if (newCust.type === 'customer') {
+        document.getElementById('customerCount').innerText = 
+          parseInt(document.getElementById('customerCount').innerText) + 1;
+      } else {
+        document.getElementById('supplierCount').innerText = 
+          parseInt(document.getElementById('supplierCount').innerText) + 1;
+        }     
+        renderCustomerList();
+       
+      } catch (err) { console.error(err); toastr.error('Error adding customer'); }
+    });
+
+
+    function openModal() { modalOverlay.style.display = 'flex'; }
+    function closeModal() { modalOverlay.style.display = 'none'; }
+
+    btnNew.addEventListener('click', openModal);
+    btnClose.addEventListener('click', closeModal);
+    btnCancel.addEventListener('click', closeModal);
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+      
+       console.log("here in out")
+      document.addEventListener('DOMContentLoaded', () => {
+      console.log("running")
+      updateLayout();
+      window.addEventListener('resize', updateLayout);
+      const match = location.pathname.match(/\/ledger\/([a-f0-9]{24})/);
+      if (match) loadCustomer(match[1]);
+    });
+  </script>
+
+  <script>
+    // OPEN FIRST MODAL
+    function openBulkUpload() {
+      document.getElementById('bulkUploadModal').style.display = 'flex';
+    }
+
+    function closeBulkUpload() {
+      document.getElementById('bulkUploadModal').style.display = 'none';
+    }
+
+    // OPEN SECOND MODAL
+    function openFileUploadModal() {
+      closeBulkUpload();
+      document.getElementById('fileUploadModal').style.display = 'flex';
+    }
+
+    function closeFileUploadModal() {
+      document.getElementById('fileUploadModal').style.display = 'none';
+      document.getElementById('selectedFileName').innerText = '';
+      document.getElementById('uploadStatus').innerText = '';
+      document.getElementById('uploadNowBtn').disabled = true;
+      document.getElementById('uploadNowBtn').style.opacity = '0.6';
+      document.getElementById('excelFileInput').value = '';
+    }
+
+    // HANDLE FILE SELECTION
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (file) {
+        document.getElementById('selectedFileName').innerText = file.name;
+        document.getElementById('uploadNowBtn').disabled = false;
+        document.getElementById('uploadNowBtn').style.opacity = '1';
+        document.getElementById('uploadNowBtn').style.cursor = 'pointer';
+      }
+    }
+
+    // UPLOAD EXCEL FILE
+    async function uploadExcelFile() {
+      const fileInput = document.getElementById('excelFileInput');
+      const file = fileInput.files[0];
+      if (!file) return;
+
+      const formData = new FormData();
+      formData.append('excel', file);
+
+      document.getElementById('uploadStatus').innerHTML = 'Uploading... Please wait';
+      document.getElementById('uploadNowBtn').disabled = true;
+
+      try {
+        const res = await fetch('/ledger/bulk-upload', {
+          method: 'POST',
+          body: formData
+        });
+
+        const result = await res.json();
+
+        if (res.ok) {
+          document.getElementById('uploadStatus').innerHTML = `<span style="color:green;">Success! ${result.added} customers added</span>`;
+          toastr.success(`${result.added} customers uploaded successfully!`);
+
+          // ADD NEW CUSTOMERS TO LIST INSTANTLY
+          result.customers.forEach(cust => {
+            allCustomers.unshift(cust);
+            if (cust.type === 'customer') {
+              document.getElementById('customerCount').innerText = parseInt(document.getElementById('customerCount').innerText) + 1;
+            } else {
+              document.getElementById('supplierCount').innerText = parseInt(document.getElementById('supplierCount').innerText) + 1;
+            }
+          });
+          renderCustomerList();
+
+          setTimeout(() => {
+            closeFileUploadModal();
+          }, 2000);
+
+        } else {
+          document.getElementById('uploadStatus').innerHTML = `<span style="color:red;">Error: ${result.message || 'Upload failed'}</span>`;
+          toastr.error(result.message || 'Upload failed');
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById('uploadStatus').innerHTML = '<span style="color:red;">Network error</span>';
+        toastr.error('Upload failed - check internet');
+      }
+    }
+
+    // Close modals when clicking outside
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+          modal.style.display = 'none';
+        }
+      });
+    });
+  </script>
+  <script>
+    
+  </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<script>
+  
+let allReportData = {{{ json customers }}};
+const businessName = "Mysarafa KhataBook";
+const generatedTime = new Date().toLocaleString('en-IN', {
+  day: '2-digit', month: 'short', year: 'numeric',
+  hour: '2-digit', minute: '2-digit', second: '2-digit'
+}); 
+
+function calculateTotals(cust) {
+  let cashIn = 0, cashOut = 0;
+  let goldIn = 0, goldOut = 0;
+  let silverIn = 0, silverOut = 0;
+
+  (cust.entries || []).forEach(e => {
+    const amt = Number(e.amount) || 0;
+    if (e.item === 'cash') {
+      if (e.transactionType === 'gave') cashOut += amt;   // you gave → OUT
+      else cashIn += amt;                                 // you got → IN
+    }
+    else if (e.item === 'gold') {
+      if (e.transactionType === 'gave') goldOut += amt;
+      else goldIn += amt;
+    }
+    else if (e.item === 'silver') {
+      if (e.transactionType === 'gave') silverOut += amt;
+      else silverIn += amt;
+    }
+  });
+
+  return {
+    cashIn, cashOut, cashNet: cashIn - cashOut,
+    goldIn, goldOut, goldNet: goldIn - goldOut,
+    silverIn, silverOut, silverNet: silverIn - silverOut
+  };
+}
+// CALCULATE TOTALS
+function calculateCustomerTotals(cust) {
+  let cashDr = cust.amount_balance || 0;
+  let cashCr = 0;
+  let goldDr = cust.gold_balance || 0;
+  let goldCr = 0;
+  let silverDr = cust.silver_balance || 0;
+  let silverCr = 0;
+
+  (cust.entries || []).forEach(e => {
+    if (e.item === 'cash') {
+      if (e.transactionType === 'gave') cashCr += e.amount;
+      else cashDr += e.amount;
+    } else if (e.item === 'gold') {
+      if (e.transactionType === 'gave') goldCr += e.amount;
+      else goldDr += e.amount;
+    } else if (e.item === 'silver') {
+      if (e.transactionType === 'gave') silverCr += e.amount;
+      else silverDr += e.amount;
+    }
+  });
+
+  return {
+    cashDr, cashCr, goldDr, goldCr, silverDr, silverCr,
+    cashNet: cashDr - cashCr,
+    goldNet: goldDr - goldCr,
+    silverNet: silverDr - silverCr
+  };
+}
+
+function openReportModal() {
+  console.log("here")
+  if (!currentCustomerId) return;
+  currentReportCustomer = {
+    name: document.getElementById('desktopName').innerText || document.getElementById('mobileName').innerText,
+    cash: document.getElementById('cashBal').innerText,
+    gold: document.getElementById('goldBal').innerText,
+    silver: document.getElementById('silverBal').innerText,
+    entries: document.getElementById('entriesList').innerHTML
+  };
+  
+  // Update modal title
+  document.querySelector('#reportModal .modal-content > div:first-child span').innerText = currentReportCustomer.name;
+  
+  document.getElementById('reportModal').style.display = 'flex';
+}
+
+function closeReportModal() {
+  document.getElementById('reportModal').style.display = 'none';
+}
+
+// MAIN DOWNLOAD FUNCTION
+/*
+async function downloadReport(format) {
+  const includeEntries = document.getElementById('includeEntries').checked;
+  const name = currentReportCustomer.name.replace(/[^a-zA-Z0-9]/g, '_');
+  
+  if (format === 'pdf') {
+    generatePDF(includeEntries, name);
+  } else if (format === 'excel') {
+    generateExcel(includeEntries, name);
+  }
+  closeReportModal();
+}
+*/
+
+function downloadReport(format) {
+  const includeEntries = document.getElementById('includeEntries').checked;
+  const cust = allReportData.find(c => c._id === currentCustomerId);
+  if (!cust) return;
+
+  if (format === 'pdf') generateSinglePDF(cust, includeEntries);
+  else generateSingleExcel(cust, includeEntries);
+  closeReportModal();
+}
+
+// FULL BUSINESS REPORT
+function downloadFullReport(format) {
+  const includeEntries = document.getElementById('fullIncludeEntries').checked;
+  if (format === 'pdf') generateFullPDF(includeEntries);
+  else generateFullExcel(includeEntries);
+  closeFullReportModal();
+}
+
+// PDF GENERATOR
+/*
+function generatePDF(includeEntries, name) {
+  const content = `
+    <div style="padding:30px; font-family:Arial;">
+      <h1 style="text-align:center; color:#1976d2;">Mysarafa KhataBook</h1>
+      <h2 style="text-align:center; margin:20px 0;">${currentReportCustomer.name}</h2>
+      
+      <div style="display:flex; justify-content:center; gap:30px; margin:30px 0;">
+        <div style="text-align:center; padding:15px; background:#e8f5e9; border-radius:12px; min-width:120px;">
+          <div>CASH</div>
+          <div style="font-size:24px; font-weight:bold; color:#2e7d32;">${currentReportCustomer.cash}</div>
+        </div>
+        <div style="text-align:center; padding:15px; background:#fff8e1; border-radius:12px; min-width:120px;">
+          <div>GOLD</div>
+          <div style="font-size:24px; font-weight:bold; color:#f9a825;">${currentReportCustomer.gold}</div>
+        </div>
+        <div style="text-align:center; padding:15px; background:#eceff1; border-radius:12px; min-width:120px;">
+          <div>SILVER</div>
+          <div style="font-size:24px; font-weight:bold; color:#546e7a;">${currentReportCustomer.silver}</div>
+        </div>
+      </div>
+
+      ${includeEntries ? '<h3 style="border-bottom:2px solid #1976d2; padding-bottom:8px;">All Entries</h3>' + currentReportCustomer.entries : ''}
+      
+      <div style="margin-top:50px; text-align:center; color:#888; font-size:12px;">
+        Generated on ${new Date().toLocaleDateString('en-IN')} • Mysarafa KhataBook
+      </div>
+    </div>
+  `;
+
+  const element = document.createElement('div');
+  element.innerHTML = content;
+  document.body.appendChild(element);
+
+  html2pdf().set({
+    margin: 0.5,
+    filename: `${name}_Report.pdf`,
+    html2canvas: { scale: 2 },
+    jsPDF: { format: 'a4' }
+  }).from(element).save().then(() => {
+    document.body.removeChild(element);
+    toastr.success('PDF Downloaded!');
+  });
+}
+
+// EXCEL GENERATOR
+function generateExcel(includeEntries, name) {
+  const wb = XLSX.utils.book_new();
+  
+  // Summary Sheet
+  const summaryData = [
+    ["Mysarafa KhataBook - Customer Report"],
+    [""],
+    ["Customer Name", currentReportCustomer.name],
+    ["CASH", currentReportCustomer.cash],
+    ["GOLD", currentReportCustomer.gold],
+    ["SILVER", currentReportCustomer.silver],
+    [""],
+    ["Generated on", new Date().toLocaleString('en-IN')]
+  ];
+  
+  const ws = XLSX.utils.aoa_to_sheet(summaryData);
+  XLSX.utils.book_append_sheet(wb, ws, "Summary");
+
+  // Entries Sheet (if selected)
+  if (includeEntries) {
+    const entriesHTML = document.createElement('div');
+    entriesHTML.innerHTML = currentReportCustomer.entries;
+    const rows = entriesHTML.querySelectorAll('.entry-item');
+    
+    const entriesData = [["Date", "Transaction", "Balance"]];
+    rows.forEach(row => {
+      const date = row.querySelector('.entry-date')?.innerText || '';
+      const amount = row.querySelector('div:last-child')?.innerText || '';
+      const balance = row.querySelector('.entry-bal')?.innerText || '';
+      entriesData.push([date, amount, balance]);
+    });
+    
+    const ws2 = XLSX.utils.aoa_to_sheet(entriesData);
+    XLSX.utils.book_append_sheet(wb, ws2, "Entries");
+  }
+
+  XLSX.writeFile(wb, `${name}_Report.xlsx`);
+  toastr.success('Excel Downloaded!');
+}
+*/
+
+function generateSinglePDF(cust, includeEntries) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+
+  // Header
+  doc.setFillColor(26,43,77);
+  doc.rect(0,0,210,35,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(20);
+  doc.text('KhataBook',105,25,{align:'center'});
+  doc.setTextColor(0);
+  doc.setFontSize(16);
+  doc.text(cust.name,105,45,{align:'center'});
+  doc.setFontSize(10);
+  doc.text(`Generated: ${generatedTime}`,105,52,{align:'center'});
+
+  const head = [['Date','Details',
+                 'Cash Out','Cash In',
+                 'Gold Out','Gold In',
+                 'Silver Out','Silver In']];
+  const body = [];
+
+  // ---- Opening Balance ----
+  const open = ['Opening Balance','',
+    cust.amount_balance<0?`- ${Math.abs(cust.amount_balance)}`:'',
+    cust.amount_balance>0?`+ ${cust.amount_balance}`:'',
+    cust.gold_balance<0?`- ${Math.abs(cust.gold_balance)}g`:'',
+    cust.gold_balance>0?`+ ${cust.gold_balance}g`:'',
+    cust.silver_balance<0?`- ${Math.abs(cust.silver_balance)}g`:'',
+    cust.silver_balance>0?`+ ${cust.silver_balance}g`:'' ];
+  body.push(open);
+
+  // ---- ALL Entries (date-time wise) ----
+  if (includeEntries && cust.entries && cust.entries.length) {
+    const sorted = [...cust.entries].sort((a,b)=>new Date(a.date)-new Date(b.date));
+    sorted.forEach(e => {
+      const dt = new Date(e.date).toLocaleString('en-IN',{dateStyle:'short',timeStyle:'short'});
+      const isOut = e.transactionType === 'gave';
+      const sign = isOut ? '-' : '+';
+      const row = [dt, isOut?'You Gave':'You Got'];
+
+      // cash
+      row.push(e.item==='cash' && isOut ? `${sign} ${e.amount}` : '');
+      row.push(e.item==='cash' && !isOut? `${sign} ${e.amount}` : '');
+
+      // gold
+      row.push(e.item==='gold' && isOut ? `${sign} ${e.amount}g` : '');
+      row.push(e.item==='gold' && !isOut? `${sign} ${e.amount}g` : '');
+
+      // silver
+      row.push(e.item==='silver' && isOut ? `${sign} ${e.amount}g` : '');
+      row.push(e.item==='silver' && !isOut? `${sign} ${e.amount}g` : '');
+
+      body.push(row);
+    });
+  }
+
+  // ---- Totals ----
+  const tot = calculateTotals(cust);
+  const totRow = ['Total','',
+    tot.cashOut ? `- ${tot.cashOut}` : '',
+    tot.cashIn  ? `+ ${tot.cashIn}`  : '',
+    tot.goldOut ? `- ${tot.goldOut}g` : '',
+    tot.goldIn  ? `+ ${tot.goldIn}g`  : '',
+    tot.silverOut? `- ${tot.silverOut}g` : '',
+    tot.silverIn ? `+ ${tot.silverIn}g`  : ''];
+  body.push(totRow);
+
+  // ---- Net Balance ----
+  const netRow = ['Net Balance','',
+    tot.cashNet !== 0 ? `${tot.cashNet>0?'+':'-'} ${Math.abs(tot.cashNet)}` : '0',
+    '',
+    tot.goldNet !== 0 ? `${tot.goldNet>0?'+':'-'} ${Math.abs(tot.goldNet)}g` : '0g',
+    '',
+    tot.silverNet !== 0 ? `${tot.silverNet>0?'+':'-'} ${Math.abs(tot.silverNet)}g` : '0g',
+    ''];
+  body.push(netRow);
+
+  doc.autoTable({
+    startY:60,
+    head, body,
+    theme:'grid',
+    styles:{fontSize:9,cellPadding:2.5,halign:'center'},
+    headStyles:{fillColor:[26,43,77], textColor: [255,255,255], fontStyle: 'bold'},
+    columnStyles:{
+      0:{cellWidth:28},1:{cellWidth:30},
+      2:{cellWidth:22},3:{cellWidth:22},
+      4:{cellWidth:22},5:{cellWidth:22},
+      6:{cellWidth:22},7:{cellWidth:22}
+    },
+    didParseCell:data=>{
+      const txt = data.cell.text[0]||'';
+      if (txt.startsWith('-')) data.cell.styles.textColor = [200,0,0]; 
+      if (txt.startsWith('+')) data.cell.styles.textColor = [0,120,0]; 
+
+      if (data.row.raw[0]==='Opening Balance') data.cell.styles.fillColor=[255,240,230];
+      if (data.row.raw[0]==='Total')           data.cell.styles.fillColor=[230,255,230];
+      if (data.row.raw[0]==='Net Balance')     data.cell.styles.fillColor=[245,245,255];
+    }
+  });
+
+  // Grand total bar
+  const y = doc.lastAutoTable.finalY + 10;
+  doc.setFillColor(26,43,77);
+  doc.rect(10,y,190,15,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(14);
+  doc.text('NET BALANCE',20,y+10);
+
+  doc.setTextColor(200,0,0);
+  doc.text(`CASH: ${tot.cashNet>0?'+':(tot.cashNet<0?'-':'')} ${Math.abs(tot.cashNet)}`,70,y+10);
+  doc.setTextColor(0,120,0);
+  doc.text(`GOLD: ${tot.goldNet>0?'+':(tot.goldNet<0?'-':'')} ${Math.abs(tot.goldNet)}g`,120,y+10);
+  doc.setTextColor(0,120,0);
+  doc.text(`SILVER: ${tot.silverNet>0?'+':(tot.silverNet<0?'-':'')} ${Math.abs(tot.silverNet)}g`,160,y+10);
+  const fileName = `${cust.name}_Report.pdf`;
+  doc.setProperties({
+    title: `${cust.name}_Report`
+  });
+ 
+  // doc.save(`${cust.name}_Report.pdf`);
+  const pdfBlob = doc.output('blob');
+  const pdfFile = new File([pdfBlob], fileName, { type: "application/pdf" });
+  const pdfURL = URL.createObjectURL(pdfFile);
+ 
+
+  window.open(pdfURL, '_blank');
+}
+
+/*
+function generateFullPDF(includeEntries) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+  let y = 20;
+
+  doc.setFillColor(26,43,77);
+  doc.rect(0,0,210,35,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(20);
+  doc.text('KhataBook',105,25,{align:'center'});
+  doc.setTextColor(0);
+  doc.setFontSize(16);
+  doc.text('Full Business Report',105,45,{align:'center'});
+  doc.setFontSize(10);
+  doc.text(`Generated: ${generatedTime}`,105,52,{align:'center'});
+
+  const head = [['S.No','Name','Mobile No','Cash','Gold','Silver']];
+  const body = [];
+
+  let grandCash=0, grandGold=0, grandSilver=0;
+  allReportData.forEach((c,i)=>{
+    const tot = calculateTotals(c);
+    grandCash   += tot.cashNet;
+    grandGold   += tot.goldNet;
+    grandSilver += tot.silverNet;
+
+    body.push([
+      i+1,
+      c.name,
+      c.mobile_no||'',
+      `${Math.abs(tot.cashNet)} ${tot.cashNet>0?'Dr':'Cr'}`,
+      `${Math.abs(tot.goldNet)}g ${tot.goldNet>0?'Dr':'Cr'}`,
+      `${Math.abs(tot.silverNet)}g ${tot.silverNet>0?'Dr':'Cr'}`
+    ]);
+  });
+
+  doc.autoTable({
+    startY:60,
+    head, body,
+    theme:'grid',
+    styles:{fontSize:10,cellPadding:4},
+    headStyles:{fillColor:[26,43,77],textColor:[255,255,255]},
+    alternateRowStyles:{fillColor:[245,245,245]}
+  });
+
+  // Grand total bar
+  y = doc.lastAutoTable.finalY + 10;
+  doc.setFillColor(26,43,77);
+  doc.rect(10,y,190,15,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(14);
+  doc.text('GRAND TOTAL',20,y+10);
+  doc.text(`CASH: ${Math.abs(grandCash)} ${grandCash>0?'Dr':'Cr'}`,70,y+10);
+  doc.text(`GOLD: ${Math.abs(grandGold)}g ${grandGold>0?'Dr':'Cr'}`,120,y+10);
+  doc.text(`SILVER: ${Math.abs(grandSilver)}g ${grandSilver>0?'Dr':'Cr'}`,160,y+10);
+
+  doc.save('Mysarafa_Full_Report.pdf');
+}
+*/
+
+/* ---------- FULL PDF – ONLY THIS FUNCTION CHANGES ---------- */
+function generateFullPDF(includeEntries) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+  let yPos = 20;
+
+  // Global header (once)
+  doc.setFillColor(26,43,77);
+  doc.rect(0,0,210,35,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(20);
+  doc.text('KhataBook',105,25,{align:'center'});
+  doc.setTextColor(0);
+  doc.setFontSize(16);
+  doc.text('Full Business Report',105,45,{align:'center'});
+  doc.setFontSize(10);
+  doc.text(`Generated: ${generatedTime}`,105,52,{align:'center'});
+
+  // *** NEW HEADER YOU ASKED FOR ***
+  const head = [['S.No','Name','Mobile No','Cash','Gold','Silver']];
+  const body = [];
+
+  let grandCash = 0, grandGold = 0, grandSilver = 0;
+
+  allReportData.forEach((cust, idx) => {
+    const tot = calculateTotals(cust);
+    grandCash   += tot.cashNet;
+    grandGold   += tot.goldNet;
+    grandSilver += tot.silverNet;
+
+    // ---- One row per customer (summary) ----
+    const signC = tot.cashNet   > 0 ? '+' : (tot.cashNet   < 0 ? '-' : '');
+    const signG = tot.goldNet   > 0 ? '+' : (tot.goldNet   < 0 ? '-' : '');
+    const signS = tot.silverNet > 0 ? '+' : (tot.silverNet < 0 ? '-' : '');
+
+    body.push([
+      `${idx+1}`,                                           // S.No
+      cust.name,                                            // Name
+      cust.mobile || '',                                    // Mobile No
+      `${signC}${Math.abs(tot.cashNet)}`,                   // Cash
+      `${signG}${Math.abs(tot.goldNet)}g`,                  // Gold
+      `${signS}${Math.abs(tot.silverNet)}g`                 // Silver
+    ]);
+
+    // ---- OPTIONAL: detailed entries per customer (same as before) ----
+    if (includeEntries && cust.entries?.length) {
+      // add a blank line before details
+      body.push(['','','','','','']);
+
+      const sorted = [...cust.entries].sort((a,b)=>new Date(a.date)-new Date(b.date));
+      sorted.forEach(e => {
+        const dt = new Date(e.date).toLocaleString('en-IN',{dateStyle:'short',timeStyle:'short'});
+        const isOut = e.transactionType === 'gave';
+        const sign = isOut ? '-' : '+';
+        const row = [dt, isOut ? 'You Gave' : 'You Got'];
+        row.push(e.item==='cash'   && isOut ? `${sign} ${e.amount}` : '');
+        row.push(e.item==='cash'   && !isOut? `${sign} ${e.amount}` : '');
+        row.push(e.item==='gold'   && isOut ? `${sign} ${e.amount}g` : '');
+        row.push(e.item==='gold'   && !isOut? `${sign} ${e.amount}g` : '');
+        row.push(e.item==='silver' && isOut ? `${sign} ${e.amount}g` : '');
+        row.push(e.item==='silver' && !isOut? `${sign} ${e.amount}g` : '');
+        body.push(row);
+      });
+    }
+  });
+
+  // ---- Draw the table (summary + optional details) ----
+  doc.autoTable({
+    startY: 60,
+    head, body,
+    theme: 'grid',
+    styles: {fontSize:8, cellPadding:2.5, halign:'center'},
+    headStyles: {fillColor:[26,43,77], textColor:[255,255,255], fontStyle:'bold'},
+    columnStyles: {
+      0:{cellWidth:15},1:{cellWidth:45},2:{cellWidth:30},
+      3:{cellWidth:25},4:{cellWidth:25},5:{cellWidth:30}
+    },
+    margin:{left:10,right:10},
+    didParseCell: data => {
+      // colour + / - for Cash / Gold / Silver columns
+      if (data.column.index >= 3) {
+        const txt = data.cell.text[0] || '';
+        if (txt.startsWith('-')) data.cell.styles.textColor = [200,0,0];   // red
+        if (txt.startsWith('+')) data.cell.styles.textColor = [0,120,0];  // green
+      }
+    }
+  });
+
+  // ---- GRAND TOTAL PAGE ----
+  const finalY = doc.lastAutoTable.finalY + 15;
+  if (finalY > 250) { doc.addPage(); }
+
+  doc.setFillColor(26,43,77);
+  doc.rect(0,0,210,35,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(18);
+  doc.text('GRAND TOTAL',105,25,{align:'center'});
+
+  let gy = 50;
+  doc.setFontSize(16);
+  doc.setTextColor(grandCash<0?[200,0,0]:[0,120,0]);
+  doc.text(`CASH: ${grandCash>0?'+':(grandCash<0?'-':'')} ${Math.abs(grandCash)}`,20,gy);
+  doc.setTextColor(grandGold<0?[200,0,0]:[0,120,0]);
+  doc.text(`GOLD: ${grandGold>0?'+':(grandGold<0?'-':'')} ${Math.abs(grandGold)}g`,20,gy+=20);
+  doc.setTextColor(grandSilver<0?[200,0,0]:[0,120,0]);
+  doc.text(`SILVER: ${grandSilver>0?'+':(grandSilver<0?'-':'')} ${Math.abs(grandSilver)}g`,20,gy+=20);
+
+  doc.save('Mysarafa_Full_Report.pdf');
+}
+
+
+// EXCEL GENERATORS (Single + Full)
+function generateSingleExcel(cust, includeEntries) {
+  const wb = XLSX.utils.book_new();
+  const data = [[`Report Generated: ${generatedTime}`], [""], [cust.name]];
+  data.push(["Report Time", "Date", "Details", "Cash Dr", "Cash Cr", "Gold Dr", "Gold Cr", "Silver Dr", "Silver Cr"]);
+  data.push([generatedTime, "Opening", "", cust.amount_balance || 0, "", cust.gold_balance || 0, "", cust.silver_balance || 0, ""]);
+
+  if (includeEntries) {
+    (cust.entries || []).forEach(e => {
+      data.push([
+        generatedTime,
+        new Date(e.date).toLocaleDateString('en-IN'),
+        e.transactionType === 'gave' ? "You Gave" : "You Got",
+        e.item === 'cash' && e.transactionType === 'gave' ? e.amount : "",
+        e.item === 'cash' && e.transactionType === 'got' ? e.amount : "",
+        e.item === 'gold' && e.transactionType === 'gave' ? e.amount : "",
+        e.item === 'gold' && e.transactionType === 'got' ? e.amount : "",
+        e.item === 'silver' && e.transactionType === 'gave' ? e.amount : "",
+        e.item === 'silver' && e.transactionType === 'got' ? e.amount : ""
+      ]);
+    });
+  }
+
+  const tot = calculateCustomerTotals(cust);
+  data.push([generatedTime, "Total", "", tot.cashDr, tot.cashCr, tot.goldDr, tot.goldCr, tot.silverDr, tot.silverCr]);
+  data.push([generatedTime, "Net Balance", `${Math.abs(tot.cashNet)} ${tot.cashNet>0?'Dr':'Cr'} | ${Math.abs(tot.goldNet)}g ${tot.goldNet>0?'Dr':'Cr'} | ${Math.abs(tot.silverNet)}g ${tot.silverNet>0?'Dr':'Cr'}`]);
+
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  XLSX.utils.book_append_sheet(wb, ws, "Report");
+  XLSX.writeFile(wb, `${cust.name}_Report.xlsx`);
+}
+
+function generateFullExcel(includeEntries) {
+  const wb = XLSX.utils.book_new();
+  const data = [[`Full Report - ${generatedTime}`], [""]];
+  allReportData.forEach(cust => {
+    data.push([cust.name, cust.mobile_no || '']);
+    data.push(["Report Time", "Date", "Details", "Cash Dr", "Cash Cr", "Gold Dr", "Gold Cr", "Silver Dr", "Silver Cr"]);
+    data.push([generatedTime, "Opening", "", cust.amount_balance || 0, "", cust.gold_balance || 0, "", cust.silver_balance || 0, ""]);
+
+    if (includeEntries) {
+      (cust.entries || []).forEach(e => {
+        data.push([
+          generatedTime,
+          new Date(e.date).toLocaleDateString('en-IN'),
+          e.transactionType === 'gave' ? "You Gave" : "You Got",
+          e.item === 'cash' && e.transactionType === 'gave' ? e.amount : "",
+          e.item === 'cash' && e.transactionType === 'got' ? e.amount : "",
+          e.item === 'gold' && e.transactionType === 'gave' ? e.amount : "",
+          e.item === 'gold' && e.transactionType === 'got' ? e.amount : "",
+          e.item === 'silver' && e.transactionType === 'gave' ? e.amount : "",
+          e.item === 'silver' && e.transactionType === 'got' ? e.amount : ""
+        ]);
+      });
+    }
+
+    const tot = calculateCustomerTotals(cust);
+    data.push([generatedTime, "Total", "", tot.cashDr, tot.cashCr, tot.goldDr, tot.goldCr, tot.silverDr, tot.silverCr]);
+    data.push([generatedTime, "Net", `${Math.abs(tot.cashNet)} ${tot.cashNet>0?'Dr':'Cr'} | ${Math.abs(tot.goldNet)}g ${tot.goldNet>0?'Dr':'Cr'} | ${Math.abs(tot.silverNet)}g ${tot.silverNet>0?'Dr':'Cr'}`]);
+    data.push([""]);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  XLSX.utils.book_append_sheet(wb, ws, "Full Report");
+  XLSX.writeFile(wb, "Mysarafa_Full_Report.xlsx");
+}
+
+
+
+
+
+// ==== AUTOCOMPLETE SEARCH ====
+const searchInputbox = document.getElementById('customerSearchInput');
+const autocompleteList = document.getElementById('autocompleteList');
+
+searchInputbox.addEventListener('input', function () {
+  const term = this.value.trim().toLowerCase();
+  autocompleteList.innerHTML = '';
+
+  if (term === '') {
+    autocompleteList.style.display = 'none';
+    renderCustomerList(); // fallback to normal list
+    return;
+  }
+
+  const matches = allCustomers
+    .filter(c => c.type === currentFilterType)
+    .filter(c => 
+      c.name.toLowerCase().includes(term) || 
+      (c.mobile_no && c.mobile_no.includes(term))
+    )
+    .slice(0, 8); // limit suggestions
+
+  if (matches.length === 0) {
+    autocompleteList.innerHTML = '<div style="padding:12px;color:#999;">No customer found</div>';
+    autocompleteList.style.display = 'block';
+    return;
+  }
+
+  matches.forEach(c => {
+    const item = document.createElement('div');
+    item.style.padding = '12px 16px';
+    item.style.cursor = 'pointer';
+    item.style.borderBottom = '1px solid #eee';
+    item.innerHTML = `
+      <div style="font-weight:600;">${c.name}</div>
+      ${c.mobile_no ? `<div style="font-size:12px;color:#666;">${c.mobile_no}</div>` : ''}
+    `;
+    item.onclick = (e) => {
+      e.stopPropagation();
+      loadCustomer(c._id);
+      searchInputbox.value = c.name;
+      autocompleteList.style.display = 'none';
+    };
+    item.onmouseover = () => item.style.backgroundColor = '#f0f0f0';
+    item.onmouseout = () => item.style.backgroundColor = 'white';
+    autocompleteList.appendChild(item);
+  });
+
+  autocompleteList.style.display = 'block';
+});
+
+
+// Hide dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  
+if (!searchInputbox || !autocompleteList) return;
+  if (!searchInputbox.contains(e.target) && !autocompleteList.contains(e.target)) {
+    autocompleteList.style.display = 'none';
+  }
+});
+
+// Optional: keep normal list filtering as fallback
+searchInputbox.addEventListener('input', () => {
+  if (searchInputbox.value.trim() === '') {
+    renderCustomerList();
+  }
+});
+</script>
+<script>
+// 3-DOT MENU TOGGLE
+const btn = document.getElementById('actionMenuBtn');
+const menu = document.getElementById('actionButtons');
+
+btn.onclick = (e) => {
+  e.stopPropagation(); 
+  menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+};
+
+// Close when clicking outside
+document.addEventListener('click', (e) => {
+  if (!menu.contains(e.target) && e.target !== btn) {
+    menu.style.display = 'none';
+  }
+});
+
+
+// DISABLE FULL REPORT IF NO CUSTOMERS
+function updateFullReportButton() {
+  const total = parseInt(document.getElementById('customerCount').innerText) + 
+                parseInt(document.getElementById('supplierCount').innerText);
+  const btn = document.getElementById('fullReportBtn');
+  btn.disabled = total === 0;
+  btn.style.opacity = total === 0 ? '0.5' : '1';
+}
+
+// CALL THIS EVERYWHERE AFTER ADD/UPLOAD
+// After adding customer, bulk upload, page load
+document.addEventListener('DOMContentLoaded', updateFullReportButton);
+setInterval(updateFullReportButton, 1000); 
+
+function openFullReportModal() {
+  if (document.getElementById('fullReportBtn').disabled) return;
+  document.getElementById('fullReportModal').style.display = 'flex';
+}
+function closeFullReportModal() {
+  document.getElementById('fullReportModal').style.display = 'none';
+}
+
+/*
+async function downloadFullReport(format) {
+  const includeEntries = document.getElementById('fullIncludeEntries').checked;
+  
+  if (format === 'pdf') {
+    generateFullPDF(includeEntries);
+  } else {
+    generateFullExcel(includeEntries);
+  }
+  closeFullReportModal();
+}
+
+function generateFullPDF(includeEntries) {
+  let html = `<div style="padding:30px; font-family:Arial;">
+    <h1 style="text-align:center; color:#2e7d32;">Mysarafa KhataBook - Full Report</h1>
+    <p style="text-align:center;">Generated on ${new Date().toLocaleString('en-IN')}</p>
+    <h2 style="margin:30px 0; border-bottom:2px solid #2e7d32; padding-bottom:10px;">All Customers Summary</h2>`;
+  
+  allCustomers.forEach(c => {
+    const cash = formatBalance(c.cash || 0, 'cash');
+    const gold = formatBalance(c.gold || 0, 'gold');
+    const silver = formatBalance(c.silver || 0, 'silver');
+    
+    html += `
+      <div style="margin:20px 0; padding:15px; background:#f9f9f9; border-radius:12px; border-left:5px solid #2e7d32;">
+        <h3 style="margin:0 0 10px;">${c.name} ${c.type === 'supplier' ? '(Supplier)' : ''}</h3>
+        <div style="display:flex; gap:20px; flex-wrap:wrap;">
+          <span><strong>Cash:</strong> ${cash}</span>
+          <span><strong>Gold:</strong> ${gold}</span>
+          <span><strong>Silver:</strong> ${silver}</span>
+        </div>
+      </div>`;
+  });
+
+  const element = document.createElement('div');
+  element.innerHTML = html;
+  document.body.appendChild(element);
+
+  html2pdf().set({
+    margin: 0.5,
+    filename: `Mysarafa_Full_Report_${new Date().toISOString().slice(0,10)}.pdf`,
+    html2canvas: { scale: 2 },
+    jsPDF: { format: 'a4' }
+  }).from(element).save().then(() => {
+    document.body.removeChild(element);
+    toastr.success('Full PDF Report Downloaded!');
+  });
+}
+
+function generateFullExcel(includeEntries) {
+  const wb = XLSX.utils.book_new();
+  const data = allCustomers.map(c => ({
+    Name: c.name,
+    Type: c.type,
+    Mobile: c.mobile_no || '',
+    Cash: c.cash || 0,
+    Gold: (c.gold || 0).toFixed(2),
+    Silver: (c.silver || 0).toFixed(2)
+  }));
+  
+  const ws = XLSX.utils.json_to_sheet(data);
+  XLSX.utils.book_append_sheet(wb, ws, "All Customers");
+  
+  XLSX.writeFile(wb, `Mysarafa_Full_Report_${new Date().toISOString().slice(0,10)}.xlsx`);
+  toastr.success('Full Excel Report Downloaded!');
+}
+
+*/
+// Jab input mein type karega
+document.getElementById('customerSearchInput').addEventListener('input', function(e) {
+  const query = e.target.value.toLowerCase().trim();
+  const dropdown = document.getElementById('customerDropdown');
+  
+  if (query.length === 0) {
+    dropdown.style.display = 'none';
+    return;
+  }
+
+  const matched = allCustomers
+    .filter(c => c.type === currentFilterType)
+    .filter(c => 
+      c.name.toLowerCase().includes(query) || 
+      c.mobile_no.includes(query)
+    )
+    .slice(0, 10); // sirf 10 dikhao
+
+  if (matched.length === 0) {
+    dropdown.innerHTML = '<div class="dropdown-item" style="color:#999; text-align:center;">No customer found</div>';
+    dropdown.style.display = 'block';
+    return;
+  }
+
+  dropdown.innerHTML = matched.map(c => `
+    <div class="dropdown-item" onclick="loadCustomer('${c._id}', '${c.name}', '${c.mobile_no}')">
+      <strong>${c.name}</strong><br>
+      <small style="color:#666;">${c.mobile_no}</small>
+      ${c.amount_balance !== 0 || c.gold_balance !== 0 || c.silver_balance !== 0 
+        ? '<span style="color:green;float:right;">● Active</span>' 
+        : '<span style="color:#ccc;float:right;">○ Zero</span>'}
+    </div>
+  `).join('');
+
+  dropdown.style.display = 'block';
+});
+
+// Click outside → close dropdown
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.searchable-select')) {
+    document.getElementById('customerDropdown').style.display = 'none';
+  }
+});
+
+function selectCustomer(id, name, mobile) {
+  document.getElementById('customerSearchInput').value = name;
+  document.getElementById('customerDropdown').style.display = 'none';
+  // Ab tu yahan loadCustomer(id) ya jo bhi karna hai kar sakta hai
+  console.log("Selected:", id, name, mobile);
+  // loadCustomer(id); 
+}
+</script>
+
+<script>
+//let currentCash = 0, currentGold = 0, currentSilver = 0;
+let isGave = true; 
+
+function openAddModal() {
+ if (!currentCustomerId) {
+    toastr.warning("Please select a customer first!");
+    return;
+  }
+
+  // CORRECTLY GET CUSTOMER NAME FROM BOTH MOBILE & DESKTOP
+  const customerNameElement = document.getElementById('desktopName') || document.getElementById('mobileName');
+  const customerName = customerNameElement ? customerNameElement.innerText.trim() : 'Customer';
+
+  ;
+
+  // Update modal header with customer name
+  //document.getElementById('currentCustomerName').innerText = customerName;
+  currentCash = parseFloat(document.getElementById('cashBal').innerText.replace(/[^\d.-]/g, '')) || 0;
+  currentGold = parseFloat(document.getElementById('goldBal').innerText.replace(/[^\d.-]/g, '')) || 0;
+  currentSilver = parseFloat(document.getElementById('silverBal').innerText.replace(/[^\d.-]/g, '')) || 0;
+
+  // Reset only display value, keep data attributes
+  document.getElementById('amtCash').value = '';
+  document.getElementById('amtGold').value = '';
+  document.getElementById('amtSilver').value = '';
+
+  // Reset data attributes
+  ['amtCash', 'amtGold', 'amtSilver'].forEach(id => {
+    document.getElementById(id).dataset.gave = '0';
+    document.getElementById(id).dataset.got = '0';
+  });
+
+  isGave = true;
+  ;
+  document.getElementById('btnGave').classList.add('active');
+  document.getElementById('btnGot').classList.remove('active');
+
+  updatePreviewAndFinal();
+  document.getElementById('addTransactionModal').style.display = 'flex';
+}
+
+function closeAddModal() {
+  document.getElementById('addTransactionModal').style.display = 'none';
+}
+
+
+document.getElementById('btnGave').onclick = () => {
+  isGave = true;
+  document.getElementById('btnGave').classList.add('active');
+  document.getElementById('btnGot').classList.remove('active');
+  updatePreviewAndFinal();
+};
+
+document.getElementById('btnGot').onclick = () => {
+  isGave = false;
+  document.getElementById('btnGot').classList.add('active');
+  document.getElementById('btnGave').classList.remove('active');
+  updatePreviewAndFinal();
+};
+
+
+['amtCash', 'amtGold', 'amtSilver'].forEach(id => {
+  const input = document.getElementById(id);
+  input.addEventListener('input', () => {
+    const val = input.value || '0';
+    if (isGave) {
+      input.dataset.gave = val;
+    } else {
+      input.dataset.got = val;
+    }
+    updatePreviewAndFinal();
+  });
+});
+
+function updatePreviewAndFinal() {
+  const gaveCash = parseFloat(document.getElementById('amtCash').dataset.gave) || 0;
+  const gaveGold = parseFloat(document.getElementById('amtGold').dataset.gave) || 0;
+  const gaveSilver = parseFloat(document.getElementById('amtSilver').dataset.gave) || 0;
+
+  const gotCash = parseFloat(document.getElementById('amtCash').dataset.got) || 0;
+  const gotGold = parseFloat(document.getElementById('amtGold').dataset.got) || 0;
+  const gotSilver = parseFloat(document.getElementById('amtSilver').dataset.got) || 0;
+
+  // Show only current toggle values in input
+  document.getElementById('amtCash').value = isGave ? gaveCash || '' : gotCash || '';
+  document.getElementById('amtGold').value = isGave ? gaveGold || '' : gotGold || '';
+  document.getElementById('amtSilver').value = isGave ? gaveSilver || '' : gotSilver || '';
+
+  const sign = isGave ? '−' : '+';
+  const cls = isGave ? 'gave' : 'got';
+
+  // Preview only current toggle
+  document.getElementById('previewCash').textContent   = (isGave ? gaveCash : gotCash) > 0 ? `${sign}₹${(isGave ? gaveCash : gotCash).toLocaleString()}` : '—';
+  document.getElementById('previewGold').textContent   = (isGave ? gaveGold : gotGold) > 0 ? `${sign}${(isGave ? gaveGold : gotGold).toFixed(2)}g` : '—';
+  document.getElementById('previewSilver').textContent = (isGave ? gaveSilver : gotSilver) > 0 ? `${sign}${(isGave ? gaveSilver : gotSilver).toFixed(2)}g` : '—';
+
+  ['previewCash', 'previewGold', 'previewSilver'].forEach(el => {
+    const elem = document.getElementById(el);
+    elem.className = 'preview';
+    if (elem.textContent !== '—') elem.classList.add(cls);
+  });
+
+  // FINAL BALANCE = current + all got - all gave
+  const finalCash = currentCash - gaveCash + gotCash;
+  const finalGold = currentGold - gaveGold + gotGold;
+  const finalSilver = currentSilver - gaveSilver + gotSilver;
+
+  document.getElementById('finalCash').textContent = finalCash.toLocaleString();
+  document.getElementById('finalGold').textContent = finalGold.toFixed(2);
+  document.getElementById('finalSilver').textContent = finalSilver.toFixed(2);
+}
+
+async function saveAllEntries() {
+  const gaveCash = parseFloat(document.getElementById('amtCash').dataset.gave) || 0;
+  const gaveGold = parseFloat(document.getElementById('amtGold').dataset.gave) || 0;
+  const gaveSilver = parseFloat(document.getElementById('amtSilver').dataset.gave) || 0;
+
+  const gotCash = parseFloat(document.getElementById('amtCash').dataset.got) || 0;
+  const gotGold = parseFloat(document.getElementById('amtGold').dataset.got) || 0;
+  const gotSilver = parseFloat(document.getElementById('amtSilver').dataset.got) || 0;
+
+  const total = gaveCash + gaveGold + gaveSilver + gotCash + gotGold + gotSilver;
+  if (total === 0) {
+    toastr.error("Enter at least one amount");
+    return;
+  }
+
+  const entries = [];
+  if (gaveCash > 0)   entries.push({ type: 'cash',   amount: gaveCash,   transactionType: 'gave' });
+  if (gaveGold > 0)   entries.push({ type: 'gold',   amount: gaveGold,   transactionType: 'gave' });
+  if (gaveSilver > 0) entries.push({ type: 'silver', amount: gaveSilver, transactionType: 'gave' });
+  if (gotCash >  0) entries.push({ type: 'cash',   amount: gotCash,    transactionType: 'got' });
+  if (gotGold  > 0)   entries.push({ type: 'gold',   amount: gotGold,    transactionType: 'got' });
+  if (gotSilver > 0)  entries.push({ type: 'silver', amount: gotSilver,  transactionType: 'got' });
+
+  let successCount = 0;
+
+  try {
+    for (let e of entries) {
+      const res = await fetch('/ledger/transaction/new', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ customerId: currentCustomerId, ...e })
+      });
+
+      // THIS IS THE KEY: Check if response is actually OK
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || `Server error: ${res.status}`);
+      }
+
+      const data = await res.json();
+      if (!data.success) {
+        throw new Error(data.message || "Transaction failed");
+      }
+
+      successCount++;
+    }
+
+    // Only refresh if at least one succeeded
+    await fetchCustomer(currentCustomerId);
+
+    toastr.success(`${successCount} entries saved successfully!`);
+    closeAddModal();
+
+  } catch (err) {
+    console.error("Save error:", err);
+    toastr.error(err.message || "Save failed");
+  }
+}
+</script>
+    {{> profile}}
+</body>
+
+</html>

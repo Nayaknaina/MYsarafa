@@ -26,6 +26,7 @@
             font-family: 'Poppins', sans-serif;
             height: 100vh;
             margin: -20px 0 50px;
+            overflow: hidden;
         }
 
         h1 {
@@ -457,6 +458,7 @@
         }
 
         @media (max-width: 768px) {
+
             .container {
                 width: 100%;
                 min-height: 750px;
@@ -468,7 +470,7 @@
 
             form {
                 /* padding: 15px;*/
-                height: 128%;
+                height: 130%;
             }
 
             .form-container {
@@ -488,6 +490,7 @@
                 opacity: 1;
                 transform: translateX(0);
                 z-index: 5;
+                top: 5.56% !important;
             }
 
             .sign-up-container {
@@ -510,7 +513,7 @@
             }
 
             .overlay-container {
-                position: relative;
+                position: fixed;
                 /*  width: 100%;*/
                 height: 30%;
                 display: flex;
@@ -532,12 +535,12 @@
 
             .overlay-panel {
                 width: 100%;
-                height: 50%;
+                height: 25%;
                 padding: 10px;
                 font-size: 0.9em;
                 position: absolute;
                 transition: transform 0.6s ease-in-out, opacity 0.6s ease-in-out;
-                background: #5f006d;
+               /* background: #5f006d;*/
             }
 
             .overlay-left {
@@ -611,6 +614,11 @@
             .modal-content h2 {
                 font-size: 1.4em;
             }
+            p {
+                color: black;
+                font-weight: 800;
+                margin: 0 !important;
+            }
 
             .modal-content h3 {
                 font-size: 1.1em;
@@ -637,7 +645,7 @@
             }
 
             .overlay-container {
-                height: 40%;
+                height: 110%;
             }
 
             .overlay-panel {
@@ -653,13 +661,14 @@
             p,
             span,
             .checkbox-container {
-                font-size: 11px;
+                font-size: 13.5px;
+                color: black;
             }
 
             button,
             .toggle-button {
-                padding: 8px 25px;
-                font-size: 12px;
+                padding: 12px 25px;
+                font-size: 14px;
             }
 
             /*    input {
@@ -711,7 +720,7 @@
         <!-- Sign Up Form -->
         <div class="form-container sign-up-container">
             <form action="#" id="signupForm">
-                <h1>Create Account 🚀</h1>
+                <h1>Sign Up 🚀</h1>
                 <div class="">
                     <a href="#" type="button" id="googleSignupBtn" class="login-with-google-btn">SignUp with Google</a>
                 </div>
@@ -730,11 +739,11 @@
         <!-- Sign In Form -->
         <div class="form-container sign-in-container">
             <form action="#" id="loginForm">
-                <h1>Sign In 👋</h1>
+                <h1>Log In 👋</h1>
                 <div class="">
                     <a href="#" type="button" id="googleLoginBtn" class="login-with-google-btn">SignIn with Google</a>
                 </div>
-                <span>or use your account</span>
+                <span>or use your account for Log In</span>
                 <input type="text" id="loginEmail" name="email" placeholder="📧 Email or 📱 Phone" required />
                 <input type="password" id="loginPassword" name="password" placeholder="🔒 Password" required />
                 <a href="#" id="forgotPasswordLink">Forgot your password? 🤔</a>
@@ -766,13 +775,13 @@
             <div class="overlay">
                 <!-- Overlay Left Panel (Shown when Sign In is active) -->
                 <div class="overlay-panel overlay-left">
-                    <h1>Welcome Back! 🎉</h1>
+                    <h1>Welcome Back!</h1>
                     <p>Login to stay connected</p>
                     <button class="ghost" id="signIn">Sign In</button>
                 </div>
                 <!-- Overlay Right Panel (Shown when Sign Up is active) -->
                 <div class="overlay-panel overlay-right">
-                    <h1>Hello, Friend! ✨</h1>
+                    <h1>Hello, Friend! </h1>
                     <p>To begin your journey</p>
                     <button class="ghost" id="signUp">Sign Up</button>
                 </div>

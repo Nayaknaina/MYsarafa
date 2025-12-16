@@ -23,12 +23,18 @@
                     </a>
                  </div>
 
-                <div class="search-container">
-                    <input type="text" placeholder="Search" class="search-input">
-                    <i class="fas fa-search search-icon"></i>
+                <div class="search-container" id="searchContainer">
+                    <input type="text" placeholder="Search" class="search-input" id="Search-list">
+                    <i class="fas fa-search search-icon" id="searchToggle"></i>
+                     <i class="fas fa-xmark search-icon" id="crossToggle" style="display: none; color: #6e6666;"></i>
+                    <div class="search-dropdown" id="searchDropdown"></div>
                 </div>
                 <div class="user-avatar" id="userAvatar">
-                   <img src="{{userProfile.profilePicture}}" alt="{{userProfile.name}}" class="avatar">
+                    <img 
+                    src="{{#if userProfile.profilePicture}}{{userProfile.profilePicture}}{{else}}/assets/images/default-avatar.png{{/if}}" 
+                    alt="{{userProfile.name}}" 
+                    class="avatar"
+                    >
                     <div class="avatar-dropdown" id="avatarDropdown" style="display: none;">
                         <div class="avatar-user-info">
                             <div class="avatar-user-pic"> <img src="{{userProfile.profilePicture}}" alt="{{userProfile.name}}" class="avatar"></div>

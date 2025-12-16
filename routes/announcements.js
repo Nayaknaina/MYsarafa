@@ -12,7 +12,7 @@ const {upload} = require('../middleware/multer');
 const announcementUpload = upload.fields([{ name: 'image', maxCount: 1 }]);
 
 router.get('/Announcement',authMiddleware,monthlyMembershipCheck,profileImageMiddleware,announcementController.Announcement);
-router.get('/Announcementform',authMiddleware,profileImageMiddleware,announcementController.Announcementform);
+router.get('/new',authMiddleware,profileImageMiddleware,announcementController.Announcementform);
 
 router.post('/create', authMiddleware, announcementUpload, announcementController.createAnnouncement);
 router.get('/list', authMiddleware, profileImageMiddleware, announcementController.getAnnouncements);

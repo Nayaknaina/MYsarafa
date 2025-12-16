@@ -1,0 +1,137 @@
+    <!-- Khatabook Panel (partial) -->
+    <div class="table-container" id="khatabook-panel" style="display:none;margin-top:18px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px;">
+        <div style="display:flex; gap:10px; align-items:center;">
+          <strong style="font-size:18px;">Khatabook</strong>
+          <small class="text-muted">Track cash, gold & silver udhari</small>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <label style="font-size:13px;">Customer:</label>
+          <!-- reuse ledger-customer-select -->
+          <select id="khatabook-customer-select" class="add-member-input" style="width:260px; padding:8px;"></select>
+          <button id="btn-new-transaction" class="ledger-add-member-btn">+ Txn</button>
+        </div>
+      </div>
+
+      <!-- Summary (desktop + mobile) -->
+      <div class="khatabook-summary" style="display:flex; gap:12px; padding:12px; flex-wrap:wrap;">
+        <div class="khatabook-card">
+          <div class="kb-title">You'll Give</div>
+          <div class="kb-amount kb-out">₹0</div>
+        </div>
+        <div class="khatabook-card">
+          <div class="kb-title">You'll Get</div>
+          <div class="kb-amount kb-in">₹0</div>
+        </div>
+        <div class="khatabook-card">
+          <div class="kb-title">Net Balance</div>
+          <div class="kb-amount kb-net">₹0</div>
+        </div>
+      </div>
+
+      <!-- Transactions table (desktop) -->
+      <div class="khatabook-table-wrap" style="overflow:auto;">
+        <table id="khatabook-table" class="members-table" style="width:100%">
+          <thead>
+            <tr>
+              <th>SNO</th>
+              <th>DATE/TIME</th>
+              <th>SOURCE / NOTE</th>
+              <th>OLD CASH</th>
+              <th>CASH IN(+)</th>
+              <th>CASH OUT(-)</th>
+              <th>FINAL CASH</th>
+
+              <th>OLD GOLD</th>
+              <th>GOLD IN(+)</th>
+              <th>GOLD OUT(-)</th>
+              <th>FINAL GOLD</th>
+
+              <th>OLD SILVER</th>
+              <th>SILVER IN(+)</th>
+              <th>SILVER OUT(-)</th>
+              <th>FINAL SILVER</th>
+              <th>ACTION</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+          <tfoot>
+            <tr>
+              <th colspan="3" style="text-align:right;">TOTAL :</th>
+              <th id="kb-total-old-cash">0</th>
+              <th id="kb-total-cash-in">0</th>
+              <th id="kb-total-cash-out">0</th>
+              <th id="kb-total-final-cash">0</th>
+
+              <th id="kb-total-old-gold">0</th>
+              <th id="kb-total-gold-in">0</th>
+              <th id="kb-total-gold-out">0</th>
+              <th id="kb-total-final-gold">0</th>
+
+              <th id="kb-total-old-silver">0</th>
+              <th id="kb-total-silver-in">0</th>
+              <th id="kb-total-silver-out">0</th>
+              <th id="kb-total-final-silver">0</th>
+              <th></th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <!-- Mobile card list fallback (for small screens) -->
+      <div id="khatabook-mobile-list" class="khatabook-mobile-list" style="display:none; padding:12px;">
+        <!-- Mobile: show customer list (profile + name). JS will populate -->
+        <div id="kb-customer-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+      </div>
+
+      <!-- Mobile: per-customer panel (overlay) -->
+      <div id="khatabook-customer-panel" style="display:none; position:fixed; inset:0; background:#fff; z-index:1200; overflow:auto;">
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px; background:#1565c0; color:#fff;">
+          <div style="display:flex; gap:10px; align-items:center;">
+            <button id="kb-cust-back" style="background:transparent;border:0;color:#fff;font-size:20px;">←</button>
+            <div id="kb-cust-name" style="font-weight:700; font-size:16px;">Customer</div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <button id="kb-cust-report" class="ledger-add-member-btn" style="background:#fff;color:#000;">Report</button>
+            <button id="kb-cust-sms" class="ledger-add-member-btn" style="background:#fff;color:#000;">SMS</button>
+          </div>
+        </div>
+
+        <!-- Summary row: Cash | Gold | Silver -->
+        <div style="display:flex; gap:8px; padding:12px;">
+          <div style="flex:1; border:2px solid #10b981; padding:10px; text-align:center; border-radius:6px;">
+            <div style="font-size:12px; font-weight:700;">CASH</div>
+            <div id="kb-cust-cash" style="font-size:18px; margin-top:6px;">₹0</div>
+          </div>
+          <div style="flex:1; border:2px solid #f59e0b; padding:10px; text-align:center; border-radius:6px;">
+            <div style="font-size:12px; font-weight:700;">GOLD</div>
+            <div id="kb-cust-gold" style="font-size:18px; margin-top:6px;">0g</div>
+          </div>
+          <div style="flex:1; border:2px solid #ef4444; padding:10px; text-align:center; border-radius:6px;">
+            <div style="font-size:12px; font-weight:700;">SILVER</div>
+            <div id="kb-cust-silver" style="font-size:18px; margin-top:6px;">0g</div>
+          </div>
+        </div>
+
+        <!-- Entries list -->
+        <div id="kb-cust-entries" style="padding:12px;">
+          <!-- entries injected here; if none show placeholder -->
+        </div>
+
+        <!-- Bottom add-entry area (mobile-friendly) -->
+        <div style="position:sticky; bottom:0; background:#fff; padding:12px; border-top:1px solid #eee;">
+          <div style="display:flex; gap:8px; align-items:center; margin-bottom:8px;">
+            <select id="kb-add-asset" class="add-member-input" style="flex:1; padding:8px;">
+              <option value="cash">Cash</option>
+              <option value="gold">Gold</option>
+              <option value="silver">Silver</option>
+            </select>
+            <input id="kb-add-value" type="number" step="0.01" placeholder="0" class="add-member-input" style="width:120px; padding:8px;" />
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button id="kb-add-out" class="ledger-add-member-btn" style="flex:1;background:#ef4444;color:#fff;">YOU GAVE</button>
+            <button id="kb-add-in" class="ledger-add-member-btn" style="flex:1;background:#10b981;color:#fff;">YOU GOT</button>
+          </div>
+        </div>
+      </div>
+    </div>

@@ -1,32 +1,276 @@
+<style>
+  #pageLoader{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(128, 128, 128, 0);
+    backdrop-filter: blur(4px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  #pageLoader.show {
+    display: flex;
+    opacity: 1;
+  }
+
+  #pageLoader.hiding {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .loader-container {
+    text-align: center;
+    animation: fadeInOut 2s ease-in-out infinite;
+  }
+
+  .loader-image {
+    width: 100px;
+    height: 100px;
+
+    object-fit: contain;
+    margin-bottom: 16px;
+    animation: pulse 1.5s ease-in-out infinite alternate;
+  }
+
+
+  @keyframes fadeInOut {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+  }
+
+  /* Fallback Spinner Styles (if no image) */
+  .loader-spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #2a4aa7;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 16px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .sidebar-menu a.active,
+  .sidebar-menu .menu-item.active {
+    background: #e3f2fd;
+    color: #1976d2;
+    font-weight: 600;
+  }
+  .submenu {
+  display: none !important;
+  flex-direction: column;
+  }
+
+  .menu-section.open .submenu {
+    display: flex !important;
+  }
+
+</style>
+
 <aside class="sidebar">
-  <div class="sidebar-menu">
-    <a href="/user-app/dashboard" class="menu-item">
-      Dashboard
-    </a>
-    <a href="/Groups/community/" class="menu-item">
-      <span class="menu-text"> Community<i class="fa-solid fa-user-group"></i></span>
-      
-    </a>
-    <a href="/Groups/group-member" class="menu-item">
-     <span class="menu-text"> Member
-      <i class="fas fa-plus"></i></span>
-    </a>
-  
-    <a href="/announcements/Announcement" class="menu-item ">
-     <span class="menu-text">Announcement <i class="fas fa-bullhorn"></i></span> 
-     
-    </a>
-   
-   {{#if showMonthlyMembership}}
-    <a href="/pay/Pay-received-ss" class="menu-item ">
-     <span class="menu-text">Monthly Membership <i class="fas fa-users"></i></span> 
-    </a>
-    {{/if}}
-    
-    <a href="/kyc/KYCverification" class="menu-item ">
-      
-     <span class="menu-text">KYC Verification <i class="fas fa-shield-alt"></i></span> 
-    </a>
-   
+ 
+  <div id="pageLoader">
+    <div class="loader-container">
+
+      <img src="/assets/logo/mysarafa_logo.png" alt="Loading..." class="loader-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+      <div class="loader-spinner" style="display: none;"></div>
+      {{!-- <p class="loader-text">Loading...</p> --}}
+    </div>
   </div>
+
+  <div class="sidebar-menu">
+    <!-- Top-level Dashboard link -->
+    <a href="/user-app/dashboard" class="menu-item">
+      <span class="menu-text">Dashboard <i class="fas fa-tachometer-alt"></i></span>
+    </a>
+
+    <!-- Association: grouping, communities and related pages -->
+    <div class="menu-section">
+      <button class="menu-item menu-has-sub" aria-expanded="false">
+        <span class="menu-text">Association <i class="fas fa-sitemap"></i></span>
+      </button>
+      <div class="submenu">
+        <a href="/Groups/community/">Create / Manage Community</a>
+        <a href="/Groups/my">My Communities</a>
+        <a href="/Groups/group-member">Group Members</a>
+        <a href="/Groups/pending-requests">Membership Requests</a>
+      </div>
+    </div>
+
+    <!-- Management: members, business directory, settings -->
+    <div class="menu-section">
+      <button class="menu-item menu-has-sub" aria-expanded="false">
+        <span class="menu-text">Management <i class="fas fa-briefcase"></i></span>
+      </button>
+      <div class="submenu">
+        <a href="/Groups/group-member">Add / Invite Member</a>
+        <a href="/businesses/listUP">Business Directory</a>
+        <a href="/user/profile">Edit Profile</a>
+        {{#if showMonthlyMembership}}
+        <a href="/pay/Pay-received-ss">Monthly Membership</a>
+        {{/if}}
+      </div>
+    </div>
+
+    <!-- Rates: live gold/silver rates and admin update link -->
+    <div class="menu-section">
+      <button class="menu-item menu-has-sub" aria-expanded="false">
+        <span class="menu-text">Gold & Rates <i class="fas fa-chart-line"></i></span>
+      </button>
+      <div class="submenu">
+        <a href="/rates/getRates">Live Rates</a>
+        <a href="/rates/history">Rates History</a>
+        <!-- admin/update route may exist depending on permissions -->
+        <a href="/rates/update">Update Rates</a>
+      </div>
+    </div>
+
+    <!-- Announcements -->
+    <div class="menu-section">
+      <button class="menu-item menu-has-sub" aria-expanded="false">
+        <span class="menu-text">Announcements <i class="fas fa-bullhorn"></i></span>
+      </button>
+      <div class="submenu">
+        
+        <a href="/announcements/new">Post Announcement</a>
+        <a href="/announcements/Announcement">View Announcements</a>
+      </div>
+    </div>
+
+    <!-- KYC -->
+    <div class="menu-section">
+      <a href="/kyc/KYCverification" class="menu-item">
+        <span class="menu-text">KYC Verification <i class="fas fa-id-card"></i></span>
+      </a>
+    </div>
+
+    <div class="menu-section">
+      <button class="menu-item menu-has-sub" aria-expanded="false">
+        <span class="menu-text">KhataBook <i class="fas fa-book"></i></span>
+      </button>
+        <div class="submenu">
+          <a href="/ledger/trykhatabook?type=customer" class="khata-link" data-type="customer">
+          Customers
+        </a>
+        <a href="/ledger/trykhatabook?type=supplier" class="khata-link" data-type="supplier">
+          Suppliers
+        </a>
+        <a href="/ledger">Ledger</a>
+        <a href="/ledger/?tab=list" id="sidebar-list-link">List</a>
+        </div>
+
+      
+    </div>
+    <!-- Misc / quick links -->
+    <div class="menu-section">
+      <a href="/notifications" class="menu-item">
+        <span class="menu-text">Notifications <i class="fas fa-bell"></i></span>
+      </a>  
+      <a href="/help" class="menu-item">
+        <span class="menu-text">Help & Support <i class="fas fa-question-circle"></i></span>
+      </a>
+    </div>
+  </div>
+
+ 
 </aside>
+
+ <script>
+  // Hide loader on page load (this runs on every page after DOM is ready)
+  document.addEventListener('DOMContentLoaded', function () {
+    const loader = document.getElementById('pageLoader');
+    if (loader) {
+      loader.classList.remove('show');
+      loader.classList.add('hiding');
+      setTimeout(() => {
+        loader.style.display = 'none';
+        loader.classList.remove('hiding');
+      }, 500); // Match transition duration
+    }
+    highlightActiveMenu();
+  });
+
+  // Show loader on sidebar link clicks (this handles navigation from any page)
+  document.addEventListener('click', function (event) {
+    // Check if the clicked element is a sidebar link (adjust selector as needed for your sidebar)
+    if (event.target.closest('.sidebar-menu a') || event.target.closest('.submenu a')) {
+      const loader = document.getElementById('pageLoader');
+      if (loader) {
+        loader.style.display = 'flex';
+        setTimeout(() => {
+          loader.classList.add('show');
+        }, 10); // Small delay for smooth fade-in
+      }
+      // Optional: Prevent default and handle if needed, but for full page nav, let it proceed
+    }
+  });
+
+  function highlightActiveMenu() {
+    const path = window.location.pathname;
+    const search = window.location.search;
+    const url = path + search;
+
+ 
+    document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+
+   
+    //const activeLink = document.querySelector(`.sidebar-menu a[href="${url}"]`) ||document.querySelector(`.sidebar-menu a[href^="${path}"]`);
+    let activeLink = document.querySelector(`.sidebar-menu a[href="${url}"]`);
+    if (!activeLink) {
+      activeLink = document.querySelector(`.sidebar-menu a[href="${path}"]`);
+    }
+    if (activeLink) {
+      activeLink.classList.add('active');
+     
+      const submenu = activeLink.closest('.submenu');
+      if (submenu) {
+        const button = submenu.previousElementSibling;
+        if (button && button.classList.contains('menu-has-sub')) {
+          button.setAttribute('aria-expanded', 'true');
+          //submenu.style.display = 'flex';
+          const section = button.closest('.menu-section');
+          section.classList.add('open');
+
+        }
+      }
+    }
+
+    // === KHATABOOK TOGGLE LOGIC ===
+    const khataMatch = url.match(/\/ledger\/trykhata\?type=(customer|supplier)/);
+    if (khataMatch) {
+      const type = khataMatch[1];
+      localStorage.setItem('khataToggle', type);
+
+      // Auto-click toggle in trykhata page
+      setTimeout(() => {
+        const toggleBtn = document.querySelector(`.toggle-btn[data-type="${type}"]`);
+        if (toggleBtn) toggleBtn.click();
+      }, 100);
+    } else {
+      // Restore from storage if on trykhata page
+      if (path.includes('/ledger/trykhata') && localStorage.getItem('khataToggle')) {
+        const type = localStorage.getItem('khataToggle');
+        setTimeout(() => {
+          const toggleBtn = document.querySelector(`.toggle-btn[data-type="${type}"]`);
+          if (toggleBtn) toggleBtn.click();
+        }, 100);
+      }
+    }
+  }
+</script>

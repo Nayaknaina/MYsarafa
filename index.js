@@ -19,6 +19,9 @@ const kycRoutes = require('./routes/kyc');
 const membershipRoute = require('./routes/membership');
 const announcementsRoute = require('./routes/announcements')
 const superAdminRoutes = require('./routes/superAdmin');
+const ratesRoutes = require('./routes/rates');
+const businessRoutes = require('./routes/businesses');  
+const ledgerRoutes = require('./routes/ledger');
 
 const { engine } = require('express-handlebars');
 const jwt = require('jsonwebtoken');
@@ -65,6 +68,9 @@ app.use('/kyc',kycRoutes);
 app.use('/pay',membershipRoute);
 app.use('/announcements',announcementsRoute);
 app.use('/superadmin', superAdminRoutes);
+app.use('/rates', ratesRoutes);
+app.use('/businesses', businessRoutes);
+app.use('/ledger', ledgerRoutes);
 
 // Serve superadmin frontend if needed
 app.use('/superadmin-frontend', express.static(path.join(__dirname, 'superadmin-frontend')));
@@ -78,9 +84,29 @@ app.get('/signup', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'signup.html'));
 });
 
+// Simple help page
+app.get('/help', (req, res) => {
+    try {
+        return res.render('help', { layout: false });
+    } catch (err) {
+        return res.status(500).send('Help page unavailable');
+    }
+});
 
+app.all('*', (req, res, next) => {
+    const err = new Error(`Can't find ${req.originalUrl} on this server!`);
+    err.statusCode = 404;
+    next(err);
+});
 
 app.use(errorHandler);
+
+// app.use((req, res, next) => {
+// //   const error = new Error('Page not found');
+//   error.status = 404;
+//   next(error);
+// });
+
 
 app.set('socketio', io);
 io.on('connection', (socket) => {
@@ -100,6 +126,13 @@ io.on('connection', (socket) => {
         console.log(`User disconnected: socket.id=${socket.id}`);
     });
 });
+
+// app.get("/gold-prices", (req, res) => {
+//   res.render("goldPrices", { title: "Live Gold Prices (INR)" });
+// });setInterval(async () => {
+//   const gold = await fetchGoldData();
+//   if (gold) io.emit("goldData", gold);
+// }, 1000);
 
 // Export io for use in controllers
 module.exports = { app, server };

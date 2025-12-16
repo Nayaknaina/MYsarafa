@@ -6,7 +6,11 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const Group = require('../models/group.model');
 const Payment = require('../models/payReceive.model');
+const RateHistory = require('../models/RateHistory.model');
+const Business = require('../models/Business.model');
 const Gmem = require('../models/groupMem.model');
+const LedgerTxn = require('../models/ledgerTx.model');
+const LedgerCustomer = require('../models/ledger.model')
 const { getSignedUrl} = require('../middleware/multer');
 
 
@@ -20,7 +24,8 @@ exports.dashboard = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
-
+    const goldRate = await RateHistory.findOne({ metal: 'XAU', currency: 'INR' }).sort({ createdAt: -1 }).lean();
+    const silverRate = await RateHistory.findOne({ metal: 'XAG', currency: 'INR' }).sort({ createdAt: -1 }).lean();
     
     const memberships = await Gmem.find({ user: user._id })
       .populate({
@@ -28,7 +33,7 @@ exports.dashboard = async (req, res, next) => {
         select: 'g_name g_cover description g_type total_mem user createdAt amount'
       })
       .lean();
-
+      const isLeader = memberships.some(m => m.type === 'admin');
     // Map myGroups with membership details
     const myGroups = memberships
       .filter(m => m.group && m.type !== 'pending')
@@ -101,6 +106,89 @@ exports.dashboard = async (req, res, next) => {
       }
     }
 
+
+    let featuredBusinesses = await Business.find({
+      owner: { $ne: user._id },
+      visibility: 'public'
+    })
+      .select('name type category description profile_pic location contact website reviews')
+      .sort({ createdAt: -1 })
+      .limit(10)
+      .lean()
+      featuredBusinesses = await Promise.all(
+  featuredBusinesses.map(async (biz) => ({
+      ...biz,
+      profile_pic: biz.profile_pic
+        ? await getSignedUrl(biz.profile_pic)
+        : '/assets/images/demo-business.jpg'
+    }))
+  );
+ console.log("featured",featuredBusinesses);
+ 
+// const ledgerCustomer = await LedgerCustomer.findOne({
+//   createdBy: user._id
+// }).lean();
+
+// let totals = {
+//   goldTotal: 0,
+//   silverTotal: 0,
+//   cashTotal: 0,
+//   goldGet: 0,
+//   goldGive: 0,
+//   silverGet: 0,
+//   silverGive: 0,
+//   cashGet: 0,
+//   cashGive: 0
+// };
+
+// if (ledgerCustomer) {
+//   totals.goldTotal = ledgerCustomer.gold_balance || 0;
+//   totals.silverTotal = ledgerCustomer.silver_balance || 0;
+//   totals.cashTotal = ledgerCustomer.amount_balance || 0;
+// }
+const userTotals = await LedgerCustomer.aggregate([
+  { $match: { createdBy: req.user._id } },
+  {
+    $group: {
+      _id: null,
+      totalCash: { $sum: "$amount_balance" },
+      totalGold: { $sum: "$gold_balance" },
+      totalSilver: { $sum: "$silver_balance" }
+    }
+  }
+]);
+
+const totals = userTotals[0] || { totalCash: 0, totalGold: 0, totalSilver: 0 };
+console.log("the total value of this user",totals)
+
+// 2️⃣ Fetch Ledger Transactions sum
+const ledgerTxn = await LedgerTxn.aggregate([
+  { $match: { createdBy: user._id } },
+  {
+    $group: {
+      _id: null,
+      total_gold_in: { $sum: "$gold_in" },
+      total_gold_out: { $sum: "$gold_out" },
+      total_silver_in: { $sum: "$silver_in" },
+      total_silver_out: { $sum: "$silver_out" },
+      total_amount_in: { $sum: "$amount_in" },
+      total_amount_out: { $sum: "$amount_out" }
+    }
+  }
+]);
+
+if (ledgerTxn && ledgerTxn.length > 0) {
+  const lx = ledgerTxn[0];
+
+  totals.goldGet = lx.total_gold_in || 0;
+  totals.goldGive = lx.total_gold_out || 0;
+
+  totals.silverGet = lx.total_silver_in || 0;
+  totals.silverGive = lx.total_silver_out || 0;
+
+  totals.cashGet = lx.total_amount_in || 0;
+  totals.cashGive = lx.total_amount_out || 0;
+}
     res.render("dashboard", {
       user: {
         ...user,
@@ -109,11 +197,17 @@ exports.dashboard = async (req, res, next) => {
       myGroups,
       discoverGroups,
       pendingGroup,
+      goldRate,
+      silverRate,
+      featuredBusinesses,
+      isLeader,
+      totals,
       layout: false
     });
   } catch (error) {
     console.error('Error rendering dashboard:', error);
-    res.status(500).json({ success: false, message: 'Server error: ' + error.message });
+    res.status(500).render('error', { message: 'Failed to load edit form. Server error: ' + error.message });
+ //   res.status(500).json({ success: false, message: 'Server error: ' + error.message });
   }
 };
 // exports.dashboard = async (req, res, next) => {
@@ -476,7 +570,7 @@ exports.updateProfile = async (req, res) => {
             console.log("New profilePicture key set:", profilePicture);
         }
 
-        // Update user
+       
         const updatedFields = {
             f_name: f_name?.trim(),
             l_name: l_name?.trim(),
@@ -521,7 +615,7 @@ exports.updateProfile = async (req, res) => {
 
 exports.getMemberDetails = async (req, res, next) => {
   try {
-    // Fetch user by ID
+  
     const userId = req.params.id;
     const user = await User.findById(userId).lean();
     if (!user) {

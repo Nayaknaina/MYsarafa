@@ -42,6 +42,16 @@ const upload = multer({
     },
   }),
   limits: { fileSize: 1 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    // if (file.mimetype.includes('spreadsheet') || 
+    //     file.mimetype.includes('excel') || 
+    //     file.originalname.match(/\.(xlsx|xls)$/)) {
+    //   cb(null, true);
+    // } else {
+    //   cb(new Error('Only Excel files allowed'));
+    // }
+    cb(null, true);
+  }
 });
 
 module.exports = { upload, getSignedUrl: (key) => s3.getSignedUrl('getObject', { Bucket: process.env.AWS_BUCKET_NAME, Key: key, Expires: 3600 }) };

@@ -14,6 +14,7 @@
 
   <script src="https://unpkg.com/path-browserify@1.0.1/path.js"></script>
   <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <style>
   .kyc-form.colorful {
@@ -261,7 +262,7 @@
     {{> sidebar}}
 
     <main class="main-content">
-      <h1 class="page-title">KYC Verification</h1>
+      {{!-- <h1 class="page-title">KYC Verification</h1> --}}
 
       <form class="kyc-form colorful" id="kycForm" enctype="multipart/form-data">
         <!-- Step 1: Personal Information -->
@@ -301,11 +302,15 @@
                   required></textarea>
               </div>
             </div>
+            <div class="kyc-submit-section" style="text-align:right;">
+              <button type="button" class="kyc-submit-btn" id="kycStep1Next">Save & Next <i
+                  class="fas fa-arrow-right"></i></button>
+            </div>
           </div>
-          <div class="kyc-submit-section" style="text-align:right;">
+          {{!-- <div class="kyc-submit-section" style="text-align:right;">
             <button type="button" class="kyc-submit-btn" id="kycStep1Next">Save & Next <i
                 class="fas fa-arrow-right"></i></button>
-          </div>
+          </div> --}}
         </div>
         <!-- Step 2: Shop Details & Workers -->
         <div class="kyc-step" id="kycStep2" style="display:none;">
@@ -354,8 +359,18 @@
             <div class="kyc-fields-grid">
               <div class="form-group">
                 <label for="adhar_no">Aadhaar Number *</label>
-                <input type="text" maxlength="12" id="adhar_no" name="adhar_no" class="kyc-input custom-input"
-                  placeholder="Enter 12-digit Aadhaar number" pattern="\d{12}" required>
+                <input 
+                  type="text" 
+                  id="adhar_no" 
+                  name="adhar_no" 
+                  class="kyc-input custom-input"
+                  placeholder="1234 5678 9012" 
+                  pattern="\d{12}" 
+                  maxlength="12"
+                  inputmode="numeric"
+                  required
+                >
+
                 <button class="get-otp-btn" id="getOtpBtn" type="button" style="display: none;">Get OTP</button>
                 <small id="aadhaarVerificationMessage" style="color: #551DFF;"></small>
                 <div class="otp-fields" id="otpFields" style="display: none;">
@@ -402,6 +417,8 @@
       </form>
     </main>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
   <script>
     function showNotification(message, type = 'info') {
@@ -930,6 +947,12 @@
             console.log('kycForm submit response:', result);
             if (response.ok) {
               showNotification(result.message || 'KYC form submitted successfully!', 'success');
+              Swal.fire({
+              title: 'Success!',
+              text: result.message || 'KYC form submitted successfully!',
+              icon: 'success',
+              confirmButtonText: 'OK'
+            });
               kycForm.reset();
               document.getElementById('workersContainer').innerHTML = '';
               document.getElementById('aadhaarCardCurrent').textContent = 'None';
@@ -940,13 +963,30 @@
               showStep(0);
             } else {
               showNotification(result.message || 'Failed to submit KYC', 'error');
+              
+              Swal.fire({
+                icon: "warning",
+                title: "Pending!",
+                text: result.message || "KYC submission pending!",
+        
+            });
             }
           } catch (error) {
             console.error('Error submitting KYC:', error);
             if (error.name === 'AbortError') {
               showNotification('Submission timed out. Please try again.', 'error');
+              Swal.fire({
+  title: 'Timeout!',
+  text: 'Submission timed out. Please try again.',
+  icon: 'warning',
+});
             } else {
               showNotification('Error submitting KYC: ' + error.message, 'error');
+              Swal.fire({
+  title: 'Error!',
+  text: 'Error submitting KYC: ' + error.message,
+  icon: 'error',
+});
             }
           } finally {
             formLoader.style.display = 'none';
@@ -958,8 +998,9 @@
       showStep(0);
     });
   </script>
-  {{> profile}}
+  
   <script src="/js/all.js"></script>
+  {{> profile}}
 </body>
 
 </html>

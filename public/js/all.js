@@ -289,7 +289,11 @@ $(document).ready(function () {
 
 });
 
-const searchInput = document.querySelector('.search-input');
+const searchInput = document.getElementById('Search-list');
+const  dropdown = document.getElementById('searchDropdown');
+const searchtoggle = document.getElementById('searchToggle');
+ const searchcross = document.getElementById('crossToggle');
+  const container = document.getElementById('searchContainer');
 const joinBtn = document.querySelector('.join-btn');
 const communityDropdown = document.querySelector('.community-name');
 //const moreDropdown = document.querySelector('.nav-item.dropdown');
@@ -375,7 +379,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const currentPath = window.location.pathname;
 
   menuItems.forEach(item => {
-    const itemPath = new URL(item.href).pathname;
+    const href = item.getAttribute('href');
+
+    if (!href) return;  
+
+    const itemPath = new URL(href, window.location.origin).pathname; 
+    // const itemPath = new URL(item.href).pathname;
 
     // Add active class if href matches current URL
     if (itemPath === currentPath) {
@@ -388,18 +397,108 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
-searchInput.addEventListener('input', function () {
-  const searchTerm = this.value.toLowerCase();
-  console.log(`Searching for: ${searchTerm}`);
+ 
 
-  // Here you would implement actual search functionality
-  // For demo purposes, we'll just log the search term
-  if (searchTerm.length > 2) {
-    // Simulate search results
-    console.log('Search results would appear here');
+  // MOBILE: open search
+  searchtoggle.addEventListener('click', () => {
+    container.classList.add('active');
+    searchtoggle.style.display = 'none';
+    searchcross.style.display = 'block';
+    
+    searchInput.focus();
+  });
+
+  searchcross.addEventListener('click', () => {
+    container.classList.remove('active');
+    searchtoggle.style.display = 'block';
+    searchcross.style.display = 'none';
+    dropdown.style.display = 'none';
+  });
+  // Close on outside click
+  document.addEventListener('click', (e) => {
+    if (!container.contains(e.target)) {
+      container.classList.remove('active');
+      dropdown.style.display = 'none';
+    }
+  });
+  const sidebarLinks = Array.from(document.querySelectorAll('.sidebar-menu a')).map(link => ({
+    text :link.textContent.trim(),
+    href :link.getAttribute('href')
+  }));
+
+  searchInput.addEventListener('input',function(){
+    console.log('Search term:', this.value);
+    const term =  this.value.toLowerCase();
+    dropdown.innerHTML = '';
+
+    if(term.length <1){
+      dropdown.style.display = 'none';
+      return;
+    }
+
+    const results = sidebarLinks.filter(item =>
+      item.text.toLowerCase().includes(term)
+    );
+
+     if (results.length === 0) {
+      dropdown.innerHTML = `<div class="search-no-result">No results found</div>`;
+    } else {
+      results.forEach(item => {
+        const a = document.createElement('a');
+        a.href = item.href;
+        a.textContent = item.text;
+
+        a.addEventListener('click', () => {
+          dropdown.style.display = 'none';
+        });
+
+        dropdown.appendChild(a);
+      });
+    }
+
+    dropdown.style.display = 'block';
+  });
+
+  // Hide dropdown when clicking outside
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.search-container')) {
+      dropdown.style.display = 'none';
+    }
+  });
+
+// Sidebar submenu toggle behavior
+document.addEventListener('DOMContentLoaded', function () {
+  const subs = document.querySelectorAll('.menu-has-sub');
+  subs.forEach(btn => {
+    
+    const section = btn.closest('.menu-section');
+    const key = 'sidebar-open-' + (btn.textContent || '').trim();
+    try {
+      const saved = localStorage.getItem(key);
+      if (saved === 'true') {
+        btn.setAttribute('aria-expanded', 'true');
+        section && section.classList.add('open');
+      }
+    } catch (e) {  }
+
+    btn.addEventListener('click', function (e) {
+      const isOpen = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!isOpen));
+      if (section) section.classList.toggle('open', !isOpen);
+      try { localStorage.setItem(key, String(!isOpen)); } catch (err) {}
+    });
+  });
+   const activeLink = document.querySelector('.sidebar-menu a.active');
+  if (activeLink) {
+    const activeSection = activeLink.closest('.menu-section');
+
+    document.querySelectorAll('.menu-section.open').forEach(section => {
+      if (section !== activeSection) {
+        section.classList.remove('open');
+      }
+    });
   }
 });
-
 if (joinBtn) {
   joinBtn.addEventListener('click', function () {
     console.log('Join meeting clicked');
@@ -429,13 +528,7 @@ communityDropdown.addEventListener('click', function () {
   showDropdown(this, ['Sarafa Community', 'Tech Community', 'Business Community']);
 });
 
-// moreDropdown.addEventListener('click', function () {
-//   console.log('More dropdown clicked');
-//   // Here you would show a dropdown menu
-//   showDropdown(this, ['Settings', 'Help', 'About', 'Logout']);
-// });
 
-// Generic Dropdown Function
 function showDropdown(element, items) {
   // Remove existing dropdown
   const existingDropdown = document.querySelector('.custom-dropdown');
@@ -594,7 +687,7 @@ function generateInvitationLink(name, email) {
   return `${baseUrl}signup.html?invite=${token}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`;
 }
 
-function sendInvitationEmail(name, email, invitationLink) {
+function sendInvitationEmail(name, email, invitationLink) {/
   // Create email content
   const emailSubject = "You're invited to join Sarafa Community!";
   const emailBody = `
@@ -1236,7 +1329,7 @@ document.addEventListener('DOMContentLoaded', function () {
     })
       .then(response => response.json())
       .then(data => {
-        console.log("User status", data.user);
+        // console.log("User status", data.user);
         if (data.user && data.user.mobile_verified && data.user.has_password) {
           verifyMobileModal.style.display = 'none';
         } else {

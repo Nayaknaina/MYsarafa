@@ -59,10 +59,24 @@ exports.communityCreation = async (req, res, next) => {
                 group.qr_code_url = getSignedUrl(group.qr_code);
             }
         }
+         const groupsData = await GMem.find({ user: req.user.id })
+            .populate('group', '_id g_name g_type g_cover description total_mem is_kyc_req')
+            .lean();
 
+        const formattedGroups = groupsData.map(g => ({
+            id: g.group?._id || null,
+            name: g.group?.g_name || 'Unknown Group',
+            type: g.group?.g_type || 'N/A',
+            cover: g.group?.g_cover ? getSignedUrl(g.group.g_cover) : '/assets/images/demo.jpg',
+            description: g.group?.description || '',
+            totalMembers: g.group?.total_mem || 0,
+            kycRequired: g.group?.is_kyc_req || false,
+            role: g.type
+        }));
         res.render("Community-creation", {
             user,
             group,
+            groups: formattedGroups,
             questions: questions || [],
             layout: false
         });
@@ -817,6 +831,33 @@ exports.getMyGroups = async (req, res) => {
     } catch (error) {
         console.error('Error fetching user groups:', error);
         res.status(500).json({ success: false, message: 'Error fetching groups' });
+    }
+};
+
+// Render a page that displays the current user's groups (server-side)
+exports.myGroupsPage = async (req, res, next) => {
+    try {
+        const groupsData = await GMem.find({ user: req.user.id })
+            .populate('group', '_id g_name g_type g_cover description total_mem is_kyc_req')
+            .lean();
+
+        const formattedGroups = groupsData.map(g => ({
+            id: g.group?._id || null,
+            name: g.group?.g_name || 'Unknown Group',
+            type: g.group?.g_type || 'N/A',
+            cover: g.group?.g_cover ? getSignedUrl(g.group.g_cover) : '/assets/images/demo.jpg',
+            description: g.group?.description || '',
+            totalMembers: g.group?.total_mem || 0,
+            kycRequired: g.group?.is_kyc_req || false,
+            role: g.type
+        }));
+
+        const user = await User.findById(req.user.id).lean();
+
+        return res.render('my-groups', { user, groups: formattedGroups, layout: 'main' });
+    } catch (err) {
+        console.error('Error rendering My Groups page:', err);
+        return next(err);
     }
 };
 

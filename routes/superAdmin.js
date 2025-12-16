@@ -7,8 +7,8 @@ const profileImageMiddleware = require('../middleware/profileImageMiddleware');
 const {upload} = require('../middleware/multer');
 
 // Public routes
-router.get('/login', superAdminController.getLoginPage);
-router.post('/login', superAdminController.login);
+router.get('/super_login', superAdminController.getLoginPage);
+router.post('/super_login', superAdminController.login);
 
 // Superadmin forgot password via OTP
 router.get('/forgot-password', superAdminController.forgotPasswordPage);

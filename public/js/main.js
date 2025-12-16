@@ -87,22 +87,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async () => {
-            try {
-                const response = await fetch('http://localhost:5000/api/logout', {
-                    method: 'POST',
-                    credentials: 'include'
-                });
+   if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+        try {
+            const response = await fetch('/api/logout', {
+                method: 'POST',
+                credentials: 'include'
+            });
 
-                if (response.ok) {
-                    window.location.href = '/auth/login';
-                }
-            } catch (error) {
-                toastr.error('Error during logout: ' + error.message);
+            if (response.ok) {
+                window.location.href = '/auth/login';
             }
-        });
+        } catch (error) {
+            toastr.error('Error during logout: ' + error.message);
+        }
+    });
     }
+
 
     if (googleLoginBtn) {
         googleLoginBtn.addEventListener('click', () => {

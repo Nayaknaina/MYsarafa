@@ -1,82 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Error - Sarafa Community</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            min-height: 100vh;
-            background: linear-gradient(120deg, #2f95ff 0%, #6dd5ed 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: Arial, sans-serif;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{statusCode}} - {{title}} | Sarafa Community</title>
 
-        .error-container {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px 32px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(47, 149, 255, 0.10);
-            max-width: 500px;
-            width: 90%;
-            text-align: center;
-        }
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <style>
+  body {
+    min-height: 100vh;
+    background: linear-gradient(120deg, #2f95ff 0%, #6dd5ed 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: "Poppins", Arial, sans-serif;
+    /*margin: 0;*/
+    padding: 0;
+  }
 
-        .error-title {
-            color: #2f95ff;
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
+  .error-container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px 32px;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(47, 149, 255, 0.15);
+    max-width: 480px;
+    width: 90%;
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out;
+  }
 
-        .error-message {
-            color: #374151;
-            font-size: 1.1rem;
-            margin-bottom: 20px;
-        }
+  .error-icon {
+    font-size: 3rem;
+    margin-bottom: 18px;
+    animation: bounce 1.5s infinite;
+  }
 
-        .error-btn {
-            padding: 12px 24px;
-            background: #2f95ff;
-            color: #fff;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            text-decoration: none;
-        }
+  .error-title {
+    font-size: 1.9rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+  }
 
-        .error-btn:hover {
-            background: #1e7fd6;
-        }
-    </style>
+  .error-message {
+    color: #374151;
+    font-size: 1.05rem;
+    margin-bottom: 25px;
+    line-height: 1.5;
+  }
+
+  .error-btn {
+    padding: 12px 24px;
+    background: #2f95ff;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background 0.3s ease, transform 0.2s;
+  }
+
+  .error-btn:hover {
+    background: #1e7fd6;
+    transform: translateY(-2px);
+  }
+
+  /* -------- MOBILE FIRST OPTIMIZATION -------- */
+  @media (max-width: 480px) {
+    .error-container {
+      padding: 24px 16px;
+      width: 92%;
+    }
+
+    .error-icon {
+      font-size: 2.3rem;
+    }
+
+    .error-title {
+      font-size: 1.4rem;
+    }
+
+    .error-message {
+      font-size: 0.95rem;
+    }
+
+    /*.error-btn {
+      width: 100%;
+      font-size: 1rem;
+      padding: 12px;
+    }*/
+  }
+
+  /* -------- TABLET RESPONSIVE -------- */
+  @media (min-width: 481px) and (max-width: 768px) {
+    .error-container {
+      width: 85%;
+      padding: 30px 24px;
+    }
+    .error-title {
+      font-size: 1.6rem;
+    }
+  }
+
+  /* -------- LARGE SCREENS -------- */
+  @media (min-width: 1200px) {
+    .error-container {
+      max-width: 520px;
+    }
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  /* Dynamic icon colors */
+  .error-400 .error-icon { color: #facc15; }
+  .error-401 .error-icon { color: #f97316; }
+  .error-403 .error-icon { color: #ef4444; }
+  .error-404 .error-icon { color: #3b82f6; }
+  .error-500 .error-icon,
+  .error-502 .error-icon { color: #dc2626; }
+</style>
+
 </head>
 
-
 <body data-user-id="{{user._id}}">
-    <div class="error-container">
-    <h1 class="error-title">{{statusCode}} - {{title}}</h1>
-    <p class="error-message">{{errorMessage}}</p>
-
+  <div class="error-container error-{{statusCode}}">
     {{#if (eq statusCode 400)}}
-        <a href="javascript:history.back()" class="error-btn">Go Back and Fix</a>
+      <i class="fa-solid fa-triangle-exclamation error-icon"></i>
+      <h1 class="error-title">{{statusCode}} - Bad Request</h1>
+      <p class="error-message">{{errorMessage}}</p>
+      <a href="javascript:history.back()" class="error-btn">Go Back & Fix</a>
+
     {{else if (eq statusCode 401)}}
-        <a href="/" class="error-btn">Go to Login</a>
+      <i class="fa-solid fa-lock error-icon"></i>
+      <h1 class="error-title">{{statusCode}} - Unauthorized</h1>
+      <p class="error-message">{{errorMessage}}</p>
+      <a href="/" class="error-btn">Go to Login</a>
+
+    {{else if (eq statusCode 403)}}
+      <i class="fa-solid fa-ban error-icon"></i>
+      <h1 class="error-title">{{statusCode}} - Forbidden</h1>
+      <p class="error-message">{{errorMessage}}</p>
+      <a href="/" class="error-btn">Access Restricted</a>
+
     {{else if (eq statusCode 404)}}
-        <a href="/" class="error-btn">Return Home</a>
+      <i class="fa-solid fa-magnifying-glass-location error-icon"></i>
+      <h1 class="error-title">{{statusCode}} - Not Found</h1>
+      <p class="error-message">{{errorMessage}}</p>
+      <a href="/" class="error-btn">Return Home</a>
+
+    {{else if (gte statusCode 500)}}
+      <i class="fa-solid fa-server error-icon"></i>
+      <h1 class="error-title">{{statusCode}} - Server Error</h1>
+      <p class="error-message">{{errorMessage}}</p>
+      <a href="/" class="error-btn">Back to Dashboard</a>
+
     {{else}}
-        <a href="/" class="error-btn">Back to Home</a>
+      <i class="fa-solid fa-circle-info error-icon"></i>
+      <h1 class="error-title">{{statusCode}} - {{title}}</h1>
+      <p class="error-message">{{errorMessage}}</p>
+      <a href="/" class="error-btn">Back to Home</a>
     {{/if}}
-
-    <a href="/" class="error-btn">Back to Dashboard</a>
-</div>
-
+  </div>
 </body>
-
 </html>

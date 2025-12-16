@@ -1,0 +1,653 @@
+{{!-- mobile for select new tran --}}
+
+{{> header}}
+
+<div class="main-container">
+  {{> sidebar}}
+
+  <main class="main-content">
+    <div class="page-title" id="udharTitle">Udhar Ledger</div>
+
+    <div class="filter-add-container" style="margin-bottom:18px;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="display:flex; gap:8px;">
+          {{!-- <button id="tab-ledger" class="ledger-add-member-btn">Ledger</button>
+          <button id="tab-list" class="ledger-add-member-btn"
+            >List</button> --}}
+            {{#if (eq query.tab "list")}}
+  <button id="tab-ledger" class="ledger-add-member-btn" style="background:#fff;color:#111;border:1px solid #e5e7eb;">Ledger</button>
+  <button id="tab-list"   class="ledger-add-member-btn" style="background:#2f95ff;color:#fff;">List</button>
+{{else}}
+  <button id="tab-ledger" class="ledger-add-member-btn" style="background:#2f95ff;color:#fff;">Ledger</button>
+  <button id="tab-list"   class="ledger-add-member-btn" style="background:#fff;color:#111;border:1px solid #e5e7eb;">List</button>
+{{/if}}
+          {{!-- <button id="tab-khatabook" class="ledger-add-member-btn"
+            style="background:#fff;color:#111;border:1px solid #e5e7eb;">Khatabook</button> --}}
+        </div>
+        <div style="flex:1"></div>
+        <select id="ledger-customer-select" class="add-member-input" style="width:300px; padding:8px;">
+          <option value="">Select Customers</option>
+        </select>
+        <button id="btn-new-customer" class="ledger-add-member-btn">+ New</button>
+      </div>
+    </div>
+
+    <div class="table-container" id="ledger-panel"  style="{{#if (eq query.tab "list")}}display:none{{else}}display:block{{/if}}">
+      <table id="ledger-table" class="members-table" style="width:100%">
+        <thead>
+          <tr>
+            <th>SN.</th>
+            <th>NAME/NO.</th>
+            <th>CONTACT NO.</th>
+            <th>AMOUNT</th>
+            <th>GOLD</th>
+            <th>SILVER</th>
+            <th>ACTION</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr>
+            <th colspan="3" style="text-align:center;">Udhar Out(-)</th>
+            <th id="udhar-out-amount">0</th>
+            <th id="udhar-out-gold">0</th>
+            <th id="udhar-out-silver">0</th>
+            <th></th>
+          </tr>
+          <tr>
+            <th colspan="3" style="text-align:center;">Udhar In(+)</th>
+            <th id="udhar-in-amount">0</th>
+            <th id="udhar-in-gold">0</th>
+            <th id="udhar-in-silver">0</th>
+            <th></th>
+          </tr>
+          <tr>
+            <th colspan="3" style="text-align:center;">Total :</th>
+            <th id="total-amount">0</th>
+            <th id="total-gold">0</th>
+            <th id="total-silver">0</th>
+            <th></th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="table-container" id="list-panel" style="{{#if (eq query.tab "list")}}display:block{{else}}display:none{{/if}};margin-top:18px;">
+      <table id="ledger-list-table" class="members-table" style="width:100%">
+        <thead>
+          <tr>
+            <th>SNO</th>
+            <th>DATE/TIME</th>
+            <th>C.NO/C.NAME/SOURCE</th>
+            <th>OLD AMNT</th>
+            <th>AMNT IN</th>
+            <th>AMNT OUT</th>
+            <th>FINAL AMNT</th>
+            <th>OLD GOLD</th>
+            <th>GOLD IN</th>
+            <th>GOLD OUT</th>
+            <th>FINAL GOLD</th>
+            <th>OLD SILVER</th>
+            <th>SILVER IN</th>
+            <th>SILVER OUT</th>
+            <th>FINAL SILVER</th>
+            <th>ACTION</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+        <tfoot>
+          <tr>
+            <th colspan="3" style="text-align:right;">TOTAL :</th>
+            <th id="list-total-old-amount">0</th>
+            <th id="list-total-amount-in">0</th>
+            <th id="list-total-amount-out">0</th>
+            <th id="list-total-final-amount">0</th>
+            <th id="list-total-old-gold">0</th>
+            <th id="list-total-gold-in">0</th>
+            <th id="list-total-gold-out">0</th>
+            <th id="list-total-final-gold">0</th>
+            <th id="list-total-old-silver">0</th>
+            <th id="list-total-silver-in">0</th>
+            <th id="list-total-silver-out">0</th>
+            <th id="list-total-final-silver">0</th>
+            <th></th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    {{> khatabook}}
+  </main>
+</div>
+
+<!-- New Customer Modal (uses existing modal styles in styles.css) -->
+<div id="modal-new-customer" class="modal-overlay" style="display:none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3>New Party Detail</h3>
+      <button class="modal-close-btn" id="modal-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-new-customer" class="modal-form">
+        <div class="modal-form-group">
+          <label class="required">Type</label>
+          <select name="type" id="type" class="modal-input modal-select">
+            <option value="customer" selected>Customer</option>
+            <option value="supplier">Supplier</option>
+          </select>
+        </div>
+
+        <div class="modal-form-group">
+          <label class="required">Customer Name</label>
+          <input type="text" name="name" id="name" class="modal-input" required />
+          <div class="error-text"></div>
+        </div>
+
+        <div class="modal-form-group">
+          <label>Customer Mobile Number</label>
+          <input type="text" name="mobile_no" id="mobile_no" class="modal-input" />
+          <div class="error-text"></div>
+        </div>
+
+        <div class="modal-form-group">
+          <label>Customer E-Mail Address</label>
+          <input type="email" name="email" id="email" class="modal-input" />
+        </div>
+
+        <div class="modal-form-group">
+          <label>Customer Address</label>
+          <textarea name="address" id="address" class="modal-input modal-textarea"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="add-member-btn" id="submit-new">Add</button>
+      <button class="modal-close-btn" id="cancel-new">Cancel</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- New Transaction Modal -->
+<div id="modal-new-transaction" class="modal-overlay" style="display:none;">
+  <div class="modal-content" style="max-width:520px;">
+    <div class="modal-header">
+      <h3>New Transaction</h3>
+      <button class="modal-close-btn" id="modal-txn-close">&times;</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-new-transaction" class="modal-form">
+        <div class="modal-form-group">
+          <label class="required">Customer</label>
+          <select id="txn-customer-select" class="modal-input modal-select">
+            <option value="">Select customer</option>
+          </select>
+        </div>
+
+        <div class="modal-form-group">
+          <label class="required">Asset</label>
+          <select id="txn-asset" class="modal-input modal-select">
+            <option value="cash">Cash</option>
+            <option value="gold">Gold</option>
+            <option value="silver">Silver</option>
+          </select>
+        </div>
+
+        <div class="modal-form-group">
+          <label class="required">Direction</label>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <label><input type="radio" name="txn-direction" value="in" checked> In (+)</label>
+            <label><input type="radio" name="txn-direction" value="out"> Out (-)</label>
+          </div>
+        </div>
+
+        <div class="modal-form-group txn-field txn-cash-group">
+          <label>Cash Amount (₹)</label>
+          <input type="number" step="0.01" id="txn-cash-amount" class="modal-input" placeholder="0" />
+        </div>
+
+        <div class="modal-form-group txn-field txn-gold-group" style="display:none;">
+          <label>Gold Weight (gm)</label>
+          <input type="number" step="0.01" id="txn-gold-weight" class="modal-input" placeholder="0" />
+        </div>
+
+        <div class="modal-form-group txn-field txn-silver-group" style="display:none;">
+          <label>Silver Weight (gm)</label>
+          <input type="number" step="0.01" id="txn-silver-weight" class="modal-input" placeholder="0" />
+        </div>
+
+        <div class="modal-form-group">
+          <label>Date & Time</label>
+          <input type="datetime-local" id="txn-date" class="modal-input" />
+        </div>
+
+        <div class="modal-form-group">
+          <label>Note / Source</label>
+          <textarea id="txn-note" class="modal-input modal-textarea" placeholder="Optional note"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="add-member-btn" id="submit-txn">Add Transaction</button>
+      <button class="modal-close-btn" id="cancel-txn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- DataTables CSS/JS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+
+<script>
+  (function () {
+    const modalOverlay = document.getElementById('modal-new-customer');
+    const btnNew = document.getElementById('btn-new-customer');
+    const btnClose = document.getElementById('modal-close');
+    const btnCancel = document.getElementById('cancel-new');
+    const btnSubmit = document.getElementById('submit-new');
+    const form = document.getElementById('form-new-customer');
+
+    function openModal() { modalOverlay.style.display = 'flex'; }
+    function closeModal() { modalOverlay.style.display = 'none'; }
+
+    btnNew.addEventListener('click', openModal);
+    btnClose.addEventListener('click', closeModal);
+    btnCancel.addEventListener('click', closeModal);
+    window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+    const btnNewTxn = document.getElementById('btn-new-transaction');
+    const modalTxn = document.getElementById('modal-new-transaction');
+    const modalTxnClose = document.getElementById('modal-txn-close');
+    const modalTxnCancel = document.getElementById('cancel-txn');
+    const formTxn = document.getElementById('form-new-transaction');
+    const submitTxn = document.getElementById('submit-txn');
+    const txnCustomerSelect = document.getElementById('txn-customer-select');
+    const txnAsset = document.getElementById('txn-asset');
+    const txnCashGroup = document.querySelector('.txn-cash-group');
+    const txnGoldGroup = document.querySelector('.txn-gold-group');
+    const txnSilverGroup = document.querySelector('.txn-silver-group');
+
+    function openTxnModal() {
+      // populate customer select from main select
+      const main = document.getElementById('ledger-customer-select');
+      if (main && txnCustomerSelect) {
+        txnCustomerSelect.innerHTML = '';
+        const def = document.createElement('option'); def.value = ''; def.textContent = 'Select customer'; txnCustomerSelect.appendChild(def);
+        Array.from(main.querySelectorAll('option:not(:first-child)')).forEach(o => {
+          const opt = document.createElement('option'); opt.value = o.value; opt.textContent = o.textContent; txnCustomerSelect.appendChild(opt);
+        });
+      }
+      if (modalTxn) modalTxn.style.display = 'flex';
+    }
+    function closeTxnModal() { if (modalTxn) modalTxn.style.display = 'none'; formTxn.reset(); showAssetFields('cash'); }
+
+    if (btnNewTxn) btnNewTxn.addEventListener('click', openTxnModal);
+    if (modalTxnClose) modalTxnClose.addEventListener('click', closeTxnModal);
+    if (modalTxnCancel) modalTxnCancel.addEventListener('click', closeTxnModal);
+
+    function showAssetFields(asset) {
+      if (asset === 'cash') { txnCashGroup.style.display = ''; txnGoldGroup.style.display = 'none'; txnSilverGroup.style.display = 'none'; }
+      else if (asset === 'gold') { txnCashGroup.style.display = 'none'; txnGoldGroup.style.display = ''; txnSilverGroup.style.display = 'none'; }
+      else if (asset === 'silver') { txnCashGroup.style.display = 'none'; txnGoldGroup.style.display = 'none'; txnSilverGroup.style.display = ''; }
+    }
+    if (txnAsset) txnAsset.addEventListener('change', function () { showAssetFields(this.value); });
+
+    // submit transaction
+    if (submitTxn) {
+      submitTxn.addEventListener('click', async function (e) {
+        e.preventDefault();
+        // build payload
+        const customer = txnCustomerSelect.value || '';
+        if (!customer) { toastr.error('Select a customer'); return; }
+        const asset = txnAsset.value || 'cash';
+        const direction = (formTxn.querySelector('input[name="txn-direction"]:checked') || {}).value || 'in';
+        const dateVal = document.getElementById('txn-date').value;
+        const note = document.getElementById('txn-note').value.trim();
+
+        const payload = { customer, date: dateVal || new Date().toISOString(), note };
+
+        if (asset === 'cash') {
+          const amt = Number(document.getElementById('txn-cash-amount').value || 0);
+          if (!amt) { toastr.error('Enter cash amount'); return; }
+          if (direction === 'in') payload.amount_in = amt; else payload.amount_out = amt;
+        } else if (asset === 'gold') {
+          const w = Number(document.getElementById('txn-gold-weight').value || 0);
+          if (!w) { toastr.error('Enter gold weight'); return; }
+          if (direction === 'in') payload.gold_in = w; else payload.gold_out = w;
+        } else if (asset === 'silver') {
+          const w = Number(document.getElementById('txn-silver-weight').value || 0);
+          if (!w) { toastr.error('Enter silver weight'); return; }
+          if (direction === 'in') payload.silver_in = w; else payload.silver_out = w;
+        }
+
+        try {
+          const resp = await fetch('/ledger/transaction/new', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+          const json = await resp.json();
+          if (!resp.ok) { toastr.error((json && json.message) ? json.message : 'Failed to add transaction'); return; }
+          toastr.success('Transaction added');
+          closeTxnModal();
+          // refresh tables
+          if (typeof listTable !== 'undefined' && listTable) listTable.ajax.reload(null, false);
+          if (window.khatabookTable && window.khatabookTable.ajax) window.khatabookTable.ajax.reload(null, false);
+          // refresh main balances/table
+          if (typeof table !== 'undefined' && table && table.ajax) table.ajax.reload(null, false);
+        } catch (err) { console.error('txn create', err); toastr.error('Error adding transaction'); }
+      });
+    }
+
+   
+    let table = null;
+    let listTable = null;
+    function initDataTable() {
+      if (!window.jQuery || !window.jQuery.fn || !window.jQuery.fn.dataTable) return loadPlainTable();
+
+      table = jQuery('#ledger-table').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+          { extend: 'print', text: '<i class="fa fa-print"></i> Print', className: 'dt-print-btn' }
+        ],
+        ajax: { url: '/ledger/customer/list', dataSrc: function (d) { return d && d.data ? d.data : []; }, xhrFields: { withCredentials: true } },
+        columns: [
+          { data: null, render: (data, type, row, meta) => meta.row + 1 },
+          { data: 'name', render: function (d, t, r) { return (d || '') + (r.cust_no ? (' /(' + r.cust_no + ')') : ''); } },
+          { data: 'mobile_no' },
+          { data: 'amount_balance', render: function (d) { return formatAmount(d); } },
+          { data: 'gold_balance', render: function (d) { return formatWeight(d, 'gm'); } },
+          { data: 'silver_balance', render: function (d) { return formatWeight(d, 'gm'); } },
+          { data: null, orderable: false, render: () => '<button class="action-btn">Open</button>' }
+        ],
+        pageLength: 25,
+        responsive: true,
+        language: { emptyTable: 'No parties found' },
+        footerCallback: function (row, data, start, end, display) {
+          // sum amount, gold, silver for visible rows
+          let api = this.api();
+          // helper to safely extract numeric value
+          const toNum = function (v) {
+            if (typeof v === 'object') return Number(v || 0) || 0;
+            return Number(v || 0) || 0;
+          };
+
+          const colDataArray = function (index) {
+            try { return Array.from(api.column(index, { page: 'current' }).data()); } catch (e) { return (api.column(index, { page: 'current' }).data() || []); }
+          };
+
+          // totals
+          const amtArr = colDataArray(3);
+          const goldArr = colDataArray(4);
+          const silverArr = colDataArray(5);
+
+          let totalAmount = 0, inAmount = 0, outAmount = 0;
+          amtArr.forEach(v => { const n = toNum(v); totalAmount += n; if (n > 0) inAmount += n; else outAmount += n; });
+
+          let totalGold = 0, inGold = 0, outGold = 0;
+          goldArr.forEach(v => { const n = toNum(v); totalGold += n; if (n > 0) inGold += n; else outGold += n; });
+
+          let totalSilver = 0, inSilver = 0, outSilver = 0;
+          silverArr.forEach(v => { const n = toNum(v); totalSilver += n; if (n > 0) inSilver += n; else outSilver += n; });
+
+          document.getElementById('udhar-out-amount').innerHTML = '<span class="color-red">' + formatAmount(outAmount) + '</span>';
+          document.getElementById('udhar-out-gold').innerHTML = '<span class="color-red">' + formatWeight(outGold, 'gm') + '</span>';
+          document.getElementById('udhar-out-silver').innerHTML = '<span class="color-red">' + formatWeight(outSilver, 'gm') + '</span>';
+
+          document.getElementById('udhar-in-amount').innerHTML = '<span class="color-green">' + formatAmount(inAmount) + '</span>';
+          document.getElementById('udhar-in-gold').innerHTML = '<span class="color-green">' + formatWeight(inGold, 'gm') + '</span>';
+          document.getElementById('udhar-in-silver').innerHTML = '<span class="color-green">' + formatWeight(inSilver, 'gm') + '</span>';
+
+          document.getElementById('total-amount').textContent = formatAmount(totalAmount);
+          document.getElementById('total-gold').textContent = formatWeight(totalGold, 'gm');
+          document.getElementById('total-silver').textContent = formatWeight(totalSilver, 'gm');
+        }
+      });
+
+      // no free-text search; ledger select filters by customer id
+      // keep select change handled elsewhere
+    }
+
+    let selectedCustomerId = '';
+    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+      try {
+        if (settings.nTable.id === 'ledger-table') {
+          if (!selectedCustomerId) return true;
+          const row = jQuery('#ledger-table').DataTable().row(dataIndex).data();
+          return row && row._id === selectedCustomerId;
+        }
+        return true;
+      } catch (e) {
+        return true;
+      }
+    });
+
+    function initListTable() {
+  if (!window.jQuery || !window.jQuery.fn || !window.jQuery.fn.dataTable) return loadPlainList();
+
+  listTable = jQuery('#ledger-list-table').DataTable({
+    dom: 'Bfrtip',
+    buttons: [{ extend: 'print', text: 'Print', className: 'dt-print-btn' }],
+    ajax: {
+      url: '/ledger/transaction/list',  // Always load ALL user's transactions
+      dataSrc: function (d) { return d && d.data ? d.data : []; },
+      xhrFields: { withCredentials: true }
+    },
+    columns: [
+      { data: null, render: (d, t, r, meta) => meta.row + 1 },
+      { data: 'date', render: d => d ? new Date(d).toLocaleString() : '' },
+      { data: null, render: r => (r.cust_no ? (r.cust_no + '<br/>') : '') + (r.cname || '') },
+
+      { data: 'old_amount', render: d => formatAmount(d) },
+      { data: 'amount_in', render: d => formatAmount(d) },
+      { data: 'amount_out', render: d => formatAmount(d) },
+      { data: 'final_amount', render: d => formatAmount(d) },
+
+      { data: 'old_gold', render: d => formatWeight(d, 'gm') },
+      { data: 'gold_in', render: d => formatWeight(d, 'gm') },
+      { data: 'gold_out', render: d => formatWeight(d, 'gm') },
+      { data: 'final_gold', render: d => formatWeight(d, 'gm') },
+
+      { data: 'old_silver', render: d => formatWeight(d, 'gm') },
+      { data: 'silver_in', render: d => formatWeight(d, 'gm') },
+      { data: 'silver_out', render: d => formatWeight(d, 'gm') },
+      { data: 'final_silver', render: d => formatWeight(d, 'gm') },
+
+      { data: null, orderable: false, render: () => '<button class="action-btn">Open</button>' }
+    ],
+    pageLength: 25,
+    responsive: true,
+    footerCallback: function () {
+      const api = this.api();
+      const sum = (idx) => api.column(idx, { page: 'current' }).data().reduce((a, b) => a + (Number(b) || 0), 0);
+
+      document.getElementById('list-total-old-amount').textContent = formatAmount(sum(3));
+      document.getElementById('list-total-amount-in').textContent = formatAmount(sum(4));
+      document.getElementById('list-total-amount-out').textContent = formatAmount(sum(5));
+      document.getElementById('list-total-final-amount').textContent = formatAmount(sum(6));
+
+      document.getElementById('list-total-old-gold').textContent = formatWeight(sum(7), 'gm');
+      document.getElementById('list-total-gold-in').textContent = formatWeight(sum(8), 'gm');
+      document.getElementById('list-total-gold-out').textContent = formatWeight(sum(9), 'gm');
+      document.getElementById('list-total-final-gold').textContent = formatWeight(sum(10), 'gm');
+
+      document.getElementById('list-total-old-silver').textContent = formatWeight(sum(11), 'gm');
+      document.getElementById('list-total-silver-in').textContent = formatWeight(sum(12), 'gm');
+      document.getElementById('list-total-silver-out').textContent = formatWeight(sum(13), 'gm');
+      document.getElementById('list-total-final-silver').textContent = formatWeight(sum(14), 'gm');
+    }
+  });
+
+  // Client-side filtering when customer is selected
+  const customerSelect = document.getElementById('ledger-customer-select');
+
+  // Add custom search extension for customer filtering
+  $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+    if (settings.nTable.id !== 'ledger-list-table') return true;
+
+    const row = listTable.row(dataIndex).data();
+    if (!row || !row.customer) return true;
+
+    if (!selectedCustomerId) return true; // Show all if no customer selected
+    return row.customer.toString() === selectedCustomerId;
+  });
+
+  customerSelect.addEventListener('change', function () {
+    selectedCustomerId = this.value || '';
+    listTable.draw(); // This triggers the custom search above
+  });
+
+  // Also trigger on ledger table draw (for consistency)
+  if (table) {
+    table.on('draw', function () {
+      listTable.draw();
+    });
+  }
+}
+    async function loadPlainTable() {
+      const tbody = document.querySelector('#ledger-table tbody');
+      tbody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
+      try {
+        const resp = await fetch('/ledger/customer/list?all=1', { credentials: 'same-origin' });
+        if (!resp.ok) throw new Error('Failed');
+        const json = await resp.json();
+        const rows = json.data || [];
+        tbody.innerHTML = rows.map((r, i) => `\n        <td>${i + 1}</td>
+      <td>${escapeHtml(r.name)}${r.cust_no ? ` (${escapeHtml(r.cust_no)})` : ''}</td>
+      <td>${escapeHtml(r.mobile_no || '')}</td>
+      <td>${escapeHtml(r.email || '')}</td>
+      <td>${escapeHtml(r.address || '')}</td>
+      <td>${escapeHtml(r.type || '')}</td>
+      <td><button class="action-btn">Open</button></td>
+    </tr>
+  `).join('');
+      } catch (err) { tbody.innerHTML = '<tr><td colspan="7">Could not load data</td></tr>'; }
+    }
+
+    function escapeHtml(s) { return String(s || '').replace(/[&<>\"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+    // submit
+    // helpers
+    function formatAmount(v) {
+      const n = Number(v || 0);
+      const cls = n < 0 ? 'color-red' : 'color-green';
+      return (n >= 0 ? '+' : '') + n.toLocaleString('en-IN') + '₹';
+    }
+
+    function formatWeight(v, u) {
+      const n = Number(v || 0);
+      const sign = n > 0 ? '+' : '';
+      return sign + (n === 0 ? '0' : n) + (u || 'gm');
+    }
+
+    btnSubmit.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const data = {
+        name: form.name.value.trim(),
+        mobile_no: form.mobile_no.value.trim(),
+        email: form.email.value.trim(),
+        address: form.address.value.trim(),
+        type: form.type.value
+      };
+      if (!data.name) { toastr.error('Name is required'); return; }
+
+      try {
+        const resp = await fetch('/ledger/customer/new', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+        const json = await resp.json();
+        console.log('Add customer resp', json);
+        if (!resp.ok) { toastr.error((json && json.message) ? json.message : 'Failed to add'); return; }
+        toastr.success('Customer added');
+        closeModal(); form.reset();
+        // refresh customer select and both tables
+        await populateCustomerSelect();
+        if (table) table.ajax.reload(null, false); else loadPlainTable();
+        if (listTable) listTable.ajax.reload(null, false);
+      } catch (err) { console.error(err); toastr.error('Error adding customer'); }
+    });
+
+    initDataTable();
+    initListTable();
+
+    // populate customer select from server
+    async function populateCustomerSelect() {
+      try {
+        const resp = await fetch('/ledger/customer/list?all=1', { credentials: 'same-origin' });
+        if (!resp.ok) return;
+        const json = await resp.json();
+        const arr = json.data || [];
+        const sel = document.getElementById('ledger-customer-select');
+        // clear existing options except first
+        sel.querySelectorAll('option:not(:first-child)').forEach(o => o.remove());
+        arr.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c._id;
+          opt.textContent = (c.name || '') + (c.cust_no ? (' /(' + c.cust_no + ')') : '');
+          sel.appendChild(opt);
+        });
+      } catch (e) { console.error('Could not populate customers', e); }
+    }
+
+    // initial populate
+    populateCustomerSelect();
+
+    // Tabs toggle
+    const tabLedger = document.getElementById('tab-ledger');
+    const tabList = document.getElementById('tab-list');
+    const ledgerPanel = document.getElementById('ledger-panel');
+    const listPanel = document.getElementById('list-panel');
+    const udharTitle = document.getElementById('udharTitle');
+    // Optional: Keep only for manual clicks (no flash because default is already correct)
+document.getElementById('tab-ledger').addEventListener('click', () => {
+  document.getElementById('ledger-panel').style.display = 'block';
+  document.getElementById('list-panel').style.display = 'none';
+  document.getElementById('tab-ledger').style.background = '#2f95ff';
+  document.getElementById('tab-ledger').style.color = '#fff';
+  document.getElementById('tab-list').style.background = '#fff';
+  document.getElementById('tab-list').style.color = '#111';
+  document.getElementById('udharTitle').textContent = 'Udhar Ledger';
+});
+
+document.getElementById('tab-list').addEventListener('click', () => {
+  document.getElementById('ledger-panel').style.display = 'none';
+  document.getElementById('list-panel').style.display = 'block';
+  document.getElementById('tab-list').style.background = '#2f95ff';
+  document.getElementById('tab-list').style.color = '#fff';
+  document.getElementById('tab-ledger').style.background = '#fff';
+  document.getElementById('tab-ledger').style.color = '#111';
+  document.getElementById('udharTitle').textContent = 'Udhar List';
+});
+    
+    // ensure khatabook select is populated in parallel with main select
+    async function populateBothSelects() {
+      await populateCustomerSelect();
+      try {
+        const src = document.getElementById('ledger-customer-select');
+        const tgt = document.getElementById('khatabook-customer-select');
+        if (!src || !tgt) return;
+        tgt.innerHTML = '';
+        const def = document.createElement('option'); def.value = ''; def.textContent = 'All Customers'; tgt.appendChild(def);
+        src.querySelectorAll('option:not(:first-child)').forEach(o => {
+          const opt = document.createElement('option'); opt.value = o.value; opt.textContent = o.textContent; tgt.appendChild(opt);
+        });
+      } catch (e) { console.error('populateBothSelects err', e); }
+    }
+    populateBothSelects();
+
+    // expose helper formatters for external khatabook script
+    window.formatAmount = formatAmount;
+    window.formatWeight = formatWeight;
+  })();
+
+  if (window.location.pathname === '/ledger/' || window.location.pathname === '/ledger') {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('tab') === 'list') {
+    
+    setTimeout(() => {
+      const listTabBtn = document.getElementById('tab-list');
+      if (listTabBtn && !listTabBtn.style.background.includes('#2f95ff')) {
+        listTabBtn.click();
+      }
+    }, 150);
+  }
+}
+</script>
+<script src="/js/khatabook.js"></script>

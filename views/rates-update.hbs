@@ -1,0 +1,25 @@
+<div class="container">
+  <h1>Update Rates (Admin)</h1>
+  <form method="post" action="/rates/update">
+    <div>
+      <label>Metal</label>
+      <input name="metal" value="XAU" />
+    </div>
+    <div>
+      <label>Price</label>
+      <input name="price" />
+    </div>
+    <div>
+      <label>Currency</label>
+      <input name="currency" value="INR" />
+    </div>
+    <button type="submit">Submit</button>
+  </form>
+
+  <h2>Latest entries</h2>
+  <ul>
+    {{#each latest}}
+      <li>{{metal}} — {{price}} {{currency}} ({{createdAt}})</li>
+    {{/each}}
+  </ul>
+</div>

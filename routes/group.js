@@ -10,6 +10,7 @@ const {upload} = require('../middleware/multer');
 
 router.get('/community/:groupId?', authMiddleware,monthlyMembershipCheck, profileImageMiddleware, groupController.communityCreation);
 router.get('/group-member',authMiddleware,monthlyMembershipCheck, profileImageMiddleware, groupController.groupMemberPage);
+router.get('/my', authMiddleware, monthlyMembershipCheck, profileImageMiddleware, groupController.myGroupsPage);
 
 router.post('/create', authMiddleware,upload.fields([
   { name: 'coverImage', maxCount: 1 },

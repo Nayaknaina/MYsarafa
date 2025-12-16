@@ -235,6 +235,7 @@
         socket.emit('joinRoom', 'superadmin');
 
         // Socket: Listen for new contact
+        //error part
         socket.on('newContact', function (newContact) {
             const rowHtml = `
                 <tr class="table-warning">

@@ -1,0 +1,146 @@
+<div class="container">
+  <h1>Rates History</h1>
+  <div>
+    <label for="dateSelect">Choose date:</label>
+    <select id="dateSelect">
+      <option value="latest">Latest</option>
+      {{#each historicalDates}}
+        <option value="{{this}}" {{#ifEquals ../selectedDate this}}selected{{/ifEquals}}>{{this}}</option>
+      {{/each}}
+    </select>
+  </div>
+
+  <div class="filter-row" style="margin:12px 0; display:flex; gap:12px; align-items:center;">
+    <div>
+      <label for="startDate">From</label>
+      <input id="startDate" type="date" class="filter-input" />
+    </div>
+    <div>
+      <label for="endDate">To</label>
+      <input id="endDate" type="date" class="filter-input" />
+    </div>
+    <div>
+      <button id="applyDateFilter" class="btn-filter">Apply</button>
+      <button id="clearDateFilter" class="btn-filter">Clear</button>
+    </div>
+  </div>
+
+  <!-- DataTable-enabled history table -->
+  <table id="ratesHistoryTable" class="table display" style="width:100%;">
+    <thead>
+      <tr><th>Metal</th><th>Price</th><th>Currency</th><th>Recorded At</th></tr>
+    </thead>
+    <tbody>
+      {{#if rates.length}}
+        {{#each rates}}
+          <tr data-createdat="{{createdAt}}">
+            <td>{{metal}}</td>
+            <td>{{price}}</td>
+            <td>{{currency}}</td>
+            <td>{{createdAt}}</td>
+          </tr>
+        {{/each}}
+      {{else}}
+        <tr><td colspan="4">No data for selected date</td></tr>
+      {{/if}}
+    </tbody>
+  </table>
+</div>
+
+<!-- DataTables CSS/JS (load only on this page) -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+
+<script>
+  // onDateChange now applies client-side filtering without a full page reload
+  function onDateChange() {
+    var sel = document.getElementById('dateSelect');
+    var date = sel.value;
+    var table = window.ratesHistoryTable;
+    if (!table) return; // table not ready yet
+
+    if (date === 'latest') {
+      // clear explicit date inputs and redraw
+      $('#startDate').val('');
+      $('#endDate').val('');
+      table.draw();
+      return;
+    }
+
+    // set both start and end to the selected date to filter that day only
+    $('#startDate').val(date);
+    $('#endDate').val(date);
+    table.draw();
+  }
+
+  (function(){
+    // initialize DataTable once DOM ready
+    $(document).ready(function(){
+      var table = $('#ratesHistoryTable').DataTable({
+        paging: true,
+        pageLength: 10,
+        lengthChange: true,
+        searching: true,
+        ordering: true,
+        order: [[3, 'desc']],
+        language: {
+          emptyTable: 'No history available'
+        }
+      });
+
+      // expose table globally so the select handler can access it
+      window.ratesHistoryTable = table;
+
+      // custom date-range filter
+      $.fn.dataTable.ext.search.push(function(settings, data, dataIndex) {
+        if (settings.nTable.id !== 'ratesHistoryTable') return true;
+        var min = $('#startDate').val();
+        var max = $('#endDate').val();
+        var createdAt = $(table.row(dataIndex).node()).data('createdat');
+        if (!createdAt) return true;
+        var created = Date.parse(createdAt);
+        var minT = null, maxT = null;
+        if (min) {
+          minT = Date.parse(min);
+          if (isNaN(minT)) minT = null;
+        }
+        if (max) {
+          // include entire day by setting time to end of day
+          var maxDate = new Date(max);
+          maxDate.setHours(23,59,59,999);
+          maxT = maxDate.getTime();
+        }
+        if (!minT && !maxT) return true;
+        if (minT && !maxT) return created >= minT;
+        if (!minT && maxT) return created <= maxT;
+        return created >= minT && created <= maxT;
+      });
+
+      $('#applyDateFilter').on('click', function(e){
+        e.preventDefault();
+        table.draw();
+      });
+      $('#clearDateFilter').on('click', function(e){
+        e.preventDefault();
+        $('#startDate').val('');
+        $('#endDate').val('');
+        $('#dateSelect').val('latest');
+        table.draw();
+      });
+
+      // If server provided a selectedDate via query, select it in the dropdown and apply filter
+      var params = new URLSearchParams(window.location.search);
+      var selDate = params.get('date');
+      if (selDate) {
+        $('#dateSelect').val(selDate);
+        // set date inputs and filter
+        $('#startDate').val(selDate);
+        $('#endDate').val(selDate);
+        table.draw();
+      }
+
+      // attach change handler to select to avoid inline reloads
+      $('#dateSelect').on('change', function(){ onDateChange(); });
+    });
+  })();
+</script>

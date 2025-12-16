@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Directory - MySarafa</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="canonical" href="https://app.mysarafa.com/businesses">
+</head>
+
+<style>
+    /* Custom styles if needed beyond Tailwind */
+    .business-card {
+        transition: all 0.3s ease;
+    }
+
+    .business-card:hover {
+        transform: translateY(-4px);
+    }
+
+    .my-business-item {
+        transition: background-color 0.2s ease;
+    }
+
+    .my-business-item:hover {
+        background-color: #f9fafb;
+    }
+
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background: white;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 600px;
+        max-height: 90vh;
+        overflow-y: auto;
+        position: relative;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 24px;
+        cursor: pointer;
+        color: #9ca3af;
+    }
+
+    .close-btn:hover {
+        color: #ef4444;
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 1rem;
+    }
+
+    .form-select,
+    .form-textarea {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-size: 1rem;
+        resize: vertical;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 12px;
+        background: #2a4aa7;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .submit-btn:hover {
+        background: #224485;
+    }
+    .action-menu {
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    opacity: 0;
+    pointer-events: none;
+    }
+    .action-menu.scale-y-100 {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    /* Star Rating Styles */
+    .star-rating {
+        display: flex;
+        align-items: center;
+        gap: 0.125rem;
+    }
+
+    .star-rating .star {
+        font-size: 0.6875rem; /* Even smaller for ultra-compact */
+        color: #d1d5db;
+    }
+
+    .star-rating .star.filled {
+        color: #fbbf24;
+    }
+
+    .star-rating .review-count {
+        font-size: 0.6875rem;
+        color: #6b7280;
+        margin-left: 0.25rem;
+    }
+
+    @media (max-width: 768px) {
+        .main-layout {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+            order: 2;
+        }
+
+        .grid-cols-3 {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+<body>
+    
+    {{> header}}
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        {{> sidebar}}
+        <div class="w-full p-4">
+            <!-- Header Section -->
+            <div class="mb-2">
+                <h1 class="text-2xl font-bold text-gray-900 mb-2">Business Connect</h1>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <input type="text" id="discoverSearch" placeholder="Search discover businesses..."
+                        class="flex-1 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button id="openAddBusinessModal"
+                        class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-medium">
+                        Add New Business
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Layout: Discover Grid + My Businesses Sidebar -->
+            <div class="flex gap-8 main-layout">
+                <!-- Discover Businesses Grid (70%) -->
+                <div class="flex-1">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-6">Discover Businesses</h2>
+                    {{#if discoverBusinesses.length}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3" id="discoverBusinessesGrid">
+                        {{#each discoverBusinesses}}
+                        <div class="business-card cursor-pointer" onclick="openBusinessDetailsModal('{{_id}}')">
+                            <div class="bg-white rounded-lg shadow-sm overflow-hidden h-full flex flex-col border">
+                                <img src="{{profile_pic}}" alt="{{name}}" class="w-full h-24 object-cover flex-shrink-0">
+                                <div class="p-2 flex-1 flex flex-col justify-between">
+                                    <div class="mb-1">
+                                        <h3 class="text-sm font-bold text-gray-900 line-clamp-1">{{name}}</h3>
+                                        <p class="text-xs text-gray-600 line-clamp-1">{{description}}</p>
+                                        <p class="text-xs text-gray-500 mt-1">Cat: {{category}}</p>
+                                        <p class="text-xs text-gray-500">Own: {{owner.f_name}} {{owner.l_name}}</p>
+                                    </div>
+                                    <div class="mt-1 pt-1">
+                                        <div class="star-rating mb-1">
+                                            {{#each starArray}}
+                                            <i class="star {{this.filled ? 'filled' : ''}} fas fa-star"></i>
+                                            {{/each}}
+                                            <span class="review-count">({{reviews.length}})</span>
+                                        </div>
+                                        <button
+                                            class="w-full bg-green-500 text-white px-1 py-1 rounded text-xs hover:bg-green-600 transition text-center"
+                                            onclick="event.stopPropagation(); contactOwner('{{owner._id}}')">
+                                            <i class="fab fa-whatsapp mr-1"></i>Contact
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+                    {{else}}
+                    <div class="text-center py-12 text-gray-500">
+                        <p class="text-lg">No businesses available to discover yet.</p>
+                    </div>
+                    {{/if}}
+                </div>
+
+                <!-- My Businesses list (30%) -->
+                <aside class="w-lg ">
+                    <h2 class="text-2xl font-semibold text-gray-800 mb-6">My Businesses</h2>
+                    {{#if myBusinesses.length}}
+                    <ul class="space-y-4 my-business-list-scroll">
+                        {{#each myBusinesses}}
+                        <li class="my-business-item flex items-center gap-4 p-4 bg-white rounded-lg shadow border">
+                            <img src="{{profile_pic}}" alt="{{name}}"
+                                class="w-16 h-16 rounded-lg object-cover flex-shrink-0">
+                            <div class="flex-1 min-w-0">
+                                <h3 class="font-semibold text-gray-900 truncate">{{name}}</h3>
+                                <p class="text-sm text-gray-500">Category: {{category}} | Visibility: {{visibility}}</p>
+                            </div>
+                            <div class="relative">
+                                <button onclick="toggleMenu(this)" class="p-2 rounded hover:bg-gray-100 transition">
+                                    <i class="fas fa-ellipsis-v text-gray-600"></i>
+                                </button>
+
+                                <div class="action-menu absolute right-0 mt-2 w-32 bg-white rounded-lg shadow-lg border border-gray-200 transform scale-y-0 origin-top transition-transform duration-200 ease-out">
+                                    <button onclick="openBusinessDetailsModal('{{_id}}'); hideAllMenus();" class="block w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50">
+                                        <i class="fas fa-eye mr-2"></i> View
+                                    </button>
+                                    <button onclick="openEditBusinessModal('{{_id}}'); hideAllMenus();" class="block w-full text-left px-4 py-2 text-sm text-yellow-600 hover:bg-yellow-50">
+                                        <i class="fas fa-edit mr-2"></i> Edit
+                                    </button>
+                                    <button onclick="deleteBusiness('{{_id}}'); hideAllMenus();" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                        <i class="fas fa-trash mr-2"></i> Delete
+                                    </button>
+                                </div>
+                            </div>
+
+
+                        </li>
+                        {{/each}}
+                    </ul>
+                    {{else}}
+                    <div class="text-center py-8 text-gray-500">
+                        <p>You haven't listed any businesses yet.</p>
+                        <button id="openAddBusinessModalLink" class="mt-2 text-blue-600 hover:underline">Add one
+                            now!</button>
+                    </div>
+                    {{/if}}
+                </aside>
+            </div>
+        </div>
+
+        <!-- Business Details Modal -->
+        <div id="businessDetailsModal" class="modal-overlay">
+            <div class="modal-content p-6">
+                <button class="close-btn" onclick="closeBusinessDetailsModal()">&times;</button>
+                <div id="businessDetailsContent">
+                    <!-- Dynamically loaded content -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit/Add Business Modal -->
+        <div id="businessFormModal" class="modal-overlay">
+            <div class="modal-content p-6">
+                <button class="close-btn" id="closeBusinessFormModal">&times;</button>
+                <h3 id="modalTitle" class="text-xl font-semibold mb-4 text-gray-800">Add New Business</h3>
+                <form id="businessForm" enctype="multipart/form-data">
+                    <input type="hidden" id="businessId" name="id">
+                    <input type="text" name="name" class="form-input" placeholder="Business Name" required>
+                    <select name="type" class="form-select" required>
+                        <option value="">Select Type</option>
+                        <option value="retail">Retail</option>
+                        <option value="wholesale">Wholesale</option>
+                        <option value="manufacturing">Manufacturing</option>
+                    </select>
+                    <select name="category" class="form-select" required>
+                        <option value="">Select Category</option>
+                        <option value="Jewelry Retail">Jewelry Retail</option>
+                        <option value="Wholesale Supplier">Wholesale Supplier</option>
+                        <option value="Manufacturing">Manufacturing</option>
+                        <option value="Repair Services">Repair Services</option>
+                    </select>
+                    <textarea name="description" class="form-textarea" placeholder="Description" required
+                        rows="3"></textarea>
+                    <input type="text" name="location" class="form-input" placeholder="Location">
+                    <input type="text" name="contact" class="form-input" placeholder="Contact (Phone/Email)">
+                    <input type="url" name="website" class="form-input" placeholder="Website (Optional)">
+                    <select name="visibility" class="form-select" required>
+                        <option value="public">Public</option>
+                        <option value="private">Private</option>
+                    </select>
+                    <input type="file" name="profile_pic" class="form-input" accept="image/*">
+                    <button type="submit" class="submit-btn">Save Business</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        // Notification helper
+        function showNotification(message, type = 'info') {
+            toastr.options = { timeOut: 3000, positionClass: 'toast-top-right' };
+            if (type === 'success') toastr.success(message);
+            else if (type === 'error') toastr.error(message);
+            else toastr.info(message);
+        }
+
+        // Debounce for search
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        // Utility to generate stars (client-side for modal too, but template uses server-side)
+        function renderStars(rating, total = 5) {
+            let html = '';
+            for (let i = 1; i <= total; i++) {
+                if (i <= Math.floor(rating)) {
+                    html += '<i class="star filled fas fa-star"></i>';
+                } else if (i === Math.ceil(rating) && rating % 1 !== 0) {
+                    html += '<i class="star fas fa-star-half-alt"></i>'; // Half star if needed
+                } else {
+                    html += '<i class="star far fa-star"></i>';
+                }
+            }
+            return html;
+        }
+
+        // Open Business Details Modal (fetch via AJAX)
+        function openBusinessDetailsModal(businessId) {
+            $.ajax({
+                url: `/businesses/${businessId}`,
+                method: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    if (!data.success) {
+                        showNotification(data.message || 'Failed to load details', 'error');
+                        return;
+                    }
+                    const modal = document.getElementById('businessDetailsModal');
+                    const content = document.getElementById('businessDetailsContent');
+                    const isOwner = data.business.owner._id.toString() === '{{user._id}}';
+                    const reviewsHtml = data.business.reviews && data.business.reviews.length > 0
+                        ? data.business.reviews.map(review => `
+                        <div class="border-t pt-2 mb-2 p-2 bg-gray-50 rounded">
+                            <div class="flex items-center mb-1">
+                                <span class="text-sm font-medium">${review.user ? review.user.full_name : 'Anonymous'}</span>
+                                <span class="ml-auto text-xs text-gray-500">${new Date(review.createdAt).toLocaleDateString()}</span>
+                            </div>
+                            <div class="flex mb-1">${renderStars(review.rating)}</div>
+                            <p class="text-sm text-gray-700">${review.comment || 'No comment'}</p>
+                        </div>
+                    `).join('')
+                        : '<p class="text-gray-500 italic">No reviews yet.</p>';
+
+                    const reviewForm = !isOwner ? `
+                    <div class="mt-4 p-4 border-t bg-blue-50 rounded-lg">
+                        <h5 class="font-semibold mb-2">Add Your Review</h5>
+                        <form id="reviewForm">
+                            <div class="mb-2">
+                                <label class="block text-sm font-medium mb-1">Rating (1-5):</label>
+                                <select name="rating" class="w-full p-2 border rounded" id="rating" required>
+                                    <option value="">Select Rating</option>
+                                    <option value="1">1 ★</option>
+                                    <option value="2">2 ★★</option>
+                                    <option value="3">3 ★★★</option>
+                                    <option value="4">4 ★★★★</option>
+                                    <option value="5">5 ★★★★★</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="block text-sm font-medium mb-1">Comment (optional):</label>
+                                <textarea name="comment" rows="3" maxlength="500" class="w-full p-2 border rounded" placeholder="Share your experience..."></textarea>
+                            </div>
+                            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">Submit Review</button>
+                        </form>
+                    </div>
+                ` : '<p class="text-gray-500 mt-4">You own this business.</p>';
+
+                    const contactBtn = !isOwner ? `
+                    <button onclick="contactOwner('${data.business.owner._id}')" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mt-2">
+                        <i class="fas fa-envelope mr-1"></i>Contact Owner
+                    </button>` : '';
+
+                    content.innerHTML = `
+                    <h3 class="text-2xl font-bold mb-4">${data.business.name}</h3>
+                    <img src="${data.business.profile_pic || '/default-business.jpg'}" alt="${data.business.name}" class="w-full h-64 object-cover rounded mb-4">
+                    <p class="text-gray-700 mb-4">${data.business.description}</p>
+                    <div class="grid grid-cols-2 gap-4 mb-4 text-sm">
+                        <p><strong>Type:</strong> ${data.business.type || 'N/A'}</p>
+                        <p><strong>Category:</strong> ${data.business.category}</p>
+                        <p><strong>Location:</strong> ${data.business.location || 'N/A'}</p>
+                        <p><strong>Contact:</strong> ${data.business.contact || 'N/A'}</p>
+                        <p><strong>Website:</strong> <a href="${data.business.website}" target="_blank" class="text-blue-500 hover:underline">${data.business.website || 'N/A'}</a></p>
+                        <p><strong>Visibility:</strong> ${data.business.visibility}</p>
+                        <p><strong>Avg Rating:</strong> <div class="star-rating inline-flex">${renderStars(data.business.averageRating)}</div> (${data.business.reviews ? data.business.reviews.length : 0} reviews)</p>
+                    </div>
+                    <div class="mb-4">
+                        <h4 class="font-semibold mb-2">Reviews:</h4>
+                        ${reviewsHtml}
+                    </div>
+                    ${reviewForm}
+                    ${contactBtn}
+                `;
+                    modal.style.display = 'flex';
+
+                    // Handle review submission
+                    const reviewFormEl = document.getElementById('reviewForm');
+                    if (reviewFormEl) {
+                        reviewFormEl.onsubmit = function (e) {
+                            e.preventDefault();
+                            const formData = new FormData(reviewFormEl);
+                             const rating = formData.get('rating');
+                            if (!rating || isNaN(rating)) {
+                                showNotification('Please select a valid rating before submitting', 'error');
+                                return;
+                            }
+                            console.log('Submitting review with rating:', rating);
+                            $.ajax({
+                                url: `/businesses/${businessId}/review`,
+                                method: 'POST',
+                                contentType: 'application/json',
+                                data: JSON.stringify({
+                                    rating: rating,
+                                    comment: formData.get('comment')
+                                }),
+                                success: function (response) {
+                                    if (response.success) {
+                                        showNotification(response.message, 'success');
+                                        openBusinessDetailsModal(businessId); 
+                                    } else {
+                                        showNotification(response.message || 'Failed to add review', 'error');
+                                    }
+                                },
+                                error: function () {
+                                    showNotification('Error submitting review', 'error');
+                                }
+                            });
+                        };
+                    }
+                },
+                error: function () {
+                    showNotification('Failed to load business details', 'error');
+                }
+            });
+        }
+
+        function closeBusinessDetailsModal() {
+            document.getElementById('businessDetailsModal').style.display = 'none';
+        }
+
+        // Open Edit Modal (fetch form data via AJAX - assumes controller returns JSON for edit)
+        function openEditBusinessModal(businessId) {
+            $.ajax({
+                url: `/businesses/${businessId}/edit`,
+                method: 'GET',
+                dataType: 'json', // Assume updated controller returns JSON
+                success: function (data) {
+                    const form = document.getElementById('businessForm');
+                    const modalTitle = document.getElementById('modalTitle');
+                    const businessIdInput = document.getElementById('businessId');
+
+                    modalTitle.textContent = 'Edit Business';
+                    businessIdInput.value = data.business._id;
+                    form.querySelector('[name="name"]').value = data.business.name || '';
+                    form.querySelector('[name="type"]').value = data.business.type || '';
+                    form.querySelector('[name="category"]').value = data.business.category || '';
+                    form.querySelector('[name="description"]').value = data.business.description || '';
+                    form.querySelector('[name="location"]').value = data.business.location || '';
+                    form.querySelector('[name="contact"]').value = data.business.contact || '';
+                    form.querySelector('[name="website"]').value = data.business.website || '';
+                    form.querySelector('[name="visibility"]').value = data.business.visibility || '';
+
+                    document.getElementById('businessFormModal').style.display = 'flex';
+                    form.onsubmit = function (e) {
+                        e.preventDefault();
+                        const formData = new FormData(form);
+                        formData.append('id', businessId);
+                        $.ajax({
+                            url: `/businesses/${businessId}`,
+                            method: 'PUT',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function (res) {
+                                showNotification('Business updated successfully', 'success');
+                                closeBusinessFormModal();
+                                location.reload();
+                            },
+                            error: function () {
+                                showNotification('Failed to update business', 'error');
+                            }
+                        });
+                    };
+                },
+                error: function () {
+                    showNotification('Failed to load edit form', 'error');
+                }
+            });
+        }
+
+        // Reset form for Add New
+        function resetBusinessForm() {
+            const form = document.getElementById('businessForm');
+            form.reset();
+            document.getElementById('businessId').value = '';
+            document.getElementById('modalTitle').textContent = 'Add New Business';
+            form.onsubmit = function (e) {
+                e.preventDefault();
+                const formData = new FormData(form);
+                $.ajax({
+                    url: '/businesses/business',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (res) {
+                        showNotification('Business added successfully', 'success');
+                        closeBusinessFormModal();
+                        location.reload();
+                    },
+                    error: function () {
+                        showNotification('Failed to add business', 'error');
+                    }
+                });
+            };
+        }
+
+        function closeBusinessFormModal() {
+            document.getElementById('businessFormModal').style.display = 'none';
+            resetBusinessForm();
+        }
+
+        // Contact Owner (placeholder)
+        function contactOwner(ownerId) {
+            showNotification('Contact initiated (implement messaging)', 'info');
+            closeBusinessDetailsModal();
+        }
+
+        // Delete Business
+        function deleteBusiness(id) {
+            if (confirm('Are you sure you want to delete this business?')) {
+                $.ajax({
+                    url: `/businesses/${id}/delete`,
+                    method: 'DELETE',
+                    success: function (data) {
+                        if (data.success) {
+                            location.reload();
+                            showNotification('Business deleted successfully', 'success');
+                        } else {
+                            showNotification('Failed to delete', 'error');
+                        }
+                    },
+                    error: function (err) {
+                        showNotification('Error: ' + err.responseText, 'error');
+                    }
+                });
+            }
+        }
+
+        // DOM Ready
+        document.addEventListener('DOMContentLoaded', function () {
+            // Search for Discover
+            const discoverSearch = document.getElementById('discoverSearch');
+            const discoverGrid = document.getElementById('discoverBusinessesGrid');
+            if (discoverSearch && discoverGrid) {
+                discoverSearch.addEventListener('input', debounce(function () {
+                    const value = this.value.toLowerCase();
+                    discoverGrid.querySelectorAll('.business-card').forEach(card => {
+                        const name = card.querySelector('h3').textContent.toLowerCase();
+                        card.style.display = name.includes(value) ? 'block' : 'none';
+                    });
+                }, 300));
+            }
+
+            // Modal Controls
+            const addModalBtn = document.getElementById('openAddBusinessModal');
+            const addModalLink = document.getElementById('openAddBusinessModalLink');
+            const closeFormBtn = document.getElementById('closeBusinessFormModal');
+            const businessModal = document.getElementById('businessDetailsModal');
+            const businessFormModal = document.getElementById('businessFormModal');
+
+            if (addModalBtn) addModalBtn.onclick = () => { resetBusinessForm(); businessFormModal.style.display = 'flex'; };
+            if (addModalLink) addModalLink.onclick = () => { resetBusinessForm(); businessFormModal.style.display = 'flex'; };
+            if (closeFormBtn) closeFormBtn.onclick = closeBusinessFormModal;
+
+            // Close modals on overlay click
+            [businessModal, businessFormModal].forEach(modal => {
+                modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+            });
+
+            // Escape key to close modals
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    closeBusinessDetailsModal();
+                    closeBusinessFormModal();
+                }
+            });
+        });
+        function toggleMenu(btn) {
+            const menu = btn.nextElementSibling;
+            const isVisible = menu.classList.contains('scale-y-100');
+
+            hideAllMenus();
+            if (!isVisible) {
+                menu.classList.add('scale-y-100');
+                menu.classList.remove('scale-y-0');
+            }
+        }
+
+        function hideAllMenus() {
+            document.querySelectorAll('.action-menu').forEach(menu => {
+                menu.classList.remove('scale-y-100');
+                menu.classList.add('scale-y-0');
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.relative')) hideAllMenus();
+        });
+
+    </script>
+
+</body>
+
+</html>
