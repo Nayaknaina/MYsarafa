@@ -263,6 +263,7 @@ $(document).ready(function () {
   const payNowBtn = $('#payNowBtn');
 
   if (duePaymentModal.length) {
+    console.log("duepayment")
     // Close modal
     closeDuePaymentModal.click(function () {
       duePaymentModal.hide();
@@ -687,7 +688,7 @@ function generateInvitationLink(name, email) {
   return `${baseUrl}signup.html?invite=${token}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`;
 }
 
-function sendInvitationEmail(name, email, invitationLink) {/
+function sendInvitationEmail(name, email, invitationLink) {
   // Create email content
   const emailSubject = "You're invited to join Sarafa Community!";
   const emailBody = `
