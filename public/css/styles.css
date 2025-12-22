@@ -76,6 +76,9 @@ body {
   padding-bottom: 32px;
 }
 
+main{
+  width: calc(100% - 260px);
+}
 
 @media (max-width: 900px) {
   .main-container {
@@ -798,6 +801,9 @@ body {
 @media (max-width: 768px) {
   .main-content {
   flex:none;
+  }
+  main{
+    width: 100%;
   }
   .header-content {
     flex-direction: row;
@@ -3110,6 +3116,7 @@ body {
         scroll-snap-align: start;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
         margin-right: 16px;
+        /* width: 33.33%; */
     }
 
     .business-scroll-card:hover {
