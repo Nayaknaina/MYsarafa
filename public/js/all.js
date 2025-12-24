@@ -632,14 +632,7 @@ function createMobileMenuToggle() {
       mobileMenuToggleBtn.className = 'mobile-menu-toggle-btn';
       mobileMenuToggleBtn.innerHTML = '<i class="fas fa-bars"></i>';
       mobileMenuToggleBtn.style.cssText = `
-                background: none;
-                color: white;
-                border: none;
-                padding: 8px;
-                border-radius: 4px;
-                cursor: pointer;
-                font-size: 20px;
-                z-index: 1101;
+              
             `;
       mobileMenuToggleBtn.addEventListener('click', function (e) {
         e.stopPropagation();

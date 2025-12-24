@@ -68,23 +68,319 @@
 
   .sidebar-menu a.active,
   .sidebar-menu .menu-item.active {
-    background: #e3f2fd;
-    color: #1976d2;
+    background: #2f95ff;
+    color: white !important;
     font-weight: 600;
   }
-  .submenu {
-  display: none !important;
-  flex-direction: column;
+
+  /* Sidebar Base */
+  .sidebar {
+    width: 260px;
+    min-width: 260px;
+    height: 100vh;
+    position: relative !important;
+    top: 0;
+    left: 0;
+    background: white;
+    border-right: 1px solid #e5e7eb;
+    padding: 30px 0;
+    transition:  0.5s ease;
+    /*overflow: hidden;*/
+    z-index: 998;
+    display: flex;
+    flex-direction: column;
+    overflow: visible !important;
   }
 
-  .menu-section.open .submenu {
-    display: flex !important;
+  .sidebar.collapsed {
+    width: 76px; /* Slightly wider than icon for better hover */
+    min-width: 76px;
+  }
+
+  /* Sidebar Menu */
+  .sidebar-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 12px;
+    flex: 1;
+    /*overflow-y: auto;*/
+  }
+
+  /* Menu Items & Buttons */
+  .menu-item,
+  .menu-has-sub {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 5px;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #6b7280;
+    font-size: 14px;
+  }
+  .menu-label {
+  display: flex;
+  align-items: center;
+  gap: 14px;                    /* Nice, consistent gap between icon and text */
+  width: 100%;
+}
+
+/* Icon fixed size */
+.menu-label i {
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.menu-label .menu-text {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+  .menu-item:hover,
+  .menu-has-sub:hover {
+    background-color: #f3f4f6;
+    color: #111827;
+  }
+
+ .menu-item.active,
+.menu-has-sub.active {
+  background-color: #2f95ff !important;
+  color: white !important;
+}
+
+  /* Icon Styling */
+  .menu-item i,
+  .menu-has-sub i {
+    font-size: 20px;
+    min-width: 24px;
+    text-align: center;
+    flex-shrink: 0;
+  }
+
+  /* Text Wrapper */
+  .menu-text {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  /* Hide text when collapsed */
+  .sidebar.collapsed .menu-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    transition: opacity 0.15s ease 0.1s, width 0s ease 0.3s;
+  }
+  .sidebar.collapsed .menu-label {
+  justify-content: center;      /* Center icon when text hidden */
+  gap: 0;
+}
+
+/* Ensure icon stays centered in collapsed mode */
+.sidebar.collapsed .menu-label i {
+  margin: 0 auto;
+}
+  /* Submenu Caret */
+/*.menu-label::after {
+  display: none;
+}*/
+
+/* Show chevron ONLY on items with submenu */
+.menu-has-sub > .menu-label::after {
+  content: '\f078';                    /* Font Awesome chevron-down */
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  font-size: 12px;
+  color: #9ca3af;
+  margin-left: auto;                   /* Aligns to the right */
+  transition: transform 0.3s ease;
+  opacity: 0.8;
+}
+
+/* Rotate 180° when expanded */
+.menu-has-sub[aria-expanded="true"] > .menu-label::after {
+  transform: rotate(180deg);
+}
+
+/* Slightly nicer look on hover */
+.menu-has-sub:hover > .menu-label::after {
+  color: #4b5563;
+  opacity: 1;
+}
+
+/* Hide chevron completely when sidebar collapsed */
+.sidebar.collapsed .menu-label::after {
+  display: none;
+}
+
+  /* Submenu */
+  .submenu {
+    display: none;
+    flex-direction: column;
+    gap: 4px;
+    padding-left: 42px; /* icon(24) + gap(12) + padding */
+    margin-top: 4px;
+  }
+
+  .menu-section.open .submenu,
+  .menu-has-sub[aria-expanded="true"] + .submenu {
+    display: flex;
+  }
+
+  .submenu a {
+    padding: 10px 14px;
+    border-radius: 6px;
+    color: #4b5563;
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .submenu a:hover {
+    background: #3741514f;
+    color: #111827;
+  }
+
+  /* Hide submenu in collapsed state */
+  .sidebar.collapsed .submenu {
+    display: none !important;
+  }
+
+  /* Tooltips when collapsed */
+  .sidebar.collapsed .menu-item:hover::after,
+  .sidebar.collapsed .menu-has-sub:hover::after {
+    content: attr(data-tooltip);
+    display: block;
+    position: absolute;
+    left: 51px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #1f2937;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    white-space: nowrap;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.2s 
+    ease;
+    pointer-events: none;
+  }
+
+  .sidebar.collapsed .menu-item:hover::before,
+  .sidebar.collapsed .menu-has-sub:hover::before {
+    content: '';
+    position: absolute;
+    left: 34px;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 8px solid transparent;
+    border-right-color: #1f2937;
+  }
+
+  /* Toggle Button */
+  .sidebar-toggle {
+    position: absolute;
+    top: 0px;
+    right: -15px;
+    width: 30px;
+    height: 30px;
+    background: #1976d2;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 10;
+  }
+
+  /* Mobile Toggle */
+  .mobile-toggle {
+    display: block;
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    z-index: 1000;
+    background: #1976d2;
+    color: white;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  /* Desktop Media Query */
+  @media (min-width: 992px) {
+    .sidebar-toggle { display: flex; }
+    .mobile-toggle { display: none; }
+  }
+
+  /* Mobile Media Query */
+  @media (max-width: 991px) {
+    /*.main-container {
+    flex-direction: row;        */
+
+
+ 
+  main {
+    width: 100%;
+    flex: 1;
+    margin-left: 0 !important;
+  }
+
+  /* Hamburger always visible on mobile */
+  .mobile-toggle {
+    display: none !important;
+  }
+
+  /* Hide desktop toggle pin */
+  .sidebar-toggle {
+    display: none !important;
+  }
+
+  /* Optional: Reduce padding on small screens */
+  .main-content {
+    padding: 16px;
+  }
+    .sidebar {
+      left: -260px;
+      transition: left 0.3s ease;
+      padding: 16px 0;
+      display: none !important;
+    }
+   
+    .sidebar-toggle { display: none !important; }
+    body.sidebar-open-mobile { overflow: hidden; }
   }
 
 </style>
 
-<aside class="sidebar">
- 
+<aside class="sidebar" id="sidebar">
+
+  <button class="sidebar-toggle" id="sidebarToggle">
+      <i class="fas fa-angle-left" id="toggleIcon"></i>
+    </button>
+
   <div id="pageLoader">
     <div class="loader-container">
 
@@ -96,14 +392,17 @@
 
   <div class="sidebar-menu">
     <!-- Top-level Dashboard link -->
-    <a href="/user-app/dashboard" class="menu-item">
-      <span class="menu-text">Dashboard <i class="fas fa-tachometer-alt"></i></span>
+    <a href="/user-app/dashboard" class="menu-item" data-tooltip="Dashboard">
+     <div class="menu-label">
+      <i class="fas fa-tachometer-alt"></i>
+      <span class="menu-text">Dashboard</span>
+    </div>
     </a>
 
     <!-- Association: grouping, communities and related pages -->
     <div class="menu-section">
-      <button class="menu-item menu-has-sub" aria-expanded="false">
-        <span class="menu-text">Association <i class="fas fa-sitemap"></i></span>
+      <button class="menu-item menu-has-sub" aria-expanded="false" data-tooltip="Association">
+        <div class="menu-label"><i class="fas fa-sitemap"></i> <span class="menu-text">Association </span></div> 
       </button>
       <div class="submenu">
         <a href="/Groups/community/">Create / Manage Community</a>
@@ -115,13 +414,13 @@
 
     <!-- Management: members, business directory, settings -->
     <div class="menu-section">
-      <button class="menu-item menu-has-sub" aria-expanded="false">
-        <span class="menu-text">Management <i class="fas fa-briefcase"></i></span>
+      <button class="menu-item menu-has-sub" aria-expanded="false" data-tooltip="Management">
+        <div class="menu-label"><i class="fas fa-briefcase"></i> <span class="menu-text">Management </span></div>
       </button>
       <div class="submenu">
         <a href="/Groups/group-member">Add / Invite Member</a>
-        <a href="/businesses/listUP">Business Directory</a>
-        <a href="/user/profile">Edit Profile</a>
+          <a href="/businesses/listUP">Business Directory</a>
+          <a href="/user/profile">Edit Profile</a>
         {{#if showMonthlyMembership}}
         <a href="/pay/Pay-received-ss">Monthly Membership</a>
         {{/if}}
@@ -130,8 +429,8 @@
 
     <!-- Rates: live gold/silver rates and admin update link -->
     <div class="menu-section">
-      <button class="menu-item menu-has-sub" aria-expanded="false">
-        <span class="menu-text">Gold & Rates <i class="fas fa-chart-line"></i></span>
+      <button class="menu-item menu-has-sub" aria-expanded="false" data-tooltip="Gold & Rates">
+        <div class="menu-label"><i class="fas fa-chart-line"></i> <span class="menu-text">Gold & Rates </span></div>
       </button>
       <div class="submenu">
         <a href="/rates/getRates">Live Rates</a>
@@ -143,8 +442,8 @@
 
     <!-- Announcements -->
     <div class="menu-section">
-      <button class="menu-item menu-has-sub" aria-expanded="false">
-        <span class="menu-text">Announcements <i class="fas fa-bullhorn"></i></span>
+      <button class="menu-item menu-has-sub" aria-expanded="false" data-tooltip="Announcements">
+        <div class="menu-label"><i class="fas fa-bullhorn"></i> <span class="menu-text">Announcements </span></div>
       </button>
       <div class="submenu">
         
@@ -155,14 +454,14 @@
 
     <!-- KYC -->
     <div class="menu-section">
-      <a href="/kyc/KYCverification" class="menu-item">
-        <span class="menu-text">KYC Verification <i class="fas fa-id-card"></i></span>
+      <a href="/kyc/KYCverification" class="menu-item" data-tooltip="KYC Verification">
+        <div class="menu-label"><i class="fas fa-id-card"></i> <span class="menu-text">KYC Verification </span></div>
       </a>
     </div>
 
     <div class="menu-section">
-      <button class="menu-item menu-has-sub" aria-expanded="false">
-        <span class="menu-text">KhataBook <i class="fas fa-book"></i></span>
+      <button class="menu-item menu-has-sub" aria-expanded="false" data-tooltip="KhataBook">
+        <div class="menu-label"><i class="fas fa-book"></i> <span class="menu-text">KhataBook </span></div>
       </button>
         <div class="submenu">
           <a href="/ledger/trykhatabook?type=customer" class="khata-link" data-type="customer">
@@ -178,20 +477,59 @@
       
     </div>
     <!-- Misc / quick links -->
-    <div class="menu-section">
-      <a href="/notifications" class="menu-item">
+    {{!-- <div class="menu-section">
+      <a href="/notifications" class="menu-item" data-tooltip="Notifications">
         <span class="menu-text">Notifications <i class="fas fa-bell"></i></span>
       </a>  
       <a href="/help" class="menu-item">
         <span class="menu-text">Help & Support <i class="fas fa-question-circle"></i></span>
       </a>
-    </div>
+    </div> --}}
   </div>
 
  
 </aside>
 
+<button class="mobile-toggle" id="mobileToggle">
+  <i class="fas fa-bars"></i>
+</button>
+
  <script>
+  const sidebar = document.getElementById('sidebar');
+  const sidebarToggle = document.getElementById('sidebarToggle');
+  const toggleIcon = document.getElementById('toggleIcon');
+  const mobileToggle = document.getElementById('mobileToggle');
+
+  if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+      toggleIcon.classList.toggle('fa-angle-left');
+      toggleIcon.classList.toggle('fa-angle-right');
+      if (sidebar.classList.contains('collapsed')) {
+        toggleIcon.classList.replace('fa-angle-left', 'fa-angle-right');
+      } else {
+        toggleIcon.classList.replace('fa-angle-right', 'fa-angle-left');
+      }
+    });
+  }
+
+  // Mobile toggle (off-canvas)
+  if (mobileToggle) {
+    mobileToggle.addEventListener('click', () => {
+      sidebar.classList.toggle('open-mobile');
+      document.body.classList.toggle('sidebar-open-mobile');
+    });
+  }
+
+  // Close mobile sidebar when clicking a link
+  document.querySelectorAll('.sidebar-menu a').forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth < 992) {
+        sidebar.classList.remove('open-mobile');
+        document.body.classList.remove('sidebar-open-mobile');
+      }
+    });
+  });
   // Hide loader on page load (this runs on every page after DOM is ready)
   document.addEventListener('DOMContentLoaded', function () {
     const loader = document.getElementById('pageLoader');
