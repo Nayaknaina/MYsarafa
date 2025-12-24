@@ -26,10 +26,18 @@ exports.signup = async (req, res ,next) => {
         await user.save();
         const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '12h' });
 
-        res.cookie('token', token, {
+        // res.cookie('token', token, {
+        //     httpOnly: true,
+        //     secure: false, 
+        //     sameSite: 'lax', 
+        //     maxAge: 12 * 60 * 60 * 1000
+        // });
+         res.cookie('token', token, {
             httpOnly: true,
-            secure: false, 
-            sameSite: 'lax', 
+            secure: true,
+            sameSite: 'lax',
+            domain:'.mysarafa.com',
+            path:'/',
             maxAge: 12 * 60 * 60 * 1000
         });
 
@@ -68,8 +76,10 @@ exports.login = async (req, res, next) => {
         // Set cookie
         res.cookie('token', token, {
             httpOnly: true,
-            secure: false,
+            secure: true,
             sameSite: 'lax',
+            domain:'.mysarafa.com',
+            path:'/',
             maxAge: 12 * 60 * 60 * 1000
         });
 

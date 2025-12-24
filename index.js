@@ -93,11 +93,34 @@ app.get('/help', (req, res) => {
     }
 });
 
+const corsOptions = {
+   origin: 'https://mysarafa.com',  // Change to 'http://localhost:xxxx' for dev
+  //origin: 'http://localhost:5500',
+    credentials: true,
+    optionsSuccessStatus: 200
+};
+
+app.get('/authcheck', cors(corsOptions), (req, res) => {
+  const token = req.cookies.token; 
+  if (!token) {
+    return res.status(401).json({ loggedIn: false });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Your secret & algorithm
+    // Optional: add extra checks (e.g., user still exists in DB)
+
+    res.json({ loggedIn: true /* , user: { name: decoded.name } if needed */ });
+  } catch (err) {
+    res.status(401).json({ loggedIn: false });
+  }
+});
 app.all('*', (req, res, next) => {
     const err = new Error(`Can't find ${req.originalUrl} on this server!`);
     err.statusCode = 404;
     next(err);
 });
+
 
 app.use(errorHandler);
 
