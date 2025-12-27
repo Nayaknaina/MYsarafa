@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="canonical" href="https://app.mysarafa.com/">
+</head>
+<script src="https://cdn.tailwindcss.com"></script>
+
+
+<body data-user-id="{{user._id}}">
+
+    {{> header}}
+
+    <div class="main-container">
+        <!-- Sidebar -->
+        {{> sidebar}}
+
+        <main class="main-content">
+
+            {{!-- association.hbs -- This will be rendered inside <main class="main-content"> --}}
+                <div class="max-w-7xl mx-auto ">
+                    <!-- Header Section -->
+                    <div class="bg-white rounded-lg shadow-md p-2 mb-4">
+                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <h1 class="text-xl font-bold text-gray-800">Associations &amp; Groups</h1>
+
+                            <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+
+
+                                <!--  Create Group Button -->
+                                <div class="relative flex-1 max-w-md">
+                                    <input type="text" id="globalGroupSearch" placeholder="Search groups"
+                                        class="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                                    <i
+                                        class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                         <div id="associationsDropdown" 
+                                          class="absolute top-full left-0 mt-2 w-full bg-white rounded-lg shadow-2xl border border-gray-200   max-h-96 overflow-y-auto hidden z-50">
+                                        <div id="dropdownContent" class="py-2">
+                                            <!-- Results injected here -->
+                                        </div>
+                                </div>
+                                </div>
+                               
+                                {{!-- <button
+                                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg flex items-center justify-center gap-2 transition shadow-md">
+                                    <i class="fas fa-plus"></i>
+                                    Create New Group
+                                </button> --}}
+                                <a href="/Groups/community" 
+                                class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 transition">
+                                    <i class="fas fa-plus"></i>
+                                    Create New Group
+                                </a>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid  gap-8">
+                        <!--  -->
+                        <div class="lg:col-span-2 space-y-8">
+                            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                                <div class="bg-gradient-to-r from-green-600 to-teal-600 text-white p-2">
+                                    <h4 class="text-xl font-semibold flex items-center justify-between">Suggested for
+                                        you
+                                        <div class="flex gap-4">
+                                            <span class="text-sm font-normal bg-white/20 px-3 py-1 rounded-full">view
+                                                all</span><i class="fa-solid fa-compass"></i>
+                                        </div>
+                                    </h4>
+                                    <p class="text-sm opacity-90 mt-1">Groups you might be interested in</p>
+                                </div>
+
+
+                            </div>
+                            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                                <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-2">
+                                    <h4 class="text-xl font-semibold flex items-center justify-between">
+                                        Admin
+                                        {{!-- <div class="flex gap-4"> --}}
+                                        <div class="flex items-center gap-6 text-sm">
+                                            {{!-- <span class="text-sm font-normal bg-white/20 px-3 py-1 rounded-full">see
+                                                request with count</span> --}}
+                                                <a href="/association/requests" class="text-sm font-normal bg-white/20 px-3 py-1 rounded-full flex items-center gap-2 text-blackgray-700 hover:text-white transition">
+                                                <i class="fas fa-user-clock text-lg"></i>
+                                                <span>Join Requests 
+                                                    <span class="ml-1 bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-medium">3</span>
+                                                </span>
+                                            </a>
+                                            {{!-- <span class="text-sm font-normal bg-white/20 px-3 py-1 rounded-full">group
+                                                members with count</span> --}}
+                                                <a href="/Groups/group-member" class=" text-sm font-normal bg-white/20 px-3 py-1 rounded-full flex items-center gap-2 text-black hover:text-white transition">
+                                                <i class="fas fa-users text-lg"></i>
+                                                <span>Manage Members
+                                                    <span class="ml-1 bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-medium">3</span>
+                                                </span>
+                                                  </a>
+                                        </div>
+
+                                    </h4>
+                                    <p class="text-sm opacity-90 mt-1">Your Groups</p>
+                                </div>
+
+                                <div class="p-4 max-h-56 overflow-y-auto"> <!-- Scrollable list -->
+                                    <div class="space-y-4">
+                                        <!--  -->
+                                        {{#each myGroups}}
+                                        <div
+                                            class="border border-gray-200 rounded-lg p-2 hover:shadow-lg transition flex items-center justify-between">
+                                            <div class="flex-1">
+                                                <h3 class="text-lg font-medium text-gray-800">{{this.g_name}}</h3>
+                                                <p class="text-sm text-gray-600 mt-1">{{this.total_mem}} members •
+                                                     {{this.g_type}}</p>
+                                            </div>
+                                            <div class="flex items-center gap-3">
+                                                <button class="text-blue-600 hover:text-blue-800 font-medium"
+                                                     data-group-id="{{this._id}}">View</button>
+                                                <button class="text-gray-500 hover:text-gray-700">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        {{else}}
+                                        <p class="text-center text-gray-500 py-8">You haven't joined any groups yet.</p>
+                                        {{/each}}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                                <div class="bg-gradient-to-r from-blue-600 to-teal-600 text-white p-2">
+                                    <h2 class="text-xl font-semibold">Member</h2>
+                                    <p class="text-sm opacity-90 mt-1">Groups you've joined</p>
+
+                                </div>
+
+                                <div class="p-4 max-h-96 overflow-y-auto"> <!-- Scrollable -->
+                                    <div class="space-y-4">
+                                         
+                                        <!-- Suggested Group Item -->
+                                        {{#each discoverGroups}}
+                                        <div class="border border-gray-200 rounded-lg p-2 hover:shadow-lg transition">
+                                            <div class="flex justify-between items-start mb-2">
+                                                <h3 class="font-medium text-gray-800">{{this.g_name}}</h3>
+                                                <span
+                                                    class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">{{this.g_type}}</span>
+                                            </div>
+                                            <p class="text-sm text-gray-600 mb-3">{{this.total_mem}} members • {{this.description}}</p>
+
+                                        </div>
+                                        {{else}}
+                                        <p class="text-center text-gray-500 py-8">You haven't joined any groups yet.</p>
+                                        {{/each}}
+
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                       
+                    </div>
+                </div>
+
+            </main>
+    </div>
+    <script src="/js/all.js"></script>
+    
+   
+<script>
+const searchassociationInput = document.getElementById('globalGroupSearch');
+const associationdropdown = document.getElementById('associationsDropdown');
+const content = document.getElementById('dropdownContent');
+
+if (!searchassociationInput || !associationdropdown || !content) {
+    console.error('Search elements not found! Check IDs.');
+}
+
+searchassociationInput.addEventListener('input', function () {
+    const query = this.value.trim();
+    console.log('Search query:', query); // ← Check this in browser console!
+
+    // Hide dropdown if query too short
+    if (query.length < 2) {
+        associationdropdown.classList.add('hidden');
+        return;
+    }
+
+    // Show loading state
+    content.innerHTML = '<div class="px-4 py-3 text-gray-500">Searching...</div>';
+    associationdropdown.classList.remove('hidden');
+
+    fetch(`/Groups/search?query=${encodeURIComponent(query)}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Network error');
+            return response.json();
+        })
+        .then(data => {
+            console.log('Search data received:', data); // ← Check this in browser console!
+             associationdropdown.classList.remove('hidden');
+             console.log('Dropdown shown', associationdropdown); // ← Check this in browser console!
+            if (!data.success || (!data.myGroups?.length && !data.discoverGroups?.length)) {
+                content.innerHTML = '<div class="px-4 py-3 text-center text-gray-500">No groups found</div>';
+                return;
+            }
+
+            let html = '';
+
+            if (data.myGroups?.length) {
+                html += '<div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Your Groups</div>';
+                data.myGroups.forEach(g => {
+                    html += `
+                    <a href="/association/group/${g._id}" class="block px-4 py-3 hover:bg-gray-100 flex items-center gap-3">
+                        <img src="${g.g_cover || '/assets/images/demo.jpg'}" class="w-10 h-10 rounded object-cover" alt=""/>
+                        <div>
+                            <div class="font-medium text-gray-900">${g.g_name}</div>
+                            <div class="text-xs text-gray-500">${g.total_mem} members</div>
+                        </div>
+                    </a>`;
+                });
+            }
+
+            if (data.discoverGroups?.length) {
+                html += '<div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Discover</div>';
+                data.discoverGroups.forEach(g => {
+                    html += `
+                    <a href="/association/group/${g._id}" class="block px-4 py-3 hover:bg-gray-100 flex items-center gap-3">
+                        <img src="${g.g_cover || '/assets/images/demo.jpg'}" class="w-10 h-10 rounded object-cover" alt=""/>
+                        <div>
+                            <div class="font-medium text-gray-900">${g.g_name}</div>
+                            <div class="text-xs text-gray-500">${g.total_mem} members • ${g.g_type}</div>
+                        </div>
+                    </a>`;
+                });
+            }
+
+            content.innerHTML = html;
+            // Force show again in case something hid it
+            associationdropdown.classList.remove('hidden');
+        })
+        .catch(err => {
+            console.error('Search error:', err);
+            content.innerHTML = '<div class="px-4 py-3 text-red-500">Error loading results</div>';
+        });
+});
+
+// Hide associationdropdown when clicking outside
+document.addEventListener('click', function(e) {
+    if (!searchInput.contains(e.target) && !associationdropdown.contains(e.target)) {
+        associationdropdown.classList.add('hidden');
+    }
+});
+
+// Optional: Hide when pressing Escape
+searchInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        associationdropdown.classList.add('hidden');
+        this.blur();
+    }
+});
+</script>
+    {{> profile}}
+</body>
+
+</html>

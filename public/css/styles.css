@@ -277,8 +277,10 @@ main{
 
 .avatar-dropdown {
   position: absolute;
-  right: 0;
-  top: 120%;
+  /* right: 0;
+  top: 120%; */
+  right: -14px;
+    top: 125%;
   background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -363,6 +365,35 @@ main{
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+.kyc-status {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Status colors */
+.kyc-status.approved {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.kyc-status.pending {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.kyc-status.rejected {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.kyc-status.unsubmitted {
+    background-color: #e2e3e5;
+    color: #383d41;
 }
 
 @keyframes fadeIn {

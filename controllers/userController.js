@@ -736,3 +736,82 @@ exports.signout = async (req, res, next)=>{
         next(error);
     }
 };
+
+exports.associationSample = async (req, res, next) => {
+  try { 
+    
+     if (!req.user || !req.user.id) {
+      return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
+    }
+    const user = await User.findById(req.user.id).lean();
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+      const memberships = await Gmem.find({ user: user._id })
+        .populate({
+          path: 'group',
+          select: 'g_name g_cover description g_type total_mem user createdAt amount'
+        })
+        .lean();
+        const isLeader = memberships.some(m => m.type === 'admin');
+
+      const myGroups = memberships
+      .filter(m => m.group && m.type !== 'pending')
+      .map(m => ({
+        _id: m.group._id,
+        g_name: m.group.g_name,
+        g_cover: m.group.g_cover ? getSignedUrl(m.group.g_cover) : '/assets/images/demo.jpg',
+        description: m.group.description,
+        g_type: m.group.g_type,
+        total_mem: m.group.total_mem,
+        user: m.group.user,
+        createdAt: m.group.createdAt,
+        membershipType: m.type,
+        joinedAt: m.createdAt
+      }))
+      .sort((a, b) => {
+        if (a.user.toString() === user._id.toString() && b.user.toString() === user._id.toString()) {
+          return new Date(b.createdAt) - new Date(a.createdAt);
+        }
+        return new Date(b.joinedAt) - new Date(a.joinedAt);
+      });
+
+       const joinedGroupIds = myGroups.map(g => g._id.toString());
+    const pendingGroupIds = memberships
+      .filter(m => m.group && m.type === 'pending')
+      .map(m => m.group._id.toString());
+
+    let discoverGroups = await Group.find({
+      $and: [
+        { user: { $ne: user._id } },
+        { _id: { $nin: joinedGroupIds } },
+        { g_type: { $in: ['public', 'private'] } }
+      ]
+    })
+      .select('g_name g_cover description g_type total_mem user createdAt')
+      .sort({ createdAt: -1 })
+      .limit(4)
+      .lean();
+
+    discoverGroups = discoverGroups.map(g => ({
+      ...g,
+      g_cover: g.g_cover ? getSignedUrl(g.g_cover) : '/assets/images/demo.jpg',
+      isJoined: joinedGroupIds.includes(g._id.toString()),
+      isPending: pendingGroupIds.includes(g._id.toString())
+    }));
+     
+    res.render("Association", {
+      user: {
+        ...user,
+        has_password: !!user.password
+      },
+      myGroups,
+      discoverGroups,
+     
+      layout: false
+    });
+  } catch (error) {
+    console.error('Error rendering dashboard:', error);
+    res.status(500).json({ success: false, message: 'Server error: ' + error.message });
+  }
+};

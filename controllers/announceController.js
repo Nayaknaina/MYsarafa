@@ -68,7 +68,7 @@ exports.Announcementform = async (req, res, next) => {
 
   const groupMember = await GMem.findOne({ user: req.user.id, type: 'admin' });
     if (!groupMember) {
-      return res.status(403).render('error', { errorMessage: 'You are not authorized to create announcements', layout: false });
+      return res.status(403).render('error', { errorMessage: 'Please make your Association first! You are not authorized to create announcements', layout: false });
     }
 
     res.render("Announcement-form", {

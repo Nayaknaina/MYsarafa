@@ -1,56 +1,58 @@
-  <header class="header">
-        <div class="header-content">
-            <div class="header-left">
-                <div class="community-name">
-                    <span>Sarafa Community</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <nav class="nav-menu">
-                    <a href="/user-app/dashboard" class="nav-item">Home</a>
-                    <a href="/announcements/Announcement" class="nav-item">Event</a>
-                    <a href="/Groups/group-member" class="nav-item">Members</a>
-                    {{!-- <div class="nav-item dropdown">
-                        <span>More</span>
-                        <i class="fas fa-chevron-down"></i>
-                    </div> --}}
-                </nav>
+<header class="header">
+    <div class="header-content">
+        <div class="header-left">
+            <div class="community-name">
+                <span>Sarafa Community</span>
+                <i class="fas fa-chevron-down"></i>
             </div>
-            <div class="header-right">
-                <div class="notification-icon">
-                    <a href="/user-app/notifs">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge" style="display:none;">0</span>
-                    </a>
-                 </div>
+            <nav class="nav-menu">
+                <a href="/user-app/dashboard" class="nav-item">Home</a>
+                <a href="/announcements/Announcement" class="nav-item">Event</a>
+                <a href="/Groups/group-member" class="nav-item">Members</a>
+                {{!-- <div class="nav-item dropdown">
+                    <span>More</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div> --}}
+            </nav>
+        </div>
+        <div class="header-right">
+            <div class="notification-icon">
+                <a href="/user-app/notifs">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge" style="display:none;">0</span>
+                </a>
+            </div>
 
-                <div class="search-container" id="searchContainer">
-                    <input type="text" placeholder="Search" class="search-input" id="Search-list">
-                    <i class="fas fa-search search-icon" id="searchToggle"></i>
-                     <i class="fas fa-xmark search-icon" id="crossToggle" style="display: none; color: #6e6666;"></i>
-                    <div class="search-dropdown" id="searchDropdown"></div>
-                </div>
-                <div class="user-avatar" id="userAvatar">
-                    <img 
-                    src="{{#if userProfile.profilePicture}}{{userProfile.profilePicture}}{{else}}/assets/images/default-avatar.png{{/if}}" 
-                    alt="{{userProfile.name}}" 
-                    class="avatar"
-                    >
-                    <div class="avatar-dropdown" id="avatarDropdown" style="display: none;">
-                        <div class="avatar-user-info">
-                            <div class="avatar-user-pic"> <img src="{{userProfile.profilePicture}}" alt="{{userProfile.name}}" class="avatar"></div>
-                            <div class="avatar-user-details">
-                                <span class="avatar-user-name">{{userProfile.name}} </span>
-                                <span class="avatar-user-email">{{user.email}}</span>
-                            </div>  
+            <div class="search-container" id="searchContainer">
+                <input type="text" placeholder="Search" class="search-input" id="Search-list">
+                <i class="fas fa-search search-icon" id="searchToggle"></i>
+                <i class="fas fa-xmark search-icon" id="crossToggle" style="display: none; color: #6e6666;"></i>
+                <div class="search-dropdown" id="searchDropdown"></div>
+            </div>
+            <div class="user-avatar" id="userAvatar">
+                <img src="{{#if userProfile.profilePicture}}{{userProfile.profilePicture}}{{else}}/assets/images/default-avatar.png{{/if}}"
+                    alt="{{userProfile.name}}" class="avatar"
+                    onerror="this.onerror=null; this.src='/assets/images/default-avatar.png';">
+                <div class="avatar-dropdown" id="avatarDropdown" style="display: none;">
+                    <div class="avatar-user-info">
+                        <div class="avatar-user-pic"> <img src="{{userProfile.profilePicture}}"
+                                alt="{{userProfile.name}}" class="avatar"></div>
+                        <div class="avatar-user-details">
+                            <span class="avatar-user-name">{{userProfile.name}} </span>
+                            <span class="avatar-user-email">{{user.email}}</span>
                         </div>
-                        <ul>
-                            <li id="profileDetailsBtn"><i class="fas fa-user-circle"></i> Profile</li>
-                            <li><i class="fas fa-cog"></i> Settings</li>
-                            <li href="/kyc/KYCverification"><i class="fas fa-id-card"></i> My KYC</li>
-                            <li id="logoutBtn"><i class="fas fa-sign-out-alt"></i>Sign out</li>
-                        </ul>
                     </div>
+                    <ul>
+                        <li id="profileDetailsBtn"><i class="fas fa-user-circle"></i> Profile</li>
+                        <li><i class="fas fa-cog"></i> Settings</li>
+                        <li href="/kyc/KYCverification"><i class="fas fa-id-card"></i> My KYC <span
+                                class="kyc-status {{user.kyc_status}}">
+                                {{user.kyc_status}}
+                            </span></li>
+                        <li id="logoutBtn"><i class="fas fa-sign-out-alt"></i>Sign out</li>
+                    </ul>
                 </div>
             </div>
         </div>
-    </header>
+    </div>
+</header>

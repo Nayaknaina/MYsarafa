@@ -18,6 +18,9 @@ router.post('/user/:id/verify', authMiddleware, isAdmin, userController.verifyMe
 router.get('/notifs',authMiddleware,profileImageMiddleware,userController.notifications);
 
 
+router.get('/association-sample',authMiddleware,profileImageMiddleware,userController.associationSample);
+
+
 
 router.get('/sign-out',userController.signout);
 

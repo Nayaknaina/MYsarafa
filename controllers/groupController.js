@@ -1380,6 +1380,77 @@ exports.searchMyGroups = async (req, res) => {
         res.status(500).json({ success: false, message: 'Error searching groups', error: error.message });
     }
 };
+// Combined search for both myGroups and discoverGroups
+exports.searchAllGroups = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const query = sanitize(req.query.query || '').trim();
+
+        // Create a REAL RegExp for JavaScript filtering
+        const jsRegex = query ? new RegExp(query, 'i') : null;
+
+        // MongoDB regex object (for future use if needed)
+        const mongoRegex = query ? { $regex: query, $options: 'i' } : null;
+
+        // 1. My Groups (joined, not pending)
+        const myMemberships = await GMem.find({ user: userId, type: { $ne: 'pending' } })
+            .populate('group', 'g_name g_cover description g_type total_mem user createdAt')
+            .lean();
+
+        let myGroups = myMemberships
+            .filter(m => m.group && (!query || jsRegex.test(m.group.g_name))) // ← Fixed here
+            .map(m => ({
+                _id: m.group._id,
+                g_name: m.group.g_name,
+                g_cover: m.group.g_cover ? getSignedUrl(m.group.g_cover) : '/assets/images/demo.jpg',
+                description: m.group.description || '',
+                g_type: m.group.g_type,
+                total_mem: m.group.total_mem,
+                isMine: m.group.user.toString() === userId,
+                type: 'my'
+            }));
+
+        // 2. Discover Groups
+        const joinedIds = myMemberships.map(m => m.group._id.toString());
+
+        const discoverQuery = {
+            g_type: { $in: ['public', 'private'] },
+            user: { $ne: userId },
+            _id: { $nin: joinedIds }
+        };
+
+        if (query) {
+            discoverQuery.g_name = mongoRegex; // Use MongoDB regex here
+        }
+
+        let discoverGroups = await Group.find(discoverQuery)
+            .select('g_name g_cover description g_type total_mem user createdAt')
+            .sort({ createdAt: -1 })
+            .limit(20)
+            .lean();
+
+        discoverGroups = discoverGroups.map(g => ({
+            _id: g._id,
+            g_name: g.g_name,
+            g_cover: g.g_cover ? getSignedUrl(g.g_cover) : '/assets/images/demo.jpg',
+            description: g.description || '',
+            g_type: g.g_type,
+            total_mem: g.total_mem,
+            isMine: false,
+            type: 'discover'
+        }));
+
+        res.json({
+            success: true,
+            myGroups,
+            discoverGroups
+        });
+
+    } catch (err) {
+        console.error('Search error:', err);
+        res.status(500).json({ success: false, message: 'Search failed' });
+    }
+};
 
 exports.leaveGroup = async (req, res) => {
     try {
