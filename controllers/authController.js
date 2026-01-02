@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user.model');
 const axios = require('axios');
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 
 exports.signup = async (req, res ,next) => {
    
@@ -34,11 +36,17 @@ exports.signup = async (req, res ,next) => {
         // });
          res.cookie('token', token, {
             httpOnly: true,
-            secure: true,
-            sameSite: 'lax',
-            domain:'.mysarafa.com',
-            path:'/',
+            secure: isProduction,          // ❗ false on localhost
+            sameSite: isProduction ? 'none' : 'lax',
+            domain: isProduction ? '.mysarafa.com' : undefined,
+            path: '/',
             maxAge: 12 * 60 * 60 * 1000
+            // httpOnly: true,
+            // secure: true,
+            // sameSite: 'lax',
+            // domain:'.mysarafa.com',
+            // path:'/',
+            // maxAge: 12 * 60 * 60 * 1000
         });
 
         res.status(201).json({ message: 'User registered successfully' });
@@ -46,7 +54,6 @@ exports.signup = async (req, res ,next) => {
         next(error);
     }
 };
-
 exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
@@ -75,12 +82,18 @@ exports.login = async (req, res, next) => {
 
         // Set cookie
         res.cookie('token', token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'lax',
-            domain:'.mysarafa.com',
-            path:'/',
-            maxAge: 12 * 60 * 60 * 1000
+            // httpOnly: true,
+            // secure: true,
+            // sameSite: 'lax',
+            // domain:'.mysarafa.com',
+            // path:'/',
+            // maxAge: 12 * 60 * 60 * 1000
+              httpOnly: true,
+              secure: isProduction,          // ❗ false on localhost
+              sameSite: isProduction ? 'none' : 'lax',
+              domain: isProduction ? '.mysarafa.com' : undefined,
+              path: '/',
+              maxAge: 12 * 60 * 60 * 1000
         });
 
         res.json({ message: 'Login successful' });

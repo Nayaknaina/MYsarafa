@@ -799,6 +799,30 @@ exports.associationSample = async (req, res, next) => {
       isJoined: joinedGroupIds.includes(g._id.toString()),
       isPending: pendingGroupIds.includes(g._id.toString())
     }));
+
+     const recentThreshold = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+     let pendingGroup = null;
+    for (const membership of memberships) {
+      const group = membership.group;
+      if (!group || group.amount <= 0 || group.updatedAt < recentThreshold) {
+        continue;
+      }
+      if (membership.type === 'admin') {
+        console.log(`Skipping modal for group ${group.g_name}: User is admin`);
+        continue;
+      }
+      const payment = await Payment.findOne({
+        user: user._id,
+        group: group._id
+      }).lean();
+      if (!payment || (payment && group.updatedAt > payment.uploadedAt)) {
+       pendingGroup = {
+          ...group,
+          qr_code: group.qr_code ? getSignedUrl(group.qr_code) : '/assets/images/demo.jpg'
+        };
+        break;
+      }
+    }
      
     res.render("Association", {
       user: {
@@ -807,6 +831,7 @@ exports.associationSample = async (req, res, next) => {
       },
       myGroups,
       discoverGroups,
+      pendingGroup,
      
       layout: false
     });

@@ -94,7 +94,7 @@ app.get('/help', (req, res) => {
 });
 
 const corsOptions = {
-   origin: 'https://mysarafa.com',  // Change to 'http://localhost:xxxx' for dev
+   origin: 'https://mysarafa.com',  
   //origin: 'http://localhost:5500',
     credentials: true,
     optionsSuccessStatus: 200

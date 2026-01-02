@@ -1398,7 +1398,7 @@ exports.searchAllGroups = async (req, res) => {
             .lean();
 
         let myGroups = myMemberships
-            .filter(m => m.group && (!query || jsRegex.test(m.group.g_name))) // ← Fixed here
+            .filter(m => m.group && (!query || jsRegex.test(m.group.g_name))) 
             .map(m => ({
                 _id: m.group._id,
                 g_name: m.group.g_name,
@@ -1411,7 +1411,9 @@ exports.searchAllGroups = async (req, res) => {
             }));
 
         // 2. Discover Groups
-        const joinedIds = myMemberships.map(m => m.group._id.toString());
+        const joinedIds = myMemberships 
+                    .filter(m => m.group)        
+                    .map(m => m.group._id.toString());
 
         const discoverQuery = {
             g_type: { $in: ['public', 'private'] },

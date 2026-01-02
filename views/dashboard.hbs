@@ -260,29 +260,6 @@
             <div class="main-content p-6" style="height: 80vh !important;">
                 {{!-- <h1 class="page-title">Dashboard</h1> --}}
 
-                {{#if pendingGroup}}
-                <div id="duePaymentModal" class="modal-overlay" style="display: flex;">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <span style="font-size: 18px; font-weight: 600;">Payment Due</span>
-                            <button class="modal-close-btn" id="closeDuePaymentModal">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <p style="font-size: 15px; color: #333; margin-bottom: 18px;">
-                                Pay your pending payment.<br>
-                                Your <strong>{{pendingGroup.g_name}}</strong> payment of
-                                <strong>₹{{pendingGroup.amount}}</strong> is due.
-                            </p> 
-                            <div style="display: flex; gap: 10px;">
-                                <button id="payNowBtn" data-group-id="{{pendingGroup._id}}"
-                                    style="flex: 1; background: #2f95ff; color: #fff; border: none; border-radius: 8px; padding: 10px 0; font-size: 15px; font-weight: 500; cursor: pointer;"
-                                    class="pay-now-btn">Pay Now</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {{/if}}
-
                 <!-- Welcome Banner -->
                 <section class="welcome-banner">
                     <h2 class="welcome-title">Welcome to MySarafa</h2>

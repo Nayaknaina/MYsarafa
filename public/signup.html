@@ -54,14 +54,7 @@
             margin-top: 2.5rem;
         }
 
-        a {
-            color: #333;
-            font-size: 12px;
-            text-decoration: none;
-            margin: 15px 0;
-            transition: color 0.3s ease;
-        }
-
+        
         button {
             border-radius: 20px;
             border: 1px solid #ffffff;
@@ -180,6 +173,7 @@
             position: absolute;
             top: 0;
             left: 50%;
+            /* left: 24%; */
             width: 50%;
             height: 100%;
             overflow: hidden;
@@ -431,26 +425,40 @@
             left: 0;
             top: 0;
             width: 100%;
-            height: 100%;
+            height: 100vh;
             display: none;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgb(255 255 255 / 50%);
         }
 
         .forgot-modal-content {
             background-color: #fff;
-            margin: 10% auto;
+            margin: 15% auto;
             padding: 20px 30px;
             border-radius: 12px;
-            width: 350px;
+            /* width: 350px; */
             text-align: center;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
 
         .close-btn {
-            float: right;
-            cursor: pointer;
-            font-size: 22px;
-            color: #333;
+           position: absolute;
+        top: 20px;
+        right: 0px;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #e0e0e0;
+        color: #333;
+        border-radius: 50%;
+        font-size: 20px;
+        cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+        float: right;
+        cursor: pointer;
+    /* font-size: 22px; */
+    /* color: #333; */
         }
 
         .hidden {
@@ -511,11 +519,18 @@
                 opacity: 1;
                 z-index: 5;
             }
+            .container.right-panel-active .overlay-container {
+            transform: none;
+             }
 
+             
             .overlay-container {
+                pointer-events: none;           
+                  z-index: 10;
                 position: fixed;
+                left: 24%;
                 /*  width: 100%;*/
-                height: 30%;
+                /* height: 30%; */
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
@@ -578,6 +593,10 @@
                 /* Visible at bottom when sign-in is active */
                 opacity: 1;
             }
+            .overlay-panel,
+            .overlay-panel button.ghost {
+                pointer-events: auto !important;  
+            }
 
             h1 {
                 font-size: 1.6em;
@@ -590,15 +609,20 @@
                 font-size: 13px;
             }
 
-            /* input {
-                padding: 10px;
-                font-size: 13px;
-            }*/
+            input {
+               min-height: 48px;     
+                padding: 14px 15px;    
+                font-size: 16px !important;  
+                -webkit-appearance: none;
+            }
 
             .login-with-google-btn {
-                padding: 8px 12px 8px 36px;
-                background-size: 24px;
-                font-size: 13px;
+              padding: 10px 20px 10px 55px !important;
+        background-position: 15px center !important;
+        background-size: 28px !important;
+        font-size: 15px !important;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
             }
 
             .checkbox-container {
@@ -616,7 +640,7 @@
             }
             p {
                 color: black;
-                font-weight: 800;
+                /* font-weight: 800; */
                 margin: 0 !important;
             }
 
@@ -644,9 +668,9 @@
                 /*  top: 12.56%;*/
             }
 
-            .overlay-container {
+            /* .overlay-container {
                 height: 110%;
-            }
+            } */
 
             .overlay-panel {
                 padding: 8px;
@@ -657,7 +681,9 @@
                 font-size: 1.4em;
                 margin-bottom: 0.8rem;
             }
-
+            h4{
+                display: none;
+            }
             p,
             span,
             .checkbox-container {
@@ -678,9 +704,9 @@
             }*/
 
             .login-with-google-btn {
-                padding: 8px 10px 8px 29px;
-                background-size: 22px;
-                font-size: 12px;
+                padding: 8px 10px 8px 30px;
+                background-size: 24px;
+                font-size: 18px;
             }
 
             .social-container a {
@@ -720,7 +746,7 @@
         <!-- Sign Up Form -->
         <div class="form-container sign-up-container">
             <form action="#" id="signupForm">
-                <h1>Sign Up 🚀</h1>
+                <h1>Signup</h1>
                 <div class="">
                     <a href="#" type="button" id="googleSignupBtn" class="login-with-google-btn">SignUp with Google</a>
                 </div>
@@ -733,21 +759,21 @@
                     <label for="termsCheckbox">By signing up, you agree to the <a id="termsLink">Terms of Service</a>,
                         including Cookie Use.</label>
                 </div>
-                <button type="submit" id="signupButton">Sign Up</button>
+                <button type="submit" id="signupButton">Create Account</button>
             </form>
         </div>
         <!-- Sign In Form -->
         <div class="form-container sign-in-container">
             <form action="#" id="loginForm">
-                <h1>Log In 👋</h1>
+                <h1>Login </h1>
                 <div class="">
                     <a href="#" type="button" id="googleLoginBtn" class="login-with-google-btn">SignIn with Google</a>
                 </div>
                 <span>or use your account for Log In</span>
                 <input type="text" id="loginEmail" name="email" placeholder="📧 Email or 📱 Phone" required />
                 <input type="password" id="loginPassword" name="password" placeholder="🔒 Password" required />
-                <a href="#" id="forgotPasswordLink">Forgot your password? 🤔</a>
-                <button type="submit">Sign In</button>
+                <a href="#" id="forgotPasswordLink">Forgot your password?</a>
+                <button type="submit">Log In</button>
             </form>
             <!-- Forgot Password Modal -->
             <div id="forgotPasswordModal" class="forgot-modal hidden">
@@ -775,15 +801,15 @@
             <div class="overlay">
                 <!-- Overlay Left Panel (Shown when Sign In is active) -->
                 <div class="overlay-panel overlay-left">
-                    <h1>Welcome Back!</h1>
-                    <p>Login to stay connected</p>
-                    <button class="ghost" id="signIn">Sign In</button>
+                    <h4>Welcome Back!</h4>
+                    <span>Login to stay connected</span>
+                    <button class="ghost" id="signIn">Log In</button>
                 </div>
                 <!-- Overlay Right Panel (Shown when Sign Up is active) -->
                 <div class="overlay-panel overlay-right">
-                    <h1>Hello, Friend! </h1>
-                    <p>To begin your journey</p>
-                    <button class="ghost" id="signUp">Sign Up</button>
+                    <h4>Hello, Friend! </h4>
+                    <span>To begin your journey</span>
+                    <button class="ghost" id="signUp">Create Account</button>
                 </div>
             </div>
         </div>
