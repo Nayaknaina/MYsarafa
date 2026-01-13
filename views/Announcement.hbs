@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{!-- <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -13,7 +13,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
 
-  <style>
+  
+</head> --}}
+<style>
     .announcement-copy:active,
 .announcement-share:active {
   transform: scale(1.2);
@@ -422,8 +424,6 @@
   }
 }
   </style>
-</head>
-
 <body data-user-id="{{user._id}}">
   {{> header}}
 
@@ -433,7 +433,7 @@
     {{> sidebar}}
     <main class="main-content">
       {{#if isAdmin}}
-      <a href="/announcements/Announcementform" style="text-decoration: none;">
+      <a href="/announcements/new" style="text-decoration: none;">
         <button class="Announcement-btn">New +</button>
       </a>
       {{/if}}

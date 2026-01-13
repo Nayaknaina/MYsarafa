@@ -88,10 +88,27 @@ exports.groupMemberPage = async (req, res) => {
     try {
         console.log("we are in a group members page ");
         const user = await User.findById(req.user.id).lean();
+          const groupId = req.params.groupId;
+         let group = null;
+        let questions = [];
+        if (groupId) {
+            // Validate groupId
+            if (!mongoose.isValidObjectId(groupId)) {
+                return res.status(400).json({ success: false, message: 'Invalid group ID' });
+            }
 
+         
+            group = await Group.findOne({ _id: groupId, user: req.user.id }).lean();
+            if (!group) {
+                return res.status(404).json({ success: false, message: 'Group not found or you do not have permission to edit it' });
+            }
+           console.log("Group found:", group);
+        }
         res.render("grpMembers", {
             user,
-            layout: false
+            group,
+            title:'Sarafa Members | MySarafa',
+            layout: 'main'
         });
     } catch (error) {
         res.status(500).render("500", { errorMessage: "Something went wrong, please try again later." });
@@ -992,19 +1009,42 @@ exports.getGroupMembers = async (req, res) => {
 
 exports.searchGroupMembers = async (req, res) => {
     try {
-        const { name, groupName, email } = req.query;
+        const { name, groupName, email, groupId } = req.query;
 
 
-        const ownedGroups = await Group.find({ user: req.user._id }).select('_id').lean();
-        const groupIds = ownedGroups.map(g => g._id);
+        // const ownedGroups = await Group.find({ user: req.user._id }).select('_id').lean();
+        // const groupIds = ownedGroups.map(g => g._id);
 
-        if (!groupIds.length) {
-            return res.status(200).json({ success: true, members: [], message: 'You do not own any groups' });
+        // if (!groupIds.length) {
+        //     return res.status(200).json({ success: true, members: [], message: 'You do not own any groups' });
+        // }
+
+
+        // const query = { group: { $in: groupIds } };
+// ALWAYS get only groups owned by current user
+        const ownedGroups = await Group.find({ user: req.user._id }).select('_id g_name').lean();
+        const ownedGroupIds = ownedGroups.map(g => g._id);
+
+        if (ownedGroupIds.length === 0) {
+            return res.json({ success: true, members: [], message: 'You do not own any groups' });
         }
 
+        let targetGroupId = null;
 
-        const query = { group: { $in: groupIds } };
+        // If a specific groupId is requested, validate it belongs to user
+        if (groupId && mongoose.isValidObjectId(groupId)) {
+            if (ownedGroupIds.some(id => id.toString() === groupId)) {
+                targetGroupId = groupId;
+            } else {
+                // User is trying to access a group they don't own → block it
+                return res.json({ success: true, members: [] });
+            }
+        }
 
+        // Build query: always within owned groups
+        const query = {
+            group: targetGroupId ? targetGroupId : { $in: ownedGroupIds }
+        };
 
         const userMatch = {};
         if (name) {
@@ -1031,6 +1071,7 @@ exports.searchGroupMembers = async (req, res) => {
                 match: Object.keys(groupMatch).length ? groupMatch : {},
                 select: 'g_name'
             })
+            // .sort({ createdAt: -1 })
             .lean();
 
         // Step 5: Filter out members where user or group is null

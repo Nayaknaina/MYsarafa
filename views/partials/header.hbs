@@ -35,7 +35,7 @@
                     onerror="this.onerror=null; this.src='/assets/images/default-avatar.png';">
                 <div class="avatar-dropdown" id="avatarDropdown" style="display: none;">
                     <div class="avatar-user-info">
-                        <div class="avatar-user-pic"> <img src="{{userProfile.profilePicture}}"
+                        <div class="avatar-user-pic"> <img src="{{#if userProfile.profilePicture}}{{userProfile.profilePicture}}{{else}}/assets/images/default-avatar.png{{/if}}"
                                 alt="{{userProfile.name}}" class="avatar"></div>
                         <div class="avatar-user-details">
                             <span class="avatar-user-name">{{userProfile.name}} </span>

@@ -1984,9 +1984,9 @@
     if (allCustomers.filter(c => c.type === currentFilterType).length === 0) {
       message = `
         <div style="padding:40px 20px; text-align:center; color:#999;">
-          <div style="font-size:60px; margin-bottom:16px;">No customers yet</div>
+          <div >No customers yet</div>
           <p style="font-size:16px; margin:10px 0;">Start by adding your first ${currentFilterType}</p>
-          <button class="action-btn" onclick="document.getElementById('btn-new-customer').click()" style="margin-top:16px; padding:12px 24px;">
+          <button class="action-btn" onclick="document.getElementById('btn-new-customer').click()" style="display:inline-block !important;">
             Add First ${currentFilterType.charAt(0).toUpperCase() + currentFilterType.slice(1)}
           </button>
         </div>`;

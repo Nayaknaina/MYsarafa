@@ -175,7 +175,7 @@ exports.tryKhatabook = async (req, res, next) => {
 
     res.render('trykhata', {
       user,
-      layout: false,
+      title:'Khatabook | MySarafa', 
       customers,
       totalCash,
       totalGold,

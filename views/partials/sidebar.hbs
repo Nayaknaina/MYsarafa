@@ -329,6 +329,7 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
   }
 
+
   /* Desktop Media Query */
   @media (min-width: 992px) {
     .sidebar-toggle { display: flex; }
@@ -425,7 +426,7 @@
       <div class="submenu">
         <a href="/Groups/group-member">Add / Invite Member</a>
           <a href="/businesses/listUP">Business Directory</a>
-          <a href="/user/profile">Edit Profile</a>
+          {{!-- <a href="/user/profile">Edit Profile</a> --}}
         {{#if showMonthlyMembership}}
         <a href="/pay/Pay-received-ss">Monthly Membership</a>
         {{/if}}
@@ -439,9 +440,10 @@
       </button>
       <div class="submenu">
         <a href="/rates/getRates">Live Rates</a>
-        <a href="/rates/history">Rates History</a>
+        {{!-- coming soon tags --}}
+        {{!-- <a href="/rates/history" aria-disabled="true">Rates History</a>
         <!-- admin/update route may exist depending on permissions -->
-        <a href="/rates/update">Update Rates</a>
+        <a href="/rates/update">Update Rates</a> --}}
       </div>
     </div>
 

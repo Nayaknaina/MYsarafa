@@ -53,7 +53,9 @@ exports.getBusinessDirectory = async (req, res) => {
             discoverBusinesses,
             search,
             category,
-            user: req.user
+            user: req.user,
+        
+            title: 'Business Directory'
         });
 
     } catch (error) {

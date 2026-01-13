@@ -109,7 +109,7 @@ exports.rendertabularPayReceived = async (req, res, next) => {
       user: user || {},
          fullName: `${user.f_name || ''} ${user.l_name || ''}`.trim(),
       payments: formattedPayments,
-       layout: false,
+      title:'Sarafa Payments | MySarafa',
       group: null // No group selected initially
     });
   } catch (error) {

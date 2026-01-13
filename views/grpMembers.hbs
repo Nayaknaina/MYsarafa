@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{!-- <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -15,7 +15,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 
-</head>
+</head> --}}
 
 <style>
     .main-content {
@@ -457,7 +457,96 @@
 .toggle-btn {
   display: none; /* hidden on desktop */
 }
+.group-members-header {
+    background: linear-gradient(to right, #2563eb, #14b8a6);
+    color: white;
+    padding: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: relative;
+}
 
+.group-members-header.all-groups {
+   background: linear-gradient(to right, #2563eb, #14b8a6);
+}
+
+.header-groupmembers {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 60px;
+}
+
+.back-btn {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    flex-shrink: 0;
+}
+
+.back-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.header-text {
+    flex: 1;
+    min-width: 0; /* Allows text to truncate if too long */
+}
+
+.header-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.header-subtitle {
+    font-size: 14px;
+    margin: 4px 0 0 0;
+    opacity: 0.9;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .group-members-header {
+        padding: 12px;
+    }
+
+    .header- {
+        gap: 12px;
+    }
+
+    .back-btn {
+        font-size: 15px;
+        padding: 6px 10px;
+    }
+
+    .header-title {
+        font-size: 18px;
+    }
+
+    .header-subtitle {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-title {
+        font-size: 17px;
+    }
+
+    .back-btn {
+        font-size: 14px;
+        padding: 6px 8px;
+    }
+}
 /* Mobile view */
 @media (max-width: 768px) {
   .button-group {
@@ -525,6 +614,34 @@
         {{> sidebar}}
 
         <main class="main-content">
+            {{#if group}}
+            <div class="group-members-header">
+                <div class="header-groupmembers">
+                    <a href="javascript:history.back()" class="back-btn">
+                        ← Back
+                    </a>
+                    <div class="header-text">
+                        <h1 class="header-title">Members of "{{group.g_name}}"</h1>
+                        <p class="header-subtitle">
+                            {{group.g_type}} group · {{group.total_mem}} members
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {{else}}
+            <div class="group-members-header all-groups">
+                <div class="header-groupmembers">
+                    <a href="javascript:history.back()" class="back-btn">
+                        ← Back
+                    </a>
+                    <div class="header-text">
+                        <h1 class="header-title">All Group Members</h1>
+                    </div>
+                </div>
+            </div>
+            {{/if}}
+
+       
 
             <!-- Filter Section -->
             <div class="filter-section mb-2 button-group">
@@ -717,6 +834,9 @@
             </form>
         </div>
     </div>
+    <script>
+    const CURRENT_GROUP_ID = "{{groupId}}" || null;
+</script>
     <script src="/js/all.js"></script>
     <script>
  

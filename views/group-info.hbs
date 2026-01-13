@@ -376,9 +376,9 @@
             font-size: 1.8em;
         }
 
-        .group-tabs {
+       /* .group-tabs {
             overflow-x: auto;
-        }
+        }*/
 
         .announcement-actions {
             margin: 0;
@@ -403,7 +403,7 @@
             <div class="group-header">
                 <img src="{{group.g_cover}}" alt="{{group.g_name}} cover" class="group-cover">
 
-                {{#if isMember}}
+                {{#if isMember}} 
                 <button class="joined-btn">Joined</button>
                 {{else}}
                 <button class="join-btn">Join Group</button>
@@ -411,10 +411,16 @@
             </div>
 
 
-            <nav class="group-tabs">
+            {{!-- <nav class="group-tabs">
                 <h1 class="group-name">{{group.g_name}}</h1>
                 <p class="group-type">{{group.g_type}} group · {{group.total_mem}} members</p>
-            </nav>
+            </nav> --}}
+            <a href="/Groups/group-member/{{group._id}}" class="block text-white no-underline">
+    <nav class="group-tabs">
+        <h1 class="group-name">{{group.g_name}}</h1>
+        <p class="group-type">{{group.g_type}} group · {{group.total_mem}} members →</p>
+    </nav>
+</a>
             <!-- Tabs -->
             <nav class="group-tabs">
                 <a href="#discussion">Discussion</a>
@@ -425,6 +431,16 @@
             </nav>
 
             <div class="group-layout">
+                  <aside class="group-about-box">
+                    <h2>About</h2>
+                    <p>{{group.description}}</p>
+                    <hr>
+                    <p><strong>Type:</strong> {{group.g_type}}</p>
+                    <p><strong>Members:</strong> {{group.total_mem}}</p>
+                    <p><strong>Created:</strong> {{formatDate group.createdAt}}</p>
+                    <p><strong>Location:</strong> {{group.location}}</p>
+                    <p><strong>Admin:</strong> {{group.createdBy.full_name}}</p>
+                </aside>
 
                 <!-- Main Content: Announcements -->
                 <section id="discussion" class="group-discussion">
@@ -474,17 +490,7 @@
                     {{/if}}
                 </section>
 
-                <aside class="group-about-box">
-                    <h2>About</h2>
-                    <p>{{group.description}}</p>
-                    <hr>
-                    <p><strong>Type:</strong> {{group.g_type}}</p>
-                    <p><strong>Members:</strong> {{group.total_mem}}</p>
-                    <p><strong>Created:</strong> {{formatDate group.createdAt}}</p>
-                    <p><strong>Location:</strong> {{group.location}}</p>
-                    <p><strong>Admin:</strong> {{group.createdBy.full_name}}</p>
-                </aside>
-
+              
                 <!-- People Section -->
                 <section id="people" class="group-people" style="display: none;">
                     <h2>Members ({{group.total_mem}})</h2>

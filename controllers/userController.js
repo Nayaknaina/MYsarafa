@@ -194,6 +194,7 @@ if (ledgerTxn && ledgerTxn.length > 0) {
         ...user,
         has_password: !!user.password
       },
+      title:'Sarafa Association Dashboard',
       myGroups,
       discoverGroups,
       pendingGroup,
@@ -202,7 +203,7 @@ if (ledgerTxn && ledgerTxn.length > 0) {
       featuredBusinesses,
       isLeader,
       totals,
-      layout: false
+      layout: 'main'
     });
   } catch (error) {
     console.error('Error rendering dashboard:', error);
@@ -800,6 +801,8 @@ exports.associationSample = async (req, res, next) => {
       isPending: pendingGroupIds.includes(g._id.toString())
     }));
 
+    const memberGroups = myGroups.filter(g => g.membershipType === 'user');
+
      const recentThreshold = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
      let pendingGroup = null;
     for (const membership of memberships) {
@@ -829,11 +832,13 @@ exports.associationSample = async (req, res, next) => {
         ...user,
         has_password: !!user.password
       },
+      title:'Sarafa Association',
       myGroups,
       discoverGroups,
       pendingGroup,
+      memberGroups,
      
-      layout: false
+      layout: 'main'
     });
   } catch (error) {
     console.error('Error rendering dashboard:', error);

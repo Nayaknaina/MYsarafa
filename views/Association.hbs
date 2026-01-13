@@ -1,18 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{title}}</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <link rel="canonical" href="https://app.mysarafa.com/">
-</head>
 <script src="https://cdn.tailwindcss.com"></script>
 
 
@@ -47,7 +33,7 @@
                     </div>
                 </div>
                 {{/if}}
-            {{!-- association.hbs -- This will be rendered inside <main class="main-content"> --}}
+          
                 <div class="max-w-7xl mx-auto ">
                     <!-- Header Section -->
                     <div class="bg-white rounded-lg shadow-md p-2 mb-4">
@@ -94,8 +80,8 @@
                                     <h4 class="text-xl font-semibold flex items-center justify-between">Suggested for
                                         you
                                         <div class="flex gap-4">
-                                            <span class="hover:bg-white hover:text-black text-sm font-normal bg-white/20 px-3 py-1 rounded-full flex items-center gap-2 text-blackgray-700 text-white transition">View
-                                                All</span><i class="fa-solid fa-compass"></i>
+                                            <a  href="/user-app/dashboard#discover-groups-section" class="hover:bg-white hover:text-black text-sm font-normal bg-white/20 md:w-auto px-3  rounded-full flex items-center gap-2 text-blackgray-700 text-white transition font-semibold"><span>View
+                                                All<i class="fa-solid fa-compass p-2"></i></span></a>
                                         </div>
                                     </h4>
                                     <p class="text-sm opacity-90 mt-1">Groups you might be interested in</p>
@@ -104,48 +90,30 @@
 
                             </div>
                             <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                                <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-3">
-                                    <h4 class="text-lg md:text-xl font-semibold flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                                        <span>Admin</span>
+                               <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-3">
+                                    <h4 class="text-lg md:text-xl font-semibold flex  md:flex-row md:items-center justify-between gap-4">
+                                        
 
-                                        <div class="flex flex-col sm:flex-row gap-2 sm:gap-4 text-sm w-full md:w-auto">
+                                        Admin<div class="flex flex-col sm:flex-row gap-3  text-sm  md:w-auto">
                                             
                                             <!-- Join Requests -->
-                                            <a href="/association/requests"
-                                            class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-2
+                                            <a href="/association/requests" class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-2
                                                     bg-white/20 hover:bg-white hover:text-black
-                                                    px-3 py-2 rounded-full transition text-white">
+                                                    px-3 py-1 rounded-full transition text-white">
 
                                                 <span class="flex items-center gap-2">
                                                     <i class="fas fa-user-clock text-base"></i>
                                                     Join Requests
                                                 </span>
 
-                                                {{!-- <span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-medium">
-                                                    3
-                                                </span> --}}
                                             </a>
 
                                             <!-- Manage Members -->
-                                            <a href="/Groups/group-member"
-                                            class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-2
-                                                    bg-white/20 hover:bg-white hover:text-black
-                                                    px-3 py-2 rounded-full transition text-white">
-
-                                                <span class="flex items-center gap-2">
-                                                    <i class="fas fa-users text-base"></i>
-                                                    Manage Members
-                                                </span>
-
-                                                {{!-- <span class="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-medium">
-                                                    3
-                                                </span> --}}
-                                            </a>
 
                                         </div>
                                     </h4>
 
-                                    <p class="text-sm opacity-90 mt-1">Your Groups</p>
+                                    <p class="text-sm opacity-90 mt-0">Your Groups</p>
                                 </div>
 
 
@@ -154,11 +122,18 @@
                                         <!--  -->
                                         {{#each myGroups}}
                                         <div
-                                            class="border border-gray-200 rounded-lg p-2 hover:shadow-lg transition flex items-center justify-between">
+                                            class="border border-gray-200 rounded-lg p-2 hover:shadow-lg transition flex items-center justify-between group-card" data-group-id="{{this._id}}">
                                             <div class="flex-1">
                                                 <h3 class="text-lg font-medium text-gray-800">{{this.g_name}}</h3>
-                                                <p class="text-sm text-gray-600 mt-1">{{this.total_mem}} members •
-                                                     {{this.g_type}}</p>
+                                                <p class="text-sm text-gray-600 mt-1 gap-2">
+                                                    {{!-- <i class="fa fa-globe" aria-hidden="true"></i>{{this.g_type}} • {{this.total_mem}} members  --}}
+                                                    {{#if (eq this.g_type "public")}}
+                                                        <i class="fa fa-globe"></i>
+                                                    {{else}}
+                                                        <i class="fa fa-lock"></i>
+                                                    {{/if}}
+                                                    {{this.g_type}} • <i class="fa fa-user"></i> {{this.total_mem}} members
+                                                     </p>
                                             </div>
                                             <div class="flex items-center gap-3">
                                                 <button class="text-blue-600 hover:text-blue-800 font-medium"
@@ -186,12 +161,17 @@
                                     <div class="space-y-4">
                                          
                                         <!-- Suggested Group Item -->
-                                        {{#each discoverGroups}}
-                                        <div class="border border-gray-200 rounded-lg p-2 hover:shadow-lg transition">
+                                        {{#each memberGroups}}
+                                        <div class="border border-gray-200 rounded-lg p-2 hover:shadow-lg transition group-card" data-group-id="{{this._id}}">
                                             <div class="flex justify-between items-start mb-2">
                                                 <h3 class="font-medium text-gray-800">{{this.g_name}}</h3>
-                                                <span
-                                                    class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">{{this.g_type}}</span>
+                                                    <span
+                                                    class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded"> {{#if (eq this.g_type "public")}}
+                                                        <i class="fa fa-globe"></i> 
+                                                    {{else}}
+                                                        <i class="fa fa-lock"></i> 
+                                                    {{/if}}
+                                                    {{this.g_type}}</span>
                                             </div>
                                             <p class="text-sm text-gray-600 mb-3">{{this.total_mem}} members • {{this.description}}</p>
 
@@ -299,12 +279,37 @@ document.addEventListener('click', function(e) {
     }
 });
 
+
 // Optional: Hide when pressing Escape
 searchInput.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
         associationdropdown.classList.add('hidden');
         this.blur();
     }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+   
+    document.querySelectorAll('.group-card').forEach(card => {
+        card.style.cursor = 'pointer';
+        card.addEventListener('click', (e) => {
+           
+            if (e.target.closest('a, button')) {
+                return;
+            }
+
+            const groupId = card.dataset.groupId;
+            if (groupId) {
+                window.location.href = `/Groups/group-info/${groupId}`;
+            }
+        });
+    });
+
+    document.querySelectorAll('.group-title').forEach(title => {
+        title.style.cursor = 'pointer';
+    });
 });
 </script>
     {{> profile}}

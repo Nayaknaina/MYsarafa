@@ -1,18 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sarafa Community Dashboard</title>
-    <link rel="stylesheet" href="/css/styles.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <link rel="canonical" href="https://app.mysarafa.com/">
-</head>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
     .otp-input::-webkit-outer-spin-button,
@@ -257,7 +243,7 @@
         <!-- Main Content -->
         
         <main class="flex-1 overflow-auto">
-            <div class="main-content p-6" style="height: 80vh !important;">
+            <div class="main-content p-6" style="height: 85vh !important;">
                 {{!-- <h1 class="page-title">Dashboard</h1> --}}
 
                 <!-- Welcome Banner -->
@@ -323,7 +309,7 @@
                     <h2 class="text-lg font-semibold text-gray-800 flex items-center">
                         <i class="fas fa-wallet mr-2 text-yellow-600"></i> Gold, Silver & Cash Summary
                     </h2>
-                    <a href="/rates/getRates" class="view-btn inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full hover:bg-blue-700 transition-colors">
+                    <a href="/ledger/trykhatabook?type=customer" class="view-btn inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full hover:bg-blue-700 transition-colors">
                         <i class="fas fa-eye mr-1"></i> + Add Entry
                     </a>
                 </div>
@@ -388,7 +374,7 @@
                 <section class="group-discovery-section">
                     <div class="group-discovery-container">
 
-                        <div class="discover-groups">
+                        <div class="discover-groups" id="discover-groups-section" >
                             <div class="flex justify-between items-center mb-4">
                                 <h2 class="section-title">Discover Community</h2>
                                 <div class="search-container w-1/3">

@@ -22,7 +22,7 @@ exports.KYCverification = async (req, res) => {
         res.render("KYC-verification", {
             user,
             disabledSidebar,
-            layout: false 
+            title:'KYC Verification | MySarafa',
         });
     } catch (error) {
         res.status(500).render("500", { errorMessage: "Something went wrong, please try again later." });

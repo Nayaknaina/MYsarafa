@@ -626,7 +626,7 @@ function createMobileMenuToggle() {
   const headerLeft = document.querySelector('.header-left');
   if (!sidebar || !headerLeft) return;
 
-  if (window.innerWidth <= 768) {
+  if (window.innerWidth <= 991) {
     if (!mobileMenuToggleBtn) {
       mobileMenuToggleBtn = document.createElement('button');
       mobileMenuToggleBtn.className = 'mobile-menu-toggle-btn';
@@ -1666,6 +1666,10 @@ document.addEventListener('DOMContentLoaded', function () {
       if (searchParams.name) url.searchParams.append('name', searchParams.name);
       if (searchParams.groupName) url.searchParams.append('groupName', searchParams.groupName);
 
+      if (CURRENT_GROUP_ID) {
+            url.searchParams.append('groupId', CURRENT_GROUP_ID);
+        }
+
       const response = await fetch(url, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
@@ -2329,8 +2333,32 @@ document.addEventListener('DOMContentLoaded', function () {
       window.open("/share-page", "_blank");
     }
   });
+
+  
 });
 
 function goBack() {
   window.history.back();
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    if (window.location.hash === '#discover-groups-section') {
+        const section = document.getElementById('discover-groups-section');
+
+        if (section) {
+            // Delay so page fully loads
+            setTimeout(() => {
+                section.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+
+                section.classList.add('highlight-discover');
+
+                setTimeout(() => {
+                    section.classList.remove('highlight-discover');
+                }, 2500);
+            }, 300);
+        }
+    }
+});

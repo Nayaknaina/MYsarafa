@@ -46,7 +46,7 @@ exports.Announcement = async (req, res, next) => {
         has_password: !!user.password
       },
       isAdmin,
-      layout: false
+      
     });
   } catch (error) {
     console.error('Error rendering announcements:', error);
@@ -71,13 +71,13 @@ exports.Announcementform = async (req, res, next) => {
       return res.status(403).render('error', { errorMessage: 'Please make your Association first! You are not authorized to create announcements', layout: false });
     }
 
-    res.render("Announcement-form", {
+    res.render("Announcement-form", { 
       user: {
         ...user,
         has_password: !!user.password
       },
     //   groupId,
-      layout: false
+      title:'Sarafa Create Announcement | MySarafa',
     });
   } catch (error) {
     console.error('Error rendering announcement form:', error);
