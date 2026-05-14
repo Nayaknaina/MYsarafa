@@ -886,8 +886,8 @@
             }
 
             try {
-                // const res = await fetch("/auth/forgot-password/verify-otp", {
-                const res = await fetch("http://localhost:5001/auth/forgot-password/verify-otp", {
+                const res = await fetch("/auth/forgot-password/verify-otp", {
+                // const res = await fetch("http://localhost:5001/auth/forgot-password/verify-otp", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ otp, newPassword, purpose: "forgot_password" })
