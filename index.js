@@ -95,7 +95,7 @@ app.get('/help', (req, res) => {
 
 const corsOptions = {
    origin: 'https://mysarafa.com',  
-  //origin: 'http://localhost:5500',
+ 
     credentials: true,
     optionsSuccessStatus: 200
 };
@@ -115,9 +115,9 @@ app.get('/authcheck', cors(corsOptions), (req, res) => {
     res.status(401).json({ loggedIn: false });
   }
 });
-app.get('/', (req, res) => {
-    res.send('Backend Running');
-});
+// app.get('/', (req, res) => {
+//     res.send('Backend Running');
+// });
 
 
 app.all('*', (req, res, next) => {
