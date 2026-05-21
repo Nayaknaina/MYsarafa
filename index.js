@@ -115,6 +115,11 @@ app.get('/authcheck', cors(corsOptions), (req, res) => {
     res.status(401).json({ loggedIn: false });
   }
 });
+app.get('/', (req, res) => {
+    res.send('Backend Running');
+});
+
+
 app.all('*', (req, res, next) => {
     const err = new Error(`Can't find ${req.originalUrl} on this server!`);
     err.statusCode = 404;
