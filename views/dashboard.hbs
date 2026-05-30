@@ -1,4 +1,3 @@
-
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
     .otp-input::-webkit-outer-spin-button,
@@ -60,7 +59,7 @@
         transition: none;
     }
 
-    
+
 
     .grpsearch-input {
         width: 100%;
@@ -121,7 +120,14 @@
     /* Live Rates and Business Preview Styles */
     .live-rates-preview,
     .business-preview {
-        border-left: 4px solid #2a4aa7;
+        /*  border-left: 4px solid #2a4aa7;
+        transition: all 0.3s ease; */
+
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 22px !important;
+        border: 1px solid #edf1f7;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.04);
         transition: all 0.3s ease;
     }
 
@@ -134,21 +140,56 @@
     .business-card {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        justify-content: space-between;
-        min-height: 100px;
+        justify-content: center;
+        min-height: 125px;
+        border-radius: 16px;
+        padding: 18px;
+        position: relative;
+        transition: all 0.3s ease;
+
+        overflow: hidden;
+        isolation: isolate;
     }
 
-    .rate-value {
-        margin: 4px 0;
+    .summary-card {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 16px;
+        overflow: hidden;
+    }
+
+    .summary-content {
+        flex: 1;
     }
 
     .rate-change.up {
-        color: #28a745;
+        color: #16a34a;
     }
 
     .rate-change.down {
-        color: #dc3545;
+        color: #dc2626;
+    }
+
+    .rate-sub-details {
+        margin-top: 12px;
+        font-size: 14px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .rate-sub-details p {
+        margin-bottom: 4px;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    .rate-sub-details .get-value {
+        color: #16a34a;
+    }
+
+    .rate-sub-details .give-value {
+        color: #dc2626;
     }
 
     .business-logo {
@@ -164,8 +205,9 @@
     .action-btn {
         display: inline-flex;
         align-items: center;
-        gap: 4px;
+        gap: 7px;
         transition: all 0.3s ease;
+        white-space: nowrap;
     }
 
     .view-btn:hover,
@@ -191,19 +233,253 @@
         }
     }
 
+    .summary-icon-wrap {
+        width: 80px;
+        height: 80px;
+        min-width: 52px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .summary-icon-wrap img {
+        width: 52px;
+        height: 52px;
+        object-fit: contain;
+    }
+
+    .summary-gold-card .summary-icon-wrap {
+        background: #fff4cc;
+    }
+
+    .summary-silver-card .summary-icon-wrap {
+        background: #f1f5f9;
+    }
+
+    .summary-cash-card .summary-icon-wrap {
+        background: #dcfce7;
+    }
+
+    .summary-card {
+        background: #ffffff;
+        border: 1px solid #edf1f7;
+    }
+
+    .live-rates-preview .gold-card {
+        background: linear-gradient(135deg, #fff7df, #fff3cc);
+        border: 1px solid #f6df9e;
+    }
+
+    .live-rates-preview .silver-card {
+        background: linear-gradient(135deg, #f5f5f5, #ebebeb);
+        border: 1px solid #d8d8d8;
+    }
+
+    .rate-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .rate-top {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .live-rates-preview .rate-item {
+        align-items: flex-start;
+    }
+
+    .rate-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+
+    .rate-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #555;
+        text-transform: uppercase;
+    }
+
+    .rate-value {
+        font-size: 30px;
+        font-weight: 700;
+        color: #111827;
+        margin: 6px 0;
+        position: relative;
+        z-index: 2;
+        line-height: 1.2;
+        word-break: break-word;
+    }
+
+    .rate-change {
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .rate-chart {
+        position: absolute;
+        right: 12px;
+        bottom: 0px;
+        opacity: 1;
+        background: transparent !important;
+        z-index: 1;
+    }
+
+    .rate-chart img {
+        width: 120px;
+        height: auto;
+        object-fit: contain;
+        display: block;
+    }
+
+    @media (max-width:768px) {
+
+        .live-rates-preview .grid {
+            grid-template-columns: 1fr !important;
+        }
+
+        /*   .rate-value {
+            font-size: 24px;
+        } */
+
+        .rate-item {
+            min-height: 160px;
+            padding: 16px;
+        }
+
+        .rate-chart {
+            width: 65px;
+            right: -5px;
+            bottom: -5px;
+            opacity: 0.08;
+        }
+
+        .rate-chart img {
+            width: 75px;
+            opacity: 0.9;
+        }
+
+        .rate-value {
+            font-size: 22px;
+            line-height: 1.2;
+        }
+
+        .live-rates-preview .grid {
+            gap: 14px;
+        }
+
+        .rate-change {
+            font-size: 11px;
+            line-height: 1.4;
+            padding-right: 45px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .rate-sub-details {
+            font-size: 12px;
+            padding-right: 40px;
+        }
+
+        .rate-sub-details p {
+            margin-bottom: 2px;
+        }
+
+        .rate-value {
+            font-size: 22px;
+        }
+    }
+
+    @media (min-width: 769px) and (max-width: 1024px) {
+
+        .rate-chart {
+            width: 65px;
+            right: -5px;
+            bottom: -5px;
+            opacity: 0.08;
+        }
+
+        .rate-chart img {
+            width: 75px;
+            opacity: 0.9;
+        }
+
+        .rate-change {
+            font-size: 13px;
+            line-height: 1.4;
+            padding-right: 70px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .rate-item {
+            overflow: hidden;
+        }
+
+        .rate-chart img {
+            width: 70px;
+        }
+    }
+
     /* Welcome Banner */
     .welcome-banner {
-        background: linear-gradient(to left, #2a4aa7, #2f95ff);
+        /*   background: linear-gradient(to left, #2a4aa7, #2f95ff); */
+        background: linear-gradient(to right, #5d81ed, #2f95ff);
         color: white;
         padding: 24px;
         border-radius: 12px;
         margin-bottom: 30px;
         text-align: center;
+
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 30px;
+    }
+
+    .welcome-left {
+        flex: 1;
+    }
+
+    .welcome-right {
+        flex: 0 0 auto;
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .welcome-right img {
+        width: 320px;
+        max-width: 100%;
+        object-fit: contain;
     }
 
     .welcome-title {
-        font-size: 2rem;
-        margin-bottom: 12px;
+        font-size: 2.5rem;
+        margin-bottom: 14px;
+        line-height: 1.2;
+        font-weight: 700;
+    }
+
+    .welcome-text {
+        color: rgba(255, 255, 255, 0.92);
+        font-weight: 500;
+    }
+
+    .user-name {
+        color: #f6f6f6;
+        font-weight: 500;
     }
 
     .welcome-description {
@@ -215,6 +491,7 @@
         display: flex;
         justify-content: center;
         gap: 12px;
+        flex-wrap: wrap;
     }
 
     .action-btn {
@@ -230,10 +507,179 @@
     .action-btn:hover {
         background: #f0f2f5;
     }
+
+    @media (max-width: 768px) {
+
+        .welcome-banner {
+            flex-direction: column-reverse;
+            text-align: center;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .welcome-left {
+            width: 100%;
+        }
+
+        .welcome-right {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .welcome-right img {
+            width: 220px;
+        }
+
+        .welcome-title {
+            font-size: 1.8rem;
+            line-height: 1.3;
+        }
+
+        .welcome-description {
+            font-size: 14px;
+            line-height: 1.6;
+            padding: 0 5px;
+        }
+
+        .welcome-actions {
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .action-btn {
+            width: auto;
+            min-width: 170px;
+            justify-content: center;
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+
+        .grid-cols-4 {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .live-rates-preview,
+        .business-preview {
+            padding: 12px;
+        }
+
+        .view-btn {
+            background: transparent !important;
+            padding: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+            color: #2563eb !important;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .view-btn i {
+            display: none;
+        }
+    }
+
+    /* Discover community section */
+    #discoverGroupsList,
+    #myGroupsList {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .group-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 14px;
+        position: relative;
+
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    /* TOP SECTION */
+    .group-image {
+        width: 70px;
+        height: 70px;
+        border-radius: 12px;
+        object-fit: cover;
+        flex-shrink: 0;
+    }
+
+    .group-details {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    /* image + title */
+    .group-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 10px;
+    }
+
+    /* description middle me */
+    .group-description {
+        font-size: 13px;
+        color: #6b7280;
+        line-height: 1.5;
+        flex: 1;
+        margin-bottom: 14px;
+    }
+
+    /* buttons bottom me */
+    .join-group-btn,
+    .manage-group-btn,
+    .leave-group-btn,
+    .joined-btn,
+    .pending-btn {
+        align-self: flex-start;
+        margin-top: auto;
+    }
+
+    /* image + title ko same line me */
+    .group-card .group-details::before {
+        content: "";
+    }
+
+    .group-card img.group-image {
+        margin-bottom: 10px;
+    }
+
+    /* dots */
+    .group-actions {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+
+    .see-group-btn {
+        white-space: nowrap;
+    }
+
+    #discoverGroupsList,
+    #myGroupsList {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    /* MOBILE */
+    @media (max-width: 768px) {
+
+        #discoverGroupsList,
+        #myGroupsList {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 
 <body data-user-id="{{user._id}}">
- 
+
     {{> header}}
 
     <div class="main-container">
@@ -241,52 +687,138 @@
         {{> sidebar}}
 
         <!-- Main Content -->
-        
+
         <main class="flex-1 overflow-auto">
             <div class="main-content p-6" style="height: 85vh !important;">
                 {{!-- <h1 class="page-title">Dashboard</h1> --}}
 
                 <!-- Welcome Banner -->
                 <section class="welcome-banner">
-                    <h2 class="welcome-title">Welcome to MySarafa</h2>
-                    <p class="welcome-description">Connect with sarafa communities, stay updated with live gold and silver
-                        rates, list your business for visibility, and manage associations effortlessly.</p>
-                    <div class="welcome-actions">
-                        <a href="/rates/getRates" class="action-btn">View Live Rates</a>
-                        <a href="/businesses/listUP" class="action-btn">List Your Business</a>
-                        <a href="/Groups/community/" class="action-btn">Create Community</a>
+                    <div class="welcome-left">
+                        <h2 class="welcome-title">
+                            <span class="welcome-text">Welcome Back,</span>
+                            <span class="user-name">{{user.f_name}}!</span>
+                        </h2>
+                        <p class="welcome-description">
+                            {{!-- Connect with sarafa communities, stay updated with live gold and
+                            silver
+                            rates, list your business for visibility, and manage associations effortlessly. --}}
+                            Track live market rates, grow your jewellery business, and stay connected with trusted
+                            sarafa communities — all in one seamless platform.
+
+                        </p>
+                        <div class="welcome-actions">
+                            <a href="/rates/getRates" class="action-btn">
+                                <i class="fas fa-chart-line"></i>
+                                <span>View Live Rates</span>
+                            </a>
+                            <a href="/businesses/listUP" class="action-btn">
+                                <i class="fas fa-store"></i>
+                                <span>List Your Business</span>
+                            </a>
+                            <a href="/Groups/community/" class="action-btn">
+                                <i class="fas fa-users"></i>
+                                <span>Create Community</span>
+                            </a>
+                        </div>
                     </div>
+                    <div class="welcome-right">
+                        <img src="/img/mysarafaDashboard_BG.png" alt="Jewellery">
+                    </div>
+
                 </section>
 
                 <!-- Live Rates Preview -->
                 <section class="live-rates-preview bg-white rounded-xl p-4 mb-6 shadow-md">
                     <div class="flex items-center justify-between mb-2">
                         <h2 class="text-lg font-semibold text-gray-800 flex items-center">
-                            <i class="fas fa-chart-line mr-2 text-blue-500"></i> Live Gold & Silver Rates
+                            <i class="fas fa-chart-line mr-2 text-blue-500"></i>
+                            Live Gold & Silver Rates
                         </h2>
                         <a href="/rates/getRates"
                             class="view-btn inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full hover:bg-blue-700 transition-colors">
-                            <i class="fas fa-eye mr-1"></i> View All
+                            <i class="fas fa-eye mr-1"></i>
+                            View All
                         </a>
                     </div>
                     <div class="grid grid-cols-2  gap-3">
                         {{#if goldRate}}
-                        <div class="rate-item bg-gray-50 p-2 rounded-lg text-center hover:bg-gray-100 transition-colors">
-                            <span class="text-xs text-gray-600">Gold (24K/10g)</span>
-                            <p class="rate-value text-lg font-bold text-gray-900">₹{{goldRate.price_gram_24k}}</p>
-                            <span class="rate-change {{goldRate.changes.price}} text-sm">
-                                {{#if_eq goldRate.changes.price 'up'}}
-                                <i class="fas fa-arrow-up mr-1"></i>
-                                {{else}}
-                                <i class="fas fa-arrow-down mr-1"></i>
-                                {{/if_eq}}
-                                {{goldRate.chp}}%
-                            </span>
+                        <div class="rate-item gold-card">
+                            <div class="rate-top">
+                                <div class="rate-icon">
+                                    <i class="fas fa-coins text-yellow-500"></i>
+                                </div>
+
+                                <div>
+                                    <span class="rate-label">Gold 24K</span>
+                                    {{!-- <p class="rate-value">₹{{goldRate.price_gram_24k}} --}}
+                                    <p class="rate-value">₹{{goldRate.mcx_gold}}
+                                        <span style="font-size:14px; font-weight:500;">/gm</span>
+                                    </p>
+
+
+                                    {{!-- <span class="rate-change {{goldRate.changes.price}}"> --}}
+                                        {{!-- <span class="rate-change {{goldRate.goldTrend}}">
+
+
+                                            {{#if_eq goldRate.goldTrend 'up'}}
+                                            Gold rate has increased by
+                                            <span class="text-green-600 font-semibold">₹{{goldRate.gold_ch}}</span>
+
+                                            from yesterday
+                                            {{else}}
+                                            Gold rate has decreased by
+
+                                            <span class="text-red-600 font-semibold">₹{{goldRate.gold_ch}}</span>
+                                            from yesterday
+                                            {{/if_eq}}
+                                        </span> --}}
+
+                                        <span class="rate-change {{goldRate.goldTrend}}">
+
+                                            {{#if_eq goldRate.goldTrend 'up'}}
+
+                                            <i class="fas fa-arrow-up text-green-600"></i>
+                                            Gold rate increased by
+                                            <span class="text-green-600 font-semibold">
+                                                ₹{{goldRate.gold_ch}}
+                                            </span>
+                                            from yesterday
+
+                                            {{else}}
+
+                                            {{#if_eq goldRate.goldTrend 'down'}}
+
+                                            <i class="fas fa-arrow-down text-red-600"></i>
+                                            Gold rate decreased by
+                                            <span class="text-red-600 font-semibold">
+                                                ₹{{goldRate.gold_ch}}
+                                            </span>
+                                            from yesterday
+
+                                            {{else}}
+
+                                            <i class="fas fa-minus text-gray-500"></i>
+                                            Gold rate unchanged from yesterday
+
+                                            {{/if_eq}}
+
+                                            {{/if_eq}}
+
+                                        </span>
+                                </div>
+                            </div>
+
+                            <div class="rate-chart">
+                                <img src="/img/gold_graph.png" alt="">
+                            </div>
                         </div>
                         {{/if}}
                         {{#if silverRate}}
-                        <div class="rate-item bg-gray-50 p-2 rounded-lg text-center hover:bg-gray-100 transition-colors">
-                            <span class="text-xs text-gray-600">Silver (1kg)</span>
+                        <div {{!--
+                            class="rate-item bg-gray-50 p-2 rounded-lg text-center hover:bg-gray-100 transition-colors"
+                            --}} class="rate-item silver-card">
+                            {{!-- <span class="text-xs text-gray-600">Silver (1kg)</span>
                             <p class="rate-value text-lg font-bold text-gray-900">₹{{silverRate.price}}</p>
                             <span class="rate-change {{silverRate.changes.price}} text-sm">
                                 {{#if_eq silverRate.changes.price 'up'}}
@@ -295,86 +827,272 @@
                                 <i class="fas fa-arrow-down mr-1"></i>
                                 {{/if_eq}}
                                 {{silverRate.chp}}%
-                            </span>
+                            </span> --}}
+                            <div class="rate-top">
+                                <div class="rate-icon">
+                                    <i class="fas fa-coins text-gray-400"></i>
+                                </div>
+
+                                <div>
+                                    <span class="rate-label">Silver</span>
+
+                                    {{!-- <p class="rate-value">₹{{silverRate.price}} --}}
+                                    <p class="rate-value">₹{{silverRate.silver}}
+                                        <span style="font-size:14px; font-weight:500;">/gm</span>
+                                    </p>
+
+                                    {{!-- <span class="rate-change {{silverRate.changes.price}}">
+                                        {{#if_eq silverRate.changes.price 'up'}}
+                                        <i class="fas fa-arrow-up"></i>
+                                        {{else}}
+                                        <i class="fas fa-arrow-down"></i>
+                                        {{/if_eq}}
+                                        {{silverRate.chp}}%
+                                    </span> --}}
+                                    {{!-- <span class="rate-change {{silverRate.changes.price}}"> --}}
+                                        {{!-- <span class="rate-change {{silverRate.silverTrend}}">
+
+
+                                            {{#if_eq silverRate.silverTrend 'up'}}
+                                            Silver rate has increased by
+                                            <span class="text-green-600 font-semibold">₹{{silverRate.silver_ch}}</span>
+                                            from yesterday
+                                            {{else}}
+                                            Silver rate has decreased by
+                                            <span class="text-red-600 font-semibold">₹{{silverRate.silver_ch}}</span>
+                                            from yesterday
+                                            {{/if_eq}}
+                                        </span> --}}
+                                        <span class="rate-change {{silverRate.silverTrend}}">
+
+                                            {{#if_eq silverRate.silverTrend 'up'}}
+
+                                            <i class="fas fa-arrow-up text-green-600"></i>
+                                            Silver rate increased by
+                                            <span class="text-green-600 font-semibold">
+                                                ₹{{silverRate.silver_ch}}
+                                            </span>
+                                            from yesterday
+
+                                            {{else}}
+
+                                            {{#if_eq silverRate.silverTrend 'down'}}
+
+                                            <i class="fas fa-arrow-down text-red-600"></i>
+                                            Silver rate decreased by
+                                            <span class="text-red-600 font-semibold">
+                                                ₹{{silverRate.silver_ch}}
+                                            </span>
+                                            from yesterday
+
+                                            {{else}}
+
+                                            <i class="fas fa-minus text-gray-500"></i>
+                                            Silver rate unchanged from yesterday
+
+                                            {{/if_eq}}
+
+                                            {{/if_eq}}
+
+                                        </span>
+                                </div>
+                            </div>
+
+                            <div class="rate-chart">
+                                <img src="/img/silver_graph.png" alt="">
+                            </div>
                         </div>
                         {{/if}}
                     </div>
                 </section>
 
-             
+
                 {{> businessScroller businesses=featuredBusinesses showAddButton=isLeader}}
-                
+
                 <section class="live-rates-preview bg-white rounded-xl p-4 mb-6 shadow-md">
-                <div class="flex items-center justify-between mb-2">
-                    <h2 class="text-lg font-semibold text-gray-800 flex items-center">
-                        <i class="fas fa-wallet mr-2 text-yellow-600"></i> Gold, Silver & Cash Summary
-                    </h2>
-                    <a href="/ledger/trykhatabook?type=customer" class="view-btn inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full hover:bg-blue-700 transition-colors">
-                        <i class="fas fa-eye mr-1"></i> + Add Entry
-                    </a>
-                </div>
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+                            <i class="fas fa-wallet mr-2 text-yellow-600"></i> Gold, Silver & Cash Summary
+                        </h2>
+                        <a href="/ledger/trykhatabook?type=customer"
+                            class="view-btn inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-eye mr-1"></i>
+                            +Add Entry
+                        </a>
+                    </div>
 
-                <div class="grid grid-cols-3 gap-3">
+                    <div class="grid grid-cols-3 gap-3">
 
-                    {{!-- GOLD CARD --}}
-                    <div class="rate-item bg-gray-50 p-3 rounded-lg text-center hover:bg-gray-100 transition-colors">
-                        <span class="text-xs text-gray-600">Gold Total (gram)</span>
+                        {{!-- GOLD CARD --}}
+                        {{!-- <div
+                            class="rate-item bg-gray-50 p-3 rounded-lg text-center hover:bg-gray-100 transition-colors">
+                            <span class="text-xs text-gray-600">Gold Total (gram)</span>
                             <p class="rate-value text-lg font-bold 
                             {{#if (gt totals.totalGold 0)}}text-green-600
                             {{else}}{{#if (lt totals.totalGold 0)}}text-red-600
                             {{else}}text-gray-800{{/if}}{{/if}}">
-                            {{#if (gt totals.totalGold 0)}}+{{/if}}{{totals.totalGold}}
+                                {{#if (gt totals.totalGold 0)}}+{{/if}}{{totals.totalGold}}
                             </p>
 
-                        <div class="mt-3 text-sm">
-                            <p class="text-green-600 font-medium">You Get: {{totals.goldGet}}</p>
-                            <p class="text-red-600 font-medium">You Give: {{totals.goldGive}}</p>
-                        </div>
-                    </div>
+                            <div class="mt-3 text-sm">
+                                <p class="text-green-600 font-medium">You Get: {{totals.goldGet}}</p>
+                                <p class="text-red-600 font-medium">You Give: {{totals.goldGive}}</p>
+                            </div>
+                        </div> --}}
+                        <div class="rate-item summary-card summary-gold-card">
 
-                    {{!-- SILVER CARD --}}
-                    <div class="rate-item bg-gray-50 p-3 rounded-lg text-center hover:bg-gray-100 transition-colors">
-                        <span class="text-xs text-gray-600">Silver Total (gram)</span>
-                        {{!-- <p class="rate-value text-lg font-bold text-gray-900">{{totals.silverTotal}}</p> --}}
+                            <!-- ICON -->
+                            <div class="summary-icon-wrap">
+                                <img src="/img/gold.png" alt="Gold">
+                            </div>
+
+                            <!-- CONTENT -->
+                            <div class="summary-content">
+
+                                <span class="text-xs text-gray-600">
+                                    Gold Total (gram)
+                                </span>
+
+                                <p class="rate-value text-lg font-bold 
+            {{#if (gt totals.totalGold 0)}}text-green-600
+            {{else}}{{#if (lt totals.totalGold 0)}}text-red-600
+            {{else}}text-gray-800{{/if}}{{/if}}">
+
+                                    {{#if (gt totals.totalGold 0)}}+{{/if}}
+                                    {{totals.totalGold}}
+
+                                </p>
+
+                                <div class="mt-2 text-sm">
+                                    <p class="text-green-600 font-medium">
+                                        You Get: {{totals.goldGet}}
+                                    </p>
+
+                                    <p class="text-red-600 font-medium">
+                                        You Give: {{totals.goldGive}}
+                                    </p>
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                        {{!-- SILVER CARD --}}
+                        {{!-- <div
+                            class="rate-item bg-gray-50 p-3 rounded-lg text-center hover:bg-gray-100 transition-colors">
+                            <span class="text-xs text-gray-600">Silver Total (gram)</span>
 
                             <p class="rate-value text-lg font-bold 
                             {{#if (gt totals.totalSilver 0)}}text-green-600
                             {{else}}{{#if (lt totals.totalSilver 0)}}text-red-600
                             {{else}}text-gray-800{{/if}}{{/if}}">
-                            {{#if (gt totals.totalSilver 0)}}+{{/if}}{{totals.totalSilver}}
+                                {{#if (gt totals.totalSilver 0)}}+{{/if}}{{totals.totalSilver}}
                             </p>
 
-                        <div class="mt-3 text-sm">
-                            <p class="text-green-600 font-medium">You Get: {{totals.silverGet}}</p>
-                            <p class="text-red-600 font-medium">You Give: {{totals.silverGive}}</p>
-                        </div>
-                    </div>
+                            <div class="mt-3 text-sm">
+                                <p class="text-green-600 font-medium">You Get: {{totals.silverGet}}</p>
+                                <p class="text-red-600 font-medium">You Give: {{totals.silverGive}}</p>
+                            </div>
+                        </div> --}}
 
-                    {{!-- CASH CARD --}}
-                    <div class="rate-item bg-gray-50 p-3 rounded-lg text-center hover:bg-gray-100 transition-colors">
-                        <span class="text-xs text-gray-600">Cash Total (₹)</span>
-                        {{!-- <p class="rate-value text-lg font-bold text-gray-900">{{totals.cashTotal}}</p> --}}
-                        <p class="rate-value text-lg font-bold 
+                        <div class="rate-item summary-card summary-silver-card">
+                            <!-- ICON -->
+                            <div class="summary-icon-wrap">
+                                <img src="/img/silver.png" alt="Silver">
+                            </div>
+
+                            <!-- CONTENT -->
+                            <div class="summary-content">
+
+                                <span class="text-xs text-gray-600">
+                                    Silver Total (gram)
+                                </span>
+
+                                <p class="rate-value text-lg font-bold 
+            {{#if (gt totals.totalSilver 0)}}text-green-600
+            {{else}}{{#if (lt totals.totalSilver 0)}}text-red-600
+            {{else}}text-gray-800{{/if}}{{/if}}">
+
+                                    {{#if (gt totals.totalSilver 0)}}+{{/if}}
+                                    {{totals.totalSilver}}
+
+                                </p>
+
+                                <div class="mt-2 text-sm">
+                                    <p class="text-green-600 font-medium">
+                                        You Get: {{totals.silverGet}}
+                                    </p>
+
+                                    <p class="text-red-600 font-medium">
+                                        You Give: {{totals.silverGive}}
+                                    </p>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        {{!-- CASH CARD --}}
+                        {{!-- <div
+                            class="rate-item bg-gray-50 p-3 rounded-lg text-center hover:bg-gray-100 transition-colors">
+                            <span class="text-xs text-gray-600">Cash Total (₹)</span>
+                            <p class="rate-value text-lg font-bold 
                             {{#if (gt totals.totalCash 0)}}text-green-600
                             {{else}}{{#if (lt totals.totalCash 0)}}text-red-600
                             {{else}}text-gray-800{{/if}}{{/if}}">
-                            {{#if (gt totals.totalCash 0)}}+{{/if}}{{totals.totalCash}}
+                                {{#if (gt totals.totalCash 0)}}+{{/if}}{{totals.totalCash}}
                             </p>
 
-                        <div class="mt-3 text-sm">
-                            <p class="text-green-600 font-medium">You Get: {{totals.cashGet}}</p>
-                            <p class="text-red-600 font-medium">You Give: {{totals.cashGive}}</p>
-                        </div>
-                    </div>
+                            <div class="mt-3 text-sm">
+                                <p class="text-green-600 font-medium">You Get: {{totals.cashGet}}</p>
+                                <p class="text-red-600 font-medium">You Give: {{totals.cashGive}}</p>
+                            </div>
+                        </div> --}}
 
-                </div>
+                        <div class="rate-item summary-card summary-cash-card">
+
+                            <!-- ICON -->
+                            <div class="summary-icon-wrap">
+                                <img src="/img/wallet.png" alt="Cash">
+                            </div>
+
+                            <!-- CONTENT -->
+                            <div class="summary-content">
+
+                                <span class="text-xs text-gray-600">
+                                    Cash Total (₹)
+                                </span>
+
+                                <p class="rate-value text-lg font-bold 
+            {{#if (gt totals.totalCash 0)}}text-green-600
+            {{else}}{{#if (lt totals.totalCash 0)}}text-red-600
+            {{else}}text-gray-800{{/if}}{{/if}}">
+
+                                    {{#if (gt totals.totalCash 0)}}+{{/if}}
+                                    {{totals.totalCash}}
+
+                                </p>
+
+                                <div class="mt-2 text-sm">
+                                    <p class="text-green-600 font-medium">
+                                        You Get: {{totals.cashGet}}
+                                    </p>
+
+                                    <p class="text-red-600 font-medium">
+                                        You Give: {{totals.cashGive}}
+                                    </p>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
                 </section>
 
                 <!-- Group Discovery and My Groups Section -->
                 <section class="group-discovery-section">
                     <div class="group-discovery-container">
 
-                        <div class="discover-groups" id="discover-groups-section" >
+                        <div class="discover-groups" id="discover-groups-section">
                             <div class="flex justify-between items-center mb-4">
                                 <h2 class="section-title">Discover Community</h2>
                                 <div class="search-container w-1/3">
@@ -385,82 +1103,101 @@
                                 </div>
                             </div>
                             <div id="discoverGroupsList">
-                                <p id="discoverNoResults" style="display: none;">No public communities available to join.
+                                <p id="discoverNoResults" style="display: none;">No public communities available to
+                                    join.
                                 </p>
                                 {{#each discoverGroups}}
-                                <div class="group-card" data-group-name="{{this.g_name}}">
+                                {{!-- <div class="group-card" data-group-name="{{this.g_name}}">
                                     <img src="{{this.g_cover}}" alt="{{this.g_name}} Image" class="group-image">
-                                    <div class="group-details">
-                                        <h3 class="group-title">{{this.g_name}}</h3>
-                                        <p class="group-description">{{this.description}} Join this {{this.g_type}}
-                                            community to connect with others.</p>
-                                        {{#if isJoined}}
-                                        <button class="joined-btn" disabled>Joined</button>
-                                        {{else if isPending}}
-                                        <button class="pending-btn" disabled>Pending</button>
-                                        {{else}}
-                                        <button class="join-group-btn" data-group-id="{{_id}}">Join Community</button>
-                                        {{/if}}
+                                    <div class="group-details"> --}}
+                                        <div class="group-card" data-group-name="{{this.g_name}}">
+
+                                            <div class="group-top">
+                                                <img src="{{this.g_cover}}" alt="{{this.g_name}} Image"
+                                                    class="group-image">
+
+                                                <div class="group-header">
+                                                    <h3 class="group-title">{{this.g_name}}</h3>
+                                                </div>
+                                            </div>
+
+                                            <div class="group-details">
+                                                {{!-- <h3 class="group-title">{{this.g_name}}</h3> --}}
+                                                <p class="group-description">{{this.description}} Join this
+                                                    {{this.g_type}}
+                                                    community to connect with others.</p>
+                                                {{#if isJoined}}
+                                                <button class="joined-btn" disabled>Joined</button>
+                                                {{else if isPending}}
+                                                <button class="pending-btn" disabled>Pending</button>
+                                                {{else}}
+                                                <button class="join-group-btn" data-group-id="{{_id}}">Join
+                                                    Community</button>
+                                                {{/if}}
+                                            </div>
+                                            <div class="group-actions">
+                                                <button class="more-options-btn" aria-label="More options">•••</button>
+                                                <div class="more-options-menu"
+                                                    style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ddd; border-radius: 8px; padding: 8px;">
+                                                    <button class="see-group-btn" data-group-id="{{_id}}">See
+                                                        Group</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {{/each}}
                                     </div>
-                                    <div class="group-actions">
-                                        <button class="more-options-btn" aria-label="More options">•••</button>
-                                        <div class="more-options-menu"
-                                            style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ddd; border-radius: 8px; padding: 8px;">
-                                            <button class="see-group-btn" data-group-id="{{_id}}">See Group</button>
+                                </div>
+
+                                <!-- My Groups (User's own groups) -->
+                                <div class="my-groups">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <h2 class="section-title">My Communities</h2>
+                                        <div class="search-container w-1/3">
+                                            <i class="fas fa-search grpsearch-icon"></i>
+                                            <input type="text" id="myGroupsSearch" class="grpsearch-input"
+                                                placeholder="Search my communities...">
+                                            <div id="myGroupsLoading" class="loading-spinner"></div>
                                         </div>
                                     </div>
-                                </div>
-                                {{/each}}
-                            </div>
-                        </div>
+                                    <div id="myGroupsList">
+                                        <p id="myGroupsNoResults" style="display:none;">You haven't created or joined
+                                            any
+                                            communities yet.</p>
 
-                        <!-- My Groups (User's own groups) -->
-                        <div class="my-groups">
-                            <div class="flex justify-between items-center mb-4">
-                                <h2 class="section-title">My Communities</h2>
-                                <div class="search-container w-1/3">
-                                    <i class="fas fa-search grpsearch-icon"></i>
-                                    <input type="text" id="myGroupsSearch" class="grpsearch-input"
-                                        placeholder="Search my communities...">
-                                    <div id="myGroupsLoading" class="loading-spinner"></div>
-                                </div>
-                            </div>
-                            <div id="myGroupsList">
-                                <p id="myGroupsNoResults" style="display:none;">You haven't created or joined any
-                                    communities yet.</p>
-
-                                {{#each myGroups}}
-                                <div class="group-card">
-                                    <img src="{{this.g_cover}}" alt="{{this.g_name}} Image" class="group-image">
-                                    <div class="group-details">
-                                        <h3 class="group-title">{{this.g_name}}</h3>
-                                        <p class="group-description">Manage your {{this.g_type}} community with
-                                            {{this.total_mem}} members.</p>
-                                        {{!-- <button class="manage-group-btn" data-group-id="{{this._id}}">Manage
-                                            Community</button> --}}
-                                        {{#if (eq this.membershipType "admin")}}
-                                        <button class="manage-group-btn" data-group-id="{{this._id}}">Manage
-                                            Community</button>
-                                        {{else}}
-                                        <button class="leave-group-btn" data-group-id="{{this._id}}">Leave
-                                            Community</button>
-                                        {{/if}}
+                                        {{#each myGroups}}
+                                        <div class="group-card">
+                                            <img src="{{this.g_cover}}" alt="{{this.g_name}} Image" class="group-image">
+                                            <div class="group-details">
+                                                <h3 class="group-title">{{this.g_name}}</h3>
+                                                <p class="group-description">Manage your {{this.g_type}} community with
+                                                    {{this.total_mem}} members.</p>
+                                                {{!-- <button class="manage-group-btn"
+                                                    data-group-id="{{this._id}}">Manage
+                                                    Community</button> --}}
+                                                {{#if (eq this.membershipType "admin")}}
+                                                <button class="manage-group-btn" data-group-id="{{this._id}}">Manage
+                                                    Community</button>
+                                                {{else}}
+                                                <button class="leave-group-btn" data-group-id="{{this._id}}">Leave
+                                                    Community</button>
+                                                {{/if}}
 
 
-                                    </div>
-                                    <div class="group-actions">
-                                        <button class="more-options-btn" aria-label="More options">•••</button>
-                                        <div class="more-options-menu"
-                                            style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ddd; border-radius: 8px; padding: 8px;">
-                                            <button class="see-group-btn" data-group-id="{{_id}}">See Group</button>
+                                            </div>
+                                            <div class="group-actions">
+                                                <button class="more-options-btn" aria-label="More options">•••</button>
+                                                <div class="more-options-menu"
+                                                    style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ddd; border-radius: 8px; padding: 8px;">
+                                                    <button class="see-group-btn" data-group-id="{{_id}}">See
+                                                        Group</button>
+                                                </div>
+                                            </div>
                                         </div>
+
+                                        {{/each}}
                                     </div>
                                 </div>
-
-                                {{/each}}
                             </div>
-                        </div>
-                    </div>
                 </section>
 
 
@@ -493,7 +1230,8 @@
                                         <span>Send OTP</span>
                                     </span>
                                 </button>
-                                <p class="error text-red-600 text-sm text-center" id="mobileError" style="display: none;">
+                                <p class="error text-red-600 text-sm text-center" id="mobileError"
+                                    style="display: none;">
                                 </p>
                                 <div id="otpSection" class="flex justify-center space-x-0 hidden">
                                     <input type="number" class="otp-input" maxlength="1" min="0" max="9" placeholder=""
@@ -548,7 +1286,8 @@
                                         <span>Set Password</span>
                                     </span>
                                 </button>
-                                <p class="error text-red-600 text-sm text-center" id="passwordError" style="display: none;">
+                                <p class="error text-red-600 text-sm text-center" id="passwordError"
+                                    style="display: none;">
                                 </p>
                             </div>
                             {{/unless}}
@@ -584,11 +1323,13 @@
                                         </svg>
                                     </div>
                                     <h2 class="text-2xl font-bold text-red-600 mb-4">Verification Failed!</h2>
-                                    <p class="text-gray-600 mb-6">The code you entered is incorrect. Please try again.</p>
+                                    <p class="text-gray-600 mb-6">The code you entered is incorrect. Please try again.
+                                    </p>
                                 </div>
                                 <div
                                     class="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-dashed border-blue-300 rounded-2xl p-6 mb-6">
-                                    <div class="text-3xl font-bold text-blue-600 letter-spacing-widest" id="modalOtpCode">
+                                    <div class="text-3xl font-bold text-blue-600 letter-spacing-widest"
+                                        id="modalOtpCode">
                                         ------</div>
                                     <p class="text-sm text-gray-500 mt-2">Verification Code</p>
                                 </div>
@@ -604,7 +1345,8 @@
                 </div>
             </div>
             <footer class="main-footer text-center p-4 ">
-                <strong>Copyright © {{ date 'Y' }} <a href = "#" style="color: #2F95FF;!important"> MySarafa </a>.</strong> All rights reserved.
+                <strong>Copyright © {{ date 'Y' }} <a href="#" style="color: #2F95FF;!important"> MySarafa
+                    </a>.</strong> All rights reserved.
             </footer>
         </main>
     </div>
@@ -795,24 +1537,24 @@
             }
         });
     </script>
-    
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Hide loader once the page content is fully loaded
-        const loader = document.getElementById('globalLoader');
-        loader.style.display = 'none';
 
-        // Add click event listeners to all sidebar menu links
-        const sidebarLinks = document.querySelectorAll('.sidebar .menu-item a');
-        sidebarLinks.forEach(link => {
-            link.addEventListener('click', function(e) {
-                // Show loader immediately on click
-                console.log('Link clicked, showing loader...');
-                loader.style.display = 'flex';
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Hide loader once the page content is fully loaded
+            const loader = document.getElementById('globalLoader');
+            loader.style.display = 'none';
+
+            // Add click event listeners to all sidebar menu links
+            const sidebarLinks = document.querySelectorAll('.sidebar .menu-item a');
+            sidebarLinks.forEach(link => {
+                link.addEventListener('click', function (e) {
+                    // Show loader immediately on click
+                    console.log('Link clicked, showing loader...');
+                    loader.style.display = 'flex';
+                });
             });
         });
-    });
-</script>
+    </script>
 
     {{> profile}}
 </body>

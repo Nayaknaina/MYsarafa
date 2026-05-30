@@ -1,4 +1,5 @@
-{{!-- <!DOCTYPE html>
+{{!--
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -106,11 +107,13 @@
     .submit-btn:hover {
         background: #224485;
     }
+
     .action-menu {
-    transition: transform 0.2s ease, opacity 0.2s ease;
-    opacity: 0;
-    pointer-events: none;
+        transition: transform 0.2s ease, opacity 0.2s ease;
+        opacity: 0;
+        pointer-events: none;
     }
+
     .action-menu.scale-y-100 {
         opacity: 1;
         pointer-events: auto;
@@ -124,7 +127,8 @@
     }
 
     .star-rating .star {
-        font-size: 0.6875rem; /* Even smaller for ultra-compact */
+        font-size: 0.6875rem;
+        /* Even smaller for ultra-compact */
         color: #d1d5db;
     }
 
@@ -153,8 +157,9 @@
         }
     }
 </style>
+
 <body>
-    
+
     {{> header}}
 
     <div class="main-container">
@@ -180,12 +185,17 @@
                 <div class="flex-1">
                     <h2 class="text-xl font-semibold text-gray-800 mb-6">Discover Businesses</h2>
                     {{#if discoverBusinesses.length}}
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3" id="discoverBusinessesGrid">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3"
+                        id="discoverBusinessesGrid">
                         {{#each discoverBusinesses}}
-                        <div class="business-card cursor-pointer" onclick="openBusinessDetailsModal('{{_id}}')">
-                            <div class="bg-white rounded-lg shadow-sm overflow-hidden h-full flex flex-col border">
-                                <img src="{{profile_pic}}" alt="{{name}}" class="w-full h-24 object-cover flex-shrink-0">
-                                <div class="p-2 flex-1 flex flex-col justify-between">
+                        {{!-- <div class="business-card cursor-pointer" onclick="openBusinessDetailsModal('{{_id}}')">
+                            <div
+                                class="business-card-inner bg-white rounded-2xl shadow-sm overflow-hidden h-full flex flex-col border">
+                                <img src="{{profile_pic}}" alt="{{name}}" class="business-banner">
+                                <div class="business-initial">
+                                    {{name.[0]}}
+                                </div>
+                                <div class="business-content">
                                     <div class="mb-1">
                                         <h3 class="text-sm font-bold text-gray-900 line-clamp-1">{{name}}</h3>
                                         <p class="text-xs text-gray-600 line-clamp-1">{{description}}</p>
@@ -206,6 +216,41 @@
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                        </div> --}}
+                        <div class="business-card cursor-pointer" onclick="openBusinessDetailsModal('{{_id}}')">
+
+                            <div class="bg-white rounded-lg shadow-sm overflow-hidden h-full flex flex-col border">
+                                <img src="{{profile_pic}}" alt="{{name}}"
+                                    class="w-full h-24 object-cover flex-shrink-0">
+
+
+                                <div class="p-2 flex-1 flex flex-col justify-between">
+
+                                    <h3 class="business-name">
+                                        {{name}}
+                                    </h3>
+
+                                    <p class="business-desc">
+                                        {{description}}
+                                    </p>
+
+                                    <p class="business-meta">
+                                        {{category}}
+                                    </p>
+
+                                    <p class="business-meta">
+                                        {{owner.f_name}} {{owner.l_name}}
+                                    </p>
+
+                                    <button
+                                        class="w-full bg-green-500 text-white px-1 py-1 rounded text-xs hover:bg-green-600 transition text-center"
+                                        onclick="event.stopPropagation(); contactOwner('{{owner._id}}')">
+                                        Visit Profile
+                                    </button>
+
+                                </div>
+
                             </div>
                         </div>
                         {{/each}}
@@ -235,14 +280,18 @@
                                     <i class="fas fa-ellipsis-v text-gray-600"></i>
                                 </button>
 
-                                <div class="action-menu absolute right-0 mt-2 w-32 bg-white rounded-lg shadow-lg border border-gray-200 transform scale-y-0 origin-top transition-transform duration-200 ease-out">
-                                    <button onclick="openBusinessDetailsModal('{{_id}}'); hideAllMenus();" class="block w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50">
+                                <div
+                                    class="action-menu absolute right-0 mt-2 w-32 bg-white rounded-lg shadow-lg border border-gray-200 transform scale-y-0 origin-top transition-transform duration-200 ease-out">
+                                    <button onclick="openBusinessDetailsModal('{{_id}}'); hideAllMenus();"
+                                        class="block w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-blue-50">
                                         <i class="fas fa-eye mr-2"></i> View
                                     </button>
-                                    <button onclick="openEditBusinessModal('{{_id}}'); hideAllMenus();" class="block w-full text-left px-4 py-2 text-sm text-yellow-600 hover:bg-yellow-50">
+                                    <button onclick="openEditBusinessModal('{{_id}}'); hideAllMenus();"
+                                        class="block w-full text-left px-4 py-2 text-sm text-yellow-600 hover:bg-yellow-50">
                                         <i class="fas fa-edit mr-2"></i> Edit
                                     </button>
-                                    <button onclick="deleteBusiness('{{_id}}'); hideAllMenus();" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                    <button onclick="deleteBusiness('{{_id}}'); hideAllMenus();"
+                                        class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
                                         <i class="fas fa-trash mr-2"></i> Delete
                                     </button>
                                 </div>
@@ -426,7 +475,7 @@
                         reviewFormEl.onsubmit = function (e) {
                             e.preventDefault();
                             const formData = new FormData(reviewFormEl);
-                             const rating = formData.get('rating');
+                            const rating = formData.get('rating');
                             if (!rating || isNaN(rating)) {
                                 showNotification('Please select a valid rating before submitting', 'error');
                                 return;
@@ -443,7 +492,7 @@
                                 success: function (response) {
                                     if (response.success) {
                                         showNotification(response.message, 'success');
-                                        openBusinessDetailsModal(businessId); 
+                                        openBusinessDetailsModal(businessId);
                                     } else {
                                         showNotification(response.message || 'Failed to add review', 'error');
                                     }

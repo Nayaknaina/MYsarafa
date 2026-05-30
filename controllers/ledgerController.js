@@ -7,7 +7,7 @@ const fs = require('fs');
 
 exports.createCustomer = async (req, res, next) => {
   try {
-    const { name, mobile_no, email, address,  cust_no,type_of_customer } = req.body;
+    const { name, mobile_no, email, address, cust_no, type_of_customer } = req.body;
 
     if (!name) {
       return res.status(400).json({ success: false, message: 'Name is required' });
@@ -36,7 +36,7 @@ exports.createCustomer = async (req, res, next) => {
       amount_balance: req.body.amount_balance ? Number(req.body.amount_balance) : 0,
       gold_balance: req.body.gold_balance ? Number(req.body.gold_balance) : 0,
       silver_balance: req.body.silver_balance ? Number(req.body.silver_balance) : 0,
-      
+
     };
 
     if (cust_no) payload.cust_no = cust_no;
@@ -76,7 +76,7 @@ exports.listCustomers = async (req, res, next) => {
 exports.renderPage = async (req, res, next) => {
   try {
     // Pass minimal context to the template; layout 'main' used by default
-    return res.render('ledger', { user: req.user, title: 'Udhar Ledger',query: req.query });
+    return res.render('ledger', { user: req.user, title: 'Udhar Ledger', query: req.query });
   } catch (err) {
     next(err);
   }
@@ -121,46 +121,60 @@ exports.renderPage = async (req, res, next) => {
 
 exports.tryKhatabook = async (req, res, next) => {
   try {
-      const user = await User.findById(req.user.id).lean();
-        if (!user) {
-          return res.status(404).render('error', {
-            statusCode: 404,
-            title: 'User Not Found',
-            errorMessage: 'No user found with the provided credentials.',
-            layout: false
-          });
-        }
-      const { id } = req.params;
-      const urlType = req.query.type;
+    const user = await User.findById(req.user.id).lean();
+    if (!user) {
+      return res.status(404).render('error', {
+        statusCode: 404,
+        title: 'User Not Found',
+        errorMessage: 'No user found with the provided credentials.',
+        layout: false
+      });
+    }
+    const { id } = req.params;
+    const urlType = req.query.type;
 
-   
-      let customer = { name: '', cash: 0, gold: 0, silver: 0, entries: [] };
-      if (id) {
-        const found = await LedgerCustomer.findById(id).lean();
-        if (found) {
-          customer = {
-            _id: found._id,
-            name: found.name,
-            mobile_no: found.mobile_no || '',
-            cash: found.amount_balance || 0,
-            gold: found.gold_balance || 0,
-            silver: found.silver_balance || 0,
-            entries: found.entries || []
-          };
-        }
+
+    let customer = { name: '', cash: 0, gold: 0, silver: 0, entries: [] };
+    if (id) {
+      const found = await LedgerCustomer.findById(id).lean();
+      if (found) {
+        customer = {
+          _id: found._id,
+          name: found.name,
+          mobile_no: found.mobile_no || '',
+          cash: found.amount_balance || 0,
+          gold: found.gold_balance || 0,
+          silver: found.silver_balance || 0,
+          entries: found.entries || []
+        };
       }
+    }
 
-    const customers = await LedgerCustomer.find({ 
-      createdBy:user,
-      type: { $in: ['customer', 'supplier'] } 
+    const customers = await LedgerCustomer.find({
+      createdBy: user,
+      type: { $in: ['customer', 'supplier'] }
     })
       .select('name _id mobile_no type amount_balance gold_balance silver_balance entries createdAt ')
       .sort({ name: 1 })
       .lean();
 
+      // customer /supplier ki last entry time fetch krna h
+
+    for (let customer of customers) {
+
+      const lastTx = await LedgerTx.findOne({
+        customer: customer._id
+      })
+        .sort({ date: -1 })
+        .select('date')
+        .lean();
+
+      customer.lastTransactionTime = lastTx ? lastTx.date : customer.createdAt;
+    }
+
     const totals = await LedgerCustomer.aggregate([
       // { $match: { type: { $in: ['customer', 'supplier'] } } },
-       { $match: { createdBy: user._id } },
+      { $match: { createdBy: user._id } },
       {
         $group: {
           _id: null,
@@ -170,18 +184,18 @@ exports.tryKhatabook = async (req, res, next) => {
         }
       }
     ]);
-    console.log("totals",totals);
+    console.log("totals", totals);
     const { totalCash = 0, totalGold = 0, totalSilver = 0 } = totals[0] || {};
 
     res.render('trykhata', {
       user,
-      title:'Khatabook | MySarafa', 
+      title: 'Khatabook | MySarafa',
       customers,
       totalCash,
       totalGold,
       totalSilver,
       customer,
-      urlType:urlType || 'customer'
+      urlType: urlType || 'customer'
     });
   } catch (err) {
     console.error(err);
@@ -192,15 +206,15 @@ exports.tryKhatabook = async (req, res, next) => {
 // Create a new transaction (udhar list row)
 exports.createTransaction = async (req, res, next) => {
   const user = await User.findById(req.user.id).lean();
-        if (!user) {
-          return res.status(404).render('error', {
-            statusCode: 404,
-            title: 'User Not Found',
-            errorMessage: 'No user found with the provided credentials.',
-            layout: false
-          });
-        }
- try {
+  if (!user) {
+    return res.status(404).render('error', {
+      statusCode: 404,
+      title: 'User Not Found',
+      errorMessage: 'No user found with the provided credentials.',
+      layout: false
+    });
+  }
+  try {
     const { customerId, type, amount, transactionType } = req.body;
 
     // Validate
@@ -252,7 +266,7 @@ exports.createTransaction = async (req, res, next) => {
 
     // Save customer
     await customer.save();
-    console.log("customer came",customer);
+    console.log("customer came", customer);
 
     // Optional: Save to LedgerTx (for audit log)
     const tx = new LedgerTx({
@@ -285,20 +299,20 @@ exports.createTransaction = async (req, res, next) => {
       createdBy: req.user?._id
     });
     await tx.save();
-    console.log("transaction came",tx);// Calculate totals for this user
-  const userTotals = await LedgerCustomer.aggregate([
-  { $match: { createdBy: req.user._id } },
-  {
-    $group: {
-      _id: null,
-      totalCash: { $sum: "$amount_balance" },
-      totalGold: { $sum: "$gold_balance" },
-      totalSilver: { $sum: "$silver_balance" }
-    }
-  }
-]);
+    console.log("transaction came", tx);// Calculate totals for this user
+    const userTotals = await LedgerCustomer.aggregate([
+      { $match: { createdBy: req.user._id } },
+      {
+        $group: {
+          _id: null,
+          totalCash: { $sum: "$amount_balance" },
+          totalGold: { $sum: "$gold_balance" },
+          totalSilver: { $sum: "$silver_balance" }
+        }
+      }
+    ]);
 
-const totals = userTotals[0] || { totalCash: 0, totalGold: 0, totalSilver: 0 };
+    const totals = userTotals[0] || { totalCash: 0, totalGold: 0, totalSilver: 0 };
 
 
 
@@ -331,12 +345,12 @@ const totals = userTotals[0] || { totalCash: 0, totalGold: 0, totalSilver: 0 };
 exports.listTransactions = async (req, res, next) => {
   try {
     const { startDate, endDate, customer } = req.query;
-    console.log("quwery got cleared",req.query)
+    console.log("quwery got cleared", req.query)
 
     const filter = {
-      createdBy: req.user._id   
+      createdBy: req.user._id
     };
-    console.log("1",filter)
+    console.log("1", filter)
 
     if (customer) {
       // Optional: extra safety - verify the customer belongs to this user
@@ -344,7 +358,7 @@ exports.listTransactions = async (req, res, next) => {
         _id: customer,
         createdBy: req.user._id
       });
-      console.log("2",customerDoc)
+      console.log("2", customerDoc)
       if (!customerDoc && customer) {
         return res.json({ success: true, data: [] }); // or 403
       }
@@ -373,14 +387,14 @@ exports.listTransactions = async (req, res, next) => {
 exports.bulkupload = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).lean();
-        if (!user) {
-          return res.status(404).render('error', {
-            statusCode: 404,
-            title: 'User Not Found',
-            errorMessage: 'No user found with the provided credentials.',
-            layout: false
-          });
-        }
+    if (!user) {
+      return res.status(404).render('error', {
+        statusCode: 404,
+        title: 'User Not Found',
+        errorMessage: 'No user found with the provided credentials.',
+        layout: false
+      });
+    }
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
@@ -403,9 +417,9 @@ exports.bulkupload = async (req, res) => {
         continue;
       }
 
-    
+
       let rawType = (row.Type || row.type || row.TYPE || row.Category || '').toString().trim();
-      let type = 'customer'; 
+      let type = 'customer';
 
       if (rawType) {
         rawType = rawType.toLowerCase();
@@ -414,7 +428,7 @@ exports.bulkupload = async (req, res) => {
         } else if (['customer', 'cust', 'c', 'client', 'party'].includes(rawType)) {
           type = 'customer';
         }
-       
+
       }
 
       try {
@@ -423,8 +437,8 @@ exports.bulkupload = async (req, res) => {
           mobile_no: (row.Mobile || row.mobile_no || row.Phone || '').toString().trim(),
           email: (row.Email || row.email || '').toString().trim(),
           address: (row.Address || row.address || '').toString().trim(),
-          type: type  ,
-          createdBy:user._id
+          type: type,
+          createdBy: user._id
         });
         added.push(cust);
       } catch (e) {
@@ -432,7 +446,7 @@ exports.bulkupload = async (req, res) => {
       }
     }
 
-    fs.unlink(filePath, () => {});
+    fs.unlink(filePath, () => { });
 
     return res.json({
       success: true,

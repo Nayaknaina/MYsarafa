@@ -20,15 +20,59 @@
         <div id="businessScroller" class="scroller  overflow-x-auto space-x-4 pb-4 snap-x snap-mandatory">
             {{#each businesses}}
             <div class="business-scroll-card">
-                <img src="{{profile_pic}}" alt="{{name}}" class="w-full h-40 object-cover rounded-t-lg">
+                <div class="card-image-wrapper">
+                    <img src="{{profile_pic}}" alt="{{name}}" class="w-full h-40 object-cover rounded-t-md">
+                    <div class="business-initial-badge" data-name="{{name}}">
+                    </div>
+                </div>
                 <div class="card-content">
                     <h3 class="font-bold text-base mb-2">{{name}}</h3>
                     <p class="description text-sm text-gray-600 mb-3">{{truncate description 60}}</p>
-                    <p class="meta text-xs text-gray-500 mb-3">{{category}} • {{location}}</p>
-                    <a href="/businesses/{{_id}}" class="view-link">View Details →</a>
+                    <p class="meta text-xs text-gray-500 mb-3">
+                        <span class="category-pill">{{category}}</span>
+                        <span class="location-text">
+                            {{#if location}}
+                            <span class="location-text">
+                                <i class="fas fa-map-marker-alt"></i>
+                                {{location}}
+                            </span>
+                            {{/if}}
+                        </span>
+                    </p>
+                    <a href="/businesses/{{_id}}" class="view-link">
+                        Visit Profile
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
                 </div>
             </div>
             {{/each}}
         </div>
     </div>
 </section>
+
+<script>
+    document.querySelectorAll('.business-initial-badge').forEach((badge) => {
+
+    const name = badge.dataset.name?.trim() || '';
+
+    if (!name) {
+        badge.innerHTML = '<i class="fas fa-store"></i>';
+        return;
+    }
+
+    // Split words and remove &, empty values
+    const words = name
+        .split(' ')
+        .filter(word => word && word !== '&');
+
+    let initials = '';
+
+    if (words.length === 1) {
+        initials = words[0][0];
+    } else {
+        initials = words[0][0] + words[1][0];
+    }
+
+    badge.textContent = initials.toUpperCase();
+});
+</script>

@@ -24,8 +24,15 @@ exports.dashboard = async (req, res, next) => {
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
-    const goldRate = await RateHistory.findOne({ metal: 'XAU', currency: 'INR' }).sort({ createdAt: -1 }).lean();
-    const silverRate = await RateHistory.findOne({ metal: 'XAG', currency: 'INR' }).sort({ createdAt: -1 }).lean();
+    // const goldRate = await RateHistory.findOne({ metal: 'XAU', currency: 'INR' }).sort({ createdAt: -1 }).lean();
+    // const silverRate = await RateHistory.findOne({ metal: 'XAG', currency: 'INR' }).sort({ createdAt: -1 }).lean();
+    const latestRate = await RateHistory
+    .findOne({ currency: 'INR' })
+    .sort({ createdAt: -1 })
+    .lean();
+console.log("latestRate:",latestRate);
+const goldRate = latestRate;
+const silverRate = latestRate;
     
     const memberships = await Gmem.find({ user: user._id })
       .populate({
