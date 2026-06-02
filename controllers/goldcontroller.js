@@ -279,7 +279,7 @@ exports.fetchMetalRates = async () => {
 
 const cron = require('node-cron');
 
-cron.schedule('* * * * *', () => {
+cron.schedule('0 0 * * *', () => {
     console.log('⏰ Cron running daily at 12 Am');
     // exports.fetchAndStoreRates();
     exports.fetchMetalRates();
