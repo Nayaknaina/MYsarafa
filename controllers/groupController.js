@@ -39,7 +39,7 @@ exports.communityCreation = async (req, res, next) => {
                 return res.status(400).json({ success: false, message: 'Invalid group ID' });
             }
 
-         
+
             group = await Group.findOne({ _id: groupId, user: req.user.id }).lean();
             if (!group) {
                 return res.status(404).json({ success: false, message: 'Group not found or you do not have permission to edit it' });
@@ -59,7 +59,7 @@ exports.communityCreation = async (req, res, next) => {
                 group.qr_code_url = getSignedUrl(group.qr_code);
             }
         }
-         const groupsData = await GMem.find({ user: req.user.id })
+        const groupsData = await GMem.find({ user: req.user.id })
             .populate('group', '_id g_name g_type g_cover description total_mem is_kyc_req')
             .lean();
 
@@ -88,8 +88,8 @@ exports.groupMemberPage = async (req, res) => {
     try {
         console.log("we are in a group members page ");
         const user = await User.findById(req.user.id).lean();
-          const groupId = req.params.groupId;
-         let group = null;
+        const groupId = req.params.groupId;
+        let group = null;
         let questions = [];
         if (groupId) {
             // Validate groupId
@@ -97,17 +97,17 @@ exports.groupMemberPage = async (req, res) => {
                 return res.status(400).json({ success: false, message: 'Invalid group ID' });
             }
 
-         
+
             group = await Group.findOne({ _id: groupId, user: req.user.id }).lean();
             if (!group) {
                 return res.status(404).json({ success: false, message: 'Group not found or you do not have permission to edit it' });
             }
-           console.log("Group found:", group);
+            console.log("Group found:", group);
         }
         res.render("grpMembers", {
             user,
             group,
-            title:'Sarafa Members | MySarafa',
+            title: 'Sarafa Members | MySarafa',
             layout: 'main'
         });
     } catch (error) {
@@ -150,12 +150,12 @@ exports.createGroup = async (req, res) => {
             // coverPhoto = `/uploads/${Date.now()}_${file.name}`;
             // await file.mv(`./public${coverPhoto}`);
             // coverPhoto = `/uploads/coverImage/${req.files.coverImage[0].filename}`;
-              coverPhoto = req.files.coverImage[0].key;
-            
+            coverPhoto = req.files.coverImage[0].key;
+
         }
         if (req.files && req.files.qrCode) {
             // qrCode = `/uploads/qrCode/${req.files.qrCode[0].filename}`;
-              qrCode = req.files.qrCode[0].key; 
+            qrCode = req.files.qrCode[0].key;
         }
 
         const group = new Group({
@@ -219,8 +219,8 @@ exports.createGroup = async (req, res) => {
                 id: group._id,
                 name: group.g_name,
                 type: group.g_type,
-                  cover: coverPhoto ? getSignedUrl(coverPhoto) : '/assets/images/demo.jpg',
-                    qr_code: qrCode ? getSignedUrl(qrCode) : '/assets/images/default-qr.jpg',
+                cover: coverPhoto ? getSignedUrl(coverPhoto) : '/assets/images/demo.jpg',
+                qr_code: qrCode ? getSignedUrl(qrCode) : '/assets/images/default-qr.jpg',
                 kycRequired: group.is_kyc_req,
                 description: description || '',
                 amount: group.amount,
@@ -279,10 +279,10 @@ exports.updateGroup = async (req, res) => {
         //     await file.mv(`./public${coverPhoto}`);
         // }
 
-      let coverPhoto = group.g_cover;
+        let coverPhoto = group.g_cover;
         if (req.files && req.files.coverImage) {
             coverPhoto = req.files.coverImage[0].key;
-        
+
             if (group.g_cover) {
                 try {
                     await s3.deleteObject({
@@ -297,7 +297,7 @@ exports.updateGroup = async (req, res) => {
         let qrCode = group.qr_code;
         if (req.files && req.files.qrCode) {
             qrCode = req.files.qrCode[0].key;
-            
+
             if (group.qr_code) {
                 try {
                     await s3.deleteObject({
@@ -346,8 +346,8 @@ exports.updateGroup = async (req, res) => {
                 id: group._id,
                 name: group.g_name,
                 type: group.g_type,
-                 cover: coverPhoto ? getSignedUrl(coverPhoto) : '/assets/images/demo.jpg',
-                 qr_code: qrCode ? getSignedUrl(qrCode) : '/assets/images/default-qr.jpg',
+                cover: coverPhoto ? getSignedUrl(coverPhoto) : '/assets/images/demo.jpg',
+                qr_code: qrCode ? getSignedUrl(qrCode) : '/assets/images/default-qr.jpg',
                 description: group.description,
                 amount: group.amount,
                 amount_description: group.amount_description,
@@ -604,92 +604,92 @@ exports.joinGroup = async (req, res) => {
 };
 
 exports.groupDetails = async (req, res) => {
-  try {
-    const groupId = req.params.groupId;
-    const user = await User.findById(req.user.id).lean();
+    try {
+        const groupId = req.params.groupId;
+        const user = await User.findById(req.user.id).lean();
 
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
 
-    if (!mongoose.isValidObjectId(groupId)) {
-      return res.status(400).json({ success: false, message: 'Invalid group ID' });
-    }
+        if (!mongoose.isValidObjectId(groupId)) {
+            return res.status(400).json({ success: false, message: 'Invalid group ID' });
+        }
 
-    const group = await Group.findById(groupId).lean();
-    if (!group) {
-      return res.status(404).json({ success: false, message: 'Group not found' });
-    }
-
-   
-    const membership = await GMem.findOne({ group: groupId, user: user._id }).lean();
-    if (group.g_type === 'private' && (!membership || membership.type === 'pending')) {
-      return res.status(403).json({ success: false, message: 'You do not have access to this private group' });
-    }
-    let members = await GMem.find({ group: groupId, type: { $ne: 'pending' } })
-      .populate('user', 'name email mobile profile_pic') // Assuming User model has these fields
-      .lean();
-
-    members = members.map(m => ({
-      ...m,
-      user: {
-        ...m.user,
-        profile_pic: m.user.profile_pic ? getSignedUrl(m.user.profile_pic) : '/assets/images/default-profile.jpg'
-      }
-    }));
+        const group = await Group.findById(groupId).lean();
+        if (!group) {
+            return res.status(404).json({ success: false, message: 'Group not found' });
+        }
 
 
-   let announcements = await Announcement.find({ group: groupId })
-    .sort({ createdAt: -1 })
-    .populate('createdBy', 'f_name l_name profilePicture')
-    .lean();
+        const membership = await GMem.findOne({ group: groupId, user: user._id }).lean();
+        if (group.g_type === 'private' && (!membership || membership.type === 'pending')) {
+            return res.status(403).json({ success: false, message: 'You do not have access to this private group' });
+        }
+        let members = await GMem.find({ group: groupId, type: { $ne: 'pending' } })
+            .populate('user', 'name email mobile profile_pic') // Assuming User model has these fields
+            .lean();
 
-  announcements = announcements.map(a => {
-  const fullName = `${a.createdBy.f_name || ''} ${a.createdBy.l_name || ''}`.trim() || 'Unknown User';
+        members = members.map(m => ({
+            ...m,
+            user: {
+                ...m.user,
+                profile_pic: m.user.profile_pic ? getSignedUrl(m.user.profile_pic) : '/assets/images/default-profile.jpg'
+            }
+        }));
 
-  return {
-    ...a,
-    createdBy: {
-      ...a.createdBy,
-      full_name: fullName,
-      profile_pic: (a.createdBy.profilePicture && !a.createdBy.profilePicture.startsWith('/assets/'))
-        ? getSignedUrl(a.createdBy.profilePicture)
-        : '/assets/images/default-profile.jpg'
-    },
-    image: (a.image && !a.image.startsWith('/assets/') && !a.image.startsWith('/uploads/'))
-      ? getSignedUrl(a.image)
-      : a.image || '/assets/images/demo.jpg'
-     };
-    });
-    console.log("Fetched announcements:", announcements);
-    
+
+        let announcements = await Announcement.find({ group: groupId })
+            .sort({ createdAt: -1 })
+            .populate('createdBy', 'f_name l_name profilePicture')
+            .lean();
+
+        announcements = announcements.map(a => {
+            const fullName = `${a.createdBy.f_name || ''} ${a.createdBy.l_name || ''}`.trim() || 'Unknown User';
+
+            return {
+                ...a,
+                createdBy: {
+                    ...a.createdBy,
+                    full_name: fullName,
+                    profile_pic: (a.createdBy.profilePicture && !a.createdBy.profilePicture.startsWith('/assets/'))
+                        ? getSignedUrl(a.createdBy.profilePicture)
+                        : '/assets/images/default-profile.jpg'
+                },
+                image: (a.image && !a.image.startsWith('/assets/') && !a.image.startsWith('/uploads/'))
+                    ? getSignedUrl(a.image)
+                    : a.image || '/assets/images/demo.jpg'
+            };
+        });
+        console.log("Fetched announcements:", announcements);
+
 
         if (group.g_cover && !group.g_cover.startsWith('/assets/')) {
-        group.g_cover = getSignedUrl(group.g_cover);
+            group.g_cover = getSignedUrl(group.g_cover);
         } else {
-        group.g_cover = '/assets/images/demo.jpg';
+            group.g_cover = '/assets/images/demo.jpg';
         }
 
         if (group.qr_code && !group.qr_code.startsWith('/assets/')) {
-        group.qr_code = getSignedUrl(group.qr_code);
+            group.qr_code = getSignedUrl(group.qr_code);
         } else {
-        group.qr_code = '/assets/images/default-qr.jpg';
+            group.qr_code = '/assets/images/default-qr.jpg';
         }
 
-    res.render('group-info', {
-      user,
-      group,
-      members,
-      announcements,
-      hasAnnouncements: announcements.length > 0,
-      isMember: !!membership,
-      isAdmin: membership && membership.type === 'admin',
-      layout: false
-    });
-  } catch (error) {
-    console.error('Error rendering group details:', error);
-    res.status(500).json({ success: false, message: 'Server error: ' + error.message });
-  }
+        res.render('group-info', {
+            user,
+            group,
+            members,
+            announcements,
+            hasAnnouncements: announcements.length > 0,
+            isMember: !!membership,
+            isAdmin: membership && membership.type === 'admin',
+            layout: false
+        });
+    } catch (error) {
+        console.error('Error rendering group details:', error);
+        res.status(500).json({ success: false, message: 'Server error: ' + error.message });
+    }
 };
 
 
@@ -828,7 +828,7 @@ exports.getGroups = async (req, res) => {
 };
 
 exports.getMyGroups = async (req, res) => {
-   try {
+    try {
         const groups = await GMem.find({ user: req.user.id })
             .populate('group', 'g_name g_type g_cover description total_mem is_kyc_req')
             .lean();
@@ -979,6 +979,7 @@ exports.addGroupMember = async (req, res) => {
 
 exports.getGroupMembers = async (req, res) => {
     try {
+        console.log("exports.getGroupMembers = async (req, res) => {");
         const members = await GMem.find()
             .populate('user', 'f_name l_name mobile_no  blacklistStatus blacklistReason ')
             .populate('group', 'g_name')
@@ -1009,6 +1010,7 @@ exports.getGroupMembers = async (req, res) => {
 
 exports.searchGroupMembers = async (req, res) => {
     try {
+        console.log("exports.searchGroupMembers ");
         const { name, groupName, email, groupId } = req.query;
 
 
@@ -1021,7 +1023,7 @@ exports.searchGroupMembers = async (req, res) => {
 
 
         // const query = { group: { $in: groupIds } };
-// ALWAYS get only groups owned by current user
+        // ALWAYS get only groups owned by current user
         const ownedGroups = await Group.find({ user: req.user._id }).select('_id g_name').lean();
         const ownedGroupIds = ownedGroups.map(g => g._id);
 
@@ -1089,13 +1091,13 @@ exports.searchGroupMembers = async (req, res) => {
             blacklistReason: member.user.blacklistReason || '',
             invitationToken: member.user.invitationToken
         }));
-                let existing = await User.findOne({ email:req.user.email  });
-                const isExistingUser = !!existing;
+        let existing = await User.findOne({ email: req.user.email });
+        const isExistingUser = !!existing;
 
 
-        
+
         console.log('Formatted members:', formattedMembers);
-        res.status(200).json({ success: true, members: formattedMembers,isExistingUser });
+        res.status(200).json({ success: true, members: formattedMembers, isExistingUser });
     } catch (error) {
         console.error('Error searching group members:', error);
         res.status(500).json({ success: false, message: 'Error searching members' });
@@ -1349,13 +1351,13 @@ exports.searchDiscoverGroups = async (req, res) => {
                 // $score: {
                 //   $meta: 'textScore'
                 // },
-                
+
                 createdAt: -1
             })
             .limit(4)
             .lean();
 
-       const formattedGroups = groups.map(g => ({
+        const formattedGroups = groups.map(g => ({
             _id: g._id,
             g_name: g.g_name,
             g_cover: g.g_cover ? getSignedUrl(g.g_cover) : '/assets/images/demo.jpg',
@@ -1390,7 +1392,7 @@ exports.searchMyGroups = async (req, res) => {
             })
             .lean();
 
-      const groups = memberships
+        const groups = memberships
             .filter(m => m.group)
             .map(m => ({
                 _id: m.group._id,
@@ -1439,7 +1441,7 @@ exports.searchAllGroups = async (req, res) => {
             .lean();
 
         let myGroups = myMemberships
-            .filter(m => m.group && (!query || jsRegex.test(m.group.g_name))) 
+            .filter(m => m.group && (!query || jsRegex.test(m.group.g_name)))
             .map(m => ({
                 _id: m.group._id,
                 g_name: m.group.g_name,
@@ -1452,9 +1454,9 @@ exports.searchAllGroups = async (req, res) => {
             }));
 
         // 2. Discover Groups
-        const joinedIds = myMemberships 
-                    .filter(m => m.group)        
-                    .map(m => m.group._id.toString());
+        const joinedIds = myMemberships
+            .filter(m => m.group)
+            .map(m => m.group._id.toString());
 
         const discoverQuery = {
             g_type: { $in: ['public', 'private'] },
@@ -1500,7 +1502,7 @@ exports.leaveGroup = async (req, res) => {
         const userId = req.user.id;
         const { groupId } = req.params;
 
-    
+
         const membership = await GMem.findOne({ user: userId, group: groupId });
         if (!membership) {
             return res.status(404).json({ success: false, message: 'Membership not found' });

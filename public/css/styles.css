@@ -2977,7 +2977,7 @@ main {
   margin-bottom: 20px;
 }
 
-.group-card {
+/* .group-card {
   display: flex;
   gap: 15px;
   margin-bottom: 20px;
@@ -2985,6 +2985,32 @@ main {
   border-radius: 8px;
   padding: 15px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+} */
+/* Facebook Style Admin Cards */
+
+.group-card {
+  display: block !important;
+  padding: 0 !important;
+  margin-bottom: 0 !important;
+  background: #fff !important;
+  border-radius: 18px !important;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.group-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .12);
+}
+
+.group-card h3 {
+  color: #111827 !important;
+  font-weight: 600;
+}
+
+.group-card h3::after {
+  display: none !important;
 }
 
 .group-image {

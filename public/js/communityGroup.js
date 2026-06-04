@@ -90,13 +90,13 @@ document.addEventListener('DOMContentLoaded', function () {
             const groupId = groupIdInput.value;
             console.log(groupId);
             const url = groupId ? `/Groups/update/${groupId}` : `/Groups/create`;
-            console.log("url",url)
+            console.log("url", url)
             try {
                 const response = await fetch(url, {
                     method: groupId ? 'PUT' : 'POST',
                     body: formData,
                     credentials: 'include',
-                      headers: {
+                    headers: {
                         "Accept": "application/json"
                     }
                 });
@@ -112,17 +112,22 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                     // Show success notification
-                  showNotification(groupId ? 'Group updated successfully!' : 'Group created successfully!', 'success');
+                    showNotification(groupId ? 'Group updated successfully!' : 'Group created successfully!', 'success');
+                    if (!groupId) {
+                        setTimeout(() => {
+                            window.location.href = "/user-app/association-sample";
+                        }, 1500);
+                    }
 
                     // // Reset form
                     if (!groupId) {
-                    groupCreateForm.reset(); 
-                    coverImagePreview.src = '/assets/images/demo.jpg'; 
-                    groupNamePreview.textContent = '';
-                    groupPrivacyPreview.textContent = '';
-                    groupDescriptionPreview.textContent = 'Community description will appear here...';
-                      }
-                    
+                        groupCreateForm.reset();
+                        coverImagePreview.src = '/assets/images/demo.jpg';
+                        groupNamePreview.textContent = '';
+                        groupPrivacyPreview.textContent = '';
+                        groupDescriptionPreview.textContent = 'Community description will appear here...';
+                    }
+
                 } else {
                     formError.textContent = result.message || 'Failed to create group';
                     formError.style.display = 'block';
@@ -184,7 +189,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     // New Modal and Question Handling Logic
-  
+
 
     // Show/hide options section based on question type
     function updateOptionsSection() {
@@ -223,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const type = this.value ? this.value.charAt(0).toUpperCase() + this.value.slice(1) : 'Community privacy';
             groupPrivacyPreview.textContent = `${type} · 1 member`;
             if (this.value === 'private') {
-                  //console.log("[communityTypeSelect] Showing privacyModal");
+                //console.log("[communityTypeSelect] Showing privacyModal");
                 //privacyModal.style.display = 'flex';
             }
         });
@@ -301,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Handle question form submission
     if (questionForm) {
-      questionForm.addEventListener('submit', function (e) {
+        questionForm.addEventListener('submit', function (e) {
             e.preventDefault();
             console.log("[questionForm] Submitting question form");
             const question = {
@@ -333,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Update questions display
     function updateQuestionsDisplay() {
-       //  console.log("[updateQuestionsDisplay] Editing question at index =", idx, questions[idx]);
+        //  console.log("[updateQuestionsDisplay] Editing question at index =", idx, questions[idx]);
         const questionsList = document.getElementById('questionsList');
         questionsList.innerHTML = '';
         questions.forEach((q, index) => {
@@ -389,32 +394,32 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 document.querySelector('.dlt-community')?.addEventListener('click', async () => {
-  const groupId = document.getElementById('groupId').value;
+    const groupId = document.getElementById('groupId').value;
 
-  if(!groupId){
-    toastr.info("No community to delete");
-    return;
-  }
-
-  if (!confirm("Are you sure you want to delete this community? This cannot be undone.")) {
-    return;
-  }
-
-  try {
-    const response = await fetch(`/Groups/group/${groupId}`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' }
-    });
-
-    const result = await response.json();
-    if (result.success) {
-      toastr.info("Community deleted successfully!");
-      window.location.href = "/user-app/dashboard"; // redirect after deletion
-    } else {
-      toastr.error(result.message || "Failed to delete community.");
+    if (!groupId) {
+        toastr.info("No community to delete");
+        return;
     }
-  } catch (error) {
-    console.error("Error deleting community:", error);
-    toastr.error("An error occurred while deleting the community.");
-  }
+
+    if (!confirm("Are you sure you want to delete this community? This cannot be undone.")) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/Groups/group/${groupId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            toastr.info("Community deleted successfully!");
+            window.location.href = "/user-app/dashboard"; // redirect after deletion
+        } else {
+            toastr.error(result.message || "Failed to delete community.");
+        }
+    } catch (error) {
+        console.error("Error deleting community:", error);
+        toastr.error("An error occurred while deleting the community.");
+    }
 });

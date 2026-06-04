@@ -1,4 +1,3 @@
-
 <script src="https://cdn.tailwindcss.com"></script>
 
 
@@ -11,233 +10,493 @@
         {{> sidebar}}
 
         <main class="main-content">
-              {{#if pendingGroup}}
-                <div id="duePaymentModal" class="modal-overlay" style="display: flex;">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <span style="font-size: 18px; font-weight: 600;">Payment Due</span>
-                            <button class="modal-close-btn" id="closeDuePaymentModal">&times;</button>
-                        </div>
-                        <div class="modal-body">
-                            <p style="font-size: 15px; color: #333; margin-bottom: 18px;">
-                                Pay your pending payment.<br>
-                                Your <strong>{{pendingGroup.g_name}}</strong> payment of
-                                <strong>₹{{pendingGroup.amount}}</strong> is due.
-                            </p> 
-                            <div style="display: flex; gap: 10px;">
-                                <button id="payNowBtn" data-group-id="{{pendingGroup._id}}"
-                                    style="flex: 1; background: #2f95ff; color: #fff; border: none; border-radius: 8px; padding: 10px 0; font-size: 15px; font-weight: 500; cursor: pointer;"
-                                    class="pay-now-btn">Pay Now</button>
-                            </div>
+            {{#if pendingGroup}}
+            <div id="duePaymentModal" class="modal-overlay" style="display: flex;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span style="font-size: 18px; font-weight: 600;">Payment Due</span>
+                        <button class="modal-close-btn" id="closeDuePaymentModal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p style="font-size: 15px; color: #333; margin-bottom: 18px;">
+                            Pay your pending payment.<br>
+                            Your <strong>{{pendingGroup.g_name}}</strong> payment of
+                            <strong>₹{{pendingGroup.amount}}</strong> is due.
+                        </p>
+                        <div style="display: flex; gap: 10px;">
+                            <button id="payNowBtn" data-group-id="{{pendingGroup._id}}"
+                                style="flex: 1; background: #2f95ff; color: #fff; border: none; border-radius: 8px; padding: 10px 0; font-size: 15px; font-weight: 500; cursor: pointer;"
+                                class="pay-now-btn">Pay Now</button>
                         </div>
                     </div>
                 </div>
-                {{/if}}
-          
-                <div class="max-w-7xl mx-auto ">
-                    <!-- Header Section -->
-                    <div class="bg-white rounded-lg shadow-md p-2 mb-4">
-                        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            </div>
+            {{/if}}
+
+            <div class="max-w-7xl mx-auto space-y-6">
+                <!-- Header Section -->
+                <div class="bg-white rounded-lg shadow-md p-2 mb-4">
+                    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                        <div>
                             <h1 class="text-xl font-bold text-gray-800">Associations &amp; Groups</h1>
+                            <p class="text-sm text-gray-500 mt-1">
+                                Manage your groups and explore new opportunities
+                            </p>
+                        </div>
 
-                            <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+                        <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
 
 
-                                <!--  Create Group Button -->
-                                <div class="relative flex-1 max-w-md">
-                                    <input type="text" id="globalGroupSearch" placeholder="Search groups"
-                                        class="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-                                    <i
-                                        class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                                         <div id="associationsDropdown" 
-                                          class="absolute top-full left-0 mt-2 w-full bg-white rounded-lg shadow-2xl border border-gray-200   max-h-96 overflow-y-auto hidden z-50">
-                                        <div id="dropdownContent" class="py-2">
-                                            <!-- Results injected here -->
-                                        </div>
+                            <!--  Create Group Button -->
+                            <div class="relative flex-1 max-w-md">
+                                <input type="text" id="globalGroupSearch" placeholder="Search groups"
+                                    class="w-full pl-12 pr-4 py-2 border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
+                                <i
+                                    class="fas fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                                <div id="associationsDropdown"
+                                    class="absolute top-full left-0 mt-2 w-full bg-white rounded-lg shadow-2xl border border-gray-200   max-h-96 overflow-y-auto hidden z-50">
+                                    <div id="dropdownContent" class="py-2">
+                                        <!-- Results injected here -->
+                                    </div>
                                 </div>
-                                </div>
-                               
-                                {{!-- <button
-                                    class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg flex items-center justify-center gap-2 transition shadow-md">
-                                    <i class="fas fa-plus"></i>
-                                    Create New Group
-                                </button> --}}
-                                <a href="/Groups/community" 
+                            </div>
+
+                            {{!-- <button
+                                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-lg flex items-center justify-center gap-2 transition shadow-md">
+                                <i class="fas fa-plus"></i>
+                                Create New Group
+                            </button> --}}
+                            <a href="/Groups/community"
                                 class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 transition">
-                                    <i class="fas fa-plus"></i>
-                                    Create New Group
-                                </a>
+                                <i class="fas fa-plus"></i>
+                                Create New Group
+                            </a>
 
-                            </div>
                         </div>
-                    </div>
-
-                    <div class="grid  gap-8">
-                        <!--  -->
-                        <div class="lg:col-span-2 space-y-8">
-                            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                                <div class="bg-gradient-to-r from-green-600 to-teal-600 text-white p-2">
-                                    <h4 class="text-xl font-semibold flex items-center justify-between">Suggested for
-                                        you
-                                        <div class="flex gap-4">
-                                            <a  href="/user-app/dashboard#discover-groups-section" class="hover:bg-white hover:text-black text-sm font-normal bg-white/20 md:w-auto px-3  rounded-full flex items-center gap-2 text-blackgray-700 text-white transition font-semibold"><span>View
-                                                All<i class="fa-solid fa-compass p-2"></i></span></a>
-                                        </div>
-                                    </h4>
-                                    <p class="text-sm opacity-90 mt-1">Groups you might be interested in</p>
-                                </div> 
-
-
-                            </div>
-                            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                               <div class="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-3">
-                                    <h4 class="text-lg md:text-xl font-semibold flex  md:flex-row md:items-center justify-between gap-4">
-                                        
-
-                                        Admin<div class="flex flex-col sm:flex-row gap-3  text-sm  md:w-auto">
-                                            
-                                            <!-- Join Requests -->
-                                            <a href="/association/requests" class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-2
-                                                    bg-white/20 hover:bg-white hover:text-black
-                                                    px-3 py-1 rounded-full transition text-white">
-
-                                                <span class="flex items-center gap-2">
-                                                    <i class="fas fa-user-clock text-base"></i>
-                                                    Join Requests
-                                                </span>
-
-                                            </a>
-
-                                            <!-- Manage Members -->
-
-                                        </div>
-                                    </h4>
-
-                                    <p class="text-sm opacity-90 mt-0">Your Groups</p>
-                                </div>
-
-
-                                <div class="p-4 max-h-56 overflow-y-auto"> <!-- Scrollable list -->
-                                    <div class="space-y-4">
-                                        <!--  -->
-                                        {{#each myGroups}}
-                                        <div
-                                            class="border border-gray-200 rounded-lg p-2 hover:shadow-lg transition flex items-center justify-between group-card" data-group-id="{{this._id}}">
-                                            <div class="flex-1">
-                                                <h3 class="text-lg font-medium text-gray-800">{{this.g_name}}</h3>
-                                                <p class="text-sm text-gray-600 mt-1 gap-2">
-                                                    {{!-- <i class="fa fa-globe" aria-hidden="true"></i>{{this.g_type}} • {{this.total_mem}} members  --}}
-                                                    {{#if (eq this.g_type "public")}}
-                                                        <i class="fa fa-globe"></i>
-                                                    {{else}}
-                                                        <i class="fa fa-lock"></i>
-                                                    {{/if}}
-                                                    {{this.g_type}} • <i class="fa fa-user"></i> {{this.total_mem}} members
-                                                     </p>
-                                            </div>
-                                            <div class="flex items-center gap-3">
-                                                <button class="text-blue-600 hover:text-blue-800 font-medium"
-                                                     data-group-id="{{this._id}}">View</button>
-                                                <button class="text-gray-500 hover:text-gray-700">
-                                                    <i class="fas fa-ellipsis-v"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                        {{else}}
-                                        <p class="text-center text-gray-500 py-8">You haven't joined any groups yet.</p>
-                                        {{/each}}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                                <div class="bg-gradient-to-r from-blue-600 to-teal-600 text-white p-2">
-                                    <h2 class="text-xl font-semibold">Member</h2>
-                                    <p class="text-sm opacity-90 mt-1">Groups you've joined</p>
-
-                                </div>
-
-                                <div class="p-4 max-h-96 overflow-y-auto"> <!-- Scrollable -->
-                                    <div class="space-y-4">
-                                         
-                                        <!-- Suggested Group Item -->
-                                        {{#each memberGroups}}
-                                        <div class="border border-gray-200 rounded-lg p-2 hover:shadow-lg transition group-card" data-group-id="{{this._id}}">
-                                            <div class="flex justify-between items-start mb-2">
-                                                <h3 class="font-medium text-gray-800">{{this.g_name}}</h3>
-                                                    <span
-                                                    class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded"> {{#if (eq this.g_type "public")}}
-                                                        <i class="fa fa-globe"></i> 
-                                                    {{else}}
-                                                        <i class="fa fa-lock"></i> 
-                                                    {{/if}}
-                                                    {{this.g_type}}</span>
-                                            </div>
-                                            <p class="text-sm text-gray-600 mb-3">{{this.total_mem}} members • {{this.description}}</p>
-
-                                        </div>
-                                        {{else}}
-                                        <p class="text-center text-gray-500 py-8">You haven't joined any groups yet.</p>
-                                        {{/each}}
-
-                                        
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                       
                     </div>
                 </div>
 
-            </main>
+                <div class="grid  gap-8">
+                    <!--  -->
+                    <div class="lg:col-span-2 space-y-8">
+                        {{!-- <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                            <div class="bg-gradient-to-r from-green-600 to-teal-600 text-white p-2">
+
+                                <h4 class="text-xl font-semibold flex items-center justify-between">Suggested for
+                                    you
+                                    <div class="flex gap-4">
+                                        <a href="/user-app/dashboard#discover-groups-section"
+                                            class="hover:bg-white hover:text-black text-sm font-normal bg-white/20 md:w-auto px-3  rounded-full flex items-center gap-2 text-blackgray-700 text-white transition font-semibold"><span>View
+                                                All<i class="fa-solid fa-compass p-2"></i></span></a>
+                                    </div>
+                                </h4>
+                                <p class="text-sm opacity-90 mt-1">Groups you might be interested in</p>
+
+                            </div>
+
+
+                        </div> --}}
+
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
+                            <div class="bg-[#acccfb] border-b border-blue-200 text-blue-900 p-3">
+
+                                <div class="flex items-center justify-between">
+
+                                    <!-- CENTER TEXT -->
+                                    <div class="flex-1">
+                                        <h4 class="text-xl font-semibold leading-tight">
+                                            Suggested for you
+                                        </h4>
+                                        <p class="text-xs opacity-90 mt-1">
+                                            Groups you might be interested in
+                                        </p>
+                                    </div>
+
+                                    <!-- RIGHT BUTTON (FIXED) -->
+                                    <div class="w-24 flex justify-end">
+                                        <a href="/user-app/dashboard#discover-groups-section" class="inline-flex items-center gap-2 whitespace-nowrap
+px-3 py-1.5 rounded-full
+bg-white/70 text-blue-700 border border-blue-200
+hover:bg-blue-600 hover:text-white
+hover:shadow-md hover:-translate-y-0.5
+transition-all duration-300 ease-out">
+
+                                            <i class="fa-solid fa-compass"></i>
+                                            <span>View All</span>
+                                        </a>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                            <div class="bg-[#acccfb] border-b border-blue-100 text-blue-900 p-3">
+                                <h4
+                                    class="text-lg md:text-xl font-semibold flex  md:flex-row md:items-center justify-between gap-4">
+
+
+                                    Admin<div class="flex flex-col sm:flex-row gap-3  text-sm  md:w-auto">
+
+                                        <!-- Join Requests -->
+                                        <a href="/association/requests" class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-2
+px-3 py-1 rounded-full
+bg-white/80 backdrop-blur-md text-blue-700 border border-blue-200
+hover:bg-blue-500 hover:text-white hover:shadow-lg
+transition-all duration-200">
+
+                                            <span class="flex items-center gap-2">
+                                                <i class="fas fa-user-clock text-base"></i>
+                                                Join Requests
+                                            </span>
+
+                                        </a>
+
+                                        <!-- Manage Members -->
+
+                                    </div>
+                                </h4>
+
+                                <p class="text-sm opacity-90 mt-0">Your Groups</p>
+                            </div>
+
+
+                            {{!-- <div class="p-4 max-h-56 overflow-y-auto"> <!-- Scrollable list -->
+                                <div class="space-y-4"> --}}
+                                    <div class="p-4">
+                                        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
+
+                                            {{#each myGroups}}
+                                            {{!-- <i class="fa fa-globe" aria-hidden="true"></i>{{this.g_type}} •
+                                            {{this.total_mem}}
+                                            members --}}
+                                            {{!-- <div
+                                                class="border border-gray-200 rounded-lg p-2 hover:shadow-lg transition flex items-center justify-between group-card"
+                                                data-group-id="{{this._id}}">
+                                                <div class="flex-1">
+                                                    <h3 class="text-lg font-medium text-gray-800">{{this.g_name}}</h3>
+                                                    <p class="text-sm text-gray-600 mt-1 gap-2">
+
+                                                        {{#if (eq this.g_type "public")}}
+                                                        <i class="fa fa-globe"></i>
+                                                        {{else}}
+                                                        <i class="fa fa-lock"></i>
+                                                        {{/if}}
+                                                        {{this.g_type}} • <i class="fa fa-user"></i> {{this.total_mem}}
+                                                        members
+                                                    </p>
+                                                </div>
+                                                <div class="flex items-center gap-3">
+                                                    <button class="text-blue-600 hover:text-blue-800 font-medium"
+                                                        data-group-id="{{this._id}}">View</button>
+                                                    <button class="text-gray-500 hover:text-gray-700">
+                                                        <i class="fas fa-ellipsis-v"></i>
+                                                    </button>
+                                                </div>
+                                            </div> --}}
+
+                                            <div class="bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 group-card"
+                                                data-group-id="{{this._id}}">
+
+                                                <!-- Cover -->
+                                                <div class="h-40 overflow-hidden">
+
+                                                    <img src="{{this.g_cover}}" alt="{{this.g_name}}"
+                                                        class="w-full h-full object-cover"
+                                                        onerror="this.src='/assets/images/demo.jpg'">
+
+                                                </div>
+
+                                                <!-- Content -->
+                                                <div class="pt-6 px-3 pb-3">
+
+                                                    <h3 class="font-semibold text-gray-800 text-base truncate">
+                                                        {{this.g_name}}
+                                                    </h3>
+
+                                                    {{!-- <div
+                                                        class="flex items-center gap-2 text-sm text-gray-500 mt-2">
+
+                                                        {{#if (eq this.g_type "public")}}
+                                                        <i class="fa fa-globe"></i>
+                                                        {{else}}
+                                                        <i class="fa fa-lock"></i>
+                                                        {{/if}}
+
+                                                        <span>{{this.g_type}}</span>
+                                                    </div> --}}
+                                                    <div class="mt-3">
+
+                                                        {{#if (eq this.g_type "public")}}
+                                                        <span
+                                                            class="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">
+                                                            <i class="fa fa-globe mr-1"></i> Public
+                                                        </span>
+                                                        {{else}}
+                                                        <span
+                                                            class="bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full">
+                                                            <i class="fa fa-lock mr-1"></i> Private
+                                                        </span>
+                                                        {{/if}}
+
+                                                    </div>
+
+                                                    <div class="text-sm text-gray-600 mt-2">
+                                                        <i class="fa fa-user"></i>
+                                                        {{this.total_mem}} Members
+                                                    </div>
+
+                                                    <div class="mt-4 flex items-center justify-between">
+
+                                                        <span class="text-xs text-gray-500">
+                                                            Created Group
+                                                        </span>
+
+                                                        <button
+                                                            class="px-4 py-2 border border-blue-600 text-blue-600 bg-white rounded-lg text-sm font-medium hover:bg-blue-50 transition">
+                                                            View Group
+                                                        </button>
+
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+
+                                            {{else}}
+                                            <p class="text-center text-gray-500 py-8">You haven't joined any groups yet.
+                                            </p>
+                                            {{/each}}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                                    <div class="bg-[#acccfb] p-2 flex items-center justify-between text-blue-900">
+                                        <div>
+                                            <h2 class="text-xl font-semibold">Member</h2>
+                                            <p class="text-sm opacity-90 mt-1">Groups you've joined</p>
+                                        </div>
+
+
+                                        <a href="#" class="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-2
+px-3 py-1 rounded-full
+bg-white/80 backdrop-blur-md text-blue-700 border border-blue-200
+hover:bg-blue-500 hover:text-white hover:shadow-lg
+transition-all duration-200">
+
+                                            <span><i class="fa-solid fa-compass"></i>View All</span>
+                                        </a>
+
+                                    </div>
+
+
+                                    {{!-- <div class="p-4 max-h-96 overflow-y-auto"> <!-- Scrollable -->
+                                        <div class="space-y-4">
+
+                                            <!-- Suggested Group Item -->
+                                            {{#each memberGroups}}
+                                            <div class="border border-gray-200 rounded-lg p-2 hover:shadow-lg transition group-card"
+                                                data-group-id="{{this._id}}">
+                                                <div class="flex justify-between items-start mb-2">
+                                                    <h3 class="font-medium text-gray-800">{{this.g_name}}</h3>
+                                                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                                        {{#if (eq this.g_type "public")}}
+                                                        <i class="fa fa-globe"></i>
+                                                        {{else}}
+                                                        <i class="fa fa-lock"></i>
+                                                        {{/if}}
+                                                        {{this.g_type}}</span>
+                                                </div>
+                                                <p class="text-sm text-gray-600 mb-3">{{this.total_mem}} members •
+                                                    {{this.description}}</p>
+
+                                            </div>
+                                            {{else}}
+                                            <p class="text-center text-gray-500 py-8">You haven't joined any groups yet.
+                                            </p>
+                                            {{/each}}
+
+
+                                        </div>
+                                    </div> --}}
+
+                                    <div class="p-4 h-[50vh] overflow-y-auto">
+
+                                        <div class="grid grid-cols-3 gap-4">
+
+                                            {{#each memberGroups}}
+                                            {{!-- <div
+                                                class="group-card border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition duration-300 bg-white"
+                                                data-group-id="{{this._id}}">
+
+                                                <!-- Image -->
+                                                <div class="h-32 w-full overflow-hidden">
+                                                    <img src="{{this.g_cover}}"
+                                                        class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                                                </div>
+
+                                                <div class="p-3">
+
+                                                    <!-- Title + Badge -->
+                                                    <div class="flex justify-between items-center mb-2">
+                                                        <h3 class="font-semibold text-gray-800 truncate">
+                                                            {{this.g_name}}
+                                                        </h3>
+
+                                                        <span class="text-xs px-2 py-1 rounded 
+                        {{#if (eq this.g_type " public")}} bg-green-100 text-green-700 {{else}} bg-gray-100
+                                                            text-gray-700 {{/if}}">
+
+                                                            {{#if (eq this.g_type "public")}}
+                                                            <i class="fa fa-globe"></i>
+                                                            {{else}}
+                                                            <i class="fa fa-lock"></i>
+                                                            {{/if}}
+
+                                                            {{this.g_type}}
+                                                        </span>
+                                                    </div>
+
+                                                    <!-- Description -->
+                                                    <p class="text-xs text-gray-600 line-clamp-2 mb-3">
+                                                        {{this.description}}
+                                                    </p>
+
+                                                    <!-- Footer -->
+                                                    <div
+                                                        class="flex justify-between items-center text-xs text-gray-500">
+                                                        <span>👥 {{this.total_mem}} members</span>
+
+                                                        <button class="text-blue-600 hover:text-blue-800 font-medium">
+                                                            View →
+                                                        </button>
+                                                    </div>
+
+                                                </div>
+                                            </div> --}}
+
+                                            <div
+                                                class="group-card border border-gray-200 rounded-xl overflow-hidden bg-white">
+
+                                                <!-- Image (NO animation) -->
+                                                <div class="h-32 w-full overflow-hidden">
+                                                    <img src="{{this.g_cover}}" class="w-full h-full object-cover">
+                                                </div>
+
+                                                <div class="p-3">
+
+                                                    <!-- Title -->
+                                                    <h3 class="font-semibold text-gray-800 text-base truncate">
+                                                        {{this.g_name}}
+                                                    </h3>
+
+                                                    <!-- Badge + Members -->
+                                                    <div class="flex items-center justify-between mt-2">
+
+                                                        {{#if (eq this.g_type "public")}}
+                                                        <span
+                                                            class="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-green-100 text-green-700">
+                                                            <i class="fa fa-globe"></i> Public
+                                                        </span>
+                                                        {{else}}
+                                                        <span
+                                                            class="flex items-center gap-1 text-xs px-2 py-1 rounded-full bg-gray-200 text-gray-700">
+                                                            <i class="fa fa-lock"></i> Private
+                                                        </span>
+                                                        {{/if}}
+
+                                                        <!-- MEMBERS ICON IMPROVED -->
+                                                        <span class="flex items-center gap-1 text-xs text-gray-600">
+                                                            <i class="fa fa-users text-gray-500"></i>
+                                                            {{this.total_mem}} members
+                                                        </span>
+
+                                                    </div>
+
+                                                    <!-- Description -->
+                                                    <p class="text-xs text-gray-500 mt-2 line-clamp-2">
+                                                        {{this.description}}
+                                                    </p>
+
+                                                    <!-- Button (NO animation) -->
+                                                    <div class="mt-3 flex justify-end">
+                                                        <button
+                                                            class="px-3 py-1.5 text-xs font-medium rounded-md border border-blue-600 text-blue-600">
+                                                            View Group
+                                                        </button>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+                                            {{else}}
+                                            <div class="col-span-2 text-center text-gray-500 py-10">
+                                                You haven't joined any groups yet.
+                                            </div>
+                                            {{/each}}
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+        </main>
     </div>
     <script src="/js/all.js"></script>
-    
-   
-<script>
-const searchassociationInput = document.getElementById('globalGroupSearch');
-const associationdropdown = document.getElementById('associationsDropdown');
-const content = document.getElementById('dropdownContent');
 
-if (!searchassociationInput || !associationdropdown || !content) {
-    console.error('Search elements not found! Check IDs.');
-}
 
-searchassociationInput.addEventListener('input', function () {
-    const query = this.value.trim();
-    console.log('Search query:', query); // ← Check this in browser console!
+    <script>
+        const searchassociationInput = document.getElementById('globalGroupSearch');
+        const associationdropdown = document.getElementById('associationsDropdown');
+        const content = document.getElementById('dropdownContent');
 
-    // Hide dropdown if query too short
-    if (query.length < 2) {
-        associationdropdown.classList.add('hidden');
-        return;
-    }
+        if (!searchassociationInput || !associationdropdown || !content) {
+            console.error('Search elements not found! Check IDs.');
+        }
 
-    // Show loading state
-    content.innerHTML = '<div class="px-4 py-3 text-gray-500">Searching...</div>';
-    associationdropdown.classList.remove('hidden');
+        searchassociationInput.addEventListener('input', function () {
+            const query = this.value.trim();
+            console.log('Search query:', query); // ← Check this in browser console!
 
-    fetch(`/Groups/search?query=${encodeURIComponent(query)}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Network error');
-            return response.json();
-        })
-        .then(data => {
-            console.log('Search data received:', data); // ← Check this in browser console!
-             associationdropdown.classList.remove('hidden');
-             console.log('Dropdown shown', associationdropdown); // ← Check this in browser console!
-            if (!data.success || (!data.myGroups?.length && !data.discoverGroups?.length)) {
-                content.innerHTML = '<div class="px-4 py-3 text-center text-gray-500">No groups found</div>';
+            // Hide dropdown if query too short
+            if (query.length < 2) {
+                associationdropdown.classList.add('hidden');
                 return;
             }
 
-            let html = '';
+            // Show loading state
+            content.innerHTML = '<div class="px-4 py-3 text-gray-500">Searching...</div>';
+            associationdropdown.classList.remove('hidden');
 
-            if (data.myGroups?.length) {
-                html += '<div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Your Groups</div>';
-                data.myGroups.forEach(g => {
-                    html += `
+            fetch(`/Groups/search?query=${encodeURIComponent(query)}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network error');
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Search data received:', data); // ← Check this in browser console!
+                    associationdropdown.classList.remove('hidden');
+                    console.log('Dropdown shown', associationdropdown); // ← Check this in browser console!
+                    if (!data.success || (!data.myGroups?.length && !data.discoverGroups?.length)) {
+                        content.innerHTML = '<div class="px-4 py-3 text-center text-gray-500">No groups found</div>';
+                        return;
+                    }
+
+                    let html = '';
+
+                    if (data.myGroups?.length) {
+                        html += '<div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Your Groups</div>';
+                        data.myGroups.forEach(g => {
+                            html += `
                     <a href="/association/group/${g._id}" class="block px-4 py-3 hover:bg-gray-100 flex items-center gap-3">
                         <img src="${g.g_cover || '/assets/images/demo.jpg'}" class="w-10 h-10 rounded object-cover" alt=""/>
                         <div>
@@ -245,13 +504,13 @@ searchassociationInput.addEventListener('input', function () {
                             <div class="text-xs text-gray-500">${g.total_mem} members</div>
                         </div>
                     </a>`;
-                });
-            }
+                        });
+                    }
 
-            if (data.discoverGroups?.length) {
-                html += '<div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Discover</div>';
-                data.discoverGroups.forEach(g => {
-                    html += `
+                    if (data.discoverGroups?.length) {
+                        html += '<div class="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Discover</div>';
+                        data.discoverGroups.forEach(g => {
+                            html += `
                     <a href="/association/group/${g._id}" class="block px-4 py-3 hover:bg-gray-100 flex items-center gap-3">
                         <img src="${g.g_cover || '/assets/images/demo.jpg'}" class="w-10 h-10 rounded object-cover" alt=""/>
                         <div>
@@ -259,59 +518,59 @@ searchassociationInput.addEventListener('input', function () {
                             <div class="text-xs text-gray-500">${g.total_mem} members • ${g.g_type}</div>
                         </div>
                     </a>`;
+                        });
+                    }
+
+                    content.innerHTML = html;
+                    // Force show again in case something hid it
+                    associationdropdown.classList.remove('hidden');
+                })
+                .catch(err => {
+                    console.error('Search error:', err);
+                    content.innerHTML = '<div class="px-4 py-3 text-red-500">Error loading results</div>';
                 });
-            }
-
-            content.innerHTML = html;
-            // Force show again in case something hid it
-            associationdropdown.classList.remove('hidden');
-        })
-        .catch(err => {
-            console.error('Search error:', err);
-            content.innerHTML = '<div class="px-4 py-3 text-red-500">Error loading results</div>';
         });
-});
 
-// Hide associationdropdown when clicking outside
-document.addEventListener('click', function(e) {
-    if (!searchInput.contains(e.target) && !associationdropdown.contains(e.target)) {
-        associationdropdown.classList.add('hidden');
-    }
-});
-
-
-// Optional: Hide when pressing Escape
-searchInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        associationdropdown.classList.add('hidden');
-        this.blur();
-    }
-});
-</script>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-   
-    document.querySelectorAll('.group-card').forEach(card => {
-        card.style.cursor = 'pointer';
-        card.addEventListener('click', (e) => {
-           
-            if (e.target.closest('a, button')) {
-                return;
-            }
-
-            const groupId = card.dataset.groupId;
-            if (groupId) {
-                window.location.href = `/Groups/group-info/${groupId}`;
+        // Hide associationdropdown when clicking outside
+        document.addEventListener('click', function (e) {
+            if (!searchInput.contains(e.target) && !associationdropdown.contains(e.target)) {
+                associationdropdown.classList.add('hidden');
             }
         });
-    });
 
-    document.querySelectorAll('.group-title').forEach(title => {
-        title.style.cursor = 'pointer';
-    });
-});
-</script>
+
+        // Optional: Hide when pressing Escape
+        searchInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                associationdropdown.classList.add('hidden');
+                this.blur();
+            }
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            document.querySelectorAll('.group-card').forEach(card => {
+                card.style.cursor = 'pointer';
+                card.addEventListener('click', (e) => {
+
+                    if (e.target.closest('a, button')) {
+                        return;
+                    }
+
+                    const groupId = card.dataset.groupId;
+                    if (groupId) {
+                        window.location.href = `/Groups/group-info/${groupId}`;
+                    }
+                });
+            });
+
+            document.querySelectorAll('.group-title').forEach(title => {
+                title.style.cursor = 'pointer';
+            });
+        });
+    </script>
     {{> profile}}
 </body>
 
