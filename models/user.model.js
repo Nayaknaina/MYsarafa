@@ -12,31 +12,31 @@ const userSchema = new mongoose.Schema({
     trim: true,
     lowercase: true
   },
-   profilePicture: {
+  profilePicture: {
     type: String,
-    default: '' 
+    default: ''
   },
- // password: { type: String, required: true },
+  // password: { type: String, required: true },
 
   password: {
-        type: String,
-        required: function() { return !this.googleId; }
-    },
-    googleId: {
-        type: String,
-        unique: true,
-        sparse: true
-    },
-    mobile_no: {
-        type: String,
-        trim: true,
-        match: [/^\d{10}$/, 'Please enter a valid 10-digit mobile number'],
-        sparse: true
-    },
-    mobile_verified: {
-        type: Boolean,
-        default: false
-    },
+    type: String,
+    required: function () { return !this.googleId; }
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
+  mobile_no: {
+    type: String,
+    trim: true,
+    match: [/^\d{10}$/, 'Please enter a valid 10-digit mobile number'],
+    sparse: true
+  },
+  mobile_verified: {
+    type: Boolean,
+    default: false
+  },
 
   dob: { type: Date, default: null },
   country: { type: String, default: '' },
@@ -54,10 +54,10 @@ const userSchema = new mongoose.Schema({
   pan_no: { type: String, sparse: true },
   pan_photo: { type: String, default: '' },
   kyc_status: {
-  type: String,
-  enum: ['unsubmitted', 'pending', 'approved', 'rejected'],
-  default: 'unsubmitted'
-},
+    type: String,
+    enum: ['unsubmitted', 'pending', 'approved', 'rejected'],
+    default: 'unsubmitted'
+  },
 
 
 
@@ -66,7 +66,7 @@ const userSchema = new mongoose.Schema({
     enum: ['verified', 'unverified'],
     default: 'unverified'
   },
-  
+
   blacklistStatus: {
     type: Boolean,
     default: false
@@ -101,20 +101,30 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['user', 'super_admin'],
     default: 'user'
-  }
+  },
+
+  aadhaar_verified: {
+    type: Boolean,
+    default: false
+  },
+
+  fcmToken: {
+    type: String,
+    default: null
+  },
 
 }, { timestamps: true });
 
-userSchema.pre('save', async function(next) {
-    if (this.isModified('password') && this.password) {
-        this.password = await bcrypt.hash(this.password, 10);
-    }
-    next();
+userSchema.pre('save', async function (next) {
+  if (this.isModified('password') && this.password) {
+    this.password = await bcrypt.hash(this.password, 10);
+  }
+  next();
 });
 
-userSchema.methods.comparePassword = async function(password) {
-    if (!this.password) return false;
-    return await bcrypt.compare(password, this.password);
+userSchema.methods.comparePassword = async function (password) {
+  if (!this.password) return false;
+  return await bcrypt.compare(password, this.password);
 };
 
 module.exports = mongoose.model('User', userSchema);

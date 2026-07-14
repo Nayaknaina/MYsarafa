@@ -4,29 +4,30 @@ const WorkerDetails = require('../models/workerDetails.model');
 const fs = require('fs').promises;
 const path = require('path');
 const axios = require('axios');
+const { s3, getSignedUrl } = require('../middleware/multer');
 
 const { userRequiresKyc } = require('../middleware/kycCheck');
 
 
 exports.KYCverification = async (req, res) => {
-    try {
-        console.log("we are in a kyc");
-        const user = await User.findById(req.user.id).lean();
+  try {
+    console.log("we are in a kyc");
+    const user = await User.findById(req.user.id).lean();
 
-        const requiresKyc = await userRequiresKyc(user._id);
-        const disabledSidebar = requiresKyc && user.kyc_status === 'unsubmitted';
-        // const disabledSidebar = requiresKyc ;
-        console.log(disabledSidebar);
-        
+    const requiresKyc = await userRequiresKyc(user._id);
+    const disabledSidebar = requiresKyc && user.kyc_status === 'unsubmitted';
+    // const disabledSidebar = requiresKyc ;
+    console.log(disabledSidebar);
 
-        res.render("KYC-verification", {
-            user,
-            disabledSidebar,
-            title:'KYC Verification | MySarafa',
-        });
-    } catch (error) {
-        res.status(500).render("500", { errorMessage: "Something went wrong, please try again later." });
-    }
+
+    res.render("KYC-verification", {
+      user,
+      disabledSidebar,
+      title: 'KYC Verification | MySarafa',
+    });
+  } catch (error) {
+    res.status(500).render("500", { errorMessage: "Something went wrong, please try again later." });
+  }
 };
 
 exports.getKycData = async (req, res) => {
@@ -58,8 +59,10 @@ exports.getKycData = async (req, res) => {
       adhar_photo: user.adhar_photo || '',
       shop_licence: user.shop_licence || '',
       pan_photo: user.pan_photo || '',
+      aadhaar_verified: user.aadhaar_verified || false,
       kyc_status: user.kyc_status || 'unsubmitted',
       user_status: user.user_status || 'unverified',
+      otp_pending: !!aadhaarRequestStore[req.user.id],
     };
 
     // console.log('getKycData response:', kycData); 
@@ -75,54 +78,66 @@ const aadhaarRequestStore = {};
 exports.sendAadhaarOtp = async (req, res) => {
   try {
     const { aadhaarNumber } = req.body;
+
+    if (aadhaarRequestStore[req.user.id]) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP already sent. Please verify it first."
+      });
+    }
+
     if (!/^\d{12}$/.test(aadhaarNumber)) {
       return res.status(400).json({ success: false, message: 'Invalid Aadhaar number. Must be 12 digits.' });
     }
 
-       const existingUser = await User.findOne({ adhar_no: aadhaarNumber, _id: { $ne: req.user.id } });
-        if (existingUser) {
-          return res.status(400).json({ success: false, message: 'Aadhaar number already linked with another account.' });
-        }
+    const existingUser = await User.findOne({ adhar_no: aadhaarNumber, _id: { $ne: req.user.id } });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: 'Aadhaar number already linked with another account.' });
+    }
 
-   
-     const response = await axios.post(
+    const response = await axios.post(
       'https://api.quickekyc.com/api/v1/aadhaar-v2/generate-otp',
       {
-        key: process.env.QUICK_EKYC_API_KEY ,
+        key: process.env.QUICK_EKYC_API_KEY,
         id_number: aadhaarNumber
       },
       {
         headers: {
           'Content-Type': 'application/json'
-          
+
         }
       }
     );
 
     console.log("Generate OTP response:", response.data);
 
-    if (response.data.status === 'success' && response.data.data.otp_sent)  {
-      console.log("response fo generate otp have",response);
+    if (response.data.status === 'success' && response.data.data.otp_sent) {
+      console.log("response fo generate otp have", response);
       // const user = await User.findById(req.user.id);
       // user.temp_aadhaar_request_id = response.data.request_id;
       // await user.save();
-        aadhaarRequestStore[req.user.id] = response.data.request_id;
-        await User.updateOne({ _id: req.user.id }, { adhar_no: aadhaarNumber });
+      aadhaarRequestStore[req.user.id] = response.data.request_id;
+      await User.updateOne({ _id: req.user.id }, { adhar_no: aadhaarNumber });
       res.status(200).json({ success: true, message: 'OTP sent to registered mobile number' });
     } else {
       res.status(400).json({ success: false, message: response.data.message || 'Failed to send OTP' });
     }
-  }catch (error) {
-  console.error('Error sending Aadhaar OTP:', error.response?.data || error.message);
-  if (error.response?.status === 401) {
-    return res.status(401).json({ 
-      success: false, 
-      message: 'API authentication failed. Check your Quick eKYC API key.' 
-    });
-  }
-  res.status(500).json({ success: false, message: 'Error sending OTP', error: error.message });
-};
+  } catch (error) {
+    console.error('Error sending Aadhaar OTP:', error.response?.data || error.message);
+    if (error.response?.status === 401) {
+      return res.status(401).json({
+        success: false,
+        message: 'API authentication failed. Check your Quick eKYC API key.'
+      });
+    }
+    res.status(500).json({ success: false, message: 'Error sending OTP', error: error.message });
+  };
 }
+
+exports.resendAadhaarOtp = async (req, res) => {
+  delete aadhaarRequestStore[req.user.id];
+  return exports.sendAadhaarOtp(req, res);
+};
 
 // exports.verifyAadhaarOtp = async (req, res) => {
 //   try {
@@ -155,7 +170,7 @@ exports.sendAadhaarOtp = async (req, res) => {
 //     console.log("Verify OTP response:", response.data);
 
 //     // Clear request_id from memory after verification attempt
-  
+
 
 //     if (response.data.status === 'success') {
 //       user.kyc_status = 'approved';
@@ -168,7 +183,7 @@ exports.sendAadhaarOtp = async (req, res) => {
 //     } else {
 //       res.status(400).json({ success: false, message: response.data.message || 'Invalid OTP' });
 //     }
-    
+
 //   } catch (error) {
 //      console.error('Error verifying Aadhaar OTP:', error.response?.data || error.message);
 //     return res.status(error.response?.status || 500).json({
@@ -190,7 +205,7 @@ exports.sendAadhaarOtp = async (req, res) => {
 //       return res.status(400).json({ success: false, message: 'No OTP request found for this user' });
 //     }
 
-    
+
 //     const response = await axios.post(
 //       'https://api.quickekyc.com/api/v1/aadhaar-v2/submit-otp',
 //       {
@@ -206,11 +221,11 @@ exports.sendAadhaarOtp = async (req, res) => {
 //     if (response.data.status === 'success') {
 //       const aadhaarData = response.data.data; 
 //       console.log("aadhar data coming ",aadhaarData);
-      
-    
+
+
 //       const normalize = str => str?.trim().toLowerCase();
 
-  
+
 //       let mismatch = [];
 //       if (fullName && normalize(fullName) !== normalize(aadhaarData.full_name)) {
 //         mismatch.push('Name');
@@ -233,7 +248,7 @@ exports.sendAadhaarOtp = async (req, res) => {
 //       user.kyc_status = 'approved';
 //       user.user_status = 'verified';
 //       user.adhar_no = aadhaarData.aadhaar_number || user.adhar_no; 
-    
+
 //       await user.save();
 
 //       delete aadhaarRequestStore[req.user.id];
@@ -246,7 +261,7 @@ exports.sendAadhaarOtp = async (req, res) => {
 //     } else {
 //       return res.status(400).json({ success: false, message: response.data.message || 'Invalid OTP' });
 //     }
-    
+
 //   } catch (error) {
 //     console.error('Error verifying Aadhaar OTP:', error.response?.data || error.message);
 //     return res.status(error.response?.status || 500).json({
@@ -257,7 +272,7 @@ exports.sendAadhaarOtp = async (req, res) => {
 // };
 exports.verifyAadhaarOtp = async (req, res) => {
   try {
-    const { otp, fullName, dob } = req.body; 
+    const { otp, fullName, dob } = req.body;
     console.log("Request body for verifyAadhaarOtp:", req.body);
 
     if (!otp || otp.length !== 6) {
@@ -287,7 +302,7 @@ exports.verifyAadhaarOtp = async (req, res) => {
     // console.log("Verify OTP response:", response.data);
 
     if (response.data.status === 'success') {
-      const aadhaarData = response.data.data; 
+      const aadhaarData = response.data.data;
       console.log("aadhar data coming ", aadhaarData);
 
       // --- Normalization helpers ---
@@ -325,23 +340,23 @@ exports.verifyAadhaarOtp = async (req, res) => {
         });
       }
 
-     
-      user.kyc_status = 'approved';
-      user.user_status = 'verified';
-      user.adhar_no = aadhaarData.aadhaar_number || user.adhar_no; 
+
+      user.adhar_no = aadhaarData.aadhaar_number || user.adhar_no;
+      user.aadhaar_verified = true;
+
       await user.save();
 
       delete aadhaarRequestStore[req.user.id];
 
-      return res.status(200).json({ 
-        success: true, 
-        message: 'Aadhaar OTP verified & details matched successfully', 
-        data: aadhaarData 
+      return res.status(200).json({
+        success: true,
+        message: 'Aadhaar OTP verified & details matched successfully',
+        data: aadhaarData
       });
     } else {
       return res.status(400).json({ success: false, message: response.data.message || 'Invalid OTP' });
     }
-    
+
   } catch (error) {
     console.error('Error verifying Aadhaar OTP:', error.response?.data || error.message);
     return res.status(error.response?.status || 500).json({
@@ -403,8 +418,19 @@ exports.submitKyc = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Aadhaar number already in use' });
     }
 
-    if (aadhaarVerified !== 'true') {
-      return res.status(400).json({ success: false, message: 'Aadhaar must be verified before submission.' });
+    if (!user.aadhaar_verified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please verify your Aadhaar OTP before submitting KYC.'
+      });
+    }
+
+    // YAHAN
+    if (req.body.aadhaarVerified !== "true") {
+      return res.status(400).json({
+        success: false,
+        message: "Please upload the original Aadhaar image. Image verification failed."
+      });
     }
 
     if (!req.files || !req.files['aadhaarCard']) {
@@ -455,8 +481,8 @@ exports.submitKyc = async (req, res, next) => {
           field === 'aadhaarCard'
             ? 'adhar_photo'
             : field === 'shopLicence'
-            ? 'shop_licence'
-            : 'pan_photo'
+              ? 'shop_licence'
+              : 'pan_photo'
         ];
 
         // Delete old S3 file if exists
@@ -483,10 +509,11 @@ exports.submitKyc = async (req, res, next) => {
     if (filePaths.panCard) user.pan_photo = filePaths.panCard;
 
     // ✅ KYC status updates
-    user.kyc_status = 'pending'; 
+    user.kyc_status = 'approved';
     user.user_status = 'verified';
 
     await user.save();
+    delete aadhaarRequestStore[req.user.id];
 
     // Save worker details
     await WorkerDetails.deleteMany({ user: req.user.id });
@@ -514,7 +541,7 @@ exports.submitKyc = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      message: 'KYC submitted successfully! Your application is under review.',
+      message: "KYC submitted successfully.",
       kyc_status: user.kyc_status,
       data: updatedData
     });
@@ -536,7 +563,7 @@ exports.getLocationByPincode = async (req, res) => {
     }
 
     const response = await axios.get(`https://api.postalpincode.in/pincode/${pincode}`);
-    console.log('PostalPincode API response:', response.data); 
+    console.log('PostalPincode API response:', response.data);
 
     if (response.data[0].Status !== 'Success') {
       return res.status(404).json({ success: false, message: 'PIN code not found.' });
@@ -556,13 +583,13 @@ exports.getLocationByPincode = async (req, res) => {
   }
 };
 
-exports.checkKycRequired =async(req ,res ,next) =>{
-    try {
-        const user = req.user;
-        const requiresKyc = await userRequiresKyc(user._id);
-        const needsKyc = requiresKyc && user.kyc_status === 'unsubmitted';
-        res.json({ needsKyc });
-    } catch (error) {
-        next(error);
-    }
+exports.checkKycRequired = async (req, res, next) => {
+  try {
+    const user = req.user;
+    const requiresKyc = await userRequiresKyc(user._id);
+    const needsKyc = requiresKyc && user.kyc_status === 'unsubmitted';
+    res.json({ needsKyc });
+  } catch (error) {
+    next(error);
+  }
 };

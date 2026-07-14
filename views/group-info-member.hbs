@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{group.g_name}} - Group Details</title>
+
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="canonical" href="https://app.mysarafa.com/">
+</head>
+<style>
+    .main-content {
+        flex: 1;
+        padding: 20px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Group Header */
+    .group-header {
+        position: relative;
+        margin-bottom: 60px;
+    }
+
+    .group-cover {
+        width: 100%;
+        height: 300px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    .group-name {
+        position: absolute;
+        bottom: 20px;
+        left: 20px;
+        color: rgb(0, 0, 0);
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .group-type {
+        position: absolute;
+        bottom: 0;
+        left: 20px;
+        color: rgb(103, 100, 100);
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .joined-btn,
+    .join-btn {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .join-btn {
+        background: #1877f2;
+        color: white;
+        border: none;
+    }
+
+    .joined-btn {
+        background: #e7e9ed;
+        color: #050505;
+        border: 1px solid #ddd;
+    }
+
+    /* Group Tabs */
+    .group-tabs {
+        position: relative;
+        display: flex;
+        border-bottom: 1px solid #ddd;
+        margin-bottom: 20px;
+    }
+
+    .group-tabs a {
+        padding: 12px 20px;
+        color: #65676b;
+        text-decoration: none;
+        font-weight: 600;
+        border-bottom: 2px solid transparent;
+        transition: all 0.3s;
+    }
+
+    .group-tabs a:hover,
+    .group-tabs a.active {
+        color: #1877f2;
+        border-bottom: 2px solid #1877f2;
+    }
+
+    /* Layout for Content and Aside */
+    .group-content {
+        display: flex;
+        gap: 20px;
+    }
+
+    .group-about {
+        width: 30%;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .group-about h2 {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+        color: #050505;
+    }
+
+    .group-about p {
+        color: #65676b;
+        font-size: 0.9em;
+    }
+
+    /* Discussion Section */
+    .group-discussion {
+        width: 70%;
+    }
+
+    .group-layout {
+        display: flex;
+        align-items: flex-start;
+        gap: 25px;
+        margin-top: 20px;
+    }
+
+    .group-about-box {
+        flex: 1;
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        border: 1px solid #ddd;
+        max-height: 500px;
+        overflow-y: auto;
+        position: sticky;
+        top: 100px;
+    }
+
+    .group-discussion h2 {
+        font-size: 1.5em;
+        margin-bottom: 15px;
+    }
+
+    /* Announcement Card styled like Facebook Post */
+    .announcement-card {
+        background: #fff;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        border: 1px solid #ddd;
+    }
+
+    .announcement-header {
+        display: flex;
+        align-items: center;
+        padding: 12px 16px;
+        border-bottom: 1px solid #ebedf0;
+    }
+
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-right: 12px;
+        object-fit: cover;
+    }
+
+    .announcement-header .user-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .announcement-header .user-name {
+        font-weight: 600;
+        font-size: 15px;
+        color: #050505;
+    }
+
+    .announcement-header .post-date {
+        font-size: 13px;
+        color: #65676b;
+    }
+
+    .announcement-content {
+        padding: 12px 16px;
+        font-size: 15px;
+        color: #050505;
+        line-height: 1.5;
+    }
+
+    .announcement-content h3 {
+        font-size: 17px;
+        margin-bottom: 8px;
+        font-weight: 600;
+    }
+
+    .announcement-images {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 5px;
+        padding: 10px;
+    }
+
+    .announcement-images img {
+        width: 100%;
+        border-radius: 6px;
+        object-fit: cover;
+    }
+
+    /* Buttons like Facebook */
+    .announcement-actions {
+        display: flex;
+        border-top: 1px solid #ebedf0;
+    }
+
+    .announcement-actions button {
+        flex: 1;
+        background: none;
+        border: none;
+        padding: 12px;
+        color: #65676b;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .announcement-actions button:hover {
+        background: #f0f2f5;
+        border-radius: 8px;
+    }
+
+    .announcement-actions i {
+        margin-right: 6px;
+        font-size: 16px;
+    }
+
+    .like-btn.liked,
+    .like-btn.liked i {
+        color: #1877f2;
+    }
+
+    /* Comments */
+    .comments-section {
+        display: none;
+        padding: 10px 16px;
+        border-top: 1px solid #ebedf0;
+    }
+
+    /* People Section */
+    .group-people {
+        width: 70%;
+    }
+
+    .group-people h2 {
+        font-size: 1.5em;
+        margin-bottom: 15px;
+    }
+
+    .member-card {
+        display: flex;
+        align-items: center;
+        background: white;
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 10px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .member-card img {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        margin-right: 15px;
+    }
+
+    .member-card span:first-of-type {
+        flex: 1;
+        font-weight: bold;
+        color: #050505;
+    }
+
+    .member-card span:last-of-type {
+        color: #65676b;
+        font-size: 0.9em;
+    }
+
+    /* Hide sections by default except discussion */
+    #people,
+    #events,
+    #media,
+    #files {
+        display: none;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .group-layout {
+            flex-direction: column;
+        }
+
+        .group-about-box {
+            max-height: none;
+            position: relative;
+            top: 0;
+            width: 100%;
+        }
+
+        .main-container {
+            flex-direction: column;
+        }
+
+        .sidebar {
+            width: 100%;
+            border-right: none;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .group-content {
+            flex-direction: column;
+        }
+
+        .group-about,
+        .group-discussion,
+        .group-people {
+            width: 100%;
+        }
+
+        .group-cover {
+            height: 200px;
+        }
+
+        .group-name {
+            font-size: 1.8em;
+        }
+
+        .announcement-actions {
+            margin: 0;
+        }
+
+        .announcement-actions button {
+            font-size: 13px;
+            padding: 10px;
+        }
+    }
+</style>
+
+<body>
+    {{> header}}
+
+    <div class="main-container">
+        {{> sidebar}}
+
+        <main class="main-content">
+            <!-- Group Header -->
+            <div class="group-header">
+                <img src="{{group.g_cover}}" alt="{{group.g_name}} cover" class="group-cover">
+
+                {{#if isMember}}
+                <button class="joined-btn">Joined</button>
+                {{else}}
+                <button class="join-btn">Join Group</button>
+                {{/if}}
+            </div>
+
+            <a href="/Groups/group-member/{{group._id}}" class="block text-white no-underline">
+                <nav class="group-tabs">
+                    <h1 class="group-name">{{group.g_name}}</h1>
+                    <p class="group-type">{{group.g_type}} group · {{group.total_mem}} members →</p>
+                </nav>
+            </a>
+
+            <!-- Tabs -->
+            <nav class="group-tabs">
+                <a href="#discussion">Discussion</a>
+                <a href="#people">People</a>
+                <a href="#events">Events</a>
+                <a href="#media">Media</a>
+                <a href="#files">Files</a>
+            </nav>
+
+            <div class="group-layout">
+                <aside class="group-about-box">
+                    <h2>About</h2>
+                    <p>{{group.description}}</p>
+                    <hr>
+                    <p><strong>Type:</strong> {{group.g_type}}</p>
+                    <p><strong>Members:</strong> {{group.total_mem}}</p>
+                    <p><strong>Created:</strong> {{formatDate group.createdAt}}</p>
+                    <p><strong>Location:</strong> {{group.location}}</p>
+                    <p><strong>Admin:</strong> {{group.user.f_name}} {{group.user.l_name}}</p>
+                </aside>
+
+                <!-- Main Content: Announcements -->
+                <section id="discussion" class="group-discussion">
+
+                    {{#if hasAnnouncements}}
+                    {{#each announcements}}
+                    <div class="announcement-card">
+                        <!-- Header -->
+                        <div class="announcement-header">
+                            <img src="{{this.createdBy.profilePicture}}" alt="{{this.createdBy.f_name}}"
+                                class="user-avatar">
+                            <div class="user-info">
+                                <span class="user-name">{{this.createdBy.f_name}} {{this.createdBy.l_name}}</span>
+                                <span class="post-date">{{formatDate this.createdAt}}</span>
+                            </div>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="announcement-content">
+                            <h3>{{this.title}}</h3>
+                            {{{this.message}}}
+                            {{#if this.meetingLink}}
+                            <p><a href="{{this.meetingLink}}" target="_blank">Join Meeting</a></p>
+                            {{/if}}
+                        </div>
+
+                        <!-- Image -->
+                        {{#if this.image}}
+                        <div class="announcement-images">
+                            <img src="{{this.image}}" alt="Announcement Image">
+                        </div>
+                        {{/if}}
+
+                        <!-- Actions - INTERACTIVE (member can like/comment) -->
+                        <div class="announcement-actions">
+                            <button class="like-btn {{#if this.isLiked}}liked{{/if}}" data-id="{{this._id}}">
+                                <i class="fa-{{#if this.isLiked}}solid{{else}}regular{{/if}} fa-heart"></i>
+                                {{#if this.isLiked}}Liked{{else}}Like{{/if}}
+                            </button>
+                            <button class="comment"><i class="fa-regular fa-comment"></i> Comment</button>
+                            <button class="share" data-title="{{this.title}}"
+                                data-url="https://mysarafa.com/Groups/group-view/{{../group._id}}">
+                                <i class="fa-solid fa-share"></i> Share
+                            </button>
+                        </div>
+
+                        <div class="like-count-bar" data-id="{{this._id}}"
+                            style="padding: 6px 16px; font-size: 13px; color: #65676b; cursor: pointer; {{#unless this.likeCount}}display:none;{{/unless}}">
+                            <span class="like-count-text">❤️ {{this.likeCount}} {{#if (eq this.likeCount
+                                1)}}like{{else}}likes{{/if}}</span>
+                        </div>
+
+                        <!-- Comments - INTERACTIVE (member can post) -->
+                        <div class="comments-section" data-id="{{this._id}}">
+                            <div class="comments-list"></div>
+                            <div style="display:flex; gap:8px; margin-top:10px;">
+                                <input type="text" class="comment-input" placeholder="Write a comment..."
+                                    data-id="{{this._id}}"
+                                    style="flex:1; padding:8px 12px; border:1px solid #ddd; border-radius:20px; font-size:14px; outline:none;">
+                                <button class="comment-submit-btn" data-id="{{this._id}}"
+                                    style="padding:8px 16px; background:#1877f2; color:#fff; border:none; border-radius:20px; font-size:13px; cursor:pointer;">
+                                    Post
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {{/each}}
+                    {{else}}
+                    <p>No announcements yet.</p>
+                    {{/if}}
+                </section>
+
+                <!-- People Section -->
+                <section id="people" class="group-people" style="display: none;">
+                    <h2>Members ({{group.total_mem}})</h2>
+                    {{#each members}}
+                    <div class="member-card">
+                        <img src="{{this.user.profilePicture}}" alt="{{this.user.f_name}}">
+                        <span>{{this.user.f_name}} {{this.user.l_name}}</span>
+                        <span>{{#if (eq this.type 'admin')}}Admin{{else}}Member{{/if}}</span>
+                    </div>
+                    {{/each}}
+                </section>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Likes Modal -->
+    <div id="likesModal"
+        style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+        <div
+            style="background:#fff; border-radius:10px; width:320px; max-height:400px; overflow-y:auto; padding:16px; position:relative;">
+            <button id="closeLikesModal"
+                style="position:absolute; top:10px; right:14px; background:none; border:none; font-size:20px; cursor:pointer;">&times;</button>
+            <h3 style="margin-bottom:12px;">Liked by</h3>
+            <div id="likesList"></div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="/js/all.js"></script>
+
+    <script>
+        // Simple tab switching
+        document.querySelectorAll('.group-tabs a').forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = e.target.href.split('#')[1];
+                document.querySelectorAll('.group-layout section').forEach(sec => {
+                    sec.style.display = sec.id === targetId ? 'block' : 'none';
+                });
+            });
+        });
+
+        // Share btn
+        document.querySelectorAll('.share').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const title = btn.dataset.title;
+                const url = btn.dataset.url;
+
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: title,
+                            text: "Check this announcement on MySarafa",
+                            url: url
+                        });
+                    } catch (err) {
+                        console.log("User cancelled sharing");
+                    }
+                } else {
+                    navigator.clipboard.writeText(url);
+                    toastr.success("Link copied!");
+                }
+            });
+        });
+
+        // Update like count text + button state
+        function updateLikeCountText(id, count, isLiked) {
+            const bar = document.querySelector(`.like-count-bar[data-id="${id}"]`);
+            if (bar) {
+                const textEl = bar.querySelector('.like-count-text');
+                if (count > 0) {
+                    textEl.textContent = `❤️ ${count} ${count === 1 ? 'like' : 'likes'}`;
+                    bar.style.display = 'block';
+                } else {
+                    bar.style.display = 'none';
+                }
+            }
+
+            const btn = document.querySelector(`.like-btn[data-id="${id}"]`);
+            if (btn) {
+                btn.classList.toggle('liked', isLiked);
+                btn.innerHTML = isLiked
+                    ? '<i class="fa-solid fa-heart"></i> Liked'
+                    : '<i class="fa-regular fa-heart"></i> Like';
+            }
+        }
+
+        // Like toggle
+        document.addEventListener("click", async (e) => {
+            if (e.target.closest(".like-btn")) {
+                const btn = e.target.closest(".like-btn");
+                const id = btn.dataset.id;
+
+                const res = await fetch(`/announcements/like/${id}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" }
+                });
+
+                const data = await res.json();
+                if (data && typeof data.likeCount !== 'undefined') {
+                    updateLikeCountText(id, data.likeCount, data.liked);
+                }
+            }
+        });
+
+        // Show likers modal on clicking like-count bar
+        document.addEventListener("click", async (e) => {
+            const bar = e.target.closest(".like-count-bar");
+            if (!bar) return;
+
+            const id = bar.dataset.id;
+            const modal = document.getElementById("likesModal");
+            const list = document.getElementById("likesList");
+            list.innerHTML = "Loading...";
+            modal.style.display = "flex";
+
+            try {
+                const res = await fetch(`/announcements/likes/${id}`);
+                const data = await res.json();
+
+                if (data.success && data.likes.length) {
+                    list.innerHTML = data.likes.map(u => `
+                        <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #f0f0f0;">
+                            <img src="${u.profileImage || '/assets/images/default-profile.png'}"
+                                 alt="${u.name}"
+                                 style="width:36px; height:36px; border-radius:50%; object-fit:cover;">
+                            <span style="font-size:14px; font-weight:500;">${u.name}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = "<p>No likes yet.</p>";
+                }
+            } catch (err) {
+                list.innerHTML = "<p>Error loading likes.</p>";
+            }
+        });
+
+        document.getElementById("closeLikesModal").addEventListener("click", () => {
+            document.getElementById("likesModal").style.display = "none";
+        });
+
+        // Toggle comment section + load comments
+        document.addEventListener("click", async (e) => {
+            const commentBtn = e.target.closest(".comment");
+            if (!commentBtn) return;
+
+            const card = commentBtn.closest(".announcement-card");
+            const section = card.querySelector(".comments-section");
+            const id = section.dataset.id;
+
+            const isVisible = section.style.display === 'block';
+            section.style.display = isVisible ? 'none' : 'block';
+
+            if (!isVisible) {
+                await loadComments(id);
+            }
+        });
+
+        async function loadComments(id) {
+            const section = document.querySelector(`.comments-section[data-id="${id}"]`);
+            const list = section.querySelector(".comments-list");
+            list.innerHTML = "Loading...";
+
+            try {
+                const res = await fetch(`/announcements/comments/${id}`);
+                const data = await res.json();
+
+                if (data.success && data.comments.length) {
+                    list.innerHTML = data.comments.map(c => `
+                        <div style="display:flex; gap:8px; padding:6px 0;">
+                            <img src="${c.user.profileImage}" alt="${c.user.name}"
+                                 style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+                            <div style="background:#f0f2f5; border-radius:12px; padding:6px 12px;">
+                                <div style="font-size:13px; font-weight:600;">${c.user.name}</div>
+                                <div style="font-size:14px;">${c.text}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = "<p style='font-size:13px;color:#999;'>No comments yet.</p>";
+                }
+            } catch (err) {
+                list.innerHTML = "<p style='font-size:13px;color:red;'>Error loading comments.</p>";
+            }
+        }
+
+        // Post a new comment
+        document.addEventListener("click", async (e) => {
+            if (!e.target.classList.contains("comment-submit-btn")) return;
+
+            const id = e.target.dataset.id;
+            const section = e.target.closest(".comments-section");
+            const input = section.querySelector(".comment-input");
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            try {
+                const res = await fetch(`/announcements/comment/${id}`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text })
+                });
+
+                const data = await res.json();
+                if (data.success) {
+                    input.value = "";
+                    await loadComments(id);
+                } else {
+                    toastr.error(data.message || "Error posting comment");
+                }
+            } catch (err) {
+                toastr.error("Error posting comment");
+            }
+        });
+    </script>
+    <script type="module" src="/js/firebase.js"></script>
+</body>
+
+</html>

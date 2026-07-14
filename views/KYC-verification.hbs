@@ -374,6 +374,9 @@
                   <input type="text" maxlength="1" class="otp-box" />
 
                   <button class="verify-btn" type="button" id="verifyOtpBtn"><span>Verify</span></button>
+                  <button class="verify-btn" type="button" id="resendOtpBtn" style="display:none;">
+                    <span>Resend OTP</span>
+                  </button>
                 </div>
 
               </div>
@@ -571,6 +574,31 @@
         console.log('fetchKycData response:', result);
         if (response.ok) {
           const data = result.data;
+          // OTP already sent but not verified
+          if (data.otp_pending && !data.aadhaar_verified) {
+
+            document.getElementById('getOtpBtn').style.display = 'none';
+
+            document.getElementById('otpFields').style.display = 'flex';
+
+            document.getElementById('verifyOtpBtn').style.display = 'inline-block';
+
+            document.getElementById('aadhaarVerificationMessage').textContent =
+              'OTP already sent. Please verify your OTP.';
+
+            document.getElementById('aadhaarVerificationMessage').style.color = '#551DFF';
+          }
+          if (data.aadhaar_verified) {
+            aadhaarVerified = true;
+
+            document.getElementById('aadhaarVerificationMessage').textContent =
+              'Aadhaar already verified';
+
+            document.getElementById('aadhaarVerificationMessage').style.color = '#47ff53';
+
+            document.getElementById('getOtpBtn').style.display = 'none';
+            document.getElementById('otpFields').style.display = 'none';
+          }
           document.getElementById('fullName').value = data.fullName || '';
           document.getElementById('dob').value = data.dob || '';
           document.getElementById('state').value = data.state || '';
@@ -674,7 +702,7 @@
       ];
       let currentStep = 0;
       const formLoader = document.getElementById('formLoader');
-      let aadhaarVerified = false;
+      // let aadhaarVerified = false;
       function showStep(idx) {
         steps.forEach((step, i) => {
           if (step) step.style.display = i === idx ? '' : 'none';
@@ -715,6 +743,7 @@
       const getOtpBtn = document.getElementById('getOtpBtn');
       const otpFields = document.getElementById('otpFields');
       const verifyOtpBtn = document.getElementById('verifyOtpBtn');
+      const resendOtpBtn = document.getElementById('resendOtpBtn');
 
       if (aadhaarInput && getOtpBtn) {
         aadhaarInput.addEventListener('input', () => {
@@ -778,10 +807,14 @@
               document.getElementById('aadhaarVerificationMessage').style.color = '#47ff53';
               otpFields.style.display = 'none';
               verifyOtpBtn.style.display = 'none';
+              resendOtpBtn.style.display = 'none';
             } else {
               document.getElementById('aadhaarVerificationMessage').textContent =
                 result.message || 'Invalid OTP. Please try again.';
               document.getElementById('aadhaarVerificationMessage').style.color = '#ef4444';
+
+              verifyOtpBtn.style.display = 'none';
+              resendOtpBtn.style.display = 'inline-block';
             }
           } else {
             showNotification('Please enter the complete OTP.', 'error');
@@ -789,6 +822,38 @@
         });
       }
 
+      if (resendOtpBtn) {
+        resendOtpBtn.addEventListener('click', async () => {
+          const aadhaarNumber = aadhaarInput.value.trim();
+
+          const response = await fetch('/kyc/resend-otp', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            credentials: 'include',
+            body: JSON.stringify({ aadhaarNumber })
+          });
+
+          const result = await response.json();
+
+          if (response.ok) {
+            showNotification(result.message, 'success');
+
+            resendOtpBtn.style.display = 'none';
+            verifyOtpBtn.style.display = 'inline-block';
+
+            document.getElementById('aadhaarVerificationMessage').textContent =
+              'New OTP sent. Please verify.';
+            document.getElementById('aadhaarVerificationMessage').style.color = '#551DFF';
+
+            document.querySelectorAll('.otp-box').forEach(box => box.value = '');
+            document.querySelector('.otp-box').focus();
+          } else {
+            showNotification(result.message, 'error');
+          }
+        });
+      }
 
       const postalCodeInput = document.getElementById("postalCode");
       if (postalCodeInput) {
@@ -959,7 +1024,7 @@
               Swal.fire({
                 icon: "warning",
                 title: "Pending!",
-                text: result.message || "KYC submission pending!",
+                text: result.message
 
               });
             }
@@ -991,6 +1056,7 @@
     });
   </script>
 
+  <script type="module" src="/js/firebase.js"></script>
   <script src="/js/all.js"></script>
   {{> profile}}
 </body>

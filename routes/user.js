@@ -1,27 +1,28 @@
 const express = require('express');
 const router = express.Router();
-const {authMiddleware,isAdmin} = require('../middleware/auth');
+const { authMiddleware, isAdmin } = require('../middleware/auth');
 const profileImageMiddleware = require('../middleware/profileImageMiddleware');
 
-const  monthlyMembershipCheck  = require('../middleware/monthlymembershipVisible');
-const {upload} = require('../middleware/multer');
+const monthlyMembershipCheck = require('../middleware/monthlymembershipVisible');
+const { upload } = require('../middleware/multer');
 
 const userController = require('../controllers/userController');
 const GMem = require('../models/groupMem.model');
 
-router.get('/dashboard',authMiddleware,monthlyMembershipCheck,profileImageMiddleware,userController.dashboard);
-router.post('/update-profile',authMiddleware, upload.single('profilePicture'),userController.updateProfile);
+router.get('/dashboard', authMiddleware, monthlyMembershipCheck, profileImageMiddleware, userController.dashboard);
+router.post('/update-profile', authMiddleware, upload.single('profilePicture'), userController.updateProfile);
 
-router.get('/user/:id', authMiddleware, isAdmin,profileImageMiddleware, userController.getMemberDetails);
+router.get('/user/:id', authMiddleware, isAdmin, profileImageMiddleware, userController.getMemberDetails);
 router.post('/user/:id/verify', authMiddleware, isAdmin, userController.verifyMember);
 
-router.get('/notifs',authMiddleware,profileImageMiddleware,userController.notifications);
+router.get('/notifs', authMiddleware, profileImageMiddleware, userController.notifications);
 
 
-router.get('/association-sample',authMiddleware,profileImageMiddleware,userController.associationSample);
+router.get('/association-sample', authMiddleware, profileImageMiddleware, userController.associationSample);
 
+router.post('/save-fcm-token', authMiddleware, userController.saveFcmToken);
 
-
-router.get('/sign-out',userController.signout);
+// router.get('/sign-out', userController.signout);
+router.get('/sign-out', authMiddleware, userController.signout);
 
 module.exports = router;

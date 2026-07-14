@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,6 +21,7 @@
             padding: 20px 0;
             border-bottom: 1px solid #e5e7eb;
         }
+
         .notification-title {
             font-size: 28px;
             font-weight: 700;
@@ -29,15 +31,18 @@
             gap: 12px;
             margin: 0;
         }
+
         .notification-title i {
             color: #2f95ff;
             font-size: 24px;
         }
+
         .notification-actions {
             display: flex;
             align-items: center;
             gap: 12px;
         }
+
         .mark-all-read-btn {
             background: #2f95ff;
             color: white;
@@ -52,11 +57,13 @@
             gap: 8px;
             transition: all 0.2s ease;
         }
+
         .mark-all-read-btn:hover {
             background: #1d7dd8;
             transform: translateY(-1px);
             box-shadow: 0 4px 12px rgba(47, 149, 255, 0.3);
         }
+
         .notification-settings-btn {
             background: #f3f4f6;
             color: #6b7280;
@@ -71,11 +78,13 @@
             width: 40px;
             height: 40px;
         }
+
         .notification-settings-btn:hover {
             background: #e5e7eb;
             color: #374151;
             transform: scale(1.05);
         }
+
         .notification-tabs {
             display: flex;
             gap: 8px;
@@ -87,9 +96,11 @@
             scrollbar-width: none;
             -ms-overflow-style: none;
         }
+
         .notification-tabs::-webkit-scrollbar {
             display: none;
         }
+
         .tab-btn {
             background: transparent;
             border: none;
@@ -106,15 +117,18 @@
             white-space: nowrap;
             position: relative;
         }
+
         .tab-btn:hover {
             background: #e5e7eb;
             color: #374151;
         }
+
         .tab-btn.active {
             background: #2f95ff;
             color: white;
             box-shadow: 0 2px 8px rgba(47, 149, 255, 0.3);
         }
+
         .tab-count {
             background: rgba(255, 255, 255, 0.2);
             color: inherit;
@@ -125,19 +139,23 @@
             min-width: 20px;
             text-align: center;
         }
+
         .tab-btn.active .tab-count {
             background: rgba(255, 255, 255, 0.3);
         }
+
         .notifications-container {
             display: flex;
             flex-direction: column;
             gap: 32px;
         }
+
         .notification-section {
             display: flex;
             flex-direction: column;
             gap: 16px;
         }
+
         .section-title {
             font-size: 18px;
             font-weight: 600;
@@ -147,6 +165,7 @@
             border-bottom: 2px solid #e5e7eb;
             position: relative;
         }
+
         .section-title::after {
             content: '';
             position: absolute;
@@ -156,6 +175,7 @@
             height: 2px;
             background: #2f95ff;
         }
+
         .notification-item {
             background: white;
             border-radius: 12px;
@@ -169,14 +189,17 @@
             position: relative;
             cursor: pointer;
         }
+
         .notification-item:hover {
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
             transform: translateY(-1px);
         }
+
         .notification-item.unread {
             border-left: 4px solid #2f95ff;
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         }
+
         .notification-item.unread::before {
             content: '';
             position: absolute;
@@ -188,18 +211,30 @@
             border-radius: 50%;
             animation: pulse 2s infinite;
         }
+
         @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
         }
+
         .notification-avatar {
             position: relative;
             flex-shrink: 0;
         }
+
         .main-content {
             background: white;
         }
+
         .avatar-img {
             width: 48px;
             height: 48px;
@@ -207,26 +242,31 @@
             object-fit: cover;
             border: 2px solid #e5e7eb;
         }
+
         .notification-content {
             flex: 1;
             min-width: 0;
         }
+
         .notification-text {
             font-size: 15px;
             line-height: 1.4;
             color: #111827;
             margin-bottom: 8px;
         }
+
         .notification-text strong {
             font-weight: 600;
             color: #2f95ff;
         }
+
         .notification-time {
             color: #6b7280;
             font-size: 13px;
             font-weight: 500;
             margin-left: 8px;
         }
+
         .notification-preview {
             background: #f8fafc;
             border-radius: 8px;
@@ -237,11 +277,13 @@
             font-style: italic;
             line-height: 1.4;
         }
+
         .request-action-buttons {
             display: flex;
             gap: 8px;
             margin-top: 8px;
         }
+
         .btn-accept {
             background: #2f95ff;
             color: white;
@@ -253,10 +295,12 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
+
         .btn-accept:hover {
             background: #1d7dd8;
             transform: scale(1.05);
         }
+
         .btn-decline {
             background: #f3f4f6;
             color: #6b7280;
@@ -268,31 +312,37 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
+
         .btn-decline:hover {
             background: #fef2f2;
             color: #dc2626;
             transform: scale(1.05);
         }
+
         .notifications-empty {
             text-align: center;
             padding: 60px 20px;
             color: #6b7280;
         }
+
         .notifications-empty i {
             font-size: 48px;
             color: #d1d5db;
             margin-bottom: 16px;
         }
+
         .notifications-empty h3 {
             font-size: 18px;
             font-weight: 600;
             margin-bottom: 8px;
             color: #374151;
         }
+
         .notifications-empty p {
             font-size: 14px;
             line-height: 1.5;
         }
+
         @media (max-width: 768px) {
             .notification-header {
                 flex-direction: column;
@@ -300,100 +350,126 @@
                 gap: 16px;
                 margin-bottom: 20px;
             }
+
             .notification-title {
                 font-size: 24px;
             }
+
             .notification-actions {
                 width: 100%;
                 justify-content: space-between;
             }
+
             .mark-all-read-btn {
                 font-size: 13px;
                 padding: 8px 12px;
             }
+
             .notification-tabs {
                 margin-bottom: 20px;
                 padding: 2px;
             }
+
             .tab-btn {
                 padding: 10px 12px;
                 font-size: 13px;
             }
+
             .notification-item {
                 padding: 12px;
                 gap: 12px;
             }
+
             .avatar-img {
                 width: 40px;
                 height: 40px;
             }
+
             .notification-text {
                 font-size: 14px;
             }
+
             .notification-preview {
                 font-size: 13px;
                 padding: 10px;
             }
+
             .request-action-buttons {
                 gap: 6px;
             }
-            .btn-accept, .btn-decline {
+
+            .btn-accept,
+            .btn-decline {
                 padding: 6px 12px;
                 font-size: 13px;
             }
         }
+
         @media (max-width: 480px) {
             .notification-header {
                 padding: 16px 0;
             }
+
             .notification-title {
                 font-size: 20px;
             }
+
             .notification-actions {
                 flex-direction: column;
                 gap: 8px;
                 width: 100%;
             }
+
             .mark-all-read-btn,
             .notification-settings-btn {
                 width: 100%;
                 justify-content: center;
             }
+
             .notification-tabs {
                 gap: 4px;
             }
+
             .tab-btn {
                 padding: 8px 10px;
                 font-size: 12px;
             }
+
             .tab-count {
                 font-size: 10px;
                 padding: 1px 6px;
             }
+
             .notification-item {
                 padding: 10px;
                 gap: 10px;
             }
+
             .avatar-img {
                 width: 36px;
                 height: 36px;
             }
+
             .notification-text {
                 font-size: 13px;
             }
+
             .notification-time {
                 font-size: 11px;
             }
+
             .notification-preview {
                 font-size: 12px;
                 padding: 8px;
             }
+
             .section-title {
                 font-size: 16px;
             }
         }
     </style>
 </head>
+
 <body data-user-id="{{user._id}}">
     {{> header}}
     <div class="main-container">
@@ -431,15 +507,18 @@
                             </div> --}}
                             <div class="notification-content">
                                 <div class="notification-text">
-                                    <strong>{{this.userName}}</strong> requested to join <strong>{{this.groupName}}</strong>
+                                    <strong>{{this.userName}}</strong> requested to join
+                                    <strong>{{this.groupName}}</strong>
                                     <span class="notification-time">{{this.createdAt}}</span>
                                 </div>
                                 {{!-- <div class="notification-preview" style="font-style: normal;">
                                     "Hi, I’d like to join this community to participate in events."
                                 </div> --}}
                                 <div class="request-action-buttons">
-                                    <button class="btn-accept" data-request-id="{{this.requestId}}" data-group-id="{{this.groupId}}"><i class="fas fa-check"></i> Accept</button>
-                                    <button class="btn-decline" data-request-id="{{this.requestId}}"><i class="fas fa-times"></i> Decline</button>
+                                    <button class="btn-accept" data-request-id="{{this.requestId}}"
+                                        data-group-id="{{this.groupId}}"><i class="fas fa-check"></i> Accept</button>
+                                    <button class="btn-decline" data-request-id="{{this.requestId}}"><i
+                                            class="fas fa-times"></i> Decline</button>
                                 </div>
                             </div>
                         </div>
@@ -495,17 +574,17 @@
                 }
             });
             socket.on('membershipRequest', function (data) {
-                  console.log("📩 Incoming membershipRequest socket data:", data);
+                console.log("📩 Incoming membershipRequest socket data:", data);
                 notificationCount++;
                 updateNotificationCount(notificationCount);
                 appendNotification(data);
             });
             function appendNotification(data) {
-                 console.log("🔔 Appending notification:", data);
-                const timeAgo = new Date(data.requestedAt).toLocaleTimeString(undefined, { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                    });
+                console.log("🔔 Appending notification:", data);
+                const timeAgo = new Date(data.requestedAt).toLocaleTimeString(undefined, {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
                 const notificationHtml = `
                     <div class="notification-item unread new" data-type="request" data-request-id="${data.requestId}">
                        
@@ -594,6 +673,8 @@
             });
         });
     </script>
-      <script src="/js/all.js"></script>
+    <script src="/js/all.js"></script>
+    <script type="module" src="/js/firebase.js"></script>
 </body>
+
 </html>

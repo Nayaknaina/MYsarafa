@@ -15,9 +15,17 @@ const upload = require('../middleware/multer');
 const axios = require("axios");
 const sanitize = require('mongo-sanitize');
 
-const { getSignedUrl } = require('../middleware/multer');
+const { getSignedUrl, s3 } = require('../middleware/multer');
 
-
+// Illustrator Images For Group-Info Page
+const ILLUSTRATION_COVERS = {
+    illustration1: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#667eea"/><stop offset="1" stop-color="#764ba2"/></linearGradient></defs><rect width="400" height="200" fill="url(#g)"/></svg>'),
+    illustration2: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f093fb"/><stop offset="1" stop-color="#f5576c"/></linearGradient></defs><rect width="400" height="200" fill="url(#g)"/></svg>'),
+    illustration3: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4facfe"/><stop offset="1" stop-color="#00f2fe"/></linearGradient></defs><rect width="400" height="200" fill="url(#g)"/></svg>'),
+    illustration4: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#43e97b"/><stop offset="1" stop-color="#38f9d7"/></linearGradient></defs><rect width="400" height="200" fill="url(#g)"/></svg>'),
+    illustration5: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fa709a"/><stop offset="1" stop-color="#fee140"/></linearGradient></defs><rect width="400" height="200" fill="url(#g)"/></svg>'),
+    illustration6: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="200"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#30cfd0"/><stop offset="1" stop-color="#330867"/></linearGradient></defs><rect width="400" height="200" fill="url(#g)"/></svg>')
+};
 
 exports.communityCreation = async (req, res, next) => {
     try {
@@ -623,6 +631,7 @@ exports.groupDetails = async (req, res) => {
 
 
         const membership = await GMem.findOne({ group: groupId, user: user._id }).lean();
+        console.log("Membership =>", membership);
         if (group.g_type === 'private' && (!membership || membership.type === 'pending')) {
             return res.status(403).json({ success: false, message: 'You do not have access to this private group' });
         }
@@ -634,7 +643,9 @@ exports.groupDetails = async (req, res) => {
             ...m,
             user: {
                 ...m.user,
-                profile_pic: m.user.profile_pic ? getSignedUrl(m.user.profile_pic) : '/assets/images/default-profile.jpg'
+                profile_pic: m.user?.profile_pic
+                    ? getSignedUrl(m.user.profile_pic)
+                    : '/assets/images/default-profile.jpg'
             }
         }));
 
@@ -642,17 +653,24 @@ exports.groupDetails = async (req, res) => {
         let announcements = await Announcement.find({ group: groupId })
             .sort({ createdAt: -1 })
             .populate('createdBy', 'f_name l_name profilePicture')
+            .populate('likes', 'f_name l_name profilePicture')
             .lean();
 
+        console.log("Members =>", members);
+        console.log("Announcements =>", announcements);
+
         announcements = announcements.map(a => {
-            const fullName = `${a.createdBy.f_name || ''} ${a.createdBy.l_name || ''}`.trim() || 'Unknown User';
+            const fullName = a.createdBy
+                ? `${a.createdBy.f_name || ''} ${a.createdBy.l_name || ''}`.trim()
+                : 'Unknown User';
 
             return {
                 ...a,
                 createdBy: {
                     ...a.createdBy,
                     full_name: fullName,
-                    profile_pic: (a.createdBy.profilePicture && !a.createdBy.profilePicture.startsWith('/assets/'))
+                    profile_pic: (a.createdBy?.profilePicture &&
+                        !a.createdBy.profilePicture.startsWith('/assets/'))
                         ? getSignedUrl(a.createdBy.profilePicture)
                         : '/assets/images/default-profile.jpg'
                 },
@@ -664,18 +682,14 @@ exports.groupDetails = async (req, res) => {
         console.log("Fetched announcements:", announcements);
 
 
-        if (group.g_cover && !group.g_cover.startsWith('/assets/')) {
+        if (group.g_cover && (group.g_cover.startsWith('/assets/') || group.g_cover.startsWith('data:'))) {
+            // already static/illustration - as-is rehne do
+        } else if (group.g_cover) {
             group.g_cover = getSignedUrl(group.g_cover);
         } else {
             group.g_cover = '/assets/images/demo.jpg';
         }
-
-        if (group.qr_code && !group.qr_code.startsWith('/assets/')) {
-            group.qr_code = getSignedUrl(group.qr_code);
-        } else {
-            group.qr_code = '/assets/images/default-qr.jpg';
-        }
-
+        console.log("isMember =>", !!membership);
         res.render('group-info', {
             user,
             group,
@@ -1216,6 +1230,7 @@ exports.uploadMembersCSV = async (req, res) => {
             return res.status(400).json({ success: false, message: 'No CSV file uploaded' });
         }
         const filePath = req.file.path;
+        console.log("REQ FILE =", req.file);
         const groupId = req.body.groupId;
         const user = await User.findById(req.user.id);
 
@@ -1237,7 +1252,11 @@ exports.uploadMembersCSV = async (req, res) => {
         }
 
         const csvData = [];
-        fs.createReadStream(filePath)
+        // fs.createReadStream(filePath)
+        s3.getObject({
+            Bucket: req.file.bucket,
+            Key: req.file.key
+        }).createReadStream()
             .pipe(csv())
             .on('data', (row) => {
                 csvData.push(row);
@@ -1519,3 +1538,253 @@ exports.leaveGroup = async (req, res) => {
         res.status(500).json({ success: false, message: 'Error leaving group', error: error.message });
     }
 };
+
+// Member card 
+exports.groupViewMember = async (req, res) => {
+    try {
+        const groupId = req.params.groupId;
+        const userId = req.user.id;
+
+        const group = await Group.findById(groupId)
+            .populate('user', 'f_name l_name')
+            .lean();
+
+        if (!group) {
+            return res.status(404).render('error', { errorMessage: 'Group not found', layout: false });
+        }
+
+        // Cover photo ko signed URL me convert karo
+        if (group.g_cover && (group.g_cover.startsWith('/assets/') || group.g_cover.startsWith('data:'))) {
+            // as-is rehne do
+        } else if (group.g_cover) {
+            group.g_cover = getSignedUrl(group.g_cover);
+        } else {
+            group.g_cover = '/assets/images/demo.jpg';
+        }
+
+        const membership = await GMem.findOne({ user: userId, group: groupId }).lean();
+        const isMember = !!membership;
+
+        const members = await GMem.find({ group: groupId })
+            .populate('user', 'f_name l_name profilePicture')
+            .lean();
+
+        const announcements = await Announcement.find({ group: groupId })
+            .populate('createdBy', 'f_name l_name profilePicture')
+            .populate('likes', 'f_name l_name profilePicture')
+            .sort({ createdAt: -1 })
+            .lean();
+
+        const formattedAnnouncements = announcements.map(a => ({
+            ...a,
+            image: (a.image && !a.image.startsWith('/assets/') && !a.image.startsWith('/uploads/'))
+                ? getSignedUrl(a.image)
+                : (a.image || null),
+            isLiked: a.likes?.some(u => u?._id?.toString() === userId.toString()),
+            likeCount: a.likes?.length || 0
+        }));
+
+        res.render('group-info-member', {
+            group,
+            isMember,
+            members,
+            announcements: formattedAnnouncements,
+            hasAnnouncements: formattedAnnouncements.length > 0,
+            user: { ...req.user, has_password: !!req.user.password }
+        });
+    } catch (error) {
+        console.error('Error rendering member group view:', error);
+        res.status(500).render('500', { errorMessage: 'Server error: ' + error.message, layout: false });
+    }
+};
+// ---------------------------------------------------------------
+// 1) Update group cover photo - either an uploaded file OR a preset illustration
+//    Route: PATCH /Groups/:groupId/cover   (multipart/form-data)
+//    Body : coverImage (file)  OR  illustrationKey (string)
+// ---------------------------------------------------------------
+exports.updateGroupCover = async (req, res) => {
+    try {
+        const groupId = req.params.groupId;
+        if (!mongoose.isValidObjectId(groupId)) {
+            return res.status(400).json({ success: false, message: 'Invalid group ID' });
+        }
+
+        const isAdmin = await GMem.findOne({ group: groupId, user: req.user.id, type: 'admin' });
+        if (!isAdmin) {
+            return res.status(403).json({ success: false, message: 'Only group admins can change the cover photo' });
+        }
+
+        const group = await Group.findById(groupId);
+        if (!group) {
+            return res.status(404).json({ success: false, message: 'Group not found' });
+        }
+
+        let newCoverKey = null;
+
+        if (req.files && req.files.coverImage && req.files.coverImage[0]) {
+            newCoverKey = req.files.coverImage[0].key;
+        } else if (req.body.illustrationKey && ILLUSTRATION_COVERS[req.body.illustrationKey]) {
+            newCoverKey = ILLUSTRATION_COVERS[req.body.illustrationKey];
+        } else if (req.body.illustrationKey) {
+            return res.status(400).json({ success: false, message: 'Invalid illustration selected' });
+        } else {
+            return res.status(400).json({ success: false, message: 'No cover photo or illustration provided' });
+        }
+
+        // Only delete the old cover from S3 if it was a real uploaded object (not a static illustration)
+        if (group.g_cover && !group.g_cover.startsWith('/assets/') && !group.g_cover.startsWith('data:')) {
+            try { await s3.deleteObject({ Bucket: process.env.AWS_BUCKET_NAME, Key: group.g_cover }).promise(); }
+            catch (err) { console.error('Error deleting old cover:', err); }
+        }
+        group.g_cover = newCoverKey;
+        await group.save();
+
+        const coverUrl = (newCoverKey.startsWith('/assets/') || newCoverKey.startsWith('data:'))
+            ? newCoverKey
+            : getSignedUrl(newCoverKey);
+
+        res.status(200).json({ success: true, message: 'Cover photo updated successfully', cover: coverUrl });
+    } catch (error) {
+        console.error('Error updating group cover:', error);
+        res.status(500).json({ success: false, message: 'Server error while updating cover photo' });
+    }
+};
+// ---------------------------------------------------------------
+// 2) Update group description (the "About" box Save/Cancel flow)
+//    Route: PATCH /Groups/:groupId/description  (application/json)
+//    Body : { description }
+// ---------------------------------------------------------------
+exports.updateGroupDescription = async (req, res) => {
+    try {
+        const groupId = req.params.groupId;
+        const { description } = req.body;
+
+        if (!mongoose.isValidObjectId(groupId)) {
+            return res.status(400).json({ success: false, message: 'Invalid group ID' });
+        }
+
+        const isAdmin = await GMem.findOne({ group: groupId, user: req.user.id, type: 'admin' });
+        if (!isAdmin) {
+            return res.status(403).json({ success: false, message: 'Only group admins can edit the description' });
+        }
+
+        const group = await Group.findById(groupId);
+        if (!group) {
+            return res.status(404).json({ success: false, message: 'Group not found' });
+        }
+
+        group.description = (description || '').trim();
+        await group.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Description updated successfully',
+            description: group.description
+        });
+    } catch (error) {
+        console.error('Error updating group description:', error);
+        res.status(500).json({ success: false, message: 'Server error while updating description' });
+    }
+};
+// ---------------------------------------------------------------
+// 3) Search users who CAN be invited (existing app users, not already
+//    a member/pending/admin of this group)
+//    Route: GET /Groups/:groupId/invitable-users?query=xyz
+// ---------------------------------------------------------------
+exports.searchInvitableUsers = async (req, res) => {
+    try {
+        const groupId = req.params.groupId;
+        const query = sanitize(req.query.query || '').trim();
+
+        if (!mongoose.isValidObjectId(groupId)) {
+            return res.status(400).json({ success: false, message: 'Invalid group ID' });
+        }
+
+        const isAdmin = await GMem.findOne({ group: groupId, user: req.user.id, type: 'admin' });
+        if (!isAdmin) {
+            return res.status(403).json({ success: false, message: 'Only group admins can invite members' });
+        }
+
+        // Exclude anyone already tied to this group (member, admin, or pending)
+        const existingMembers = await GMem.find({ group: groupId }).select('user').lean();
+        const excludedIds = existingMembers.map(m => m.user);
+
+        const searchQuery = { _id: { $nin: excludedIds } };
+        if (query) {
+            searchQuery.$or = [
+                { f_name: { $regex: query, $options: 'i' } },
+                { l_name: { $regex: query, $options: 'i' } },
+                { email: { $regex: query, $options: 'i' } }
+            ];
+        }
+
+        const users = await User.find(searchQuery)
+            .select('f_name l_name email profile_pic')
+            .limit(20)
+            .lean();
+
+        const formattedUsers = users.map(u => ({
+            _id: u._id,
+            name: `${u.f_name || ''} ${u.l_name || ''}`.trim() || u.email,
+            profile_pic: u.profile_pic ? getSignedUrl(u.profile_pic) : null
+        }));
+
+        res.status(200).json({ success: true, users: formattedUsers });
+    } catch (error) {
+        console.error('Error searching invitable users:', error);
+        res.status(500).json({ success: false, message: 'Server error while searching users' });
+    }
+};
+
+// ---------------------------------------------------------------
+// 4) Invite (directly add) an existing user to the group
+//    Route: POST /Groups/:groupId/invite   (application/json)
+//    Body : { userId }
+// ---------------------------------------------------------------
+exports.inviteMember = async (req, res) => {
+    try {
+        const groupId = req.params.groupId;
+        const { userId } = req.body;
+
+        if (!mongoose.isValidObjectId(groupId) || !mongoose.isValidObjectId(userId)) {
+            return res.status(400).json({ success: false, message: 'Invalid group or user ID' });
+        }
+
+        const isAdmin = await GMem.findOne({ group: groupId, user: req.user.id, type: 'admin' });
+        if (!isAdmin) {
+            return res.status(403).json({ success: false, message: 'Only group admins can invite members' });
+        }
+
+        const group = await Group.findById(groupId);
+        if (!group) {
+            return res.status(404).json({ success: false, message: 'Group not found' });
+        }
+
+        const existingMember = await GMem.findOne({ group: groupId, user: userId });
+        if (existingMember) {
+            return res.status(400).json({ success: false, message: 'User is already a member or has a pending request' });
+        }
+
+        const groupMember = new GMem({ group: groupId, user: userId, type: 'user' });
+        await groupMember.save();
+
+        group.total_mem += 1;
+        await group.save();
+
+        // Optional: real-time notify the invited user, same pattern as joinGroup/approveRequest
+        const io = req.app.get('socketio');
+        if (io) {
+            io.to(userId.toString()).emit('addedToGroup', {
+                groupId: group._id,
+                groupName: group.g_name,
+                message: `You have been added to ${group.g_name}!`
+            });
+        }
+
+        res.status(200).json({ success: true, message: 'User invited to the group successfully' });
+    } catch (error) {
+        console.error('Error inviting member:', error);
+        res.status(500).json({ success: false, message: 'Server error while inviting member' });
+    }
+};
+

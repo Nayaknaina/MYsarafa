@@ -54,4 +54,4 @@ const upload = multer({
   }
 });
 
-module.exports = { upload, getSignedUrl: (key) => s3.getSignedUrl('getObject', { Bucket: process.env.AWS_BUCKET_NAME, Key: key, Expires: 3600 }) };
+module.exports = { upload, s3, getSignedUrl: (key) => s3.getSignedUrl('getObject', { Bucket: process.env.AWS_BUCKET_NAME, Key: key, Expires: 3600 }) };

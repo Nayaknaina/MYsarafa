@@ -1,4 +1,5 @@
-{{!-- <!DOCTYPE html>
+{{!--
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -13,189 +14,190 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
 
-  
+
 </head> --}}
 <style>
-    .announcement-copy:active,
-.announcement-share:active {
-  transform: scale(1.2);
-}
-    .chat-container {
-      display: flex;
-      flex-direction: column;
-      height: 90%;
-      width: 100%;
-      margin: 30px auto 0 auto;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      padding: 20px;
-    }
+  .announcement-copy:active,
+  .announcement-share:active {
+    transform: scale(1.2);
+  }
 
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      margin-bottom: 15px;
-      padding-right: 5px;
-      border-bottom: 1px solid #eee;
-    }
+  .chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 90%;
+    width: 100%;
+    margin: 30px auto 0 auto;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    padding: 20px;
+  }
 
-    .chat-message {
-      margin-bottom: 10px;
-      padding: 8px 12px;
-      background: #f1f1f1;
-      border-radius: 8px;
-      max-width: 80%;
-      word-break: break-word;
-    }
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    padding-right: 5px;
+    border-bottom: 1px solid #eee;
+  }
 
-    .chat-message.user {
-      background: #d1e7dd;
-      align-self: flex-end;
-    }
+  .chat-message {
+    margin-bottom: 10px;
+    padding: 8px 12px;
+    background: #f1f1f1;
+    border-radius: 8px;
+    max-width: 80%;
+    word-break: break-word;
+  }
 
-    .chat-form {
-      background: #e3f0ff;
-      border-radius: 12px;
-      padding: 8px 16px;
-      margin-top: 10px;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
-    }
+  .chat-message.user {
+    background: #d1e7dd;
+    align-self: flex-end;
+  }
 
-    .chat-input-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      width: 100%;
-      box-sizing: border-box;
-    }
+  .chat-form {
+    background: #e3f0ff;
+    border-radius: 12px;
+    padding: 8px 16px;
+    margin-top: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  }
 
-    .chat-icons {
-      display: flex;
-      gap: 16px;
-      color: #222;
-      font-size: 1.3rem;
-      margin-right: 12px;
-    }
+  .chat-input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    box-sizing: border-box;
+  }
 
-    .chat-input {
-      flex: 1 1 0%;
-      min-width: 0;
-      max-width: 100%;
-      font-size: 1rem;
-      padding: 10px 8px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      outline: none;
-    }
+  .chat-icons {
+    display: flex;
+    gap: 16px;
+    color: #222;
+    font-size: 1.3rem;
+    margin-right: 12px;
+  }
 
-    .chat-input::placeholder {
-      color: #a0aec0;
-      opacity: 1;
-    }
+  .chat-input {
+    flex: 1 1 0%;
+    min-width: 0;
+    max-width: 100%;
+    font-size: 1rem;
+    padding: 10px 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    outline: none;
+  }
 
-    .chat-send-btn {
-      flex-shrink: 0;
-      background: #1976d2;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 1.3rem;
-      padding: 0 18px;
-      height: 40px;
-      cursor: pointer;
-      transition: background 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+  .chat-input::placeholder {
+    color: #a0aec0;
+    opacity: 1;
+  }
 
-    .chat-send-btn:hover {
-      background: #1256a3;
-    }
+  .chat-send-btn {
+    flex-shrink: 0;
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.3rem;
+    padding: 0 18px;
+    height: 40px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-    .announcement-container {
-      width: 100%;
-      height: 100%;
-      margin: 40px auto;
-      padding: 0 16px;
-    }
+  .chat-send-btn:hover {
+    background: #1256a3;
+  }
 
-    .announcement-post-box {
-      display: flex;
-      align-items: center;
-      background: #f3f4f6;
-      border-radius: 16px;
-      padding: 18px 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-      gap: 16px;
-    }
+  .announcement-container {
+    width: 100%;
+    height: 100%;
+    margin: 40px auto;
+    padding: 0 16px;
+  }
 
-    .announcement-post-box i {
-      font-size: 2rem;
-      color: #aaa;
-    }
+  .announcement-post-box {
+    display: flex;
+    align-items: center;
+    background: #f3f4f6;
+    border-radius: 16px;
+    padding: 18px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    gap: 16px;
+  }
 
-    .announcement-input {
-      flex: 1 1 0%;
-      min-width: 0;
-      max-width: 100%;
-      font-size: 1rem;
-      padding: 10px 8px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      outline: none;
-    }
+  .announcement-post-box i {
+    font-size: 2rem;
+    color: #aaa;
+  }
 
-    .announcement-add-btn {
-      flex-shrink: 0;
-      background: #1976d2;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 1.3rem;
-      padding: 0 18px;
-      height: 40px;
-      cursor: pointer;
-      transition: background 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
+  .announcement-input {
+    flex: 1 1 0%;
+    min-width: 0;
+    max-width: 100%;
+    font-size: 1rem;
+    padding: 10px 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    outline: none;
+  }
 
-    .announcement-add-btn:hover {
-      background: #1256a3;
-    }
+  .announcement-add-btn {
+    flex-shrink: 0;
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.3rem;
+    padding: 0 18px;
+    height: 40px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-    .announcement-list {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
+  .announcement-add-btn:hover {
+    background: #1256a3;
+  }
 
-    .announcement-card {
-      background: #fff;
-      border-radius: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
-      padding: 24px;
-      margin-bottom: 8px;
-      position: relative;
-    }
+  .announcement-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
 
-/*.announcement-message {
+  .announcement-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
+    padding: 24px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  /*.announcement-message {
       font-size: 1.1rem;
       margin-bottom: 18px;
     }
 */
-   /* .announcement-meta {
+  /* .announcement-meta {
       display: flex;
       align-items: center;
       gap: 16px;
       margin-bottom: 12px;
     }
 */
-   /* .announcement-user {
+  /* .announcement-user {
       font-weight: bold;
       color: #2f95ff;
       display: flex;
@@ -203,49 +205,50 @@
       gap: 6px;
     }*/
 
-    /*.announcement-time {
+  /*.announcement-time {
       color: #aaa;
       font-size: 1rem;
       font-weight: 600;
     }*/
 
-    .new-event-btn {
-      background: linear-gradient(245deg, #D324A8 -67.04%, #551DFF 129.05%);
-      color: #fff;
-      border: none;
-      border-radius: 22px;
-      padding: 10px 28px;
-      font-size: 1rem;
-      font-weight: 300;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-      transition: background 0.2s, color 0.2s;
-    }
+  .new-event-btn {
+    background: linear-gradient(245deg, #D324A8 -67.04%, #551DFF 129.05%);
+    color: #fff;
+    border: none;
+    border-radius: 22px;
+    padding: 10px 28px;
+    font-size: 1rem;
+    font-weight: 300;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transition: background 0.2s, color 0.2s;
+  }
 
-    .new-event-btn:hover {
-      background: linear-gradient(245deg, #551DFF -67.04%, #D324A8 129.05%);
+  .new-event-btn:hover {
+    background: linear-gradient(245deg, #551DFF -67.04%, #D324A8 129.05%);
 
-    }
+  }
 
-    .Announcement-btn {
-      position: absolute;
-      top: 100px;
-      right: 35px;
-      width: 91px;
-      height: 40px;
-      background: linear-gradient(245deg, #D324A8 -67.04%, #551DFF 129.05%);
-      border-radius: 9px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      border: none;
-      cursor: pointer;
-      transition: background 0.2s, transform 0.2s;
-      color: white;
-      font-size: 1.2rem;
-      font-weight: 600;
+  .Announcement-btn {
+    position: absolute;
+    top: 100px;
+    right: 35px;
+    width: 91px;
+    height: 40px;
+    background: linear-gradient(245deg, #D324A8 -67.04%, #551DFF 129.05%);
+    border-radius: 9px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
 
 
-    }
-    /*.announcement-img{
+  }
+
+  /*.announcement-img{
       width: 50%;
       height: auto;
       border-radius: 12px;
@@ -259,171 +262,173 @@
       margin-left: 10px;
     }*/
 
-    .announcement-group {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 8px 16px;
-  border-radius: 8px 8px 0 0;
-  font-size: 14px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+  .announcement-group {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 8px 8px 0 0;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
 
-.announcement-title {
-  background: #f8fafc;
-  padding: 1px 20px;
-  font-size: 20px;
-  font-weight: 700;
-  color: #1e293b;
-  border-bottom: 1px solid #e2e8f0;
-}
+  .announcement-title {
+    background: #f8fafc;
+    padding: 1px 20px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e293b;
+    border-bottom: 1px solid #e2e8f0;
+  }
 
-.announcement-content {
-  padding: 20px;
-  background: white;
-  border-radius: 0 0 12px 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
+  .announcement-content {
+    padding: 20px;
+    background: white;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
 
-.Delete-btn {
-  top: 20px;
-  right: 20px;
-  color: #ef4444;
-  cursor: pointer;
-  font-size: 18px;
-  transition: color 0.3s ease;
-}
-.announcement-img {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 8px;
-  float: left;
-  margin: 0 16px 16px 0;
-  border: 2px solid #e2e8f0;
-}
+  .Delete-btn {
+    top: 20px;
+    right: 20px;
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 18px;
+    transition: color 0.3s ease;
+  }
 
-.announcement-message {
-  font-size: 16px;
-  line-height: 1.6;
-  color: #475569;
-  margin-bottom: 16px;
-  text-align: justify;
-}
-
-.announcement-meeting-link {
-  display: inline-block;
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: white;
-  padding: 10px 20px;
-  border-radius: 6px;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 12px;
-  margin-bottom: 20px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
-}
-
-.announcement-meeting-link:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
-}
-
-.announcement-actions {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-  justify-content: flex-end;
-}
-
-.announcement-copy,
-.announcement-share {
-
-  color: #64748b;
-  padding: 8px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-size: 16px;
-}
-
-.announcement-copy:hover {
-  background: #e0f2fe;
-  color: #0369a1;
-  transform: scale(1.05);
-}
-
-.announcement-share:hover {
-  background: #fef3c7;
-  color: #d97706;
-  transform: scale(1.05);
-}
-
-.announcement-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  /*padding-top: 16px;
-  border-top: 1px solid #e2e8f0;*/
-  font-size: 14px;
-  color: #64748b;
-}
-
-.announcement-user {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 500;
-}
-
-.announcement-user i {
-  color: #667eea;
-  font-size: 16px;
-}
-
-.announcement-time {
-  font-weight: 400;
-  color: #94a3b8;
-}
-
-/* Container styling for the entire announcement card */
-.announcement-card {
-  max-width: 600px;
-  /*margin: 20px auto; Center the card*/
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-  background: white;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.announcement-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-}
-
-/* Responsive design */
-@media (max-width: 768px) {
   .announcement-img {
-    width: 100%;
-    height: 200px;
-    float: none;
-    margin: 0 0 16px 0;
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 8px;
+    float: left;
+    margin: 0 16px 16px 0;
+    border: 2px solid #e2e8f0;
   }
-  
-  .announcement-meta {
-    /*.announcement-actions: column;*/
-    gap: 8px;
-    align-items: flex-start;
+
+  .announcement-message {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #475569;
+    margin-bottom: 16px;
+    text-align: justify;
   }
-  
+
+  .announcement-meeting-link {
+    display: inline-block;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 12px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+  }
+
+  .announcement-meeting-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
+  }
+
   .announcement-actions {
-    justify-content: center;
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    justify-content: flex-end;
   }
-}
-  </style>
+
+  .announcement-copy,
+  .announcement-share {
+
+    color: #64748b;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+  }
+
+  .announcement-copy:hover {
+    background: #e0f2fe;
+    color: #0369a1;
+    transform: scale(1.05);
+  }
+
+  .announcement-share:hover {
+    background: #fef3c7;
+    color: #d97706;
+    transform: scale(1.05);
+  }
+
+  .announcement-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /*padding-top: 16px;
+  border-top: 1px solid #e2e8f0;*/
+    font-size: 14px;
+    color: #64748b;
+  }
+
+  .announcement-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+  }
+
+  .announcement-user i {
+    color: #667eea;
+    font-size: 16px;
+  }
+
+  .announcement-time {
+    font-weight: 400;
+    color: #94a3b8;
+  }
+
+  /* Container styling for the entire announcement card */
+  .announcement-card {
+    max-width: 600px;
+    /*margin: 20px auto; Center the card*/
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    background: white;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .announcement-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .announcement-img {
+      width: 100%;
+      height: 200px;
+      float: none;
+      margin: 0 0 16px 0;
+    }
+
+    .announcement-meta {
+      /*.announcement-actions: column;*/
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .announcement-actions {
+      justify-content: center;
+    }
+  }
+</style>
+
 <body data-user-id="{{user._id}}">
   {{> header}}
 
@@ -450,136 +455,136 @@
 </html>
 
 <script>
-    // Show notification
-    function showNotification(message, type = 'info') {
-      toastr.options = { timeOut: 3000, positionClass: 'toast-top-right' };
-      if (type === 'success') toastr.success(message);
-      else if (type === 'error') toastr.error(message);
-      else toastr.info(message);
+  // Show notification
+  function showNotification(message, type = 'info') {
+    toastr.options = { timeOut: 3000, positionClass: 'toast-top-right' };
+    if (type === 'success') toastr.success(message);
+    else if (type === 'error') toastr.error(message);
+    else toastr.info(message);
+  }
+  function isValidUrl(string) {
+    try {
+      new URL(string);
+      return true;
+    } catch (_) {
+      return false;
     }
-    function isValidUrl(string) {
-      try {
-        new URL(string);
-        return true;
-      } catch (_) {
-        return false;
-      }
-    }
-
-    // Format announcement for copy/share
-   function formatAnnouncement(announcement) {
-      let text = `Announcement: ${announcement.title}\n`;
-      text += `Group: ${announcement.group.name}\n`;
-      text += `Message: ${announcement.message}\n`;
-      if (announcement.meetingLink && isValidUrl(announcement.meetingLink)) {
-        text += `Meeting Link: ${announcement.meetingLink}\n`;
-      }
-      if (announcement.image) {
-        text += `Image: ${announcement.image}\n`;
-      }
-      text += `Posted by: ${announcement.createdBy.name} at ${new Date(announcement.createdAt).toLocaleString()}`;
-      return text;
-    }
-
-    // Copy announcement to clipboard
-   async function copyAnnouncement(announcement) {
-      try {
-        const text = formatAnnouncement(announcement);
-        await navigator.clipboard.writeText(text);
-        showNotification('Announcement copied to clipboard!', 'success');
-      } catch (error) {
-        console.error('Error copying announcement:', error);
-        showNotification('Failed to copy announcement', 'error');
-      }
-    }
-
-    // Share announcement
-    async function shareAnnouncement(announcement) {
-     const text = formatAnnouncement(announcement);
-      const baseUrl = window.location.origin; 
-     // const announcementUrl = `${baseUrl}/announcements/${announcement._id}`;
-      const shareData = {
-        title: announcement.title,
-        text: text,
-       // url: announcement.meetingLink && isValidUrl(announcement.meetingLink) ? announcement.meetingLink : announcementUrl
-      };
-
-      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-       try {
-          await navigator.share(shareData);
-          //showNotification('Announcement shared successfully!', 'success');
-        } catch (error) {
-          if (error.name !== 'AbortError') {
-            console.error('Error sharing announcement:', error);
-            showNotification('Failed to share announcement. Copied to clipboard instead.', 'info');
-            await copyAnnouncement(announcement);
-          }
-        }
-      } else {
-        // Fallback: Copy to clipboard
-        copyAnnouncement(announcement);
-        showNotification('Share not supported. Copied to clipboard instead.', 'info');
-      }
-    }
-
-    // Fetch announcements
-    async function fetchAnnouncements() {
-      try {
-        const response = await fetch('/announcements/list', {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include'
-        });
-
-        const result = await response.json();
-        if (response.ok) {
-          renderAnnouncements(result.announcements);
-          console.log(result);
-        } else {
-          showNotification(result.message || 'Failed to fetch announcements', 'error');
-        }
-      } catch (error) {
-        console.error('Error fetching announcements:', error);
-        showNotification('Error fetching announcements: ' + error.message, 'error');
-      }
-    }
-
-    // Render announcements
-    function renderAnnouncements(announcements) {
-  const announcementList = document.getElementById('announcementList');
-  announcementList.innerHTML = '';
-
-  if (announcements.length === 0) {
-    announcementList.innerHTML = '<p>No announcements found.</p>';
-    return;
   }
 
-  const messageLimit = 150; // number of characters before "Read More"
+  // Format announcement for copy/share
+  function formatAnnouncement(announcement) {
+    let text = `Announcement: ${announcement.title}\n`;
+    text += `Group: ${announcement.group.name}\n`;
+    text += `Message: ${announcement.message}\n`;
+    if (announcement.meetingLink && isValidUrl(announcement.meetingLink)) {
+      text += `Meeting Link: ${announcement.meetingLink}\n`;
+    }
+    if (announcement.image) {
+      text += `Image: ${announcement.image}\n`;
+    }
+    text += `Posted by: ${announcement.createdBy.name} at ${new Date(announcement.createdAt).toLocaleString()}`;
+    return text;
+  }
 
-  announcements.forEach(announcement => {
-    const announcementCard = document.createElement('div');
-    announcementCard.className = 'announcement-card';
-    announcementCard.setAttribute('data-announcement-id', announcement._id);
+  // Copy announcement to clipboard
+  async function copyAnnouncement(announcement) {
+    try {
+      const text = formatAnnouncement(announcement);
+      await navigator.clipboard.writeText(text);
+      showNotification('Announcement copied to clipboard!', 'success');
+    } catch (error) {
+      console.error('Error copying announcement:', error);
+      showNotification('Failed to copy announcement', 'error');
+    }
+  }
 
-    // Format date
-    const createdAt = new Date(announcement.createdAt);
-    const timeString = createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  // Share announcement
+  async function shareAnnouncement(announcement) {
+    const text = formatAnnouncement(announcement);
+    const baseUrl = window.location.origin;
+    // const announcementUrl = `${baseUrl}/announcements/${announcement._id}`;
+    const shareData = {
+      title: announcement.title,
+      text: text,
+      // url: announcement.meetingLink && isValidUrl(announcement.meetingLink) ? announcement.meetingLink : announcementUrl
+    };
 
-    // Truncate message
-    let messageHtml = announcement.message;
-    let needsTruncate = false;
+    if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+      try {
+        await navigator.share(shareData);
+        //showNotification('Announcement shared successfully!', 'success');
+      } catch (error) {
+        if (error.name !== 'AbortError') {
+          console.error('Error sharing announcement:', error);
+          showNotification('Failed to share announcement. Copied to clipboard instead.', 'info');
+          await copyAnnouncement(announcement);
+        }
+      }
+    } else {
+      // Fallback: Copy to clipboard
+      copyAnnouncement(announcement);
+      showNotification('Share not supported. Copied to clipboard instead.', 'info');
+    }
+  }
 
-    if (announcement.message.length > messageLimit) {
-      const shortMessage = announcement.message.slice(0, messageLimit);
-      const longMessage = announcement.message.slice(messageLimit);
-      messageHtml = `
+  // Fetch announcements
+  async function fetchAnnouncements() {
+    try {
+      const response = await fetch('/announcements/list', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include'
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        renderAnnouncements(result.announcements);
+        console.log(result);
+      } else {
+        showNotification(result.message || 'Failed to fetch announcements', 'error');
+      }
+    } catch (error) {
+      console.error('Error fetching announcements:', error);
+      showNotification('Error fetching announcements: ' + error.message, 'error');
+    }
+  }
+
+  // Render announcements
+  function renderAnnouncements(announcements) {
+    const announcementList = document.getElementById('announcementList');
+    announcementList.innerHTML = '';
+
+    if (announcements.length === 0) {
+      announcementList.innerHTML = '<p>No announcements found.</p>';
+      return;
+    }
+
+    const messageLimit = 150; // number of characters before "Read More"
+
+    announcements.forEach(announcement => {
+      const announcementCard = document.createElement('div');
+      announcementCard.className = 'announcement-card';
+      announcementCard.setAttribute('data-announcement-id', announcement._id);
+
+      // Format date
+      const createdAt = new Date(announcement.createdAt);
+      const timeString = createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      // Truncate message
+      let messageHtml = announcement.message;
+      let needsTruncate = false;
+
+      if (announcement.message.length > messageLimit) {
+        const shortMessage = announcement.message.slice(0, messageLimit);
+        const longMessage = announcement.message.slice(messageLimit);
+        messageHtml = `
         ${shortMessage}<span class="dots">...</span>
         <span class="more" style="display:none;">${longMessage}</span>
       `;
-      needsTruncate = true;
-    }
+        needsTruncate = true;
+      }
 
-    announcementCard.innerHTML = `
+      announcementCard.innerHTML = `
       <div class="announcement-group">Group: ${announcement.group.name}</div>
       <div class="announcement-title">${announcement.title}</div>
       ${announcement.image ? `<img src="${announcement.image}" alt="Announcement Image" class="announcement-img">` : ''}
@@ -600,30 +605,30 @@
       </div>
     `;
 
-    // Toggle Read More / Read Less
-    const readMoreBtn = announcementCard.querySelector(".read-more-btn");
-    if (readMoreBtn) {
-      readMoreBtn.addEventListener("click", function () {
-        const dots = announcementCard.querySelector(".dots");
-        const moreText = announcementCard.querySelector(".more");
+      // Toggle Read More / Read Less
+      const readMoreBtn = announcementCard.querySelector(".read-more-btn");
+      if (readMoreBtn) {
+        readMoreBtn.addEventListener("click", function () {
+          const dots = announcementCard.querySelector(".dots");
+          const moreText = announcementCard.querySelector(".more");
 
-        if (moreText.style.display === "none") {
-          moreText.style.display = "inline";
-          dots.style.display = "none";
-          readMoreBtn.textContent = "Read Less";
-        } else {
-          moreText.style.display = "none";
-          dots.style.display = "inline";
-          readMoreBtn.textContent = "Read More";
-        }
-      });
-    }
+          if (moreText.style.display === "none") {
+            moreText.style.display = "inline";
+            dots.style.display = "none";
+            readMoreBtn.textContent = "Read Less";
+          } else {
+            moreText.style.display = "none";
+            dots.style.display = "inline";
+            readMoreBtn.textContent = "Read More";
+          }
+        });
+      }
 
-    announcementList.appendChild(announcementCard);
-  });
-}
+      announcementList.appendChild(announcementCard);
+    });
+  }
 
-    // Initialize on page load
+  // Initialize on page load
   document.addEventListener('DOMContentLoaded', () => {
     fetchAnnouncements();
 
@@ -631,7 +636,8 @@
     document.getElementById('announcementList').addEventListener('click', async (e) => {
       const copyButton = e.target.closest('.announcement-copy');
       const shareButton = e.target.closest('.announcement-share');
-      const deleteButton = e.target.closest('.announcement-delete'); // ✅ added delete button selector
+      //const deleteButton = e.target.closest('.announcement-delete'); // ✅ added delete button selector
+      const deleteButton = e.target.closest('.Delete-btn');
 
       if (copyButton) {
         const announcement = JSON.parse(copyButton.getAttribute('data-announcement'));
@@ -664,7 +670,7 @@
           const result = await response.json();
           if (response.ok && result.success) {
             showNotification('Announcement deleted successfully!', 'success');
-            fetchAnnouncements(); 
+            fetchAnnouncements();
           } else {
             showNotification(result.message || 'Failed to delete announcement', 'error');
           }
@@ -674,11 +680,11 @@
         }
       }
     });
-});
+  });
 
-  </script>
+</script>
 <script src="/js/all.js"></script>
-
+<script type="module" src="/js/firebase.js"></script>
 {{> profile}}
 </body>
 

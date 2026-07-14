@@ -730,18 +730,40 @@ exports.notifications = async (req, res, next) => {
   }
 };
 
+// exports.signout = async (req, res, next) => {
+//   try {
+//     res.clearCookie('token', {
+//       httpOnly: true,
+//       secure: process.env.NODE_ENV === 'production',
+//       sameSite: 'strict',
+//     });
+
+//     return res.redirect('/');
+
+//   } catch (error) {
+//     console.error('Error in signout:', error);
+//     next(error);
+//   }
+// };
 exports.signout = async (req, res, next) => {
   try {
-    res.clearCookie('token', {
+
+    if (req.user?._id) {
+      await User.findByIdAndUpdate(req.user._id, {
+        fcmToken: null
+      });
+    }
+
+    res.clearCookie("token", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
     });
 
-    return res.redirect('/');
+    return res.redirect("/");
 
   } catch (error) {
-    console.error('Error in signout:', error);
+    console.error(error);
     next(error);
   }
 };
@@ -893,5 +915,41 @@ exports.associationSample = async (req, res, next) => {
   } catch (error) {
     console.error('Error rendering dashboard:', error);
     res.status(500).json({ success: false, message: 'Server error: ' + error.message });
+  }
+};
+
+exports.saveFcmToken = async (req, res) => {
+  try {
+    console.log("========== SAVE FCM ==========");
+    console.log("req.user =", req.user);
+    console.log("req.body =", req.body);
+    const { fcmToken } = req.body;
+
+    if (!fcmToken) {
+      return res.status(400).json({
+        success: false,
+        message: "FCM Token is required"
+      });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { fcmToken }
+    );
+    console.log("Saved User =", updatedUser);
+    return res.json({
+      success: true,
+      message: "FCM Token Saved"
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Server Error"
+    });
+
   }
 };

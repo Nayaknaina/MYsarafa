@@ -12,15 +12,16 @@
       <div style="display:flex; align-items:center; gap:12px;">
         <div style="display:flex; gap:8px;">
           {{!-- <button id="tab-ledger" class="ledger-add-member-btn">Ledger</button>
+          <button id="tab-list" class="ledger-add-member-btn">List</button> --}}
+          {{#if (eq query.tab "list")}}
+          <button id="tab-ledger" class="ledger-add-member-btn"
+            style="background:#fff;color:#111;border:1px solid #e5e7eb;">Ledger</button>
+          <button id="tab-list" class="ledger-add-member-btn" style="background:#2f95ff;color:#fff;">List</button>
+          {{else}}
+          <button id="tab-ledger" class="ledger-add-member-btn" style="background:#2f95ff;color:#fff;">Ledger</button>
           <button id="tab-list" class="ledger-add-member-btn"
-            >List</button> --}}
-            {{#if (eq query.tab "list")}}
-  <button id="tab-ledger" class="ledger-add-member-btn" style="background:#fff;color:#111;border:1px solid #e5e7eb;">Ledger</button>
-  <button id="tab-list"   class="ledger-add-member-btn" style="background:#2f95ff;color:#fff;">List</button>
-{{else}}
-  <button id="tab-ledger" class="ledger-add-member-btn" style="background:#2f95ff;color:#fff;">Ledger</button>
-  <button id="tab-list"   class="ledger-add-member-btn" style="background:#fff;color:#111;border:1px solid #e5e7eb;">List</button>
-{{/if}}
+            style="background:#fff;color:#111;border:1px solid #e5e7eb;">List</button>
+          {{/if}}
           {{!-- <button id="tab-khatabook" class="ledger-add-member-btn"
             style="background:#fff;color:#111;border:1px solid #e5e7eb;">Khatabook</button> --}}
         </div>
@@ -32,7 +33,8 @@
       </div>
     </div>
 
-    <div class="table-container" id="ledger-panel"  style="{{#if (eq query.tab "list")}}display:none{{else}}display:block{{/if}}">
+    <div class="table-container" id="ledger-panel" style="{{#if (eq query.tab "
+      list")}}display:none{{else}}display:block{{/if}}">
       <table id="ledger-table" class="members-table" style="width:100%">
         <thead>
           <tr>
@@ -72,7 +74,8 @@
       </table>
     </div>
 
-    <div class="table-container" id="list-panel" style="{{#if (eq query.tab "list")}}display:block{{else}}display:none{{/if}};margin-top:18px;">
+    <div class="table-container" id="list-panel" style="{{#if (eq query.tab "
+      list")}}display:block{{else}}display:none{{/if}};margin-top:18px;">
       <table id="ledger-list-table" class="members-table" style="width:100%">
         <thead>
           <tr>
@@ -338,7 +341,7 @@
       });
     }
 
-   
+
     let table = null;
     let listTable = null;
     function initDataTable() {
@@ -422,87 +425,87 @@
     });
 
     function initListTable() {
-  if (!window.jQuery || !window.jQuery.fn || !window.jQuery.fn.dataTable) return loadPlainList();
+      if (!window.jQuery || !window.jQuery.fn || !window.jQuery.fn.dataTable) return loadPlainList();
 
-  listTable = jQuery('#ledger-list-table').DataTable({
-    dom: 'Bfrtip',
-    buttons: [{ extend: 'print', text: 'Print', className: 'dt-print-btn' }],
-    ajax: {
-      url: '/ledger/transaction/list',  // Always load ALL user's transactions
-      dataSrc: function (d) { return d && d.data ? d.data : []; },
-      xhrFields: { withCredentials: true }
-    },
-    columns: [
-      { data: null, render: (d, t, r, meta) => meta.row + 1 },
-      { data: 'date', render: d => d ? new Date(d).toLocaleString() : '' },
-      { data: null, render: r => (r.cust_no ? (r.cust_no + '<br/>') : '') + (r.cname || '') },
+      listTable = jQuery('#ledger-list-table').DataTable({
+        dom: 'Bfrtip',
+        buttons: [{ extend: 'print', text: 'Print', className: 'dt-print-btn' }],
+        ajax: {
+          url: '/ledger/transaction/list',  // Always load ALL user's transactions
+          dataSrc: function (d) { return d && d.data ? d.data : []; },
+          xhrFields: { withCredentials: true }
+        },
+        columns: [
+          { data: null, render: (d, t, r, meta) => meta.row + 1 },
+          { data: 'date', render: d => d ? new Date(d).toLocaleString() : '' },
+          { data: null, render: r => (r.cust_no ? (r.cust_no + '<br/>') : '') + (r.cname || '') },
 
-      { data: 'old_amount', render: d => formatAmount(d) },
-      { data: 'amount_in', render: d => formatAmount(d) },
-      { data: 'amount_out', render: d => formatAmount(d) },
-      { data: 'final_amount', render: d => formatAmount(d) },
+          { data: 'old_amount', render: d => formatAmount(d) },
+          { data: 'amount_in', render: d => formatAmount(d) },
+          { data: 'amount_out', render: d => formatAmount(d) },
+          { data: 'final_amount', render: d => formatAmount(d) },
 
-      { data: 'old_gold', render: d => formatWeight(d, 'gm') },
-      { data: 'gold_in', render: d => formatWeight(d, 'gm') },
-      { data: 'gold_out', render: d => formatWeight(d, 'gm') },
-      { data: 'final_gold', render: d => formatWeight(d, 'gm') },
+          { data: 'old_gold', render: d => formatWeight(d, 'gm') },
+          { data: 'gold_in', render: d => formatWeight(d, 'gm') },
+          { data: 'gold_out', render: d => formatWeight(d, 'gm') },
+          { data: 'final_gold', render: d => formatWeight(d, 'gm') },
 
-      { data: 'old_silver', render: d => formatWeight(d, 'gm') },
-      { data: 'silver_in', render: d => formatWeight(d, 'gm') },
-      { data: 'silver_out', render: d => formatWeight(d, 'gm') },
-      { data: 'final_silver', render: d => formatWeight(d, 'gm') },
+          { data: 'old_silver', render: d => formatWeight(d, 'gm') },
+          { data: 'silver_in', render: d => formatWeight(d, 'gm') },
+          { data: 'silver_out', render: d => formatWeight(d, 'gm') },
+          { data: 'final_silver', render: d => formatWeight(d, 'gm') },
 
-      { data: null, orderable: false, render: () => '<button class="action-btn">Open</button>' }
-    ],
-    pageLength: 25,
-    responsive: true,
-    footerCallback: function () {
-      const api = this.api();
-      const sum = (idx) => api.column(idx, { page: 'current' }).data().reduce((a, b) => a + (Number(b) || 0), 0);
+          { data: null, orderable: false, render: () => '<button class="action-btn">Open</button>' }
+        ],
+        pageLength: 25,
+        responsive: true,
+        footerCallback: function () {
+          const api = this.api();
+          const sum = (idx) => api.column(idx, { page: 'current' }).data().reduce((a, b) => a + (Number(b) || 0), 0);
 
-      document.getElementById('list-total-old-amount').textContent = formatAmount(sum(3));
-      document.getElementById('list-total-amount-in').textContent = formatAmount(sum(4));
-      document.getElementById('list-total-amount-out').textContent = formatAmount(sum(5));
-      document.getElementById('list-total-final-amount').textContent = formatAmount(sum(6));
+          document.getElementById('list-total-old-amount').textContent = formatAmount(sum(3));
+          document.getElementById('list-total-amount-in').textContent = formatAmount(sum(4));
+          document.getElementById('list-total-amount-out').textContent = formatAmount(sum(5));
+          document.getElementById('list-total-final-amount').textContent = formatAmount(sum(6));
 
-      document.getElementById('list-total-old-gold').textContent = formatWeight(sum(7), 'gm');
-      document.getElementById('list-total-gold-in').textContent = formatWeight(sum(8), 'gm');
-      document.getElementById('list-total-gold-out').textContent = formatWeight(sum(9), 'gm');
-      document.getElementById('list-total-final-gold').textContent = formatWeight(sum(10), 'gm');
+          document.getElementById('list-total-old-gold').textContent = formatWeight(sum(7), 'gm');
+          document.getElementById('list-total-gold-in').textContent = formatWeight(sum(8), 'gm');
+          document.getElementById('list-total-gold-out').textContent = formatWeight(sum(9), 'gm');
+          document.getElementById('list-total-final-gold').textContent = formatWeight(sum(10), 'gm');
 
-      document.getElementById('list-total-old-silver').textContent = formatWeight(sum(11), 'gm');
-      document.getElementById('list-total-silver-in').textContent = formatWeight(sum(12), 'gm');
-      document.getElementById('list-total-silver-out').textContent = formatWeight(sum(13), 'gm');
-      document.getElementById('list-total-final-silver').textContent = formatWeight(sum(14), 'gm');
+          document.getElementById('list-total-old-silver').textContent = formatWeight(sum(11), 'gm');
+          document.getElementById('list-total-silver-in').textContent = formatWeight(sum(12), 'gm');
+          document.getElementById('list-total-silver-out').textContent = formatWeight(sum(13), 'gm');
+          document.getElementById('list-total-final-silver').textContent = formatWeight(sum(14), 'gm');
+        }
+      });
+
+      // Client-side filtering when customer is selected
+      const customerSelect = document.getElementById('ledger-customer-select');
+
+      // Add custom search extension for customer filtering
+      $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+        if (settings.nTable.id !== 'ledger-list-table') return true;
+
+        const row = listTable.row(dataIndex).data();
+        if (!row || !row.customer) return true;
+
+        if (!selectedCustomerId) return true; // Show all if no customer selected
+        return row.customer.toString() === selectedCustomerId;
+      });
+
+      customerSelect.addEventListener('change', function () {
+        selectedCustomerId = this.value || '';
+        listTable.draw(); // This triggers the custom search above
+      });
+
+      // Also trigger on ledger table draw (for consistency)
+      if (table) {
+        table.on('draw', function () {
+          listTable.draw();
+        });
+      }
     }
-  });
-
-  // Client-side filtering when customer is selected
-  const customerSelect = document.getElementById('ledger-customer-select');
-
-  // Add custom search extension for customer filtering
-  $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-    if (settings.nTable.id !== 'ledger-list-table') return true;
-
-    const row = listTable.row(dataIndex).data();
-    if (!row || !row.customer) return true;
-
-    if (!selectedCustomerId) return true; // Show all if no customer selected
-    return row.customer.toString() === selectedCustomerId;
-  });
-
-  customerSelect.addEventListener('change', function () {
-    selectedCustomerId = this.value || '';
-    listTable.draw(); // This triggers the custom search above
-  });
-
-  // Also trigger on ledger table draw (for consistency)
-  if (table) {
-    table.on('draw', function () {
-      listTable.draw();
-    });
-  }
-}
     async function loadPlainTable() {
       const tbody = document.querySelector('#ledger-table tbody');
       tbody.innerHTML = '<tr><td colspan="7">Loading...</td></tr>';
@@ -596,26 +599,26 @@
     const listPanel = document.getElementById('list-panel');
     const udharTitle = document.getElementById('udharTitle');
     // Optional: Keep only for manual clicks (no flash because default is already correct)
-document.getElementById('tab-ledger').addEventListener('click', () => {
-  document.getElementById('ledger-panel').style.display = 'block';
-  document.getElementById('list-panel').style.display = 'none';
-  document.getElementById('tab-ledger').style.background = '#2f95ff';
-  document.getElementById('tab-ledger').style.color = '#fff';
-  document.getElementById('tab-list').style.background = '#fff';
-  document.getElementById('tab-list').style.color = '#111';
-  document.getElementById('udharTitle').textContent = 'Udhar Ledger';
-});
+    document.getElementById('tab-ledger').addEventListener('click', () => {
+      document.getElementById('ledger-panel').style.display = 'block';
+      document.getElementById('list-panel').style.display = 'none';
+      document.getElementById('tab-ledger').style.background = '#2f95ff';
+      document.getElementById('tab-ledger').style.color = '#fff';
+      document.getElementById('tab-list').style.background = '#fff';
+      document.getElementById('tab-list').style.color = '#111';
+      document.getElementById('udharTitle').textContent = 'Udhar Ledger';
+    });
 
-document.getElementById('tab-list').addEventListener('click', () => {
-  document.getElementById('ledger-panel').style.display = 'none';
-  document.getElementById('list-panel').style.display = 'block';
-  document.getElementById('tab-list').style.background = '#2f95ff';
-  document.getElementById('tab-list').style.color = '#fff';
-  document.getElementById('tab-ledger').style.background = '#fff';
-  document.getElementById('tab-ledger').style.color = '#111';
-  document.getElementById('udharTitle').textContent = 'Udhar List';
-});
-    
+    document.getElementById('tab-list').addEventListener('click', () => {
+      document.getElementById('ledger-panel').style.display = 'none';
+      document.getElementById('list-panel').style.display = 'block';
+      document.getElementById('tab-list').style.background = '#2f95ff';
+      document.getElementById('tab-list').style.color = '#fff';
+      document.getElementById('tab-ledger').style.background = '#fff';
+      document.getElementById('tab-ledger').style.color = '#111';
+      document.getElementById('udharTitle').textContent = 'Udhar List';
+    });
+
     // ensure khatabook select is populated in parallel with main select
     async function populateBothSelects() {
       await populateCustomerSelect();
@@ -638,16 +641,17 @@ document.getElementById('tab-list').addEventListener('click', () => {
   })();
 
   if (window.location.pathname === '/ledger/' || window.location.pathname === '/ledger') {
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('tab') === 'list') {
-    
-    setTimeout(() => {
-      const listTabBtn = document.getElementById('tab-list');
-      if (listTabBtn && !listTabBtn.style.background.includes('#2f95ff')) {
-        listTabBtn.click();
-      }
-    }, 150);
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('tab') === 'list') {
+
+      setTimeout(() => {
+        const listTabBtn = document.getElementById('tab-list');
+        if (listTabBtn && !listTabBtn.style.background.includes('#2f95ff')) {
+          listTabBtn.click();
+        }
+      }, 150);
+    }
   }
-}
 </script>
+<script type="module" src="/js/firebase.js"></script>
 <script src="/js/khatabook.js"></script>

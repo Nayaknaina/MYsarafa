@@ -1024,9 +1024,9 @@ main {
   }
 
   .discover-groups {
-    order: 1;
-    overflow-y: auto;
-    height: 500px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
   }
 
   .my-groups {
@@ -2648,23 +2648,6 @@ main {
   padding: 32px 24px;
 }
 
-/* .cover-photo-preview {
-  width: 100%;
-  height: 180px;
-  background: #f0f2f5;
-  border-radius: 8px;
-  margin-bottom: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.cover-img {
-  max-width: 100%;
-  max-height: 160px;
-  border-radius: 8px;
-} */
-
 .cover-photo-preview {
   width: 100%;
   height: 100%;
@@ -2778,8 +2761,6 @@ main {
   height: 100%;
   object-fit: cover;
 }
-
-
 
 .group-details h2 {
   font-size: 20px;
@@ -2929,8 +2910,6 @@ main {
   object-fit: fill;
 }
 
-
-
 .group-details h2 {
   font-size: 20px;
   font-weight: 600;
@@ -2989,7 +2968,7 @@ main {
 /* Facebook Style Admin Cards */
 
 .group-card {
-  display: block !important;
+  /* display: block !important; */
   padding: 0 !important;
   margin-bottom: 0 !important;
   background: #fff !important;
@@ -3104,10 +3083,8 @@ main {
 /* === My Groups page styles === */
 .my-groups-grid {
   display: grid;
-  /* force three columns for a cleaner layout on desktop */
   grid-template-columns: repeat(3, 1fr);
   gap: 18px;
-  /* constrain the groups area to the viewport height and allow internal scrolling */
   max-height: calc(100vh - 160px);
   overflow-y: auto;
   padding: 12px;
@@ -3801,5 +3778,130 @@ main {
   .khatabook-card {
     min-width: auto;
     width: 100%;
+  }
+}
+
+/* Dashboard- Discover community */
+.discover-list .group-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 14px;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  position: relative;
+}
+
+.discover-list .group-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.discover-card {
+  display: flex;
+  flex-direction: column;
+  padding: 18px;
+  background: #fff;
+  border-radius: 18px;
+  gap: 12px;
+}
+
+.discover-card .group-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.discover-card .group-image {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+
+.discover-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+}
+
+.discover-details .join-group-btn,
+.discover-details .manage-group-btn,
+.discover-details .leave-group-btn,
+.discover-details .joined-btn,
+.discover-details .pending-btn {
+  align-self: center;
+  margin-top: 10px;
+}
+
+/* Association Admi section Scrollar */
+.admin-groups-scroll {
+  max-height: 48vh;
+  /* adjust as needed */
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+/* grid layout */
+.admin-groups-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* tablet */
+@media (max-width: 1024px) {
+  .admin-groups-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .admin-groups-scroll {
+    max-height: 31vh;
+    overflow-y: auto;
+    padding-right: 6px;
+  }
+}
+
+/* mobile */
+@media (max-width: 640px) {
+  .admin-groups-grid {
+    grid-template-columns: repeat(1, 1fr);
+  }
+  .admin-groups-scroll {
+    max-height: 40vh;
+    overflow-y: auto;
+    padding-right: 6px;
+  }
+}
+
+/* Member section scrollar */
+.member-groups-scroll {
+  max-height: 50vh;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+/* grid */
+.member-groups-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+/* tablet */
+@media (max-width: 1024px) {
+  .member-groups-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* mobile */
+@media (max-width: 640px) {
+  .member-groups-grid {
+    grid-template-columns: repeat(1, 1fr);
   }
 }

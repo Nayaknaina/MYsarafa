@@ -35,9 +35,18 @@ const announcementSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now
+  },
+  likes: {
+    type: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      }
+    ],
+    default: []
   }
 }, {
-    timestamps: true
+  timestamps: true
 });
 
 module.exports = mongoose.model('Announcement', announcementSchema);

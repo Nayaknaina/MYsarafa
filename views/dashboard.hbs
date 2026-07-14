@@ -1102,7 +1102,7 @@
                                     <div id="discoverLoading" class="loading-spinner"></div>
                                 </div>
                             </div>
-                            <div id="discoverGroupsList">
+                            <div id="discoverGroupsList" class="discover-list">
                                 <p id="discoverNoResults" style="display: none;">No public communities available to
                                     join.
                                 </p>
@@ -1110,18 +1110,17 @@
                                 {{!-- <div class="group-card" data-group-name="{{this.g_name}}">
                                     <img src="{{this.g_cover}}" alt="{{this.g_name}} Image" class="group-image">
                                     <div class="group-details"> --}}
-                                        <div class="group-card" data-group-name="{{this.g_name}}">
+                                        <div class="group-card discover-card" data-group-name="{{this.g_name}}">
 
                                             <div class="group-top">
-                                                <img src="{{this.g_cover}}" alt="{{this.g_name}} Image"
-                                                    class="group-image">
+                                                <img src="{{this.g_cover}}" class="group-image">
 
                                                 <div class="group-header">
                                                     <h3 class="group-title">{{this.g_name}}</h3>
                                                 </div>
                                             </div>
 
-                                            <div class="group-details">
+                                            <div class="group-details discover-details">
                                                 {{!-- <h3 class="group-title">{{this.g_name}}</h3> --}}
                                                 <p class="group-description">{{this.description}} Join this
                                                     {{this.g_type}}
@@ -1165,7 +1164,7 @@
                                             communities yet.</p>
 
                                         {{#each myGroups}}
-                                        <div class="group-card">
+                                        <div class="group-card my-card">
                                             <img src="{{this.g_cover}}" alt="{{this.g_name}} Image" class="group-image">
                                             <div class="group-details">
                                                 <h3 class="group-title">{{this.g_name}}</h3>
@@ -1555,7 +1554,7 @@
             });
         });
     </script>
-
+    <script type="module" src="/js/firebase.js"></script>
     {{> profile}}
 </body>
 

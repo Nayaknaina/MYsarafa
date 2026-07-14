@@ -291,10 +291,10 @@ $(document).ready(function () {
 });
 
 const searchInput = document.getElementById('Search-list');
-const  dropdown = document.getElementById('searchDropdown');
+const dropdown = document.getElementById('searchDropdown');
 const searchtoggle = document.getElementById('searchToggle');
- const searchcross = document.getElementById('crossToggle');
-  const container = document.getElementById('searchContainer');
+const searchcross = document.getElementById('crossToggle');
+const container = document.getElementById('searchContainer');
 const joinBtn = document.querySelector('.join-btn');
 const communityDropdown = document.querySelector('.community-name');
 //const moreDropdown = document.querySelector('.nav-item.dropdown');
@@ -382,9 +382,9 @@ document.addEventListener('DOMContentLoaded', () => {
   menuItems.forEach(item => {
     const href = item.getAttribute('href');
 
-    if (!href) return;  
+    if (!href) return;
 
-    const itemPath = new URL(href, window.location.origin).pathname; 
+    const itemPath = new URL(href, window.location.origin).pathname;
     // const itemPath = new URL(item.href).pathname;
 
     // Add active class if href matches current URL
@@ -398,80 +398,80 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
- 
 
-  // MOBILE: open search
-  searchtoggle.addEventListener('click', () => {
-    container.classList.add('active');
-    searchtoggle.style.display = 'none';
-    searchcross.style.display = 'block';
-    
-    searchInput.focus();
-  });
 
-  searchcross.addEventListener('click', () => {
+// MOBILE: open search
+searchtoggle.addEventListener('click', () => {
+  container.classList.add('active');
+  searchtoggle.style.display = 'none';
+  searchcross.style.display = 'block';
+
+  searchInput.focus();
+});
+
+searchcross.addEventListener('click', () => {
+  container.classList.remove('active');
+  searchtoggle.style.display = 'block';
+  searchcross.style.display = 'none';
+  dropdown.style.display = 'none';
+});
+// Close on outside click
+document.addEventListener('click', (e) => {
+  if (!container.contains(e.target)) {
     container.classList.remove('active');
-    searchtoggle.style.display = 'block';
-    searchcross.style.display = 'none';
     dropdown.style.display = 'none';
-  });
-  // Close on outside click
-  document.addEventListener('click', (e) => {
-    if (!container.contains(e.target)) {
-      container.classList.remove('active');
-      dropdown.style.display = 'none';
-    }
-  });
-  const sidebarLinks = Array.from(document.querySelectorAll('.sidebar-menu a')).map(link => ({
-    text :link.textContent.trim(),
-    href :link.getAttribute('href')
-  }));
+  }
+});
+const sidebarLinks = Array.from(document.querySelectorAll('.sidebar-menu a')).map(link => ({
+  text: link.textContent.trim(),
+  href: link.getAttribute('href')
+}));
 
-  searchInput.addEventListener('input',function(){
-    console.log('Search term:', this.value);
-    const term =  this.value.toLowerCase();
-    dropdown.innerHTML = '';
+searchInput.addEventListener('input', function () {
+  console.log('Search term:', this.value);
+  const term = this.value.toLowerCase();
+  dropdown.innerHTML = '';
 
-    if(term.length <1){
-      dropdown.style.display = 'none';
-      return;
-    }
+  if (term.length < 1) {
+    dropdown.style.display = 'none';
+    return;
+  }
 
-    const results = sidebarLinks.filter(item =>
-      item.text.toLowerCase().includes(term)
-    );
+  const results = sidebarLinks.filter(item =>
+    item.text.toLowerCase().includes(term)
+  );
 
-     if (results.length === 0) {
-      dropdown.innerHTML = `<div class="search-no-result">No results found</div>`;
-    } else {
-      results.forEach(item => {
-        const a = document.createElement('a');
-        a.href = item.href;
-        a.textContent = item.text;
+  if (results.length === 0) {
+    dropdown.innerHTML = `<div class="search-no-result">No results found</div>`;
+  } else {
+    results.forEach(item => {
+      const a = document.createElement('a');
+      a.href = item.href;
+      a.textContent = item.text;
 
-        a.addEventListener('click', () => {
-          dropdown.style.display = 'none';
-        });
-
-        dropdown.appendChild(a);
+      a.addEventListener('click', () => {
+        dropdown.style.display = 'none';
       });
-    }
 
-    dropdown.style.display = 'block';
-  });
+      dropdown.appendChild(a);
+    });
+  }
 
-  // Hide dropdown when clicking outside
-  document.addEventListener('click', function (e) {
-    if (!e.target.closest('.search-container')) {
-      dropdown.style.display = 'none';
-    }
-  });
+  dropdown.style.display = 'block';
+});
+
+// Hide dropdown when clicking outside
+document.addEventListener('click', function (e) {
+  if (!e.target.closest('.search-container')) {
+    dropdown.style.display = 'none';
+  }
+});
 
 // Sidebar submenu toggle behavior
 document.addEventListener('DOMContentLoaded', function () {
   const subs = document.querySelectorAll('.menu-has-sub');
   subs.forEach(btn => {
-    
+
     const section = btn.closest('.menu-section');
     const key = 'sidebar-open-' + (btn.textContent || '').trim();
     try {
@@ -480,16 +480,16 @@ document.addEventListener('DOMContentLoaded', function () {
         btn.setAttribute('aria-expanded', 'true');
         section && section.classList.add('open');
       }
-    } catch (e) {  }
+    } catch (e) { }
 
     btn.addEventListener('click', function (e) {
       const isOpen = btn.getAttribute('aria-expanded') === 'true';
       btn.setAttribute('aria-expanded', String(!isOpen));
       if (section) section.classList.toggle('open', !isOpen);
-      try { localStorage.setItem(key, String(!isOpen)); } catch (err) {}
+      try { localStorage.setItem(key, String(!isOpen)); } catch (err) { }
     });
   });
-   const activeLink = document.querySelector('.sidebar-menu a.active');
+  const activeLink = document.querySelector('.sidebar-menu a.active');
   if (activeLink) {
     const activeSection = activeLink.closest('.menu-section');
 
@@ -987,7 +987,7 @@ function saveStepData(step) {
 }
 
 // KYC Form Functionality
-  document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // Add Worker functionality
   const addWorkerBtn = document.getElementById('addWorkerBtn');
   const workersContainer = document.getElementById('workersContainer');
@@ -1014,31 +1014,31 @@ function saveStepData(step) {
   //     e.preventDefault();
   //     // handleKYCSubmission();
   //  
-    try {
-        const response = await fetch('/kyc/checkKyc-Required', {
-            method: 'GET',
-            credentials: 'include'
-        });
-        const result = await response.json();
-        console.log("result of kyc",result)
-        if (result.needsKyc) {
-            document.getElementById('Kycmodel').style.display = 'flex';
-            document.querySelector('.main-content').style.pointerEvents = 'none';
-            document.querySelector('.main-content').style.opacity = '0.5';
-            document.querySelector('.sidebar').style.pointerEvents = 'none';
-            document.querySelector('.sidebar').style.opacity = '0.5';
-        }
-    } catch (error) {
-        console.error('Error checking KYC:', error);
+  try {
+    const response = await fetch('/kyc/checkKyc-Required', {
+      method: 'GET',
+      credentials: 'include'
+    });
+    const result = await response.json();
+    console.log("result of kyc", result)
+    if (result.needsKyc) {
+      document.getElementById('Kycmodel').style.display = 'flex';
+      document.querySelector('.main-content').style.pointerEvents = 'none';
+      document.querySelector('.main-content').style.opacity = '0.5';
+      document.querySelector('.sidebar').style.pointerEvents = 'none';
+      document.querySelector('.sidebar').style.opacity = '0.5';
     }
+  } catch (error) {
+    console.error('Error checking KYC:', error);
+  }
 
-    // Handle Get KYC button
-    const kycBtn = document.querySelector('.kyc-required-btn');
-    if (kycBtn) {
-        kycBtn.addEventListener('click', () => {
-            window.location.href = '/kyc/KYCverification';
-        });
-    }
+  // Handle Get KYC button
+  const kycBtn = document.querySelector('.kyc-required-btn');
+  if (kycBtn) {
+    kycBtn.addEventListener('click', () => {
+      window.location.href = '/kyc/KYCverification';
+    });
+  }
 
 });
 
@@ -1360,7 +1360,7 @@ document.addEventListener('DOMContentLoaded', function () {
           sendOtpBtn.disabled = true;
           sendOtpBtn.textContent = 'Sending...';
           const response = await fetch('/auth/send-otp', {
-           method: 'POST',
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ mobile_no, purpose: "verify_mobile" }),
             credentials: 'include'
@@ -1659,7 +1659,11 @@ document.addEventListener('DOMContentLoaded', function () {
   }
 
   async function populateMembers(searchParams = {}) {
+    console.log("FILTER", searchParams);
     try {
+      if ($.fn.DataTable.isDataTable('#membersTable')) {
+        $('#membersTable').DataTable().destroy();
+      }
       tableLoader.style.display = 'block';
       membersTableBody.innerHTML = '';
       const url = new URL('/Groups/search-members', window.location.origin);
@@ -1667,8 +1671,8 @@ document.addEventListener('DOMContentLoaded', function () {
       if (searchParams.groupName) url.searchParams.append('groupName', searchParams.groupName);
 
       if (CURRENT_GROUP_ID) {
-            url.searchParams.append('groupId', CURRENT_GROUP_ID);
-        }
+        url.searchParams.append('groupId', CURRENT_GROUP_ID);
+      }
 
       const response = await fetch(url, {
         method: 'GET',
@@ -1723,6 +1727,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     `;
           membersTableBody.prepend(tr);
         });
+        // setTimeout(() => {
+        //   if ($.fn.DataTable.isDataTable('#membersTable')) {
+        //     $('#membersTable').DataTable().destroy();
+        //   }
+
+        //   $('#membersTable').DataTable();
+        // }, 100);
+        $('#membersTable').DataTable();
       } else {
         showNotification('Failed to load members', 'error');
       }
@@ -2173,6 +2185,22 @@ document.addEventListener('DOMContentLoaded', function () {
       filterForm.classList.toggle('open');
     });
   }
+  const closeFilterBtn = document.getElementById('closeFilterBtn');
+
+  if (closeFilterBtn && filterForm) {
+
+    closeFilterBtn.onclick = () => {
+
+      const searchName = document.getElementById('searchName');
+      const searchGroup = document.getElementById('searchGroup');
+
+      if (searchName) searchName.value = '';
+      if (searchGroup) searchGroup.value = '';
+      filterForm.classList.remove('open');
+      populateMembers();
+    };
+
+  }
 
   if (searchName && searchGroup) {
     let searchTimeout;
@@ -2334,7 +2362,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  
+
 });
 
 function goBack() {
@@ -2342,23 +2370,29 @@ function goBack() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    if (window.location.hash === '#discover-groups-section') {
-        const section = document.getElementById('discover-groups-section');
 
-        if (section) {
-            // Delay so page fully loads
-            setTimeout(() => {
-                section.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+  const uploadCsvBtn = document.getElementById('uploadCsvBtn');
+  const uploadCsvModal = document.getElementById('uploadCsvModal');
+  const closeUploadModal = document.getElementById('closeUploadModal');
 
-                section.classList.add('highlight-discover');
 
-                setTimeout(() => {
-                    section.classList.remove('highlight-discover');
-                }, 2500);
-            }, 300);
-        }
+  if (window.location.hash === '#discover-groups-section') {
+    const section = document.getElementById('discover-groups-section');
+
+    if (section) {
+      // Delay so page fully loads
+      setTimeout(() => {
+        section.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+
+        section.classList.add('highlight-discover');
+
+        setTimeout(() => {
+          section.classList.remove('highlight-discover');
+        }, 2500);
+      }, 300);
     }
+  }
 });

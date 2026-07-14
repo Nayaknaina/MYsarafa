@@ -1,4 +1,5 @@
-{{!-- <!DOCTYPE html>
+{{!--
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -10,12 +11,16 @@
         integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="/socket.io/socket.io.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 
 </head> --}}
+
+<head>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/jquery.dataTables.min.css">
+</head>
 
 <style>
     .main-content {
@@ -195,7 +200,7 @@
         background: #f3f4f6;
     }
 
-   /* .modal-overlay {
+    /* .modal-overlay {
         position: fixed;
         top: 0;
         left: 0;
@@ -440,171 +445,249 @@
         .download-csv-form {
             max-width: 100%;
         }
-        .table-container{
+
+        .table-container {
             overflow-x: scroll;
 
         }
-        
+
     }
-    
+
     /* Default (desktop view) */
-.button-group {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.toggle-btn {
-  display: none; /* hidden on desktop */
-}
-.group-members-header {
-    background: linear-gradient(to right, #2563eb, #14b8a6);
-    color: white;
-    padding: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    position: relative;
-}
-
-.group-members-header.all-groups {
-   background: linear-gradient(to right, #2563eb, #14b8a6);
-}
-
-.header-groupmembers {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    min-height: 60px;
-}
-
-.back-btn {
-    color: white;
-    text-decoration: none;
-    font-size: 16px;
-    font-weight: 500;
-    padding: 8px 12px;
-    border-radius: 8px;
-    transition: background-color 0.2s;
-    flex-shrink: 0;
-}
-
-.back-btn:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
-.header-text {
-    flex: 1;
-    min-width: 0; /* Allows text to truncate if too long */
-}
-
-.header-title {
-    font-size: 20px;
-    font-weight: bold;
-    margin: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.header-subtitle {
-    font-size: 14px;
-    margin: 4px 0 0 0;
-    opacity: 0.9;
-}
-
-/* Mobile Responsiveness */
-@media (max-width: 768px) {
-    .group-members-header {
-        padding: 12px;
+    .button-group {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
     }
 
-    .header- {
-        gap: 12px;
+    .toggle-btn {
+        display: none;
+        /* hidden on desktop */
+    }
+
+    .group-members-header {
+        background: linear-gradient(to right, #2563eb, #14b8a6);
+        color: #2563eb;
+        padding: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        position: relative;
+    }
+
+    .group-members-header.all-groups {
+        background: #8fbcff;
+    }
+
+    .header-groupmembers {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        min-height: 60px;
     }
 
     .back-btn {
-        font-size: 15px;
-        padding: 6px 10px;
+        color: white;
+        text-decoration: none;
+        font-size: 16px;
+        font-weight: 500;
+        padding: 8px 12px;
+        border-radius: 8px;
+        transition: background-color 0.2s;
+        flex-shrink: 0;
+    }
+
+    .back-btn:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .header-text {
+        flex: 1;
+        min-width: 0;
+        /* Allows text to truncate if too long */
     }
 
     .header-title {
-        font-size: 18px;
+        font-size: 20px;
+        font-weight: bold;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     .header-subtitle {
-        font-size: 13px;
-    }
-}
-
-@media (max-width: 480px) {
-    .header-title {
-        font-size: 17px;
-    }
-
-    .back-btn {
         font-size: 14px;
-        padding: 6px 8px;
+        margin: 4px 0 0 0;
+        opacity: 0.9;
     }
-}
-/* Mobile view */
-@media (max-width: 768px) {
-  .button-group {
-    position: relative;
-    justify-content: flex-end; /* toggle on right */
-  }
 
-  .toggle-btn {
-    display: block;
-    background: #4a6cf7;
-    color: white;
-    border: none;
-    padding: 0.6rem 1rem;
-    border-radius: 6px;
-    cursor: pointer;
-  }
+    /* Mobile Responsiveness */
+    @media (max-width: 768px) {
+        .group-members-header {
+            padding: 12px;
+        }
 
-  .actions {
-    display: none;
-    flex-direction: column;
-    gap: 0.5rem;
-    position: absolute;
-    right: 0;
-    top: 110%;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 0.75rem;
-    width: 200px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    z-index: 999;
-  }
+        .header- {
+            gap: 12px;
+        }
 
-  .actions button {
-    width: 100%;
-    padding: 0.6rem;
-    border: none;
-    border-radius: 6px;
-    background: linear-gradient(90deg, #6a11cb, #2575fc);
-    color: white;
-    font-size: 14px;
-    cursor: pointer;
-  }
+        .back-btn {
+            font-size: 15px;
+            padding: 6px 10px;
+        }
 
-  .actions.show {
-    display: flex;
-  }
-} 
-.add-member-input{
-    background: linear-gradient(90deg, #fff 80%, #e3f0ff 100%);
-  border-radius: 8px;
-  font-size: 1.05rem;
-  color: #551DFF;
-  box-shadow: 0 1px 6px #D324A822;
-  transition: border 0.2s, box-shadow 0.2s;
-}
+        .header-title {
+            font-size: 18px;
+        }
 
+        .header-subtitle {
+            font-size: 13px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .header-title {
+            font-size: 17px;
+        }
+
+        .back-btn {
+            font-size: 14px;
+            padding: 6px 8px;
+        }
+    }
+
+    /* Mobile view */
+    @media (max-width: 768px) {
+        .button-group {
+            position: relative;
+            justify-content: flex-end;
+            /* toggle on right */
+        }
+
+        .toggle-btn {
+            display: block;
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .actions {
+            display: none;
+            flex-direction: column;
+            gap: 0.5rem;
+            position: absolute;
+            right: 0;
+            top: 110%;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 0.75rem;
+            width: 200px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+        }
+
+        .actions button {
+            width: 100%;
+            padding: 0.6rem;
+            border: none;
+            border-radius: 6px;
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .actions.show {
+            display: flex;
+        }
+    }
+
+    .add-member-input {
+        background: linear-gradient(90deg, #fff 80%, #e3f0ff 100%);
+        border-radius: 8px;
+        font-size: 1.05rem;
+        color: #551DFF;
+        box-shadow: 0 1px 6px #D324A822;
+        transition: border 0.2s, box-shadow 0.2s;
+    }
+
+    .filter-form {
+        position: relative;
+    }
+
+    .close-filter-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        border: none;
+        background: transparent;
+        font-size: 20px;
+        cursor: pointer;
+        color: #666;
+        padding: 4px 8px;
+    }
+
+    .close-filter-btn:hover {
+        color: #ef4444;
+    }
+
+    .filter-form.open {
+        display: flex;
+        gap: 16px;
+        flex-wrap: nowrap;
+        /* IMPORTANT: forces side-by-side */
+        align-items: flex-end;
+    }
+
+    .filter-field {
+        flex: 1;
+        min-width: 0;
+    }
+
+    @media (max-width: 991px) {
+        .filter-section {
+            position: relative;
+        }
+
+        .toggle-btn {
+            position: absolute;
+            top: -60px;
+            /* header ke upar le jata hai */
+            right: 10px;
+            /* right corner */
+            z-index: 999;
+            background: transparent;
+            border: none;
+            font-size: 22px;
+            color: #1f2937;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .filter-form.open {
+            flex-direction: column;
+            gap: 12px;
+            align-items: stretch;
+        }
+
+        .filter-field {
+            width: 100%;
+        }
+
+        .filter-form input,
+        .filter-form select {
+            width: 100%;
+        }
+    }
 </style>
+
+<script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+
 <body data-user-id="{{user._id}}">
 
     {{> header}}
@@ -635,34 +718,34 @@
                         ← Back
                     </a>
                     <div class="header-text">
-                        <h1 class="header-title">All Group Members</h1>
+                        <h1 class="header-title">ALL GROUP MEMBERS</h1>
                     </div>
                 </div>
             </div>
             {{/if}}
 
-       
+
 
             <!-- Filter Section -->
             <div class="filter-section mb-2 button-group">
-                 <button class="toggle-btn">☰ Actions</button>
-                 <div class="actions">
-                        <button class="filterbutton " id="filterBtn">
-                            <i class="fas fa-filter"></i> Filter
-                        </button>
-                        <button class="addmemberbtn " id="addNewBtn">
-                            <i class="fas fa-plus"></i> Add Member
-                        </button>
-                        <button class="csv-btn " id="uploadCsvBtn">
-                            <i class="fas fa-upload"></i> Upload CSV
-                        </button>
-                        <button class="csv-btn " id="sampleCsvBtn">
-                            <i class="fas fa-file-csv"></i> Download Sample
-                        </button>
-                        <button class="csv-btn " id="downloadCsvBtn">
-                            <i class="fas fa-download"></i> Download CSV
-                        </button>
-                    </div>
+                <button class="toggle-btn">☰</button>
+                <div class="actions">
+                    <button class="filterbutton " id="filterBtn">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                    <button class="addmemberbtn " id="addNewBtn">
+                        <i class="fas fa-plus"></i> Add Member
+                    </button>
+                    <button class="csv-btn " id="uploadCsvBtn">
+                        <i class="fas fa-upload"></i> Upload CSV
+                    </button>
+                    <button class="csv-btn " id="sampleCsvBtn">
+                        <i class="fas fa-file-csv"></i> Download Sample
+                    </button>
+                    <button class="csv-btn " id="downloadCsvBtn">
+                        <i class="fas fa-download"></i> Download CSV
+                    </button>
+                </div>
                 {{!-- <form id="uploadCsvForm" enctype="multipart/form-data">
                     <label for="uploadGroupSelect">Select Group for Upload</label>
                     <select id="uploadGroupSelect" name="groupSelect" required>
@@ -672,20 +755,46 @@
                     <input type="file" id="csvFileInput" name="csvFile" accept=".csv" required>
                     <button type="submit" class="csv-btn">Upload CSV</button>
                 </form> --}}
-               
+
             </div>
             <div class="filter-form" id="filterForm">
+                <button type="button" id="closeFilterBtn" class="close-filter-btn">
+                    ✕
+                </button>
+                {{!-- <label for="searchName">Search by Member Name</label>
+                <input type="text" id="searchName" placeholder="Enter member name">
+                <label for="searchGroup">Search by Group Name</label>
+                <input type="text" id="searchGroup" placeholder="Enter group name"> --}}
+
+                <div class="filter-field">
                     <label for="searchName">Search by Member Name</label>
                     <input type="text" id="searchName" placeholder="Enter member name">
+                </div>
+
+                <div class="filter-field">
                     <label for="searchGroup">Search by Group Name</label>
                     <input type="text" id="searchGroup" placeholder="Enter group name">
+                </div>
             </div>
-        
-
-
 
             <!-- Members Table -->
             <div class="table-container">
+                {{!-- <table class="members-table" id="membersTable">
+                    <thead>
+                        <tr>
+                            <th>Sr No</th>
+                            <th>Name</th>
+                            <th>Mobile Number</th>
+                            <th>Group</th>
+                            <th>Action</th>
+                            <th>Info</th>
+                        </tr>
+                    </thead>
+                    <tbody id="membersTableBody">
+
+                    </tbody>
+                </table> --}}
+
                 <table class="members-table" id="membersTable">
                     <thead>
                         <tr>
@@ -701,6 +810,7 @@
 
                     </tbody>
                 </table>
+
                 <div class="loader" id="tableLoader"></div>
             </div>
         </main>
@@ -722,7 +832,8 @@
                 <select id="categorySelect" class="add-member-input" name="category" required>
                     <option value="">Select Category</option>
                     <option value="Jeweller Shop Owner">Jewellery Shop Owner</option>
-                    <option value="Hallmarking Center/Bullion/Gold Exchange">Hallmarking Center/Bullion/Gold Exchange</option>
+                    <option value="Hallmarking Center/Bullion/Gold Exchange">Hallmarking Center/Bullion/Gold Exchange
+                    </option>
                     <option value="Gold Silver Refinery">Gold Silver Refinery</option>
                     <option value="Bengali/Soni Karigar">Bengali/Soni Karigar</option>
                     <option value="Taar Vala/Dai Vala">Taar Vala/Dai Vala</option>
@@ -835,17 +946,35 @@
         </div>
     </div>
     <script>
-    const CURRENT_GROUP_ID = "{{groupId}}" || null;
-</script>
+        const CURRENT_GROUP_ID = "{{groupId}}" || null;
+    </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
     <script src="/js/all.js"></script>
     <script>
- 
-            document.querySelector('.toggle-btn').addEventListener('click', function () {
+
+        document.querySelector('.toggle-btn').addEventListener('click', function () {
             document.querySelector('.actions').classList.toggle('show');
-            });
+        });
+
+
+        document.addEventListener('click', function (e) {
+            const actions = document.querySelector('.actions');
+            const toggleBtn = document.querySelector('.toggle-btn');
+
+            if (!actions || !toggleBtn) return;
+
+            const isClickInside =
+                actions.contains(e.target) ||
+                toggleBtn.contains(e.target);
+
+            if (!isClickInside) {
+                actions.classList.remove('show');
+            }
+        });
 
     </script>
-
+    <script type="module" src="/js/firebase.js"></script>
     {{> profile}}
 </body>
 

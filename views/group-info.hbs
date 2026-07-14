@@ -20,6 +20,7 @@
         padding: 20px;
         max-width: 1200px;
         margin: 0 auto;
+        padding-bottom: 100px;
     }
 
     /* Group Header */
@@ -40,7 +41,6 @@
         bottom: 20px;
         left: 20px;
         color: rgb(0, 0, 0);
-        /*font-size: 2.5em;*/
         text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
     }
 
@@ -49,7 +49,6 @@
         bottom: 0;
         left: 20px;
         color: rgb(103, 100, 100);
-        /*font-size: 1.2em;*/
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
     }
 
@@ -126,31 +125,124 @@
 
     /* Discussion Section */
     .group-discussion {
-        width: 70%;
+        flex: 1;
+        padding-bottom: 20px;
+        min-height: 100vh;
     }
+
     .group-layout {
-        
-    display: flex;
-    align-items: flex-start;
-    gap: 25px;
-    margin-top: 20px;
-
+        display: flex;
+        gap: 25px;
+        align-items: flex-start;
+        padding-bottom: 80px;
     }
+
     .group-about-box {
-       
-    flex: 1;
-    background: #fff;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    border: 1px solid #ddd;
-    max-height: 500px;
-    overflow-y: auto;
-    position: sticky;
-    top: 100px; /* stays visible when scrolling */
-
+        width: 320px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 90px;
     }
 
+    .sidebar-card {
+        background: #fff;
+        border: 1px solid #e4e6eb;
+        border-radius: 12px;
+        padding: 18px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, .06);
+        margin-bottom: 18px;
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+    }
+
+    .card-header h2,
+    .card-header h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1c1e21;
+        margin: 0;
+    }
+
+    .edit-btn {
+        background: #f0f2f5;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 8px;
+        color: #1877f2;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .edit-btn:hover {
+        background: #1877f2;
+        color: #fff;
+    }
+
+    #aboutSidebarText {
+        color: #65676b;
+        line-height: 1.6;
+        margin-bottom: 15px;
+    }
+
+    .sidebar-card p {
+        margin: 10px 0;
+        font-size: 14px;
+        color: #444;
+    }
+
+    .sidebar-card p {
+        margin: 10px 0;
+        font-size: 14px;
+        color: #444;
+    }
+
+    .sidebar-card strong {
+        color: #1c1e21;
+    }
+
+    .sidebar-card hr {
+        border: none;
+        border-top: 1px solid #ececec;
+        margin: 14px 0;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        font-size: 22px;
+        color: #888;
+        cursor: pointer;
+    }
+
+    .setup-text {
+        color: #65676b;
+        font-size: 13px;
+        margin-bottom: 12px;
+    }
+
+    .checklist-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 0;
+        border-top: 1px solid #eee;
+        cursor: pointer;
+        transition: .2s;
+    }
+
+    .checklist-item:hover {
+        color: #1877f2;
+    }
+
+    .checklist-item i {
+        width: 26px;
+        font-size: 16px;
+    }
 
     .group-discussion h2 {
         font-size: 1.5em;
@@ -159,11 +251,12 @@
 
     /* Announcement Card styled like Facebook Post */
     .announcement-card {
-        background: white;
-        border-radius: 8px;
-        margin-bottom: 20px;
+        background: #fff;
+        border-radius: 10px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
+        overflow: visible;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
     }
 
     .announcement-header {
@@ -182,6 +275,8 @@
     }
 
     .announcement-header .user-info {
+        display: flex;
+        flex-direction: column;
         flex: 1;
     }
 
@@ -198,39 +293,6 @@
         display: block;
     }
 
-    /* Improved Announcement Post Layout */
-    .announcement-card {
-        background: #fff;
-        border-radius: 10px;
-        margin-bottom: 20px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-        border: 1px solid #ddd;
-    }
-
-    .announcement-header {
-        display: flex;
-        align-items: center;
-        padding: 12px 16px;
-        border-bottom: 1px solid #ebedf0;
-    }
-
-    .announcement-header .user-info {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .announcement-header .user-name {
-        font-weight: 600;
-        font-size: 15px;
-        color: #050505;
-    }
-
-    .announcement-header .post-date {
-        font-size: 13px;
-        color: #65676b;
-    }
-
     .announcement-content {
         padding: 12px 16px;
         font-size: 15px;
@@ -245,7 +307,6 @@
     }
 
     .announcement-images {
-
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
         gap: 5px;
         padding: 10px;
@@ -255,10 +316,8 @@
         width: 100%;
         border-radius: 6px;
         object-fit: cover;
-
     }
 
-    /* Buttons like Facebook */
     .announcement-actions {
         display: flex;
         border-top: 1px solid #ebedf0;
@@ -288,7 +347,6 @@
         margin-right: 6px;
         font-size: 16px;
     }
-
 
     /* People Section */
     .group-people {
@@ -336,18 +394,142 @@
         display: none;
     }
 
-    /* Responsive Design */
-    @media (max-width: 768px) {
-         .group-layout {
-        flex-direction: column;
+    .like-btn.liked i,
+    .like-btn.liked {
+        color: #1877f2;
     }
 
-    .group-about-box {
-        max-height: none;
-        position: relative;
-        top: 0;
-        width: 100%;
+    .comments-section {
+        display: none;
     }
+
+    /* ---- Generic modal helpers (cover / invite / share / description all reuse these) ---- */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modal-box {
+        background: #fff;
+        border-radius: 10px;
+        padding: 20px;
+        position: relative;
+        max-width: 90vw;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #999;
+    }
+
+    .illustration-item {
+        border: 2px solid transparent;
+    }
+
+    .illustration-item:hover,
+    .illustration-item.selected {
+        border-color: #1877f2;
+    }
+
+    .share-icon-btn {
+        text-align: center;
+        color: #333;
+        text-decoration: none;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-family: inherit;
+    }
+
+    .share-icon-btn div {
+        font-size: 12px;
+        margin-top: 4px;
+    }
+
+    .invite-user-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .invite-user-row .user-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .invite-user-row img {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .invite-btn-small {
+        background: #1877f2;
+        color: #fff;
+        border: none;
+        padding: 6px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .invite-btn-small:disabled {
+        background: #e7e9ed;
+        color: #65676b;
+        cursor: default;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .group-header {
+            margin-bottom: 120px;
+        }
+
+        #editCoverBtn {
+            position: static !important;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .group-header>div[style*="position:absolute; bottom:16px; right:16px"] {
+            position: static !important;
+            width: 100%;
+            margin-top: 10px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        #inviteBtn,
+        #shareGroupBtn {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .group-layout {
+            flex-direction: column;
+        }
+
+        .group-about-box {
+            max-height: none;
+            position: relative;
+            top: 0;
+            width: 100%;
+        }
+
         .main-container {
             flex-direction: column;
         }
@@ -376,10 +558,6 @@
             font-size: 1.8em;
         }
 
-       /* .group-tabs {
-            overflow-x: auto;
-        }*/
-
         .announcement-actions {
             margin: 0;
         }
@@ -388,9 +566,17 @@
             font-size: 13px;
             padding: 10px;
         }
+
+        .group-discussion {
+            padding-bottom: 10px;
+        }
+
+        .announcement-card {
+            margin-bottom: 15px;
+        }
+
     }
 </style>
-
 
 <body>
     {{> header}}
@@ -401,26 +587,39 @@
         <main class="main-content">
             <!-- Group Header -->
             <div class="group-header">
-                <img src="{{group.g_cover}}" alt="{{group.g_name}} cover" class="group-cover">
+                <img src="{{group.g_cover}}" alt="{{group.g_name}} cover" class="group-cover" id="groupCoverImg">
 
-                {{#if isMember}} 
+                {{#unless isAdmin}}
+                {{#if isMember}}
                 <button class="joined-btn">Joined</button>
                 {{else}}
                 <button class="join-btn">Join Group</button>
                 {{/if}}
+                {{/unless}}
+
+                <button id="editCoverBtn"
+                    style="position:absolute; bottom:16px; left:16px; background:rgba(0,0,0,0.6); color:#fff; border:none; border-radius:6px; padding:8px 14px; font-size:13px; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                    <i class="fa-solid fa-camera"></i> Edit Cover Photo
+                </button>
+
+                <div style="position:absolute; bottom:16px; right:16px; display:flex; gap:10px;">
+                    <button id="inviteBtn"
+                        style="background:#1877f2; color:#fff; border:none; padding:8px 16px; border-radius:6px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                        <i class="fa-solid fa-user-plus"></i> Invite
+                    </button>
+                    <button id="shareGroupBtn"
+                        style="background:#e7e9ed; color:#050505; border:none; padding:8px 16px; border-radius:6px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:6px;">
+                        <i class="fa-solid fa-share"></i> Share
+                    </button>
+                </div>
             </div>
 
-
-            {{!-- <nav class="group-tabs">
-                <h1 class="group-name">{{group.g_name}}</h1>
-                <p class="group-type">{{group.g_type}} group · {{group.total_mem}} members</p>
-            </nav> --}}
             <a href="/Groups/group-member/{{group._id}}" class="block text-white no-underline">
-    <nav class="group-tabs">
-        <h1 class="group-name">{{group.g_name}}</h1>
-        <p class="group-type">{{group.g_type}} group · {{group.total_mem}} members →</p>
-    </nav>
-</a>
+                <nav class="group-tabs">
+                    <h1 class="group-name">{{group.g_name}}</h1>
+                    <p class="group-type">{{group.g_type}} group · {{group.total_mem}} members →</p>
+                </nav>
+            </a>
             <!-- Tabs -->
             <nav class="group-tabs">
                 <a href="#discussion">Discussion</a>
@@ -431,20 +630,68 @@
             </nav>
 
             <div class="group-layout">
-                  <aside class="group-about-box">
-                    <h2>About</h2>
-                    <p>{{group.description}}</p>
-                    <hr>
-                    <p><strong>Type:</strong> {{group.g_type}}</p>
-                    <p><strong>Members:</strong> {{group.total_mem}}</p>
-                    <p><strong>Created:</strong> {{formatDate group.createdAt}}</p>
-                    <p><strong>Location:</strong> {{group.location}}</p>
-                    <p><strong>Admin:</strong> {{group.createdBy.full_name}}</p>
+                <aside class="group-about-box">
+                    <!-- About Card -->
+                    <div class="sidebar-card">
+                        <div class="card-header">
+                            <h2>About</h2>
+                            <button id="editDescBtn" class="edit-btn">
+                                <i class="fa-solid fa-pen"></i> Edit
+                            </button>
+                        </div>
+                        <p id="aboutSidebarText">
+                            {{group.description}}
+                        </p>
+                        <hr>
+                        <p><strong>Type:</strong> {{group.g_type}}</p>
+                        <p><strong>Members:</strong> {{group.total_mem}}</p>
+                        <p><strong>Created:</strong> {{formatDate group.createdAt}}</p>
+                        <p><strong>Location:</strong> {{group.location}}</p>
+                        <p><strong>Admin:</strong> {{group.createdBy.full_name}}</p>
+                    </div>
+
+                    <!-- Finish Setup Card -->
+                    <div id="setupChecklist" class="sidebar-card">
+
+                        <div class="card-header">
+                            <h3>Finish setting up your group</h3>
+
+                            {{!-- <button id="closeChecklist" class="close-btn">
+                                &times;
+                            </button> --}}
+                        </div>
+
+                        <p class="setup-text">
+                            Continue adding key details and start engaging with your community.
+                        </p>
+
+                        <div class="checklist-item" data-action="invite">
+                            <i class="fa-solid fa-user-plus"></i>
+                            <span>Invite people to join</span>
+                        </div>
+
+                        <div class="checklist-item" data-action="cover">
+                            <i class="fa-solid fa-image"></i>
+                            <span>Add a Cover Photo</span>
+                        </div>
+
+                        <div class="checklist-item" data-action="description">
+                            <i class="fa-solid fa-pen"></i>
+                            <span>Add a Description</span>
+                        </div>
+
+                        <div class="checklist-item" data-action="post">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            <span>Create a Post</span>
+                        </div>
+
+                    </div>
+
                 </aside>
 
                 <!-- Main Content: Announcements -->
                 <section id="discussion" class="group-discussion">
-                  
+
                     {{#if hasAnnouncements}}
                     {{#each announcements}}
                     <div class="announcement-card">
@@ -469,20 +716,31 @@
 
                         <!-- Image Grid -->
                         {{#if this.image}}
-
                         <div class="announcement-images">
-
                             <img src="{{this.image}}" alt="Announcement Image">
-
                         </div>
                         {{/if}}
 
-                        <!-- Actions -->
+                        <!-- Actions - VIEW ONLY for Admin -->
                         <div class="announcement-actions">
-                            <button class="like"><i class="fa-regular fa-thumbs-up"></i> Like</button>
-                            <button class="comment"><i class="fa-regular fa-comment"></i> Comment</button>
-                            <button class="share"><i class="fa-solid fa-share"></i> Share</button>
+                            <button class="like-btn" data-id="{{this._id}}">
+                                <i class="fa-solid fa-heart" style="color:#1877f2;"></i> {{this.likes.length}} Likes
+                            </button>
+                            <button class="comment" data-id="{{this._id}}">
+                                <i class="fa-regular fa-comment"></i> Comments
+                            </button>
+                            <button class="share" data-title="{{this.title}}"
+                                data-url="https://mysarafa.com/Groups/group-info/{{../group._id}}">
+                                <i class="fa-solid fa-share"></i> Share
+                            </button>
                         </div>
+
+                        <!-- Comments - VIEW ONLY, no input box -->
+                        <div class="comments-section" data-id="{{this._id}}"
+                            style="padding: 10px 16px; border-top: 1px solid #ebedf0;">
+                            <div class="comments-list"></div>
+                        </div>
+
                     </div>
                     {{/each}}
                     {{else}}
@@ -490,7 +748,7 @@
                     {{/if}}
                 </section>
 
-              
+
                 <!-- People Section -->
                 <section id="people" class="group-people" style="display: none;">
                     <h2>Members ({{group.total_mem}})</h2>
@@ -505,26 +763,449 @@
             </div>
             <!-- Add other sections like Events, Media, Files as needed -->
 
+            {{!-- <div
+                style="background:#fff; border-radius:10px; padding:20px; margin:20px 0; box-shadow:0 1px 3px rgba(0,0,0,0.1); border:1px solid #ddd;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="margin:0;">About</h3>
+                    <button id="editDescBtn"
+                        style="background:none; border:none; color:#1877f2; font-weight:600; cursor:pointer;">Edit</button>
+                </div>
+                <p id="aboutText" style="color:#65676b; margin-top:10px;">
+                    {{#if group.description}}{{group.description}}{{else}}No description added yet.{{/if}}
+                </p>
+            </div> --}}
+
+            <!-- Description Modal -->
+            <div id="descModal" class="modal-overlay">
+                <div class="modal-box" style="width:360px;">
+                    <h3 style="margin-top:0;">Edit Description</h3>
+                    <textarea id="descTextarea" rows="5"
+                        style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px; font-size:14px; resize:vertical;">{{group.description}}</textarea>
+                    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:14px;">
+                        <button id="cancelDescBtn"
+                            style="padding:8px 16px; background:#e7e9ed; border:none; border-radius:6px; cursor:pointer;">Cancel</button>
+                        <button id="saveDescBtn"
+                            style="padding:8px 16px; background:#1877f2; color:#fff; border:none; border-radius:6px; cursor:pointer;">Save</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cover Photo Modal -->
+            <div id="coverModal" class="modal-overlay">
+                <div class="modal-box" style="width:420px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                        <h3 style="margin:0;">Update Cover Photo</h3>
+                        <button id="closeCoverModal" class="modal-close">&times;</button>
+                    </div>
+                    <button id="uploadPhotoOption"
+                        style="width:100%; padding:10px; margin-bottom:14px; background:#1877f2; color:#fff; border:none; border-radius:6px; font-weight:600; cursor:pointer;">
+                        <i class="fa-solid fa-upload"></i> Upload Photo
+                    </button>
+                    <input type="file" id="uploadCoverInput" accept="image/*" style="display:none;">
+                    <p style="font-size:13px; color:#65676b; margin-bottom:8px;">Or choose an illustration</p>
+                    <div id="illustrationGrid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px;">
+                        <div class="illustration-item" data-key="illustration1"
+                            style="height:70px; border-radius:6px; cursor:pointer; background:linear-gradient(135deg,#667eea,#764ba2);">
+                        </div>
+                        <div class="illustration-item" data-key="illustration2"
+                            style="height:70px; border-radius:6px; cursor:pointer; background:linear-gradient(135deg,#f093fb,#f5576c);">
+                        </div>
+                        <div class="illustration-item" data-key="illustration3"
+                            style="height:70px; border-radius:6px; cursor:pointer; background:linear-gradient(135deg,#4facfe,#00f2fe);">
+                        </div>
+                        <div class="illustration-item" data-key="illustration4"
+                            style="height:70px; border-radius:6px; cursor:pointer; background:linear-gradient(135deg,#43e97b,#38f9d7);">
+                        </div>
+                        <div class="illustration-item" data-key="illustration5"
+                            style="height:70px; border-radius:6px; cursor:pointer; background:linear-gradient(135deg,#fa709a,#fee140);">
+                        </div>
+                        <div class="illustration-item" data-key="illustration6"
+                            style="height:70px; border-radius:6px; cursor:pointer; background:linear-gradient(135deg,#30cfd0,#330867);">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invite Modal -->
+            <div id="inviteModal" class="modal-overlay">
+                <div class="modal-box" style="width:400px; max-height:520px; display:flex; flex-direction:column;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <h3 style="margin:0;">Invite People</h3>
+                        <button id="closeInviteModal" class="modal-close">&times;</button>
+                    </div>
+                    <input type="text" id="inviteSearchInput" placeholder="Search by name or email"
+                        style="padding:10px; border:1px solid #ddd; border-radius:6px; margin-bottom:10px;">
+                    <div id="inviteResultsList" style="overflow-y:auto; flex:1; min-height:200px;"></div>
+                </div>
+            </div>
+
+            <!-- Share Modal -->
+            <div id="shareModal" class="modal-overlay">
+                <div class="modal-box" style="width:320px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                        <h3 style="margin:0;">Share this group</h3>
+                        <button id="closeShareModal" class="modal-close">&times;</button>
+                    </div>
+                    <div style="display:flex; gap:20px; justify-content:center;">
+                        <a id="shareWhatsapp" class="share-icon-btn" target="_blank" rel="noopener">
+                            <i class="fa-brands fa-whatsapp fa-2x" style="color:#25D366;"></i>
+                            <div>WhatsApp</div>
+                        </a>
+                        <a id="shareFacebook" class="share-icon-btn" target="_blank" rel="noopener">
+                            <i class="fa-brands fa-facebook fa-2x" style="color:#1877f2;"></i>
+                            <div>Facebook</div>
+                        </a>
+                        <a id="shareTelegram" class="share-icon-btn" target="_blank" rel="noopener">
+                            <i class="fa-brands fa-telegram fa-2x" style="color:#0088cc;"></i>
+                            <div>Telegram</div>
+                        </a>
+                        <button id="shareCopyLink" class="share-icon-btn">
+                            <i class="fa-solid fa-link fa-2x" style="color:#65676b;"></i>
+                            <div>Copy Link</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
+    <!-- Likes Modal -->
+    <div id="likesModal" class="modal-overlay">
+        <div class="modal-box" style="width:320px; max-height:400px; overflow-y:auto;">
+            <button id="closeLikesModal" class="modal-close"
+                style="position:absolute; top:10px; right:14px;">&times;</button>
+            <h3 style="margin-bottom:12px;">Liked by</h3>
+            <div id="likesList"></div>
+        </div>
+    </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="/js/all.js"></script>
 
     <script>
+        // Handy references used throughout
+        const GROUP_ID = "{{group._id}}";
+        const GROUP_NAME = "{{group.g_name}}";
+        const GROUP_SHARE_URL = `https://mysarafa.com/Groups/group-info/${GROUP_ID}`;
+
         // Simple tab switching
         document.querySelectorAll('.group-tabs a').forEach(tab => {
             tab.addEventListener('click', (e) => {
                 e.preventDefault();
                 const targetId = e.target.href.split('#')[1];
-                document.querySelectorAll('.group-content section').forEach(sec => {
+                document.querySelectorAll('.group-content section, .group-layout section').forEach(sec => {
                     sec.style.display = sec.id === targetId ? 'block' : 'none';
                 });
             });
         });
+
+        // Announcement share btn (existing per-post share, unchanged)
+        document.querySelectorAll('.share').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const title = btn.dataset.title;
+                const url = btn.dataset.url;
+
+                if (navigator.share) {
+                    try {
+                        await navigator.share({ title: title, text: "Check this announcement on MySarafa", url: url });
+                    } catch (err) {
+                        console.log("User cancelled sharing");
+                    }
+                } else {
+                    navigator.clipboard.writeText(url);
+                    toastr.success("Link copied!");
+                }
+            });
+        });
+
+        // Show likers modal on clicking like button (VIEW ONLY - admin can't like)
+        document.addEventListener("click", async (e) => {
+            const likeBtn = e.target.closest(".like-btn");
+            if (!likeBtn) return;
+
+            const id = likeBtn.dataset.id;
+            const modal = document.getElementById("likesModal");
+            const list = document.getElementById("likesList");
+            list.innerHTML = "Loading...";
+            modal.style.display = "flex";
+
+            try {
+                const res = await fetch(`/announcements/likes/${id}`);
+                const data = await res.json();
+
+                if (data.success && data.likes.length) {
+                    list.innerHTML = data.likes.map(u => `
+                        <div style="display:flex; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #f0f0f0;">
+                            <img src="${u.profileImage || '/assets/images/default-profile.png'}"
+                                 alt="${u.name}"
+                                 style="width:36px; height:36px; border-radius:50%; object-fit:cover;">
+                            <span style="font-size:14px; font-weight:500;">${u.name}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = "<p>No likes yet.</p>";
+                }
+            } catch (err) {
+                list.innerHTML = "<p>Error loading likes.</p>";
+            }
+        });
+
+        document.getElementById("closeLikesModal").addEventListener("click", () => {
+            document.getElementById("likesModal").style.display = "none";
+        });
+
+        // Toggle comment section + load comments (VIEW ONLY - no posting)
+        document.addEventListener("click", async (e) => {
+            const commentBtn = e.target.closest(".comment");
+            if (!commentBtn) return;
+
+            const id = commentBtn.dataset.id;
+            const section = document.querySelector(`.comments-section[data-id="${id}"]`);
+
+            const isVisible = section.style.display === 'block';
+            section.style.display = isVisible ? 'none' : 'block';
+
+            if (!isVisible) {
+                await loadComments(id);
+            }
+        });
+
+        async function loadComments(id) {
+            const section = document.querySelector(`.comments-section[data-id="${id}"]`);
+            const list = section.querySelector(".comments-list");
+            list.innerHTML = "Loading...";
+
+            try {
+                const res = await fetch(`/announcements/comments/${id}`);
+                const data = await res.json();
+
+                if (data.success && data.comments.length) {
+                    list.innerHTML = data.comments.map(c => `
+                        <div style="display:flex; gap:8px; padding:6px 0;">
+                            <img src="${c.user.profileImage}" alt="${c.user.name}"
+                                 style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+                            <div style="background:#f0f2f5; border-radius:12px; padding:6px 12px;">
+                                <div style="font-size:13px; font-weight:600;">${c.user.name}</div>
+                                <div style="font-size:14px;">${c.text}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = "<p style='font-size:13px;color:#999;'>No comments yet.</p>";
+                }
+            } catch (err) {
+                list.innerHTML = "<p style='font-size:13px;color:red;'>Error loading comments.</p>";
+            }
+        }
+
+        /* =========================================================
+           NEW: Edit Cover Photo (upload OR pick illustration)
+        ========================================================= */
+        const coverModal = document.getElementById('coverModal');
+        const uploadCoverInput = document.getElementById('uploadCoverInput');
+
+        document.getElementById('editCoverBtn').addEventListener('click', () => {
+            coverModal.style.display = 'flex';
+        });
+        document.getElementById('closeCoverModal').addEventListener('click', () => {
+            coverModal.style.display = 'none';
+        });
+        document.getElementById('uploadPhotoOption').addEventListener('click', () => uploadCoverInput.click());
+
+        uploadCoverInput.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const formData = new FormData();
+            formData.append('coverImage', file);
+            await saveCover(formData);
+            uploadCoverInput.value = '';
+        });
+
+        document.querySelectorAll('#illustrationGrid .illustration-item').forEach(item => {
+            item.addEventListener('click', async () => {
+                const formData = new FormData();
+                formData.append('illustrationKey', item.dataset.key);
+                await saveCover(formData);
+            });
+        });
+
+        async function saveCover(formData) {
+            try {
+                const res = await fetch(`/Groups/${GROUP_ID}/cover`, { method: 'PATCH', body: formData });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('groupCoverImg').src = data.cover;
+                    toastr.success('Cover photo updated!');
+                    coverModal.style.display = 'none';
+                } else {
+                    toastr.error(data.message || 'Failed to update cover');
+                }
+            } catch (err) {
+                toastr.error('Error updating cover photo');
+            }
+        }
+
+        /* =========================================================
+           NEW: About / Description edit
+        ========================================================= */
+        const descModal = document.getElementById('descModal');
+
+        document.getElementById('editDescBtn').addEventListener('click', () => {
+            descModal.style.display = 'flex';
+        });
+        document.getElementById('cancelDescBtn').addEventListener('click', () => {
+            descModal.style.display = 'none';
+        });
+        document.getElementById('saveDescBtn').addEventListener('click', async () => {
+            const description = document.getElementById('descTextarea').value.trim();
+            try {
+                const res = await fetch(`/Groups/${GROUP_ID}/description`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ description })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    document.getElementById('aboutText').textContent = data.description || 'No description added yet.';
+                    document.getElementById('aboutSidebarText').textContent = data.description || 'No description added yet.'; // NEW
+                    descModal.style.display = 'none';
+                    toastr.success('Description updated!');
+                } else {
+                    toastr.error(data.message || 'Failed to update description');
+                }
+            } catch (err) {
+                toastr.error('Error updating description');
+            }
+        });
+
+        /* =========================================================
+           NEW: Invite people (only existing app users, not already members)
+        ========================================================= */
+        const inviteModal = document.getElementById('inviteModal');
+
+        document.getElementById('inviteBtn').addEventListener('click', () => {
+            inviteModal.style.display = 'flex';
+            document.getElementById('inviteSearchInput').value = '';
+            loadInvitableUsers('');
+        });
+        document.getElementById('closeInviteModal').addEventListener('click', () => {
+            inviteModal.style.display = 'none';
+        });
+
+        let inviteDebounce;
+        document.getElementById('inviteSearchInput').addEventListener('input', (e) => {
+            clearTimeout(inviteDebounce);
+            const value = e.target.value.trim();
+            inviteDebounce = setTimeout(() => loadInvitableUsers(value), 300);
+        });
+
+        async function loadInvitableUsers(query) {
+            const list = document.getElementById('inviteResultsList');
+            list.innerHTML = 'Loading...';
+            try {
+                const res = await fetch(`/Groups/${GROUP_ID}/invitable-users?query=${encodeURIComponent(query)}`);
+                const data = await res.json();
+                if (data.success && data.users.length) {
+                    list.innerHTML = data.users.map(u => `
+                        <div class="invite-user-row">
+                            <div class="user-left">
+                                <img src="${u.profile_pic || '/assets/images/default-profile.png'}" alt="${u.name}">
+                                <span>${u.name}</span>
+                            </div>
+                            <button class="invite-btn-small" data-id="${u._id}">Invite</button>
+                        </div>
+                    `).join('');
+                } else {
+                    list.innerHTML = "<p style='color:#999;font-size:13px;'>No users found.</p>";
+                }
+            } catch (err) {
+                list.innerHTML = "<p style='color:red;font-size:13px;'>Error loading users.</p>";
+            }
+        }
+
+        document.addEventListener('click', async (e) => {
+            const btn = e.target.closest('.invite-btn-small');
+            if (!btn) return;
+
+            const userId = btn.dataset.id;
+            btn.disabled = true;
+            btn.textContent = 'Inviting...';
+
+            try {
+                const res = await fetch(`/Groups/${GROUP_ID}/invite`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    btn.textContent = 'Invited';
+                    toastr.success('Invitation sent!');
+                } else {
+                    btn.disabled = false;
+                    btn.textContent = 'Invite';
+                    toastr.error(data.message || 'Failed to invite');
+                }
+            } catch (err) {
+                btn.disabled = false;
+                btn.textContent = 'Invite';
+                toastr.error('Error sending invite');
+            }
+        });
+
+        /* =========================================================
+           NEW: Share group (WhatsApp / Facebook / Telegram / Copy link)
+        ========================================================= */
+        const shareModal = document.getElementById('shareModal');
+        const shareText = encodeURIComponent(`Join ${GROUP_NAME} on MySarafa!`);
+
+        document.getElementById('shareGroupBtn').addEventListener('click', () => {
+            document.getElementById('shareWhatsapp').href =
+                `https://wa.me/?text=${shareText}%20${encodeURIComponent(GROUP_SHARE_URL)}`;
+            document.getElementById('shareFacebook').href =
+                `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(GROUP_SHARE_URL)}`;
+            document.getElementById('shareTelegram').href =
+                `https://t.me/share/url?url=${encodeURIComponent(GROUP_SHARE_URL)}&text=${shareText}`;
+            shareModal.style.display = 'flex';
+        });
+        document.getElementById('closeShareModal').addEventListener('click', () => {
+            shareModal.style.display = 'none';
+        });
+        document.getElementById('shareCopyLink').addEventListener('click', () => {
+            navigator.clipboard.writeText(GROUP_SHARE_URL);
+            toastr.success('Link copied!');
+        });
+
+        /* =========================================================
+           NEW: "Finish setting up your group" checklist actions
+        ========================================================= */
+        document.querySelectorAll('.checklist-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const action = item.dataset.action;
+                if (action === 'invite') document.getElementById('inviteBtn').click();
+                if (action === 'cover') document.getElementById('editCoverBtn').click();
+                if (action === 'description') document.getElementById('editDescBtn').click();
+                if (action === 'post') {
+                    // NOTE: adjust this path to match your actual "create announcement" route
+                    window.location.href = `/Announcement-form?groupId=${GROUP_ID}`;
+                }
+            });
+        });
+
+        document.getElementById('closeChecklist').addEventListener('click', () => {
+            document.getElementById('setupChecklist').style.display = 'none';
+        });
+
+        // Close any modal when clicking on its dark backdrop
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) overlay.style.display = 'none';
+            });
+        });
     </script>
+    <script type="module" src="/js/firebase.js"></script>
 </body>
 
 </html>

@@ -180,3 +180,7 @@ mongoose.connection.on('error', (err) => {
 
 // Connect to MongoDB
 require('./config/conn');
+
+const admin = require("./config/firebaseAdmin").default;
+
+console.log("Firebase Admin Initialized");

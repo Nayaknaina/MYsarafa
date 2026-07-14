@@ -188,36 +188,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3"
                         id="discoverBusinessesGrid">
                         {{#each discoverBusinesses}}
-                        {{!-- <div class="business-card cursor-pointer" onclick="openBusinessDetailsModal('{{_id}}')">
-                            <div
-                                class="business-card-inner bg-white rounded-2xl shadow-sm overflow-hidden h-full flex flex-col border">
-                                <img src="{{profile_pic}}" alt="{{name}}" class="business-banner">
-                                <div class="business-initial">
-                                    {{name.[0]}}
-                                </div>
-                                <div class="business-content">
-                                    <div class="mb-1">
-                                        <h3 class="text-sm font-bold text-gray-900 line-clamp-1">{{name}}</h3>
-                                        <p class="text-xs text-gray-600 line-clamp-1">{{description}}</p>
-                                        <p class="text-xs text-gray-500 mt-1">Cat: {{category}}</p>
-                                        <p class="text-xs text-gray-500">Own: {{owner.f_name}} {{owner.l_name}}</p>
-                                    </div>
-                                    <div class="mt-1 pt-1">
-                                        <div class="star-rating mb-1">
-                                            {{#each starArray}}
-                                            <i class="star {{this.filled ? 'filled' : ''}} fas fa-star"></i>
-                                            {{/each}}
-                                            <span class="review-count">({{reviews.length}})</span>
-                                        </div>
-                                        <button
-                                            class="w-full bg-green-500 text-white px-1 py-1 rounded text-xs hover:bg-green-600 transition text-center"
-                                            onclick="event.stopPropagation(); contactOwner('{{owner._id}}')">
-                                            <i class="fab fa-whatsapp mr-1"></i>Contact
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div> --}}
+
                         <div class="business-card cursor-pointer" onclick="openBusinessDetailsModal('{{_id}}')">
 
                             <div class="bg-white rounded-lg shadow-sm overflow-hidden h-full flex flex-col border">
@@ -685,7 +656,7 @@
         });
 
     </script>
-
+    <script type="module" src="/js/firebase.js"></script>
 </body>
 
 </html>

@@ -22,7 +22,7 @@
     }
 
     .group-create-form-section {
-        flex: 1;
+      flex: 1;
 
     }
 
@@ -89,7 +89,7 @@
 
     .group-create-preview-section {
       flex: 1;
-
+      height: auto;
     }
 
     .cover-photo-preview {
@@ -100,7 +100,7 @@
     .cover-img {
       width: 100%;
       /*  height: 200px;*/
-      object-fit:cover;
+      object-fit: cover;
       border-radius: 0.5rem;
     }
 
@@ -144,37 +144,72 @@
       animation: spin 1s linear infinite;
       margin: 0 auto;
     }
+
     .your-groups-section {
-  margin-top: 40px;
-  padding: 20px;
-  background: #fff;
-  border-radius: 10px;
-}
+      margin-top: 40px;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      height: auto;
+    }
 
-.my-groups-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
+    .my-groups-grid {
+      height: 400px;
+      overflow-y: scroll;
 
-.group-card {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #f8f9fa;
-  padding: 15px;
-  border-radius: 12px;
-  border: 1px solid #ddd;
-}
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-right: 6px;
+    }
 
-.group-actions .btn-delete {
-  background: red;
-  color: #fff;
-  padding: 6px 10px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-}
+    .my-groups-grid::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .my-groups-grid::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 10px;
+    }
+
+    .group-card {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 18px 22px;
+      border-radius: 12px;
+      background: #fff;
+      border: none;
+      box-shadow: none;
+      transition: background .2s ease;
+
+      flex-shrink: 0;
+    }
+
+    .my-groups-grid {
+      height: 800px !important;
+      max-height: none !important;
+      overflow-y: scroll !important;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      border-radius: 12px;
+    }
+
+    .group-left {
+      padding: 10px;
+    }
+
+    .group-card:hover {
+      background: #f5f7fa;
+    }
+
+    .group-actions .btn-delete {
+      background: red;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+    }
 
     @keyframes spin {
       0% {
@@ -201,6 +236,12 @@
 
     }
 
+    @media (max-width: 768px) {
+      .my-groups-grid {
+        max-height: 300px !important;
+        overflow-y: auto;
+      }
+    }
 
     .modal {
       display: none;
@@ -701,7 +742,7 @@
 
 <body data-user-id="{{user._id}}">
 
- 
+
   <!-- Header -->
   {{> header}}
 
@@ -816,43 +857,43 @@
               will appear here...{{/if}}</p>
           </div>
 
-            <div class="your-groups-section">
-              <h2 class="section-title">Your Communities</h2>
+          <div class="your-groups-section">
+            <h2 class="section-title">Your Communities</h2>
 
-              <div class="groups-list my-groups-grid">
-                {{#if groups.length}}
-                  {{#each groups}}
-                  
-                    <div class="group-card" data-group-id="{{id}}">
-                      <div class="group-left">
-                        <img src="{{cover}}" alt="{{name}} cover" class="group-cover" />
-                        <div class="group-info">
-                          <h3 class="group-name">
-                            {{name}} 
-                            <small class="group-type">({{type}})</small>
-                          </h3>
-                          <p class="group-desc">{{description}}</p>
-                          <p class="group-members">Members: <strong>{{totalMembers}}</strong></p>
-                        </div>
-                      </div>
+            <div class="groups-list my-groups-grid">
+              {{#if groups.length}}
+              {{#each groups}}
 
-                      <div class="group-actions">
-                        <a class="btn btn-view" href="/Groups/group-info/{{id}}">View</a>
-                        <a class="btn btn-edit" href="/Groups/community/{{id}}">Edit</a>
+              <div class="group-card" data-group-id="{{id}}">
+                <div class="group-left">
+                  <img src="{{cover}}" alt="{{name}} cover" class="group-cover" />
+                  <div class="group-info">
+                    <h3 class="group-name">
+                      {{name}}
+                      <small class="group-type">({{type}})</small>
+                    </h3>
+                    <p class="group-desc">{{description}}</p>
+                    {{!-- <p class="group-members">Members: <strong>{{totalMembers}}</strong></p> --}}
+                  </div>
+                </div>
 
-                        <!-- Delete Icon Button -->
-                        <button class="btn btn-delete" data-group-id="{{id}}">
-                            🗑️
-                        </button>
+                {{!-- <div class="group-actions">
+                  <a class="btn btn-view" href="/Groups/group-info/{{id}}">View</a>
+                  <a class="btn btn-edit" href="/Groups/community/{{id}}">Edit</a>
 
-                      </div>
-                    </div>
-                  {{/each}}
-                {{else}}
-                  <p>You are not a member of any community yet.</p>
-                {{/if}}
+                  <!-- Delete Icon Button -->
+                  <button class="btn btn-delete" data-group-id="{{id}}">
+                    🗑️
+                  </button>
+
+                </div> --}}
               </div>
+              {{/each}}
+              {{else}}
+              <p>You are not a member of any community yet.</p>
+              {{/if}}
             </div>
+          </div>
 
           {{!-- <button class="dlt-community">Delete Community</button> --}}
         </div>
@@ -957,7 +998,7 @@
 
   <script src="/js/communityGroup.js"></script>
   <script src="/js/all.js"></script>
-
+  <script type="module" src="/js/firebase.js"></script>
 
 </body>
 

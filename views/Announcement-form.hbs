@@ -1,4 +1,5 @@
-{{!-- <!DOCTYPE html>
+{{!--
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -15,453 +16,456 @@
   <script src="/socket.io/socket.io.js"></script>
 
 </head> --}}
+<script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/classic/ckeditor.js"></script>
+<style>
+  body {
+    background: #f6f7fb;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+  }
 
-  <style>
-    body {
-      background: #f6f7fb;
-      font-family: 'Segoe UI', Arial, sans-serif;
-      margin: 0;
-      min-height: 100vh;
-    }
+  .announcement-main-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 40px;
+    padding: 48px 0;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
 
+  .announcement-form-panel {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(60, 60, 60, 0.12);
+    padding: 32px 28px 24px 28px;
+    min-width: 340px;
+    max-width: 400px;
+    flex: 1;
+  }
+
+  .announcement-form-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .announcement-form-header h2 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+    color: #222;
+  }
+
+  .announcement-form-header .close-btn {
+    background: none;
+    border: none;
+    font-size: 22px;
+    color: #65676b;
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 4px 8px;
+    transition: background 0.2s;
+  }
+
+  .announcement-form-header .close-btn:hover {
+    background: #f2f3f5;
+  }
+
+  .announcement-form-group {
+    margin-bottom: 18px;
+    position: relative;
+  }
+
+  .announcement-form-label {
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 6px;
+    display: block;
+    color: #374151;
+  }
+
+  .announcement-form-input,
+  .announcement-form-textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e4e6ea;
+    border-radius: 8px;
+    font-size: 15px;
+    background: #f7f8fa;
+    transition: border-color 0.2s;
+    margin-bottom: 0;
+  }
+
+  .announcement-form-input:focus,
+  .announcement-form-textarea:focus {
+    border-color: #2f95ff;
+    background: #fff;
+    outline: none;
+  }
+
+  .announcement-form-textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+
+  .announcement-upload-box {
+    background: #f7f8fa;
+    border: 1.5px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 18px 10px;
+    text-align: center;
+    color: #888;
+    font-size: 15px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: border-color 0.2s;
+    position: relative;
+  }
+
+  .announcement-upload-box:hover {
+    border-color: #2f95ff;
+    color: #2f95ff;
+  }
+
+  .announcement-upload-box input[type="file"] {
+    opacity: 0;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+
+  .announcement-upload-preview {
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .announcement-upload-preview img {
+    max-width: 100%;
+    max-height: 120px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+  }
+
+  .announcement-form-footer {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 18px;
+  }
+
+  .announcement-form-btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .announcement-form-btn.primary {
+    background: #2f95ff;
+    color: #fff;
+  }
+
+  .announcement-form-btn.primary:hover {
+    background: #1d7dd8;
+  }
+
+  .announcement-form-btn.secondary {
+    background: #e4e6ea;
+    color: #1c1e21;
+  }
+
+  .announcement-form-btn.secondary:hover {
+    background: #d8dadf;
+  }
+
+  .switch-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .switch-label {
+    font-size: 15px;
+    color: #374151;
+    font-weight: 500;
+  }
+
+  .switch-info {
+    font-size: 13px;
+    color: #888;
+    margin-left: 4px;
+  }
+
+  .switch-toggle {
+    position: relative;
+    width: 38px;
+    height: 22px;
+    display: inline-block;
+  }
+
+  .switch-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #e4e6ea;
+    border-radius: 22px;
+    transition: background 0.2s;
+  }
+
+  .switch-toggle input:checked+.switch-slider {
+    background: #2f95ff;
+  }
+
+  .switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: transform 0.2s;
+    box-shadow: 0 1px 4px rgba(60, 60, 60, 0.10);
+  }
+
+  .switch-toggle input:checked+.switch-slider:before {
+    transform: translateX(16px);
+  }
+
+  /* Preview panel */
+  .announcement-preview-panel {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(60, 60, 60, 0.12);
+    padding: 32px 24px 24px 24px;
+    min-width: 320px;
+    max-width: 360px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .preview-phone {
+    background: #f7f8fa;
+    border: 2px solid #e4e6ea;
+    border-radius: 32px;
+    width: 260px;
+    min-height: 420px;
+    padding: 24px 18px 24px 18px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 8px rgba(60, 60, 60, 0.07);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+  }
+
+  .preview-img {
+    width: 100%;
+    max-height: 120px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    object-fit: cover;
+
+  }
+
+  .preview-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #222;
+    text-align: left;
+    width: 100%;
+  }
+
+  .preview-message {
+    font-size: 15px;
+    color: #444;
+    margin-bottom: 12px;
+    width: 100%;
+    text-align: left;
+    line-height: 1.5;
+  }
+
+  .preview-btn {
+    width: 90%;
+    padding: 12px 0;
+    background: #222;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    margin-top: auto;
+    margin-bottom: 8px;
+    cursor: pointer;
+  }
+
+  .preview-pause {
+    font-size: 13px;
+    color: #e41e3f;
+    margin-bottom: 8px;
+    font-weight: 500;
+    width: 100%;
+    text-align: left;
+    display: none;
+  }
+
+  @media (max-width: 900px) {
     .announcement-main-wrapper {
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 40px;
-      padding: 48px 0;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .announcement-form-panel {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(60, 60, 60, 0.12);
-      padding: 32px 28px 24px 28px;
-      min-width: 340px;
-      max-width: 400px;
-      flex: 1;
-    }
-
-    .announcement-form-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
-    }
-
-    .announcement-form-header h2 {
-      font-size: 22px;
-      font-weight: 600;
-      margin: 0;
-      color: #222;
-    }
-
-    .announcement-form-header .close-btn {
-      background: none;
-      border: none;
-      font-size: 22px;
-      color: #65676b;
-      cursor: pointer;
-      border-radius: 50%;
-      padding: 4px 8px;
-      transition: background 0.2s;
-    }
-
-    .announcement-form-header .close-btn:hover {
-      background: #f2f3f5;
-    }
-
-    .announcement-form-group {
-      margin-bottom: 18px;
-      position: relative;
-    }
-
-    .announcement-form-label {
-      font-size: 15px;
-      font-weight: 500;
-      margin-bottom: 6px;
-      display: block;
-      color: #374151;
-    }
-
-    .announcement-form-input,
-    .announcement-form-textarea {
-      width: 100%;
-      padding: 10px 14px;
-      border: 1px solid #e4e6ea;
-      border-radius: 8px;
-      font-size: 15px;
-      background: #f7f8fa;
-      transition: border-color 0.2s;
-      margin-bottom: 0;
-    }
-
-    .announcement-form-input:focus,
-    .announcement-form-textarea:focus {
-      border-color: #2f95ff;
-      background: #fff;
-      outline: none;
-    }
-
-    .announcement-form-textarea {
-      min-height: 80px;
-      resize: vertical;
-    }
-
-    .announcement-upload-box {
-      background: #f7f8fa;
-      border: 1.5px dashed #d1d5db;
-      border-radius: 8px;
-      padding: 18px 10px;
-      text-align: center;
-      color: #888;
-      font-size: 15px;
-      cursor: pointer;
-      margin-bottom: 10px;
-      transition: border-color 0.2s;
-      position: relative;
-    }
-
-    .announcement-upload-box:hover {
-      border-color: #2f95ff;
-      color: #2f95ff;
-    }
-
-    .announcement-upload-box input[type="file"] {
-      opacity: 0;
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      cursor: pointer;
-    }
-
-    .announcement-upload-preview {
-      margin-bottom: 10px;
-      text-align: center;
-    }
-
-    .announcement-upload-preview img {
-      max-width: 100%;
-      max-height: 120px;
-      border-radius: 8px;
-      margin-bottom: 6px;
-    }
-
-    .announcement-form-footer {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      margin-top: 18px;
-    }
-
-    .announcement-form-btn {
-      padding: 10px 24px;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .announcement-form-btn.primary {
-      background: #2f95ff;
-      color: #fff;
-    }
-
-    .announcement-form-btn.primary:hover {
-      background: #1d7dd8;
-    }
-
-    .announcement-form-btn.secondary {
-      background: #e4e6ea;
-      color: #1c1e21;
-    }
-
-    .announcement-form-btn.secondary:hover {
-      background: #d8dadf;
-    }
-
-    .switch-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 14px;
-    }
-
-    .switch-label {
-      font-size: 15px;
-      color: #374151;
-      font-weight: 500;
-    }
-
-    .switch-info {
-      font-size: 13px;
-      color: #888;
-      margin-left: 4px;
-    }
-
-    .switch-toggle {
-      position: relative;
-      width: 38px;
-      height: 22px;
-      display: inline-block;
-    }
-
-    .switch-toggle input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .switch-slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: #e4e6ea;
-      border-radius: 22px;
-      transition: background 0.2s;
-    }
-
-    .switch-toggle input:checked+.switch-slider {
-      background: #2f95ff;
-    }
-
-    .switch-slider:before {
-      position: absolute;
-      content: "";
-      height: 16px;
-      width: 16px;
-      left: 3px;
-      bottom: 3px;
-      background: #fff;
-      border-radius: 50%;
-      transition: transform 0.2s;
-      box-shadow: 0 1px 4px rgba(60, 60, 60, 0.10);
-    }
-
-    .switch-toggle input:checked+.switch-slider:before {
-      transform: translateX(16px);
-    }
-
-    /* Preview panel */
-    .announcement-preview-panel {
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(60, 60, 60, 0.12);
-      padding: 32px 24px 24px 24px;
-      min-width: 320px;
-      max-width: 360px;
-      flex: 1;
-      display: flex;
       flex-direction: column;
+      gap: 24px;
+      padding: 24px 0;
       align-items: center;
+    }
+
+    .announcement-form-panel,
+    .announcement-preview-panel {
+      max-width: 98vw;
+      min-width: unset;
     }
 
     .preview-phone {
-      background: #f7f8fa;
-      border: 2px solid #e4e6ea;
-      border-radius: 32px;
-      width: 260px;
-      min-height: 420px;
-      padding: 24px 18px 24px 18px;
-      box-sizing: border-box;
-      box-shadow: 0 2px 8px rgba(60, 60, 60, 0.07);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      position: relative;
+      width: 98vw;
+      max-width: 320px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .announcement-main-wrapper {
+      padding: 8px 0;
     }
 
-    .preview-img {
-      width: 100%;
-      max-height: 120px;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      object-fit: cover;
-
+    .announcement-form-panel,
+    .announcement-preview-panel {
+      padding: 16px 8px 12px 8px;
     }
 
-    .preview-title {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: #222;
-      text-align: left;
-      width: 100%;
+    .preview-phone {
+      padding: 14px 8px 14px 8px;
     }
+  }
 
-    .preview-message {
-      font-size: 15px;
-      color: #444;
-      margin-bottom: 12px;
-      width: 100%;
-      text-align: left;
-      line-height: 1.5;
-    }
+  .back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: none;
+    border: none;
+    color: #2f95ff;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    transition: background 0.2s;
+    z-index: 1000;
+  }
+</style>
 
-    .preview-btn {
-      width: 90%;
-      padding: 12px 0;
-      background: #222;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 600;
-      margin-top: auto;
-      margin-bottom: 8px;
-      cursor: pointer;
-    }
-
-    .preview-pause {
-      font-size: 13px;
-      color: #e41e3f;
-      margin-bottom: 8px;
-      font-weight: 500;
-      width: 100%;
-      text-align: left;
-      display: none;
-    }
-
-    @media (max-width: 900px) {
-      .announcement-main-wrapper {
-        flex-direction: column;
-        gap: 24px;
-        padding: 24px 0;
-        align-items: center;
-      }
-
-      .announcement-form-panel,
-      .announcement-preview-panel {
-        max-width: 98vw;
-        min-width: unset;
-      }
-
-      .preview-phone {
-        width: 98vw;
-        max-width: 320px;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .announcement-main-wrapper {
-        padding: 8px 0;
-      }
-
-      .announcement-form-panel,
-      .announcement-preview-panel {
-        padding: 16px 8px 12px 8px;
-      }
-
-      .preview-phone {
-        padding: 14px 8px 14px 8px;
-      }
-    }
-
-    .back-btn {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      background: none;
-      border: none;
-      color: #2f95ff;
-      font-size: 16px;
-      font-weight: 500;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 10px;
-      border-radius: 8px;
-      transition: background 0.2s;
-      z-index: 1000;
-    }
-  </style>
 <body data-user-id="{{user._id}}">
-{{> header}}
-<div class="main-container">
-  {{> sidebar}}
-  <main class="main-content">
-  <div class="announcement-main-wrapper">
-    <button class="back-btn" onclick="goBack()">
-      <i class="fas fa-arrow-left"></i> Back
-    </button <!-- Left: Announcement Form -->
-    <div class="announcement-form-panel">
-      <div class="announcement-form-header">
-        <h2>New announcement</h2>
+  {{> header}}
+  <div class="main-container">
+    {{> sidebar}}
+    <main class="main-content">
+      <div class="announcement-main-wrapper">
+        <button class="back-btn" onclick="goBack()">
+          <i class="fas fa-arrow-left"></i> Back
+        </button <!-- Left: Announcement Form -->
+        <div class="announcement-form-panel">
+          <div class="announcement-form-header">
+            <h2>New announcement</h2>
 
-      </div>
-      <form id="announcementForm" autocomplete="off">
-        <div class="announcement-form-group">
-          <label class="announcement-form-label" for="announcementTitle">
-            <i class="fas fa-pen"></i> Announcement title
-          </label>
-          <input type="text" id="announcementTitle" class="announcement-form-input" required
-            placeholder="Announcement title">
-        </div>
-        <div class="announcement-form-group">
-          <label class="announcement-form-label" for="announceGroupSelect"><i class="fas fa-pen"></i> Group</label>
-
-          <select id="announceGroupSelect" class="announcement-form-input" name="groupSelect">
-            <option value="">Select Group</option>
-          </select>
-        </div>
-        {{!-- <div class="announcement-form-group">
-          <label class="announcement-form-label" for="Meetinglink">
-            <i class="fa fa-users"></i> Meeting Link
-          </label>
-          <input type="text" id="Meetinglink" class="announcement-form-input" required placeholder="Meeting Link">
-        </div> --}}
-        <div class="announcement-form-group">
-          <label class="announcement-form-label" for="announcementImage">
-            <i class="fas fa-camera"></i> Image
-          </label>
-          <div class="announcement-upload-box" id="uploadBox">
-            <span id="uploadText">Drag and drop an image here, or <span style="color:#2f95ff;cursor:pointer;">click to
-                upload</span></span>
-            <input type="file" id="announcementImage" accept="image/*">
           </div>
-          <div class="announcement-upload-preview" id="imagePreview"></div>
-        </div>
-        <div class="announcement-form-group">
-          <label class="announcement-form-label" for="announcementMessage">
-            <i class="fas fa-align-left"></i> Description
-          </label>
-          <textarea id="announcementMessage" name="message" class="announcement-form-textarea"
-            placeholder="Add description"></textarea>
-        </div>
+          <form id="announcementForm" autocomplete="off">
+            <div class="announcement-form-group">
+              <label class="announcement-form-label" for="announcementTitle">
+                <i class="fas fa-pen"></i> Announcement title
+              </label>
+              <input type="text" id="announcementTitle" class="announcement-form-input" required
+                placeholder="Announcement title">
+            </div>
+            <div class="announcement-form-group">
+              <label class="announcement-form-label" for="announceGroupSelect"><i class="fas fa-pen"></i> Group</label>
 
-        <div class="announcement-form-footer">
-          <button type="button" class="announcement-form-btn secondary">Cancel</button>
-          <button type="submit" class="announcement-form-btn primary">Save</button>
+              <select id="announceGroupSelect" class="announcement-form-input" name="groupSelect">
+                <option value="">Select Group</option>
+              </select>
+            </div>
+            {{!-- <div class="announcement-form-group">
+              <label class="announcement-form-label" for="Meetinglink">
+                <i class="fa fa-users"></i> Meeting Link
+              </label>
+              <input type="text" id="Meetinglink" class="announcement-form-input" required placeholder="Meeting Link">
+            </div> --}}
+            <div class="announcement-form-group">
+              <label class="announcement-form-label" for="announcementImage">
+                <i class="fas fa-camera"></i> Image
+              </label>
+              <div class="announcement-upload-box" id="uploadBox">
+                <span id="uploadText">Drag and drop an image here, or <span style="color:#2f95ff;cursor:pointer;">click
+                    to
+                    upload</span></span>
+                <input type="file" id="announcementImage" accept="image/*">
+              </div>
+              <div class="announcement-upload-preview" id="imagePreview"></div>
+            </div>
+            <div class="announcement-form-group">
+              <label class="announcement-form-label" for="announcementMessage">
+                <i class="fas fa-align-left"></i> Description
+              </label>
+              <textarea id="announcementMessage" name="message" class="announcement-form-textarea"
+                placeholder="Add description"></textarea>
+            </div>
+
+            <div class="announcement-form-footer">
+              <button type="button" class="announcement-form-btn secondary">Cancel</button>
+              <button type="submit" class="announcement-form-btn primary">Save</button>
+            </div>
+          </form>
         </div>
-      </form>
-    </div>
-    <!-- Right: Announcement Preview -->
-    <div class="announcement-preview-panel">
-      <div class="preview-phone">
-        <div id="previewImgContainer" style="width:100%;margin-bottom:10px;display:none;">
-          <img id="previewImg" class="preview-img" alt="Announcement Image">
+        <!-- Right: Announcement Preview -->
+        <div class="announcement-preview-panel">
+          <div class="preview-phone">
+            <div id="previewImgContainer" style="width:100%;margin-bottom:10px;display:none;">
+              <img id="previewImg" class="preview-img" alt="Announcement Image">
+            </div>
+            <div class="preview-title" id="previewTitle">Announcement title</div>
+            <div class="preview-message" id="previewMessage">
+              Your announcement text will display here. It's best to keep it as brief as possible to make sure it gets
+              read.
+              An emoji or two can help 👍<br><br>
+              If you add an image it will display at the top of the screen.
+            </div>
+            <div class="preview-pause" id="previewPause">Announcement is paused</div>
+          </div>
         </div>
-        <div class="preview-title" id="previewTitle">Announcement title</div>
-        <div class="preview-message" id="previewMessage">
-          Your announcement text will display here. It's best to keep it as brief as possible to make sure it gets read.
-          An emoji or two can help 👍<br><br>
-          If you add an image it will display at the top of the screen.
-        </div>
-        <div class="preview-pause" id="previewPause">Announcement is paused</div>
       </div>
-    </div>
-  </div>
-  </main>
+    </main>
   </div>
   <script>
     let editorInstance;
@@ -476,29 +480,33 @@
     const uploadBox = document.getElementById('uploadBox');
     const uploadInput = document.getElementById('announcementImage');
 
-   
-    ClassicEditor.create(document.querySelector('#announcementMessage'), {
-      toolbar: ['bold', 'italic', 'underline', '|', 'link', 'bulletedList', 'numberedList']
-    })
-      .then(editor => {
-        console.log('Editor ready', editor);
-        editorInstance = editor;
-      
-        editor.model.document.on('change:data', () => {
-          previewMessage.innerHTML = editor.getData() || "Your announcement text will display here. It's best to keep it as brief as possible to make sure it gets read. An emoji or two can help 👍<br><br>If you add an image it will display at the top of the screen.";
-        });
-      })
-      .catch(error => {
-        console.error('CKEditor error:', error);
-        toastr.error('Failed to initialize editor');
-      });
 
-   
+    if (typeof ClassicEditor !== "undefined") {
+
+      ClassicEditor.create(document.querySelector('#announcementMessage'), {
+        toolbar: ['bold', 'italic', 'underline', '|', 'link', 'bulletedList', 'numberedList']
+      })
+        .then(editor => {
+          editorInstance = editor;
+
+          editor.model.document.on('change:data', () => {
+            previewMessage.innerHTML = editor.getData();
+          });
+
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
+    else {
+      console.log("CKEditor not loaded");
+    }
+
     titleInput.addEventListener('input', () => {
       previewTitle.textContent = titleInput.value || 'Announcement title';
     });
 
-  
+
     uploadInput.addEventListener('change', function () {
       if (this.files && this.files[0]) {
         const file = this.files[0];
@@ -520,7 +528,7 @@
       }
     });
 
-   
+
     uploadBox.addEventListener('dragover', function (e) {
       e.preventDefault();
       uploadBox.style.borderColor = '#2f95ff';
@@ -542,19 +550,19 @@
       }
     });
 
-  
+
     uploadBox.addEventListener('click', function () {
       uploadInput.click();
     });
 
-    
+
     document.getElementById('announcementForm').addEventListener('submit', async function (e) {
       e.preventDefault();
       const groupId = groupSelect.value;
       const title = titleInput.value.trim();
       const message = editorInstance ? editorInstance.getData().trim() : '';
 
-    
+
       if (!groupId) {
         toastr.error('Please select a group');
         return;
@@ -645,8 +653,9 @@
     });
 
   </script>
+  <script type="module" src="/js/firebase.js"></script>
 
-   {{> profile}}
+  {{> profile}}
 </body>
 
 </html>

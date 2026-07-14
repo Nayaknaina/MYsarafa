@@ -4,3 +4,4 @@ node_modules
 uploads
 public/login.html
 signup.html
+/firebase/serviceAccountKey.json
