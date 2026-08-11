@@ -110,7 +110,7 @@ transition-all duration-300 ease-out">
                         </div>
 
 
-                        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="bg-white rounded-lg shadow-md overflow-hidden mb-12">
                             <div class="bg-[#acccfb] border-b border-blue-100 text-blue-900 p-3">
                                 <h4
                                     class="text-lg md:text-xl font-semibold flex  md:flex-row md:items-center justify-between gap-4">
@@ -217,7 +217,7 @@ transition-all duration-200">
                                         </div>
                                     </div>
 
-                                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                                    <div class="bg-white rounded-lg shadow-md overflow-hidden pb-6">
                                         <div class="bg-[#acccfb] p-2 flex items-center justify-between text-blue-900">
                                             <div>
                                                 <h2 class="text-xl font-semibold">Member</h2>
@@ -236,94 +236,12 @@ transition-all duration-200">
 
                                         </div>
 
-
-                                        {{!-- <div class="p-4 max-h-96 overflow-y-auto"> <!-- Scrollable -->
-                                            <div class="space-y-4">
-
-                                                <!-- Suggested Group Item -->
-                                                {{#each memberGroups}}
-                                                <div class="border border-gray-200 rounded-lg p-2 hover:shadow-lg transition group-card"
-                                                    data-group-id="{{this._id}}">
-                                                    <div class="flex justify-between items-start mb-2">
-                                                        <h3 class="font-medium text-gray-800">{{this.g_name}}</h3>
-                                                        <span
-                                                            class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                                            {{#if (eq this.g_type "public")}}
-                                                            <i class="fa fa-globe"></i>
-                                                            {{else}}
-                                                            <i class="fa fa-lock"></i>
-                                                            {{/if}}
-                                                            {{this.g_type}}</span>
-                                                    </div>
-                                                    <p class="text-sm text-gray-600 mb-3">{{this.total_mem}} members •
-                                                        {{this.description}}</p>
-
-                                                </div>
-                                                {{else}}
-                                                <p class="text-center text-gray-500 py-8">You haven't joined any groups
-                                                    yet.
-                                                </p>
-                                                {{/each}}
-
-
-                                            </div>
-                                        </div> --}}
-
-                                        <div class="p-4">
+                                        <div class="px-4 pt-6 pb-12">
                                             <div class="member-groups-scroll">
                                                 <div class="member-groups-grid">
 
                                                     {{#each memberGroups}}
-                                                    {{!-- <div
-                                                        class="group-card border border-gray-200 rounded-xl overflow-hidden hover:shadow-xl transition duration-300 bg-white"
-                                                        data-group-id="{{this._id}}">
 
-                                                        <!-- Image -->
-                                                        <div class="h-32 w-full overflow-hidden">
-                                                            <img src="{{this.g_cover}}"
-                                                                class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                                                        </div>
-
-                                                        <div class="p-3">
-
-                                                            <!-- Title + Badge -->
-                                                            <div class="flex justify-between items-center mb-2">
-                                                                <h3 class="font-semibold text-gray-800 truncate">
-                                                                    {{this.g_name}}
-                                                                </h3>
-
-                                                                <span class="text-xs px-2 py-1 rounded 
-                        {{#if (eq this.g_type " public")}} bg-green-100 text-green-700 {{else}} bg-gray-100
-                                                                    text-gray-700 {{/if}}">
-
-                                                                    {{#if (eq this.g_type "public")}}
-                                                                    <i class="fa fa-globe"></i>
-                                                                    {{else}}
-                                                                    <i class="fa fa-lock"></i>
-                                                                    {{/if}}
-
-                                                                    {{this.g_type}}
-                                                                </span>
-                                                            </div>
-
-                                                            <!-- Description -->
-                                                            <p class="text-xs text-gray-600 line-clamp-2 mb-3">
-                                                                {{this.description}}
-                                                            </p>
-
-                                                            <!-- Footer -->
-                                                            <div
-                                                                class="flex justify-between items-center text-xs text-gray-500">
-                                                                <span>👥 {{this.total_mem}} members</span>
-
-                                                                <button
-                                                                    class="text-blue-600 hover:text-blue-800 font-medium">
-                                                                    View →
-                                                                </button>
-                                                            </div>
-
-                                                        </div>
-                                                    </div> --}}
 
                                                     <div class="group-card border border-gray-200 rounded-xl overflow-hidden bg-white"
                                                         data-group-id="{{this._id}}" data-card-type="member">

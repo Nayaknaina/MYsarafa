@@ -375,7 +375,7 @@ exports.submitKyc = async (req, res, next) => {
     }
 
     // Prevent re-submission if already approved or pending
-    if (user.kyc_status === 'approved' || user.kyc_status === 'pending') {
+    if (user.kyc_status === 'approved' || user.kyc_status === 'submitted') {
       return res.status(400).json({ success: false, message: `KYC is already ${user.kyc_status}. No changes allowed.` });
     }
 
@@ -509,8 +509,9 @@ exports.submitKyc = async (req, res, next) => {
     if (filePaths.panCard) user.pan_photo = filePaths.panCard;
 
     // ✅ KYC status updates
-    user.kyc_status = 'approved';
-    user.user_status = 'verified';
+    // user.kyc_status = 'approved';
+    // user.user_status = 'verified';
+    user.kyc_status = 'submitted';
 
     await user.save();
     delete aadhaarRequestStore[req.user.id];
@@ -551,8 +552,6 @@ exports.submitKyc = async (req, res, next) => {
   }
 };
 
-
-
 exports.getLocationByPincode = async (req, res) => {
   try {
     const { pincode } = req.query;
@@ -587,7 +586,7 @@ exports.checkKycRequired = async (req, res, next) => {
   try {
     const user = req.user;
     const requiresKyc = await userRequiresKyc(user._id);
-    const needsKyc = requiresKyc && user.kyc_status === 'unsubmitted';
+    const needsKyc = requiresKyc && (user.kyc_status === 'unsubmitted' || user.kyc_status === 'pending');
     res.json({ needsKyc });
   } catch (error) {
     next(error);

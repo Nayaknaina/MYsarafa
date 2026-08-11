@@ -3517,36 +3517,6 @@ main {
   color: white;
 }
 
-/* .card-image-wrapper {
-  position: relative;
-}
-
-.business-initial-badge {
-  position: absolute;
-  bottom: -24px;
-  left: 18px;
-
-  width: 56px;
-  height: 56px;
-
-  border-radius: 50%;
-  background: #111827;
-
-  color: #facc15;
-  font-size: 22px;
-  font-weight: 700;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  border: 3px solid #fff;
-}
-
-.business-scroll-card .card-content {
-  padding-top: 34px;
-} */
-
 /* Location + category css */
 .category-pill {
   background: #ecfdf5;

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sarafa Community Dashboard</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    {{!-- Logo Links --}}
+    <link rel="icon" href="/assets/favicon/favicon_logo.png" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/favicon/favicon_logo.png">
+    <style>
+        .payment-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            font-size: 15px;
+            box-shadow: 0 2px 8px rgba(47, 149, 255, 0.07);
+        }
+
+        .payment-table th,
+        .payment-table td {
+            padding: 12px 8px;
+            text-align: left;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .payment-table th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .payment-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            background: #d1f7e6;
+            color: #1b8c4a;
+            padding: 4px 12px;
+            border-radius: 14px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .page-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-title i {
+            color: #2f95ff;
+        }
+
+        .view-link {
+            color: #2f95ff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .view-link:hover {
+            text-decoration: underline;
+        }
+
+        .ss-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .6);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ss-modal-overlay.active {
+            display: flex;
+        }
+
+        .ss-modal-box {
+            position: relative;
+            max-width: 90vw;
+            max-height: 90vh;
+            background: #fff;
+            border-radius: 12px;
+            padding: 16px;
+        }
+
+        .ss-modal-box img {
+            max-width: 100%;
+            max-height: 80vh;
+            display: block;
+            border-radius: 8px;
+            margin: 0 auto;
+        }
+
+        .ss-modal-close {
+            position: absolute;
+            top: -14px;
+            right: -14px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #111827;
+            color: #fff;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (max-width: 500px) {
+
+            .payment-table,
+            .payment-table thead,
+            .payment-table tbody,
+            .payment-table th,
+            .payment-table td,
+            .payment-table tr {
+                display: block;
+            }
+
+            .payment-table thead {
+                display: none;
+            }
+
+            .payment-table tr {
+                margin-bottom: 16px;
+                background: #fff;
+                border-radius: 10px;
+                box-shadow: 0 1px 3px rgba(47, 149, 255, 0.07);
+                padding: 8px;
+            }
+
+            .payment-table td {
+                padding: 8px 6px;
+                border-bottom: none;
+                position: relative;
+            }
+
+            .payment-table td:before {
+                content: attr(data-label);
+                font-weight: 600;
+                color: #374151;
+                display: block;
+                margin-bottom: 2px;
+                font-size: 12px;
+            }
+        }
+
+        /*Filters*/
+        .payment-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .payment-filters input,
+        .payment-filters select {
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            min-width: 180px;
+            outline: none;
+        }
+
+        .payment-filters input:focus,
+        .payment-filters select:focus {
+            border-color: #2f95ff;
+        }
+
+        @media(max-width:768px) {
+
+            .payment-filters {
+                flex-direction: column;
+            }
+
+            .payment-filters input,
+            .payment-filters select,
+            .payment-filters button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body data-user-id="{{user._id}}">
+    {{> header}}
+
+    <div class="main-container">
+        {{> sidebar}}
+        <main class="main-content">
+            <h2 class="page-title"><i class="fas fa-receipt"></i> My Payments</h2>
+
+            <div class="payment-records-list" style="margin-bottom:32px;">
+                <div style="overflow-x:auto;">
+                    <div class="payment-filters">
+                        <input type="text" id="groupFilter" placeholder="Search Group">
+
+                        <input type="date" id="dateFilter">
+
+                        <select id="methodFilter">
+                            <option value="">All Methods</option>
+                            <option value="Cash">Cash</option>
+                            <option value="UPI">UPI</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                        </select>
+
+                        <select id="statusFilter">
+                            <option value="">All Status</option>
+                            <option value="Verified">Verified</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Reupload Required">Reupload Required</option>
+                        </select>
+
+                        <button id="clearFilters" class="action-btn">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                    </div>
+                    <table class="payment-table">
+                        <thead>
+                            <tr>
+                                <th>Group</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Method</th>
+                                <th>Amount</th>
+                                <th>Status</th>
+                                <th>Screenshot</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each payments}}
+                            <tr>
+                                <td data-label="Group">{{this.group.g_name}}</td>
+                                <td data-label="Date">{{this.date}}</td>
+                                <td data-label="Time">{{this.time}}</td>
+                                <td data-label="Method">{{this.method}}</td>
+                                <td data-label="Amount">₹{{this.amount}}</td>
+                                <td data-label="Status">
+                                    {{#if this.reuploadRequested}}
+                                    <span class="status-badge reupload">Reupload Required</span>
+                                    <br>
+                                    <a href="/pay/SS-upload?groupId={{this.group._id}}&paymentId={{this._id}}"
+                                        class="reupload-link">
+                                        <i class="fas fa-upload"></i> Upload New Screenshot
+                                    </a>
+                                    {{else if this.isVerified}}
+                                    <span class="status-badge">Verified</span>
+                                    {{else}}
+                                    <span class="status-badge pending">Pending</span>
+                                    {{/if}}
+                                </td>
+                                <td data-label="Screenshot">
+                                    {{#if this.screenshot_url}}
+                                    <button type="button" class="action-btn view-screenshot-btn"
+                                        data-src="{{this.screenshot_url}}" title="View">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                    {{else}}
+                                    <span style="color:#9ca3af; font-size:13px;">—</span>
+                                    {{/if}}
+                                </td>
+                            </tr>
+                            {{else}}
+                            <tr>
+                                <td colspan="7">No payment records found.</td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="screenshotModal" class="ss-modal-overlay">
+        <div class="ss-modal-box">
+            <button type="button" class="ss-modal-close" id="closeScreenshotModal">
+                <i class="fas fa-times"></i>
+            </button>
+            <img id="screenshotModalImg" src="" alt="Payment Screenshot">
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $(document).on('click', '.view-screenshot-btn', function () {
+                const src = $(this).data('src');
+                $('#screenshotModalImg').attr('src', src);
+                $('#screenshotModal').addClass('active');
+            });
+            $('#closeScreenshotModal').on('click', () => $('#screenshotModal').removeClass('active'));
+            $('#screenshotModal').on('click', function (e) { if (e.target === this) $(this).removeClass('active'); });
+        })
+    </script>
+    {{!-- Filters --}}
+    <script>
+        function filterPayments() {
+
+            const group = $("#groupFilter").val().toLowerCase();
+            const date = $("#dateFilter").val();
+            const method = $("#methodFilter").val().toLowerCase();
+            const status = $("#statusFilter").val().toLowerCase();
+
+            $(".payment-table tbody tr").each(function () {
+
+                if ($(this).find("td").length === 1) return;
+
+                const row = $(this);
+
+                const rowGroup = row.find("td:eq(0)").text().toLowerCase().trim();
+                const rowDate = row.find("td:eq(1)").text().trim();
+                const rowMethod = row.find("td:eq(3)").text().toLowerCase().trim();
+                const rowStatus = row.find("td:eq(5)").text().toLowerCase().trim();
+
+                const matchGroup = rowGroup.includes(group);
+                const matchDate = !date || rowDate.includes(date);
+                const matchMethod = !method || rowMethod === method;
+                const matchStatus = !status || rowStatus.includes(status);
+
+                row.toggle(matchGroup && matchDate && matchMethod && matchStatus);
+
+            });
+        }
+
+        $("#groupFilter,#dateFilter,#methodFilter,#statusFilter")
+            .on("keyup change", filterPayments);
+
+        $("#clearFilters").click(function () {
+
+            $("#groupFilter").val("");
+            $("#dateFilter").val("");
+            $("#methodFilter").val("");
+            $("#statusFilter").val("");
+
+            filterPayments();
+
+        });
+    </script>
+
+    <script src="/js/all.js"></script>
+</body>

@@ -18,10 +18,12 @@ const groupRoutes = require('./routes/group');
 const kycRoutes = require('./routes/kyc');
 const membershipRoute = require('./routes/membership');
 const announcementsRoute = require('./routes/announcements')
-const superAdminRoutes = require('./routes/superAdmin');
+const superAdminRoutes = require('./routes/superAdmin/superAdmin');
 const ratesRoutes = require('./routes/rates');
-const businessRoutes = require('./routes/businesses');  
+const businessRoutes = require('./routes/businesses');
 const ledgerRoutes = require('./routes/ledger');
+const roleRoutes = require("./routes/superAdmin/roleRoutes");
+const Role = require("./models/superAdmin/Role.model");
 
 const { engine } = require('express-handlebars');
 const jwt = require('jsonwebtoken');
@@ -56,7 +58,7 @@ app.use(session({
     secret: process.env.JWT_SECRET,
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false } 
+    cookie: { secure: false }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -64,17 +66,19 @@ app.use(passport.session());
 // Routes
 app.use('/auth', authRoutes);
 app.use('/user-app', userRoutes);
-app.use('/Groups',groupRoutes);
-app.use('/kyc',kycRoutes);
-app.use('/pay',membershipRoute);
-app.use('/announcements',announcementsRoute);
+app.use('/Groups', groupRoutes);
+app.use('/kyc', kycRoutes);
+app.use('/pay', membershipRoute);
+app.use('/announcements', announcementsRoute);
+console.log("✅ SuperAdmin Routes Loaded");
 app.use('/superadmin', superAdminRoutes);
 app.use('/rates', ratesRoutes);
 app.use('/businesses', businessRoutes);
 app.use('/ledger', ledgerRoutes);
+app.use("/api/roles", roleRoutes);
 
 // Serve superadmin frontend if needed
-app.use('/superadmin-frontend', express.static(path.join(__dirname, 'superadmin-frontend')));
+app.use('/superadmin-frontend', express.static(path.join(__dirname, 'views/superAdmin')));
 
 // Serve HTML files
 app.get('/', (req, res) => {
@@ -95,26 +99,26 @@ app.get('/help', (req, res) => {
 });
 
 const corsOptions = {
-   origin: 'https://mysarafa.com',  
- 
+    origin: 'https://mysarafa.com',
+
     credentials: true,
     optionsSuccessStatus: 200
 };
 
 app.get('/authcheck', cors(corsOptions), (req, res) => {
-  const token = req.cookies.token; 
-  if (!token) {
-    return res.status(401).json({ loggedIn: false });
-  }
+    const token = req.cookies.token;
+    if (!token) {
+        return res.status(401).json({ loggedIn: false });
+    }
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Your secret & algorithm
-    // Optional: add extra checks (e.g., user still exists in DB)
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET); // Your secret & algorithm
+        // Optional: add extra checks (e.g., user still exists in DB)
 
-    res.json({ loggedIn: true /* , user: { name: decoded.name } if needed */ });
-  } catch (err) {
-    res.status(401).json({ loggedIn: false });
-  }
+        res.json({ loggedIn: true /* , user: { name: decoded.name } if needed */ });
+    } catch (err) {
+        res.status(401).json({ loggedIn: false });
+    }
 });
 // app.get('/', (req, res) => {
 //     res.send('Backend Running');
@@ -150,6 +154,10 @@ io.on('connection', (socket) => {
         socket.join(userId);
         console.log(`User ${userId} joined room with socket.id=${socket.id}`);
     });
+    socket.on("joinSuperAdmin", () => {
+        socket.join("superadmin");
+        console.log("Superadmin joined notification room");
+    });
 
     socket.on('disconnect', () => {
         console.log(`User disconnected: socket.id=${socket.id}`);
@@ -168,9 +176,26 @@ module.exports = { app, server };
 
 const PORT = process.env.PORT || 5001;
 
-mongoose.connection.once('open', () => {
+mongoose.connection.once('open', async () => {
     console.log('MongoDB connected');
-    server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+    // const count = await Role.countDocuments();
+
+    // if (count === 0) {
+    //     await Role.insertMany([
+    //         { roleName: "super_admin", isSystemRole: true },
+    //         { roleName: "admin", isSystemRole: true },
+    //         { roleName: "manager", isSystemRole: true },
+    //         { roleName: "worker", isSystemRole: true },
+    //         { roleName: "member", isSystemRole: true }
+    //     ]);
+
+    //     console.log("✅ Default roles created");
+    // }
+
+    server.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+    });
 });
 
 mongoose.connection.on('error', (err) => {

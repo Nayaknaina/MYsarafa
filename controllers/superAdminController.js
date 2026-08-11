@@ -4,10 +4,11 @@ const User = require('../models/user.model');
 const Group = require('../models/group.model');
 const Contact = require('../models/contact.model');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
-const axios = require("axios");
-const {getSignedUrl} = require('../middleware/multer')
 
+const axios = require("axios");
+const { getSignedUrl } = require('../middleware/multer')
+const bcrypt = require("bcryptjs");
+const Role = require("../models/superAdmin/Role.model");
 
 
 //** Get Login Page */
@@ -18,17 +19,18 @@ exports.getLoginPage = (req, res) => {
 
 exports.login = async (req, res) => {
     try {
-         
+        console.log("API HIT")
         const { email, password } = req.body;
         if (!email || !password) {
             return res.status(400).render('superadmin/login', { error: 'Email and password required' });
         }
         console.log(req.body)
-        const user = await User.findOne({ email: email.toLowerCase() });
-        if (!user || user.role !== 'super_admin') {
+        const user = await User.findOne({ email: email.toLowerCase() }).populate('role');
+        if (!user || user.role?.roleName !== 'super_admin') {
+            console.log("Role:", user?.role);
             return res.status(401).json({ message: 'Unauthorized: No user session found' });
         }
-      
+
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
             return res.status(401).render('superadmin/login', { error: 'Invalid credentials' });
@@ -54,109 +56,115 @@ exports.forgotPasswordPage = (req, res) => {
     res.render('superadmin/forgot-password', { error: null, layout: 'supermain', success: null });
 };
 exports.sendOTP = async (req, res) => {
-  try {
-    const { mobile_no } = req.body;
-    if (!mobile_no || !/^\d{10}$/.test(mobile_no)) {
-      return res.status(400).json({ message: 'Enter valid 10-digit mobile number' });
+    try {
+        const { mobile_no } = req.body;
+        if (!mobile_no || !/^\d{10}$/.test(mobile_no)) {
+            return res.status(400).json({ message: 'Enter valid 10-digit mobile number' });
+        }
+
+        const superAdminRole = await Role.findOne({ roleName: 'super_admin' });
+        const user = await User.findOne({ mobile_no, role: superAdminRole?._id });
+        if (!user) {
+            return res.status(404).json({ message: 'No super admin found with this mobile number' });
+        }
+
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        req.session.otp = {
+            code: otp,
+            mobile_no,
+            expires: Date.now() + 10 * 60 * 1000
+        };
+
+        const fast2smsUrl = `https://www.fast2sms.com/dev/bulkV2?authorization=${process.env.FAST2SMS_API_KEY}&route=dlt&sender_id=${process.env.FAST2SMS_SENDER_ID}&message=${process.env.FAST2SMS_SMS_ID}&variables_values=${otp}&flash=0&numbers=${mobile_no}`;
+        const response = await axios.get(fast2smsUrl);
+
+        if (response.data.return === false) {
+            return res.status(400).json({ message: 'Failed to send OTP', error: response.data.message });
+        }
+
+        console.log('OTP Sent:', otp);
+        res.status(200).json({ message: 'OTP sent successfully' });
+    } catch (error) {
+        console.error('sendOTP Error:', error);
+        res.status(500).json({ message: 'Error sending OTP' });
     }
-
-    const user = await User.findOne({ mobile_no, role: 'super_admin' });
-    if (!user) {
-      return res.status(404).json({ message: 'No super admin found with this mobile number' });
-    }
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    req.session.otp = {
-      code: otp,
-      mobile_no,
-      expires: Date.now() + 10 * 60 * 1000
-    };
-
-    const fast2smsUrl = `https://www.fast2sms.com/dev/bulkV2?authorization=${process.env.FAST2SMS_API_KEY}&route=dlt&sender_id=${process.env.FAST2SMS_SENDER_ID}&message=${process.env.FAST2SMS_SMS_ID}&variables_values=${otp}&flash=0&numbers=${mobile_no}`;
-    const response = await axios.get(fast2smsUrl);
-
-    if (response.data.return === false) {
-      return res.status(400).json({ message: 'Failed to send OTP', error: response.data.message });
-    }
-
-    console.log('OTP Sent:', otp);
-    res.status(200).json({ message: 'OTP sent successfully' });
-  } catch (error) {
-    console.error('sendOTP Error:', error);
-    res.status(500).json({ message: 'Error sending OTP' });
-  }
 };
 
 exports.verifyOTP = (req, res) => {
-  const { mobile_no, otp } = req.body;
+    const { mobile_no, otp } = req.body;
 
-  if (!req.session.otp)
-    return res.status(400).json({ message: 'No OTP session found' });
+    if (!req.session.otp)
+        return res.status(400).json({ message: 'No OTP session found' });
 
-  const { code, expires, mobile_no: savedMobile } = req.session.otp;
+    const { code, expires, mobile_no: savedMobile } = req.session.otp;
 
-  if (Date.now() > expires)
-    return res.status(400).json({ message: 'OTP expired' });
+    if (Date.now() > expires)
+        return res.status(400).json({ message: 'OTP expired' });
 
-  if (otp !== code || mobile_no !== savedMobile)
-    return res.status(400).json({ message: 'Invalid OTP' });
+    if (otp !== code || mobile_no !== savedMobile)
+        return res.status(400).json({ message: 'Invalid OTP' });
 
-  req.session.otpVerified = true;
-  res.status(200).json({ message: 'OTP verified successfully' });
+    req.session.otpVerified = true;
+    res.status(200).json({ message: 'OTP verified successfully' });
 };
 
 exports.resetPassword = async (req, res) => {
-  try {
-    const { mobile_no, password, confirmPassword } = req.body;
+    try {
+        const { mobile_no, password, confirmPassword } = req.body;
 
-    if (!req.session.otpVerified) {
-      return res.status(401).json({ message: 'OTP not verified' });
+        if (!req.session.otpVerified) {
+            return res.status(401).json({ message: 'OTP not verified' });
+        }
+
+        if (password !== confirmPassword) {
+            return res.status(400).json({ message: 'Passwords do not match' });
+        }
+
+        const user = await User.findOne({ mobile_no }).populate("role");
+
+        if (!user || user.role?.roleName !== "super_admin") {
+            return res.status(404).json({
+                message: "No super admin found"
+            });
+        }
+
+        user.password = password; // ✅ bcrypt handled in model pre-save hook
+        await user.save();
+
+        req.session.otp = null;
+        req.session.otpVerified = null;
+
+        res.status(200).json({ message: 'Password reset successfully' });
+    } catch (error) {
+        console.error('resetPassword Error:', error);
+        res.status(500).json({ message: 'Server error' });
     }
-
-    if (password !== confirmPassword) {
-      return res.status(400).json({ message: 'Passwords do not match' });
-    }
-
-    const user = await User.findOne({ mobile_no, role: 'super_admin' });
-    if (!user) return res.status(404).json({ message: 'User not found' });
-
-    user.password = password; // ✅ bcrypt handled in model pre-save hook
-    await user.save();
-
-    req.session.otp = null;
-    req.session.otpVerified = null;
-
-    res.status(200).json({ message: 'Password reset successfully' });
-  } catch (error) {
-    console.error('resetPassword Error:', error);
-    res.status(500).json({ message: 'Server error' });
-  }
 };
 
 
 //**  Updated Dashboard    */
 exports.getDashboard = async (req, res) => {
     try {
-         if (!req.user || !req.user.id) return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
+        if (!req.user || !req.user.id) return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
         const user = await User.find().lean();
         const totalUsers = await User.countDocuments();
         const totalGroups = await Group.countDocuments();
         const pendingKYC = await User.countDocuments({ kyc_status: 'pending' });
         const blacklist = await User.countDocuments({ blacklistStatus: 'true' });
-        const superadmin=await User.findById(req.user.id).lean();
+        const superadmin = await User.findById(req.user.id).lean();
 
-           
+
         res.render('superadmin/dashboard', {
             user,
             superadmin,
             layout: 'supermain',
-          
+
             title: 'Super Admin Dashboard',
-             totalUsers,
+            totalUsers,
             totalGroups,
             pendingKYC,
             blacklist,
-            
+
         });
     } catch (error) {
         console.error(error);
@@ -165,26 +173,26 @@ exports.getDashboard = async (req, res) => {
 };
 
 //** Updated KYC page  */ 
-exports.getUserpage = async (req, res)=> {
-    
+exports.getUserpage = async (req, res) => {
+
     try {
-         if (!req.user || !req.user.id) {
-              return res.status(401).json({ success: false, message: 'Unauthorized: superadmin not authenticated' });
-            }
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({ success: false, message: 'Unauthorized: superadmin not authenticated' });
+        }
         const user = await User.find().lean();
-         const superadmin=await User.findById(req.user.id).lean();
-         const userSchema = User.schema;
-        const categoryOptions = userSchema.path('category').enumValues || []; 
-        const roleOptions = userSchema.path('role').enumValues || []; 
+        const superadmin = await User.findById(req.user.id).lean();
+        const userSchema = User.schema;
+        const categoryOptions = userSchema.path('category').enumValues || [];
+        const roleOptions = userSchema.path('role').enumValues || [];
         const kycOptions = userSchema.path('kyc_status').enumValues || [];
         res.render('superadmin/users', {
-             layout: 'supermain',
+            layout: 'supermain',
             title: 'Manage Users',
             user,
             superadmin,
             categoryOptions,
             roleOptions,
-            kycOptions 
+            kycOptions
         });
     }
     catch (error) {
@@ -252,53 +260,53 @@ exports.getUserById = async (req, res) => {
 };
 
 exports.updateUser = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const updates = req.body;
+    try {
+        const { id } = req.params;
+        const updates = req.body;
 
-    console.log("Updating user:", id, updates);
+        console.log("Updating user:", id, updates);
 
-    // Prevent password overwrite
-    delete updates.password;
+        // Prevent password overwrite
+        delete updates.password;
 
-    // ✅ Convert checkbox values safely
-    if (updates.blacklistStatus !== undefined) {
-      updates.blacklistStatus = updates.blacklistStatus === 'on' ? true : false;
+        // ✅ Convert checkbox values safely
+        if (updates.blacklistStatus !== undefined) {
+            updates.blacklistStatus = updates.blacklistStatus === 'on' ? true : false;
+        }
+
+        // Optional: clear reason if blacklist unchecked
+        if (!updates.blacklistStatus) {
+            updates.blacklistReason = '';
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(id, updates, { new: true });
+
+        if (!updatedUser) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        res.json({
+            success: true,
+            message: "User updated successfully",
+            user: updatedUser,
+        });
+
+    } catch (error) {
+        console.error("Update error:", error);
+        res.status(500).json({ success: false, message: "Server error" });
     }
-
-    // Optional: clear reason if blacklist unchecked
-    if (!updates.blacklistStatus) {
-      updates.blacklistReason = '';
-    }
-
-    const updatedUser = await User.findByIdAndUpdate(id, updates, { new: true });
-
-    if (!updatedUser) {
-      return res.status(404).json({ success: false, message: "User not found" });
-    }
-
-    res.json({
-      success: true,
-      message: "User updated successfully",
-      user: updatedUser,
-    });
-
-  } catch (error) {
-    console.error("Update error:", error);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
 };
 
 
 exports.deleteUser = async (req, res) => {
     try {
         const { id } = req.params;
-         const user = await User.findByIdAndDelete(id);
+        const user = await User.findByIdAndDelete(id);
 
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
-         res.json({ success: true, message: 'User deleted successfully' });
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+        res.json({ success: true, message: 'User deleted successfully' });
 
     } catch (error) {
         console.error(error);
@@ -310,13 +318,14 @@ exports.deleteUser = async (req, res) => {
 exports.getAllGroups = async (req, res) => {
     try {
 
-        if (!req.user || !req.user.id)  return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
-        
-        const superadmin=await User.findById(req.user.id).lean();
-        const groups = await Group.find().populate('user', 'f_name l_name').lean(); 
-        const allUsers = await User.find({ role: { $ne: 'super_admin' } }).select('f_name l_name _id').lean(); 
-        
-        
+        if (!req.user || !req.user.id) return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
+
+        const superadmin = await User.findById(req.user.id).lean();
+        const groups = await Group.find().populate('user', 'f_name l_name').lean();
+        const superAdminRole = await Role.findOne({ roleName: 'super_admin' });
+        const allUsers = await User.find({ role: { $ne: superAdminRole?._id } }).select('f_name l_name _id').lean();
+
+
         const groupSchema = Group.schema;
         const gTypeOptions = groupSchema.path('g_type')?.enumValues || [];
 
@@ -340,10 +349,10 @@ exports.createGroup = async (req, res) => {
         if (!g_name || !g_type || !user) {
             return res.status(400).json({ success: false, message: 'Name, Type, and Creator required' });
         }
-        const newGroup = new Group({ 
-            g_name: g_name.trim(), 
-            g_type, 
-            is_kyc_req: is_kyc_req === 'on', 
+        const newGroup = new Group({
+            g_name: g_name.trim(),
+            g_type,
+            is_kyc_req: is_kyc_req === 'on',
             user, // FIXED: Use 'user'
             description: description?.trim() || '',
             amount: parseInt(amount) || 0,
@@ -407,10 +416,10 @@ exports.deleteGroup = async (req, res) => {
 exports.getAllKYC = async (req, res) => {
     try {
 
-        if (!req.user || !req.user.id)  return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
+        if (!req.user || !req.user.id) return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
         const superadmin = await User.findById(req.user.id).lean();
 
-        const status = req.query.status || 'pending'; 
+        const status = req.query.status || 'pending';
         const filter = { role: { $ne: 'super_admin' } };
         if (status !== 'all') filter.kyc_status = status;
 
@@ -476,7 +485,7 @@ exports.getUserKYCById = async (req, res) => {
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
-       const userWithUrls = {
+        const userWithUrls = {
             ...user,
             adhar_photo_url: user.adhar_photo ? getSignedUrl(user.adhar_photo) : null,
             pan_photo_url: user.pan_photo ? getSignedUrl(user.pan_photo) : null,
@@ -498,7 +507,7 @@ exports.updateKYC = async (req, res) => {
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
-       if (req.files) {
+        if (req.files) {
             if (req.files.adhar_photo) {
                 if (user.adhar_photo) {
                     try {
@@ -552,7 +561,7 @@ exports.updateKYC = async (req, res) => {
 exports.deleteKYC = async (req, res) => {
     try {
         const { id } = req.params;
-       const user = await User.findById(id);
+        const user = await User.findById(id);
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
@@ -606,39 +615,57 @@ exports.deleteKYC = async (req, res) => {
 
 
 // ?-------------------------------------------------------------
-exports.superadmincontact = async(req, res) => {
-     try {
-            const { name, email, Phone, comment } = req.body;
-            console.log(req.body);
-            
-            const newContact = new Contact({
+exports.superadmincontact = async (req, res) => {
+    try {
+        const { name, email, phone, comment } = req.body;
+
+        const newContact = new Contact({
             name,
             email,
-            phone: Phone,
-            comment: comment
-    });
+            phone,
+            comment
+        });
 
-    await newContact.save();
-    io.to('superadmin').emit('newContact', newContact);
+        await newContact.save();
 
-    res.status(200).json({ success: true, message: "Message saved successfully!" });
-  } catch (error) {
-    console.error("Error saving contact:", error);
-    res.status(500).json({ success: false, message: "Server error" });
-  }
+        // Socket emit
+
+        const io = req.app.get("socketio");
+
+        io.to("superadmin").emit("newContact", {
+            _id: newContact._id,
+            name: newContact.name,
+            email: newContact.email,
+            phone: newContact.phone,
+            comment: newContact.comment,
+            createdAt: newContact.createdAt
+        });
+
+        res.status(200).json({
+            success: true,
+            message: "Message saved successfully!"
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
 };
 
 
 exports.getAllContacts = async (req, res) => {
     try {
-        if (!req.user || !req.user.id)  return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
+        if (!req.user || !req.user.id) return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
         const superadmin = await User.findById(req.user.id).lean();
         const contacts = await Contact.find().sort({ createdAt: -1 }).lean();
         const totalContacts = await Contact.countDocuments();
-        const unreadContacts = await Contact.countDocuments({ isread: { $ne: true } }); 
-        console.log("Contacts fetched:", unreadContacts); 
-        
-        
+        const unreadContacts = await Contact.countDocuments({ isread: { $ne: true } });
+        console.log("Contacts fetched:", unreadContacts);
+
+
         res.render('superadmin/contact-Enquiries', {
             superadmin,
             contacts,
@@ -659,7 +686,7 @@ exports.markAsRead = async (req, res) => {
         const { id } = req.params;
         const updated = await Contact.findByIdAndUpdate(id, { isread: true }, { new: true });
         if (!updated) return res.status(404).json({ success: false, message: 'Contact not found' });
-        console.log(`Marked contact ${id} as read`); 
+        console.log(`Marked contact ${id} as read`);
         res.json({ success: true, message: 'Marked as read' });
     } catch (error) {
         console.error(error);
@@ -692,3 +719,4 @@ exports.deleteContact = async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
+

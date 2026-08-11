@@ -129,7 +129,7 @@ exports.createGroup = async (req, res) => {
     try {
         console.log("we are adding groups");
 
-        const { communityName, communityType, kycRequired, description, amount, amountDescription, questions, upiId } = req.body;
+        const { communityName, communityType, kycRequired, description, amount, amountType, amountDescription, questions, upiId } = req.body;
 
         const user = await User.findById(req.user.id);
         if (!user) {
@@ -174,6 +174,7 @@ exports.createGroup = async (req, res) => {
             is_kyc_req: kycRequired === 'Yes',
             description: description || '',
             amount: amount || 0,
+            amount_type: ['monthly', 'yearly'].includes(amountType) ? amountType : 'monthly',
             amount_description: amountDescription || '',
             qr_code: qrCode,
             total_mem: 1,
@@ -189,6 +190,23 @@ exports.createGroup = async (req, res) => {
             type: 'admin'
         });
         await groupMember.save();
+
+        // User ka global role 'admin' set karo — sirf tab jab wo already
+        // super_admin ya admin na ho (taaki koi downgrade na ho jaye)
+        const currentUserDoc = await User.findById(req.user.id).populate('role');
+        const currentRoleName = currentUserDoc.role?.roleName;
+
+        if (currentRoleName !== 'super_admin' && currentRoleName !== 'admin') {
+            const adminRole = await Role.findOne({ roleName: 'admin' });
+            if (adminRole) {
+                currentUserDoc.role = adminRole._id;
+                await currentUserDoc.save();
+                console.log(`[createGroup] User ${req.user.id} promoted to admin role`);
+            } else {
+                console.warn('[createGroup] "admin" role not found in Role collection — skipping promotion');
+            }
+        }
+
 
         if (communityType.toLowerCase() === 'private' && questions) {
             let parsedQuestions;
@@ -258,7 +276,7 @@ exports.updateGroup = async (req, res) => {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
 
-        const group = await Group.findOne({ _id: groupId, user: req.user.id });
+        const group = await Group.findById(groupId);
         if (!group) {
             return res.status(404).json({ success: false, message: 'Group not found or you do not have permission to edit it' });
         }
@@ -323,6 +341,7 @@ exports.updateGroup = async (req, res) => {
         group.is_kyc_req = kycRequired === 'Yes';
         group.description = description || '';
         group.amount = amount || 0;
+        group.amount_type = ['monthly', 'yearly'].includes(amountType) ? amountType : group.amount_type;
         group.amount_description = amountDescription || '';
         group.g_cover = coverPhoto;
         group.qr_code = qrCode;
@@ -429,6 +448,10 @@ exports.fetchgroup = async (req, res, next) => {
             .populate('user', 'mobile_no');
         if (!group) { return res.status(404).json({ success: false, message: 'Group not found' }); }
 
+        console.log("DB amount_type:", group.amount_type);
+        console.log("Full Group:", group);
+
+
         // Add signed URLs if needed
         if (group.g_cover) {
             group.g_cover = getSignedUrl(group.g_cover);
@@ -442,6 +465,8 @@ exports.fetchgroup = async (req, res, next) => {
             group,
             mobile: group.user?.mobile_no || null
         });
+        console.log(group.amount_type);
+        console.log(group);
     } catch (error) {
         next(error);
     }
@@ -830,10 +855,46 @@ exports.pendingRequests = async (req, res) => {
 };
 
 
+// exports.getGroups = async (req, res) => {
+//     try {
+
+//         const groups = await Group.find({ user: req.user.id }).select('g_name _id');
+//         res.status(200).json({ success: true, groups });
+//     } catch (error) {
+//         console.error('Error fetching groups:', error);
+//         res.status(500).json({ success: false, message: 'Error fetching groups' });
+//     }
+// };
 exports.getGroups = async (req, res) => {
     try {
+        const { permission } = req.query;
 
-        const groups = await Group.find({ user: req.user.id }).select('g_name _id');
+        // Groups jinka user khud owner hai
+        const ownedGroups = await Group.find({ user: req.user.id }).select('g_name _id').lean();
+
+        let roleGroups = [];
+        if (permission) {
+            // Groups jaha is user ko ye specific permission wala role assign hua hai
+            const memberships = await GMem.find({ user: req.user.id, type: { $ne: 'pending' } })
+                .populate('groupRole', 'permissions')
+                .populate('group', 'g_name')
+                .lean();
+
+            roleGroups = memberships
+                .filter(m => m.group && m.groupRole && Array.isArray(m.groupRole.permissions) && m.groupRole.permissions.includes(permission))
+                .map(m => ({ _id: m.group._id, g_name: m.group.g_name }));
+        }
+
+        // Dono lists ko merge karo, duplicate groups hata do
+        const combined = [...ownedGroups, ...roleGroups];
+        const seen = new Set();
+        const groups = combined.filter(g => {
+            const id = g._id.toString();
+            if (seen.has(id)) return false;
+            seen.add(id);
+            return true;
+        });
+
         res.status(200).json({ success: true, groups });
     } catch (error) {
         console.error('Error fetching groups:', error);
@@ -844,19 +905,24 @@ exports.getGroups = async (req, res) => {
 exports.getMyGroups = async (req, res) => {
     try {
         const groups = await GMem.find({ user: req.user.id })
-            .populate('group', 'g_name g_type g_cover description total_mem is_kyc_req')
+            .populate('group', 'g_name g_type g_cover description total_mem is_kyc_req user')
             .lean();
 
-        const formattedGroups = groups.map(group => ({
-            id: group.group._id,
-            name: group.group.g_name,
-            type: group.group.g_type,
-            cover: group.group.g_cover ? getSignedUrl(group.group.g_cover) : '/assets/images/demo.jpg',
-            description: group.group.description,
-            totalMembers: group.group.total_mem,
-            kycRequired: group.group.is_kyc_req,
-            role: group.type
-        }));
+        const formattedGroups = groups
+            .filter(g => g.group) // ⭐ orphaned/deleted group references hata do
+            .map(group => ({
+                id: group.group._id,
+                name: group.group.g_name,
+                type: group.group.g_type,
+                cover: group.group.g_cover ? getSignedUrl(group.group.g_cover) : '/assets/images/demo.jpg',
+                description: group.group.description,
+                totalMembers: group.group.total_mem,
+                kycRequired: group.group.is_kyc_req,
+                role: group.type,
+                isOwner: group.group.user
+                    ? group.group.user.toString() === req.user.id.toString()
+                    : false   // ⭐ safety check
+            }));
 
         res.status(200).json({ success: true, groups: formattedGroups });
     } catch (error) {
@@ -907,10 +973,10 @@ exports.addGroupMember = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Group not found' });
         }
 
-        const isAdmin = await GMem.findOne({ group: groupId, user: req.user.id, type: 'admin' });
-        if (!isAdmin) {
-            return res.status(403).json({ success: false, message: 'Only group admins can add members' });
-        }
+        // const isAdmin = await GMem.findOne({ group: groupId, user: req.user.id, type: 'admin' });
+        // if (!isAdmin) {
+        //     return res.status(403).json({ success: false, message: 'Only group admins can add members' });
+        // }
 
         if (!name || !memberEmail || !category) {
             return res.status(400).json({ success: false, message: 'Name ,email and category are required' });
@@ -1132,10 +1198,10 @@ exports.removeGroupMember = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Group not found' });
         }
 
-        const isAdmin = await GMem.findOne({ group: groupId, user: req.user.id, type: 'admin' });
-        if (!isAdmin) {
-            return res.status(403).json({ success: false, message: 'Only group admins can remove members' });
-        }
+        // const isAdmin = await GMem.findOne({ group: groupId, user: req.user.id, type: 'admin' });
+        // if (!isAdmin) {
+        //     return res.status(403).json({ success: false, message: 'Only group admins can remove members' });
+        // }
 
         const member = await GMem.findOneAndDelete({ group: groupId, user: userId });
         if (!member) {
@@ -1167,10 +1233,10 @@ exports.blacklistMember = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Group not found' });
         }
 
-        const isAdmin = await GMem.findOne({ group: groupId, user: req.user.id, type: 'admin' });
-        if (!isAdmin) {
-            return res.status(403).json({ success: false, message: 'Only group admins can blacklist members' });
-        }
+        // const isAdmin = await GMem.findOne({ group: groupId, user: req.user.id, type: 'admin' });
+        // if (!isAdmin) {
+        //     return res.status(403).json({ success: false, message: 'Only group admins can blacklist members' });
+        // }
 
         const member = await User.findById(userId);
         if (!member) {
@@ -1208,10 +1274,21 @@ exports.downloadMembersCSV = async (req, res) => {
             .lean();
 
         console.log(members);
+        const validMembers = members.filter(
+            member => member.user && member.group
+        ); // Only valid users will be included in the downloaded CSV file. Deleted users or users with null records will not be included.
+
         const csvContent = [
             'FirstName,LastName,Email,MobileNumber,GroupName,GroupId',
-            ...members.map(member => {
-                return `${member.user.f_name || ''},${member.user.l_name || ''},${member.user.email},${member.user.mobile_no || ''},${member.group.g_name},${member.group._id}`;
+            ...validMembers.map(member => {
+                return [
+                    member.user.f_name || '',
+                    member.user.l_name || '',
+                    member.user.email || '',
+                    member.user.mobile_no || '',
+                    member.group.g_name || '',
+                    member.group._id
+                ].join(',');
             })
         ].join('\n');
 
@@ -1700,10 +1777,10 @@ exports.searchInvitableUsers = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid group ID' });
         }
 
-        const isAdmin = await GMem.findOne({ group: groupId, user: req.user.id, type: 'admin' });
-        if (!isAdmin) {
-            return res.status(403).json({ success: false, message: 'Only group admins can invite members' });
-        }
+        // const isAdmin = await GMem.findOne({ group: groupId, user: req.user.id, type: 'admin' });
+        // if (!isAdmin) {
+        //     return res.status(403).json({ success: false, message: 'Only group admins can invite members' });
+        // }
 
         // Exclude anyone already tied to this group (member, admin, or pending)
         const existingMembers = await GMem.find({ group: groupId }).select('user').lean();
@@ -1750,10 +1827,10 @@ exports.inviteMember = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid group or user ID' });
         }
 
-        const isAdmin = await GMem.findOne({ group: groupId, user: req.user.id, type: 'admin' });
-        if (!isAdmin) {
-            return res.status(403).json({ success: false, message: 'Only group admins can invite members' });
-        }
+        // const isAdmin = await GMem.findOne({ group: groupId, user: req.user.id, type: 'admin' });
+        // if (!isAdmin) {
+        //     return res.status(403).json({ success: false, message: 'Only group admins can invite members' });
+        // }
 
         const group = await Group.findById(groupId);
         if (!group) {
@@ -1785,6 +1862,48 @@ exports.inviteMember = async (req, res) => {
     } catch (error) {
         console.error('Error inviting member:', error);
         res.status(500).json({ success: false, message: 'Server error while inviting member' });
+    }
+};
+
+exports.regenerateMemberAccess = async (req, res) => {
+    try {
+        const { userId, groupId } = req.body;
+
+        if (!mongoose.isValidObjectId(userId) || !mongoose.isValidObjectId(groupId)) {
+            return res.status(400).json({ success: false, message: 'Invalid IDs' });
+        }
+
+        // const isAdmin = await GMem.findOne({ group: groupId, user: req.user.id, type: 'admin' });
+        // if (!isAdmin) {
+        //     return res.status(403).json({ success: false, message: 'Only group admins can do this' });
+        // }
+
+        const member = await User.findById(userId);
+        if (!member) {
+            return res.status(404).json({ success: false, message: 'Member not found' });
+        }
+
+        // Naya temporary password generate karo
+        const tempPassword = Math.random().toString(36).slice(-8);
+        const hashedPassword = await bcrypt.hash(tempPassword, 10);
+
+        // updateOne use karo — sirf password field update hoga, poore document ki validation nahi chalegi
+        await User.updateOne(
+            { _id: userId },
+            { $set: { password: hashedPassword } }
+        );
+
+        const invitationLink = `${req.protocol}://${req.get('host')}/signup?invite=${member.invitationToken}&email=${encodeURIComponent(member.email)}&name=${encodeURIComponent(member.f_name + (member.l_name ? ' ' + member.l_name : ''))}`;
+
+        res.status(200).json({
+            success: true,
+            message: 'New temporary password generated',
+            tempPassword,
+            invitationLink
+        });
+    } catch (error) {
+        console.error('Error regenerating member access:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
     }
 };
 

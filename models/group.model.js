@@ -38,11 +38,16 @@ const groupSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
-     
+
     amount: {
         type: Number,
         default: 0,
         min: 0
+    },
+    amount_type: {
+        type: String,
+        enum: ['monthly', 'yearly'],
+        default: 'monthly'
     },
     amount_description: {
         type: String,
@@ -53,9 +58,9 @@ const groupSchema = new mongoose.Schema({
         type: String,
         default: '/Assets/Images/default-qr.png'
     },
-    upiId:{
-        type:String,
-        default:''
+    upiId: {
+        type: String,
+        default: ''
     }
 
 }, {

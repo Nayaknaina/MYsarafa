@@ -4,7 +4,8 @@ const groupController = require('../controllers/groupController');
 const { authMiddleware, isAdmin } = require('../middleware/auth');
 const monthlyMembershipCheck = require('../middleware/monthlymembershipVisible');
 const profileImageMiddleware = require('../middleware/profileImageMiddleware');
-
+const groupRoleRoutes = require('./groupRole.routes');
+const groupPermission = require('../middleware/groupPermission');
 
 const { upload } = require('../middleware/multer');
 
@@ -32,15 +33,19 @@ router.get('/group-view/:groupId', authMiddleware, profileImageMiddleware, group
 router.get('/pending-requests', authMiddleware, groupController.pendingRequests);
 router.post('/approve-request/:requestId', authMiddleware, groupController.approveRequest);
 
-router.post('/add-member', authMiddleware, groupController.addGroupMember);
+// router.post('/add-member', authMiddleware, groupController.addGroupMember);
+// router.post('/remove-member', authMiddleware, groupController.removeGroupMember);
+router.post('/add-member', authMiddleware, groupPermission('manage_members'), groupController.addGroupMember);
+router.post('/remove-member', authMiddleware, groupPermission('manage_members'), groupController.removeGroupMember);
+
 router.get('/members', authMiddleware, groupController.getGroupMembers);
 router.get('/search-members', authMiddleware, groupController.searchGroupMembers);
-router.post('/remove-member', authMiddleware, groupController.removeGroupMember);
 
 router.get('/groups', authMiddleware, groupController.getGroups);
 router.get('/my-groups-data', authMiddleware, groupController.getMyGroups);
 
-router.post('/blacklist-member', authMiddleware, groupController.blacklistMember);
+// router.post('/blacklist-member', authMiddleware, groupController.blacklistMember);
+router.post('/blacklist-member', authMiddleware, groupPermission('manage_members'), groupController.blacklistMember);
 router.get('/download-members-csv', authMiddleware, groupController.downloadMembersCSV);
 router.post('/upload-members-csv', authMiddleware, upload.single('csvFile'), groupController.uploadMembersCSV);
 
@@ -52,14 +57,20 @@ router.get('/search', authMiddleware, groupController.searchAllGroups);
 
 router.delete('/groups/:groupId/leave', authMiddleware, groupController.leaveGroup);
 
-router.patch('/:groupId/cover', authMiddleware, upload.fields([
-  { name: 'coverImage', maxCount: 1 }
-]), groupController.updateGroupCover);
+// router.patch('/:groupId/cover', authMiddleware, upload.fields([{ name: 'coverImage', maxCount: 1 }]), groupController.updateGroupCover);
+// router.patch('/:groupId/description', authMiddleware, groupController.updateGroupDescription);
 
-router.patch('/:groupId/description', authMiddleware, groupController.updateGroupDescription);
+router.patch('/:groupId/cover', authMiddleware, groupPermission('manage_group_settings'), upload.fields([{ name: 'coverImage', maxCount: 1 }]), groupController.updateGroupCover);
+router.patch('/:groupId/description', authMiddleware, groupPermission('manage_group_settings'), groupController.updateGroupDescription);
 
-router.get('/:groupId/invitable-users', authMiddleware, groupController.searchInvitableUsers);
+// router.get('/:groupId/invitable-users', authMiddleware, groupController.searchInvitableUsers);
+// router.post('/:groupId/invite', authMiddleware, groupController.inviteMember);
+router.get('/:groupId/invitable-users', authMiddleware, groupPermission('manage_members'), groupController.searchInvitableUsers);
+router.post('/:groupId/invite', authMiddleware, groupPermission('manage_members'), groupController.inviteMember);
 
-router.post('/:groupId/invite', authMiddleware, groupController.inviteMember);
+// router.post('/regenerate-member-access', authMiddleware, groupController.regenerateMemberAccess);
+router.post('/regenerate-member-access', authMiddleware, groupPermission('manage_members'), groupController.regenerateMemberAccess);
+
+router.use('/:groupId/roles', groupRoleRoutes);
 
 module.exports = router;

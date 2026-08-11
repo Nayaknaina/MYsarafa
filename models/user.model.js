@@ -55,7 +55,7 @@ const userSchema = new mongoose.Schema({
   pan_photo: { type: String, default: '' },
   kyc_status: {
     type: String,
-    enum: ['unsubmitted', 'pending', 'approved', 'rejected'],
+    enum: ['unsubmitted', 'pending', 'submitted', 'approved', 'rejected'],
     default: 'unsubmitted'
   },
 
@@ -96,11 +96,10 @@ const userSchema = new mongoose.Schema({
     ],
     default: null
   },
-
   role: {
-    type: String,
-    enum: ['user', 'super_admin'],
-    default: 'user'
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Role",
+    default: null
   },
 
   aadhaar_verified: {

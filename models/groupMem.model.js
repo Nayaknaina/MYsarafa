@@ -16,6 +16,11 @@ const gMemSchema = new mongoose.Schema({
         enum: ['admin', 'user','pending'],
         required: true,
         default: 'user'
+    },
+    groupRole: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'GroupRole',
+        default: null
     }
 }, {
     timestamps: true

@@ -25,4 +25,6 @@ router.post('/save-fcm-token', authMiddleware, userController.saveFcmToken);
 // router.get('/sign-out', userController.signout);
 router.get('/sign-out', authMiddleware, userController.signout);
 
+router.get('/sign-out', authMiddleware, userController.signout);
+
 module.exports = router;

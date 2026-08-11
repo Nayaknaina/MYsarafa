@@ -1291,6 +1291,75 @@ document.addEventListener('DOMContentLoaded', function () {
       window.location.href = "/user-app/sign-out";
     });
   }
+
+  const changePasswordBtn = document.getElementById('changePasswordBtn');
+  const changePasswordModal = document.getElementById('changePasswordModal');
+  const closeChangePasswordModal = document.getElementById('closeChangePasswordModal');
+  const changePasswordForm = document.getElementById('changePasswordForm');
+  const changePasswordError = document.getElementById('changePasswordError');
+
+  if (changePasswordBtn && changePasswordModal) {
+    changePasswordBtn.addEventListener('click', () => {
+      changePasswordModal.style.display = 'flex';
+    });
+  }
+
+  if (closeChangePasswordModal && changePasswordModal) {
+    closeChangePasswordModal.addEventListener('click', () => {
+      changePasswordModal.style.display = 'none';
+      changePasswordForm.reset();
+      changePasswordError.style.display = 'none';
+    });
+    changePasswordModal.addEventListener('click', (e) => {
+      if (e.target === changePasswordModal) {
+        changePasswordModal.style.display = 'none';
+        changePasswordForm.reset();
+        changePasswordError.style.display = 'none';
+      }
+    });
+  }
+
+  if (changePasswordForm) {
+    changePasswordForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const newPassword = document.getElementById('changeNewPassword').value;
+      const confirmPassword = document.getElementById('changeConfirmPassword').value;
+
+      if (newPassword !== confirmPassword) {
+        changePasswordError.textContent = 'Passwords do not match';
+        changePasswordError.style.display = 'block';
+        return;
+      }
+      if (newPassword.length < 6) {
+        changePasswordError.textContent = 'Password must be at least 6 characters';
+        changePasswordError.style.display = 'block';
+        return;
+      }
+
+      try {
+        const response = await fetch('/auth/set-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password: newPassword }),
+          credentials: 'include'
+        });
+        const result = await response.json();
+
+        if (response.ok) {
+          showNotification('Password updated successfully!', 'success');
+          changePasswordModal.style.display = 'none';
+          changePasswordForm.reset();
+        } else {
+          changePasswordError.textContent = result.message || 'Failed to update password';
+          changePasswordError.style.display = 'block';
+        }
+      } catch (error) {
+        changePasswordError.textContent = 'Error: ' + error.message;
+        changePasswordError.style.display = 'block';
+      }
+    });
+  }
+
 });
 
 
@@ -1298,6 +1367,10 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
   if (verifyMobileModal && verifyMobileForm) {
     const otpInput = new OTPInputHandler('.otp-input');
+
+    const passwordChoiceModal = document.getElementById('passwordChoiceModal');
+    const setNewPasswordBtn = document.getElementById('setNewPasswordBtn');
+    const skipPasswordBtn = document.getElementById('skipPasswordBtn');
 
     // Prevent modal from being closed by clicking outside
     verifyMobileModal.addEventListener('click', (e) => {
@@ -1469,11 +1542,10 @@ document.addEventListener('DOMContentLoaded', function () {
             // Transition to password section if needed
             setTimeout(() => {
               closeModal();
-              if (passwordSection) {
-                mobileSection.classList.add('hidden');
-                passwordSection.classList.remove('hidden');
-              } else {
-                verifyMobileModal.style.display = 'none';
+              verifyMobileModal.style.display = 'none';   // OTP modal band karo
+              const passwordChoiceModal = document.getElementById('passwordChoiceModal');
+              if (passwordSection && passwordChoiceModal) {
+                passwordChoiceModal.style.display = 'flex';   // naya choice modal dikhao
               }
             }, 2000);
           } else {
@@ -1592,13 +1664,23 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       });
     }
+
+    if (setNewPasswordBtn && passwordChoiceModal) {
+      setNewPasswordBtn.addEventListener('click', () => {
+        passwordChoiceModal.style.display = 'none';
+        verifyMobileModal.style.display = 'flex';       // password wala modal wapas kholo
+        mobileSection.classList.add('hidden');
+        passwordSection.classList.remove('hidden');
+      });
+    }
+
+    if (skipPasswordBtn && passwordChoiceModal) {
+      skipPasswordBtn.addEventListener('click', () => {
+        passwordChoiceModal.style.display = 'none';     // bas band kar do, kuch aur nahi
+      });
+    }
+
   }
-
-
-
-
-  //g-mem
-
 
   async function populateGroups() {
     try {
@@ -1710,6 +1792,9 @@ document.addEventListener('DOMContentLoaded', function () {
                               <a href="#" class="dropdown-item share-member" data-user-id="${member.userId}" data-group-id="${member.groupId}" data-name="${displayName}" data-email="${member.email || ''}">
                                 <i class="fas fa-share"></i> Share
                               </a>
+                             <a href="/user-app/user/${member.userId}" class="dropdown-item verify-kyc-link">
+                                <i class="fas fa-id-card"></i> Verify KYC
+                             </a>
                               <a href="#" class="dropdown-item blacklist-member" data-user-id="${member.userId}" data-group-id="${member.groupId}">
                                 <i class="fas fa-ban"></i> Blacklist
                               </a>
@@ -1719,11 +1804,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             </div>
                           </div>
                         </td>
-                         <td>
-                            <a href="/user-app/user/${member.userId}" class="info-link" title="View Details">
-                                <i class="fas fa-info-circle"></i>
-                            </a>
-                        </td>
+                        
                     `;
           membersTableBody.prepend(tr);
         });
@@ -2236,64 +2317,46 @@ document.addEventListener('DOMContentLoaded', function () {
       if (target.classList.contains('share-member')) {
         const name = target.dataset.name;
         const email = target.dataset.email;
-        // Fetch member details to get invitation link
+
         try {
-          const response = await fetch(`/Groups/search-members?email=${encodeURIComponent(email)}`, {
-            method: 'GET',
+          const response = await fetch('/Groups/regenerate-member-access', {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, groupId }),
             credentials: 'include'
           });
           const result = await response.json();
-          console.log("memebers coming result", result)
-          if (response.ok && result.members.length) {
-            const member = result.members[0];
 
-            const isExistingUser = result.isExistingUser;
-            invitationName.textContent = name;
-            invitationEmail.textContent = email;
-            invitationLinkDisplay.textContent = `${window.location.origin}/signup?invite=${member.invitationToken}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`;
-            invitationPassword.textContent = result.tempPassword || 'N/A (Existing user)';
-
+          if (response.ok && result.success) {
             const groupResponse = await fetch(`/Groups/groups/${groupId}`, {
               method: 'GET',
               headers: { 'Content-Type': 'application/json' },
               credentials: 'include'
             });
             const groupResult = await groupResponse.json();
+
+            modalTitle.textContent = 'Share Login Details';
+            invitationNameNew.textContent = name;
+            invitationEmail.textContent = email;
+            invitationLinkDisplay.textContent = result.invitationLink;
+            invitationPassword.textContent = result.tempPassword;
             if (groupResponse.ok) {
-              document.querySelector('#invitationGroupName').textContent = groupResult.group.g_name;
+              invitationGroupNameNew.textContent = groupResult.group.g_name;
             }
 
-            if (isExistingUser) {
-              modalTitle.textContent = 'Share Member Details';
-              existingUserMessage.style.display = 'block';
-              existingUserMessage.style.display = 'block';
-              newUserRecipient.style.display = 'none';
-              newUserGroup.style.display = 'none';
-              invitationLinkLabel.style.display = 'none';
-              invitationLinkDisplay.style.display = 'none';
-              invitationPasswordLabel.style.display = 'none';
-              invitationPassword.style.display = 'none';
-              copyLinkBtn.style.display = 'none';
-            } else {
-              modalTitle.textContent = 'Invitation Link Generated';
-              existingUserMessage.style.display = 'none';
-              newUserRecipient.style.display = 'block';
-              newUserGroup.style.display = 'block';
-              invitationLinkLabel.style.display = 'block';
-              invitationLinkDisplay.style.display = 'block';
-              invitationPasswordLabel.style.display = 'block';
-              invitationPassword.style.display = 'block';
-              copyLinkBtn.style.display = 'inline-block';
+            // Ab hamesha "new user" wala layout dikhega (link + password ke saath)
+            existingUserMessage.style.display = 'none';
+            newUserRecipient.style.display = 'block';
+            newUserGroup.style.display = 'block';
+            invitationLinkLabel.style.display = 'block';
+            invitationLinkDisplay.style.display = 'block';
+            invitationPasswordLabel.style.display = 'block';
+            invitationPassword.style.display = 'block';
+            copyLinkBtn.style.display = 'inline-block';
 
-              // Set new user specifics (if needed)
-              invitationNameNew.textContent = name;
-              invitationLinkDisplay.textContent = `${window.location.origin}/signup?invite=${member.invitationToken || ''}&email=${encodeURIComponent(email)}&name=${encodeURIComponent(name)}`;
-              invitationPassword.textContent = member.tempPassword || 'N/A';
-            }
             invitationModal.style.display = 'flex';
           } else {
-            showNotification('Failed to load member invitation details', 'error');
+            showNotification(result.message || 'Failed to generate access details', 'error');
           }
         } catch (error) {
           showNotification('Error fetching invitation: ' + error.message, 'error');
@@ -2394,5 +2457,35 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 2500);
       }, 300);
     }
+  }
+});
+
+// 
+document.addEventListener("click", function (e) {
+  const actionBtn = e.target.closest(".action-btn");
+
+  // Agar 3 dots pe click hua
+  if (actionBtn) {
+    e.preventDefault();
+
+    const currentMenu = actionBtn.nextElementSibling;
+
+    // Sab menus band karo
+    document.querySelectorAll(".dropdown-menu").forEach(menu => {
+      if (menu !== currentMenu) {
+        menu.classList.remove("show");
+      }
+    });
+
+    // Current menu toggle karo
+    currentMenu.classList.toggle("show");
+    return;
+  }
+
+  // Bahar click hua to sab band
+  if (!e.target.closest(".action-dropdown")) {
+    document.querySelectorAll(".dropdown-menu").forEach(menu => {
+      menu.classList.remove("show");
+    });
   }
 });

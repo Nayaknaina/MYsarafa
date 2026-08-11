@@ -6,6 +6,7 @@ const Group = require('../models/group.model');
 const GMem = require('../models/groupMem.model');
 const GroupQue = require('../models/groupQue.model');
 const Announcement = require('../models/announcement.model');
+const Comment = require('../models/commentModel');
 
 const { getSignedUrl } = require('../middleware/multer');
 
@@ -20,6 +21,8 @@ const axios = require("axios");
 const admin = require("../config/firebaseAdmin"); // firebase Notification
 const { getMessaging } = require("firebase-admin/messaging");
 const { sendNotificationToUsers } = require('../utils/notify');
+
+const { checkGroupPermission } = require('../middleware/utils/groupPermission.util');
 
 
 exports.Announcement = async (req, res, next) => {
@@ -177,18 +180,27 @@ exports.Announcementform = async (req, res, next) => {
 //     });
 //   }
 // };
+
 exports.createAnnouncement = async (req, res) => {
   try {
     const { title, message, groupId } = req.body;
+    const plainMessage = message
+      .replace(/<[^>]*>/g, " ")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/\s+/g, " ")
+      .trim();
 
     if (!title || !message || !groupId) {
       return res.status(400).json({ success: false, message: 'Title, message, and group ID are required' });
     }
 
-    const group = await Group.findOne({ _id: groupId, user: req.user.id });
-    if (!group) {
+    // ⭐ BADLA: hardcoded owner check ki jagah permission check
+    const permCheck = await checkGroupPermission(req.user.id, groupId, 'manage_announcements');
+    if (!permCheck.allowed) {
       return res.status(403).json({ success: false, message: 'You are not authorized to create announcements for this group' });
     }
+    const group = permCheck.group;
 
     let imagePath = '';
     if (req.files && req.files['image']) {
@@ -206,45 +218,19 @@ exports.createAnnouncement = async (req, res) => {
 
     await announcement.save();
 
-    // ✅ Sirf is group ke members ko notify karo (creator ko chhod ke)
     const members = await GMem.find({ group: groupId }).select('user');
-
-    // const memberIds = members
-    //   .map(m => m.user.toString())
-    //   .filter(id => id !== req.user.id.toString());
-
-    // const { successCount, failureCount } = await sendNotificationToUsers(
-    //   memberIds,
-    //   title,
-    //   message,
-    //   { type: 'announcement', announcementId: announcement._id.toString(), groupId: groupId.toString() }
-    // );
-    // console.log(`Announcement notifications -> success: ${successCount}, failed: ${failureCount}`);
-
     const memberIds = members
       .map(m => m.user.toString())
       .filter(id => id !== req.user.id.toString());
 
-    console.log("Member IDs:", memberIds);
-
     const result = await sendNotificationToUsers(
       memberIds,
-      title,
-      message,
-      {
-        type: "announcement",
-        announcementId: announcement._id.toString(),
-        groupId: groupId.toString()
-      }
+      `${group.g_name} posted an announcement`,
+      plainMessage,
+      { type: "announcement", announcementId: announcement._id.toString(), groupId: groupId.toString() }
     );
 
-    console.log("Notification Result:", result);
-
-    res.status(201).json({
-      success: true,
-      message: "Announcement created successfully",
-      announcement
-    });
+    res.status(201).json({ success: true, message: "Announcement created successfully", announcement });
 
   } catch (error) {
     console.error("Error creating announcement:", error);
@@ -252,97 +238,153 @@ exports.createAnnouncement = async (req, res) => {
   }
 };
 
+// exports.getAnnouncements = async (req, res) => {
+//   try {
+
+//     const announcements = await Announcement.find({
+//       createdBy: req.user.id
+//     })
+//       .populate('createdBy', 'f_name l_name')
+//       .populate('group', 'g_name')
+//       .populate('likes', 'f_name l_name profilePicture')
+//       .sort({ createdAt: -1 })
+//       .lean();
+
+
+//     const formattedAnnouncements = announcements.map(announcement => ({
+//       _id: announcement._id,
+//       title: announcement.title,
+//       message: announcement.message,
+//       meetingLink: announcement.meetingLink,
+
+//       image: announcement.image ? getSignedUrl(announcement.image) : null,
+
+//       createdBy: {
+//         name: announcement.createdBy
+//           ? `${announcement.createdBy.f_name || ''} ${announcement.createdBy.l_name || ''}`.trim()
+//           : "Unknown"
+//       },
+
+//       group: {
+//         id: announcement.group?._id || null,
+//         name: announcement.group?.g_name || "Unknown"
+//       },
+
+//       createdAt: announcement.createdAt,
+
+//       likeCount: announcement.likes?.length || 0,
+
+//       isLiked: announcement.likes?.some(
+//         like => like._id.toString() === req.user.id.toString()
+//       )
+//     }));
+
+
+//     res.json({
+//       success: true,
+//       announcements: formattedAnnouncements
+//     });
+
+
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({
+//       success: false,
+//       message: error.message
+//     });
+//   }
+// };
 exports.getAnnouncements = async (req, res) => {
   try {
-    // Fetch all groups where the user is a member or admin
-    const groupMemberships = await GMem.find({ user: req.user.id })
-      .select('group type')
-      .lean();
+    const { groupId } = req.query;
+    let query = {};
 
-    if (!groupMemberships.length) {
-      return res.status(200).json({ success: true, announcements: [], message: 'You are not a member of any groups' });
+    if (groupId) {
+      // ⭐ Specific group ki saari announcements — permission check ke saath
+      const permCheck = await checkGroupPermission(req.user.id, groupId, 'manage_announcements');
+      if (!permCheck.allowed) {
+        return res.status(403).json({ success: false, message: 'You do not have access to this group\'s announcements' });
+      }
+      query.group = groupId;
+    } else {
+      // ⭐ Koi specific groupId nahi diya gaya — is user ke apne (owned) groups ki
+      // SAARI announcements dikhao, chahe post kisi ne bhi ki ho (khud ya koi role-wala member)
+      const ownedMemberships = await GMem.find({ user: req.user.id, type: 'admin' }).select('group').lean();
+      const ownedGroupIds = ownedMemberships.map(m => m.group);
+
+      if (ownedGroupIds.length > 0) {
+        query.group = { $in: ownedGroupIds };
+      } else {
+        // User kisi group ka owner nahi hai — purana default behavior: sirf apni khud ki
+        query.createdBy = req.user.id;
+      }
     }
 
-    // Extract group IDs
-    const groupIds = groupMemberships.map(membership => membership.group);
-    const adminGroupIds = groupMemberships
-      .filter(m => m.type === 'admin')
-      .map(m => m.group.toString());
-
-    // Fetch announcements for these groups
-    const announcements = await Announcement.find({ group: { $in: groupIds } })
+    const announcements = await Announcement.find(query)
       .populate('createdBy', 'f_name l_name')
       .populate('group', 'g_name')
       .populate('likes', 'f_name l_name profilePicture')
       .sort({ createdAt: -1 })
       .lean();
-    console.log("===== Announcements =====");
 
-    announcements.forEach((a, index) => {
-      console.log(`Announcement ${index + 1}`);
-      console.log("ID:", a._id);
-      console.log("Title:", a.title);
-      console.log("CreatedBy:", a.createdBy);
-      console.log("Group:", a.group);
-      console.log("-------------------------");
-    });
 
     const formattedAnnouncements = announcements.map(announcement => ({
       _id: announcement._id,
       title: announcement.title,
       message: announcement.message,
       meetingLink: announcement.meetingLink,
+
       image: announcement.image ? getSignedUrl(announcement.image) : null,
+
       createdBy: {
         name: announcement.createdBy
           ? `${announcement.createdBy.f_name || ''} ${announcement.createdBy.l_name || ''}`.trim()
-          : "Unknown",
-
-        userId: announcement.createdBy?._id || null
+          : "Unknown"
       },
+
       group: {
         id: announcement.group?._id || null,
         name: announcement.group?.g_name || "Unknown"
       },
+
       createdAt: announcement.createdAt,
 
-      likeCount: announcement.likes ? announcement.likes.length : 0,
+      likeCount: announcement.likes?.length || 0,
+
       isLiked: announcement.likes?.some(
-        like => like._id?.toString() === req.user.id.toString()
-      ),
-      // commentCount: await Comment.countDocuments({ announcement: announcement._id }),
-      canDelete:
-        req.user.role === "super_admin" ||
-        (announcement.group &&
-          adminGroupIds.includes(announcement.group._id.toString()))
-
+        like => like._id.toString() === req.user.id.toString()
+      )
     }));
-    console.log(formattedAnnouncements)
 
-    res.status(200).json({ success: true, announcements: formattedAnnouncements });
+
+    res.json({
+      success: true,
+      announcements: formattedAnnouncements
+    });
+
+
   } catch (error) {
-    console.error('Error fetching announcements:', error);
-    res.status(500).json({ success: false, message: 'Error fetching announcements', error: error.message });
+    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 };
-
 
 exports.deleteAnnouncement = async (req, res, next) => {
   try {
     const announcementId = req.params.id;
     const user = req.user;
 
-
     const announcement = await Announcement.findById(announcementId);
     if (!announcement) {
       return res.status(404).json({ success: false, message: 'Announcement not found' });
     }
-    const membership = await GMem.findOne({
-      user: user._id,
-      group: announcement.group,
-      type: 'admin'
-    });
-    if (!membership) {
+
+    // ⭐ BADLA: hardcoded type:'admin' check ki jagah permission check
+    const permCheck = await checkGroupPermission(user.id, announcement.group, 'manage_announcements');
+    if (!permCheck.allowed) {
       return res.status(403).json({ success: false, message: 'Unauthorized to delete this announcement' });
     }
 
@@ -443,16 +485,20 @@ exports.toggleLike = async (req, res) => {
     console.log("toggleLike -> liker userId:", userId);
 
     if (isNewLike && announcement.createdBy.toString() !== userId) {
-      const liker = await User.findById(userId).select('f_name l_name');
-      const likerName = `${liker?.f_name || ''} ${liker?.l_name || ''}`.trim() || 'Someone';
+      const liker = await User.findById(userId).select("f_name l_name");
+      const likerName =
+        `${liker?.f_name || ""} ${liker?.l_name || ""}`.trim() || "Someone";
 
       console.log("toggleLike -> sending notification to:", announcement.createdBy.toString());
 
       const result = await sendNotificationToUsers(
         [announcement.createdBy],
-        'New Like',
+        "New Like",
         `${likerName} liked your announcement`,
-        { type: 'like', announcementId: announcement._id.toString() }
+        {
+          type: "like",
+          announcementId: announcement._id.toString(),
+        }
       );
 
       console.log("toggleLike -> notification result:", result);   // 👈 YE ADD KARO
@@ -495,50 +541,6 @@ exports.getLikes = async (req, res) => {
 };
 
 // Comment
-const Comment = require('../models/commentModel');
-
-// Add a comment
-// exports.addComment = async (req, res) => {
-//   try {
-//     const { text } = req.body;
-//     const announcementId = req.params.id;
-
-//     if (!text || !text.trim()) {
-//       return res.status(400).json({ success: false, message: 'Comment text is required' });
-//     }
-
-//     const announcement = await Announcement.findById(announcementId);
-//     if (!announcement) {
-//       return res.status(404).json({ success: false, message: 'Announcement not found' });
-//     }
-
-//     const comment = await Comment.create({
-//       announcement: announcementId,
-//       user: req.user.id,
-//       text: text.trim()
-//     });
-
-//     const populatedComment = await Comment.findById(comment._id)
-//       .populate('user', 'f_name l_name profilePicture')
-//       .lean();
-
-//     res.status(201).json({
-//       success: true,
-//       comment: {
-//         _id: populatedComment._id,
-//         text: populatedComment.text,
-//         createdAt: populatedComment.createdAt,
-//         user: {
-//           name: `${populatedComment.user.f_name || ''} ${populatedComment.user.l_name || ''}`.trim() || 'Unknown',
-//           profileImage: populatedComment.user.profilePicture || '/assets/images/default-profile.png'
-//         }
-//       }
-//     });
-//   } catch (error) {
-//     console.error('Error adding comment:', error);
-//     res.status(500).json({ success: false, message: 'Server error while adding comment' });
-//   }
-// };
 exports.addComment = async (req, res) => {
   try {
     const { text } = req.body;
@@ -565,12 +567,27 @@ exports.addComment = async (req, res) => {
 
     // ✅ Notify announcement owner (khud ko chhod ke)
     if (announcement.createdBy.toString() !== req.user.id.toString()) {
-      const commenterName = `${populatedComment.user.f_name || ''} ${populatedComment.user.l_name || ''}`.trim() || 'Someone';
+      const commenterName =
+        populatedComment.user
+          ?
+          `${populatedComment.user.f_name || ""} ${populatedComment.user.l_name || ""}`.trim()
+          :
+          "Someone";
+      const plainComment = text
+        .replace(/<[^>]*>/g, " ")
+        .replace(/&nbsp;/g, " ")
+        .replace(/&amp;/g, "&")
+        .replace(/\s+/g, " ")
+        .trim();
+
       await sendNotificationToUsers(
         [announcement.createdBy],
-        'New Comment',
-        `${commenterName} commented: ${text.trim().slice(0, 50)}`,
-        { type: 'comment', announcementId: announcementId.toString() }
+        "New Comment",
+        `${commenterName} commented: ${plainComment.slice(0, 80)}`,
+        {
+          type: "comment",
+          announcementId: announcementId.toString(),
+        }
       );
     }
 
@@ -605,14 +622,27 @@ exports.getComments = async (req, res) => {
       text: c.text,
       createdAt: c.createdAt,
       user: {
-        name: `${c.user.f_name || ''} ${c.user.l_name || ''}`.trim() || 'Unknown',
-        profileImage: c.user.profilePicture || '/assets/images/default-profile.png'
+        name: c.user
+          ? `${c.user.f_name || ''} ${c.user.l_name || ''}`.trim()
+          : "Unknown",
+
+        profileImage: c.user?.profilePicture
+          ? c.user.profilePicture
+          : '/assets/images/default-profile.png'
       }
     }));
 
-    res.status(200).json({ success: true, count: formatted.length, comments: formatted });
+    res.status(200).json({
+      success: true,
+      count: formatted.length,
+      comments: formatted
+    });
+
   } catch (error) {
     console.error('Error fetching comments:', error);
-    res.status(500).json({ success: false, message: 'Server error while fetching comments' });
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
   }
 };

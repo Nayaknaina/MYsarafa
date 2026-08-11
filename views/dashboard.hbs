@@ -1,4 +1,5 @@
 <script src="https://cdn.tailwindcss.com"></script>
+
 <style>
     .otp-input::-webkit-outer-spin-button,
     .otp-input::-webkit-inner-spin-button {
@@ -676,6 +677,228 @@
             grid-template-columns: 1fr;
         }
     }
+
+    /*Groups*/
+    /* Common Card Base (Discover + My Communities) */
+    .group-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .group-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Image full width */
+    .group-top {
+        position: relative;
+    }
+
+    .group-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        display: block;
+    }
+
+    /* Overlay button top-right */
+    .group-actions {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+
+    .more-options-btn {
+        background: rgba(255, 255, 255, 0.9);
+        border: none;
+        border-radius: 50%;
+        padding: 6px 10px;
+        cursor: pointer;
+        font-size: 1.2rem;
+        color: #333;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .more-options-btn:hover {
+        background: #007bff;
+        color: #fff;
+    }
+
+    .more-options-menu {
+        min-width: 120px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 8px;
+        background: #fff;
+    }
+
+    /* Content below image */
+    .group-header {
+        padding: 0.8rem 1rem 0 1rem;
+    }
+
+    .group-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #222;
+    }
+
+    .group-details {
+        padding: 0.5rem 1rem 1rem 1rem;
+        font-size: 0.95rem;
+        color: #555;
+    }
+
+    .group-description {
+        margin-bottom: 0.8rem;
+    }
+
+    /* Buttons */
+    .join-group-btn,
+    .manage-group-btn,
+    .leave-group-btn,
+    .see-group-btn {
+        background: #007bff;
+        color: #fff;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background 0.3s;
+    }
+
+    .join-group-btn:hover,
+    .manage-group-btn:hover,
+    .leave-group-btn:hover,
+    .see-group-btn:hover {
+        background: #0056b3;
+    }
+
+    .joined-btn {
+        background: #28a745;
+        color: #fff;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 6px;
+    }
+
+    .pending-btn {
+        background: #ffc107;
+        color: #333;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 6px;
+    }
+
+    /* Search Bar (same for both sections) */
+    .search-container {
+        position: relative;
+    }
+
+    .grpsearch-icon {
+        position: absolute;
+        top: 50%;
+        left: 10px;
+        transform: translateY(-50%);
+        color: #888;
+    }
+
+    .grpsearch-input {
+        width: 100%;
+        padding: 8px 12px 8px 32px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        outline: none;
+        transition: border 0.3s;
+    }
+
+    .grpsearch-input:focus {
+        border-color: #007bff;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .group-image {
+            height: 140px;
+        }
+    }
+
+    /* Discover cards bhi same design follow karein */
+    .discover-card .group-top {
+        position: relative;
+        display: block;
+    }
+
+    .discover-card .group-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        display: block;
+    }
+
+    /* Overlay button same */
+    .discover-card .group-actions {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+
+    /* Title niche hi dikhaye */
+    .discover-card .group-header {
+        padding: 0.8rem 1rem 0 1rem;
+    }
+
+    .discover-card .group-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #222;
+    }
+
+    .discover-card .group-details {
+        padding: 0.5rem 1rem 1rem 1rem;
+        font-size: 0.95rem;
+        color: #555;
+    }
+
+    @media (max-width: 768px) {
+
+        /* Association Payments Summary */
+        .live-rates-preview .flex.justify-between.items-center.mb-2 {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .live-rates-preview .search-container {
+            width: 100% !important;
+        }
+
+        /* Discover Community & My Communities */
+        .my-groups .flex.justify-between.items-center.mb-4,
+        .discover-groups .flex.justify-between.items-center.mb-4 {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .my-groups .search-container,
+        .discover-groups .search-container {
+            width: 100% !important;
+        }
+
+        /* Cards 1 per row */
+        #discoverGroupsList,
+        #myGroupsList {
+            grid-template-columns: 1fr;
+        }
+    }
 </style>
 
 <body data-user-id="{{user._id}}">
@@ -1088,6 +1311,38 @@
                     </div>
                 </section>
 
+                {{#if groupPaymentSummary.length}}
+                <section class="live-rates-preview bg-white rounded-xl p-4 mb-6 shadow-md">
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+                            <i class="fas fa-hand-holding-usd mr-2 text-green-600"></i>
+                            Association Payments Summary
+                        </h2>
+                        <div class="search-container w-1/3">
+                            <i class="fas fa-search grpsearch-icon"></i>
+                            <input type="text" id="groupSummarySearch" class="grpsearch-input"
+                                placeholder="Search other communities...">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3" id="groupPaymentSummaryGrid">
+                        {{#each groupPaymentSummary}}
+                        <div class="rate-item summary-card summary-cash-card">
+                            <div class="summary-icon-wrap">
+                                <img src="/img/cashImg.png" alt="{{this.groupName}}">
+                            </div>
+                            <div class="summary-content">
+                                <span class="text-xs text-gray-600">{{this.groupName}}</span>
+                                <p class="rate-value text-lg font-bold text-green-600">₹{{this.total}}</p>
+                                <div class="mt-2 text-sm">
+                                    <p class="text-gray-500 font-medium">Total collected (verified)</p>
+                                </div>
+                            </div>
+                        </div>
+                        {{/each}}
+                    </div>
+                </section>
+                {{/if}}
+
                 <!-- Group Discovery and My Groups Section -->
                 <section class="group-discovery-section">
                     <div class="group-discovery-container">
@@ -1095,7 +1350,7 @@
                         <div class="discover-groups" id="discover-groups-section">
                             <div class="flex justify-between items-center mb-4">
                                 <h2 class="section-title">Discover Community</h2>
-                                <div class="search-container w-1/3">
+                                <div class="search-container w-1/2">
                                     <i class="fas fa-search grpsearch-icon"></i>
                                     <input type="text" id="discoverSearch" class="grpsearch-input"
                                         placeholder="Search communities...">
@@ -1107,98 +1362,229 @@
                                     join.
                                 </p>
                                 {{#each discoverGroups}}
-                                {{!-- <div class="group-card" data-group-name="{{this.g_name}}">
-                                    <img src="{{this.g_cover}}" alt="{{this.g_name}} Image" class="group-image">
-                                    <div class="group-details"> --}}
-                                        <div class="group-card discover-card" data-group-name="{{this.g_name}}">
+                                <div class="group-card discover-card" data-group-name="{{this.g_name}}">
 
-                                            <div class="group-top">
-                                                <img src="{{this.g_cover}}" class="group-image">
+                                    <div class="group-top">
+                                        <img src="{{this.g_cover}}" class="group-image">
 
-                                                <div class="group-header">
-                                                    <h3 class="group-title">{{this.g_name}}</h3>
-                                                </div>
-                                            </div>
-
-                                            <div class="group-details discover-details">
-                                                {{!-- <h3 class="group-title">{{this.g_name}}</h3> --}}
-                                                <p class="group-description">{{this.description}} Join this
-                                                    {{this.g_type}}
-                                                    community to connect with others.</p>
-                                                {{#if isJoined}}
-                                                <button class="joined-btn" disabled>Joined</button>
-                                                {{else if isPending}}
-                                                <button class="pending-btn" disabled>Pending</button>
-                                                {{else}}
-                                                <button class="join-group-btn" data-group-id="{{_id}}">Join
-                                                    Community</button>
-                                                {{/if}}
-                                            </div>
-                                            <div class="group-actions">
-                                                <button class="more-options-btn" aria-label="More options">•••</button>
-                                                <div class="more-options-menu"
-                                                    style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ddd; border-radius: 8px; padding: 8px;">
-                                                    <button class="see-group-btn" data-group-id="{{_id}}">See
-                                                        Group</button>
-                                                </div>
-                                            </div>
+                                        <div class="group-header">
+                                            <h3 class="group-title">{{this.g_name}}</h3>
                                         </div>
-                                        {{/each}}
+                                    </div>
+
+                                    <div class="group-details discover-details">
+                                        <p class="group-description">{{this.description}} Join this
+                                            {{this.g_type}}
+                                            community to connect with others.</p>
+                                        {{#if isJoined}}
+                                        <button class="joined-btn" disabled>Joined</button>
+                                        {{else if isPending}}
+                                        <button class="pending-btn" disabled>Pending</button>
+                                        {{else}}
+                                        <button class="join-group-btn" data-group-id="{{_id}}">Join
+                                            Community</button>
+                                        {{/if}}
+                                    </div>
+                                    <div class="group-actions">
+                                        <button class="more-options-btn" aria-label="More options">•••</button>
+                                        <div class="more-options-menu"
+                                            style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ddd; border-radius: 8px; padding: 8px;">
+                                            <button class="see-group-btn" data-group-id="{{_id}}">See
+                                                Group</button>
+                                        </div>
                                     </div>
                                 </div>
+                                {{/each}}
+                            </div>
+                        </div>
 
-                                <!-- My Groups (User's own groups) -->
-                                <div class="my-groups">
-                                    <div class="flex justify-between items-center mb-4">
-                                        <h2 class="section-title">My Communities</h2>
-                                        <div class="search-container w-1/3">
-                                            <i class="fas fa-search grpsearch-icon"></i>
-                                            <input type="text" id="myGroupsSearch" class="grpsearch-input"
-                                                placeholder="Search my communities...">
-                                            <div id="myGroupsLoading" class="loading-spinner"></div>
-                                        </div>
-                                    </div>
-                                    <div id="myGroupsList">
-                                        <p id="myGroupsNoResults" style="display:none;">You haven't created or joined
-                                            any
-                                            communities yet.</p>
-
-                                        {{#each myGroups}}
-                                        <div class="group-card my-card">
-                                            <img src="{{this.g_cover}}" alt="{{this.g_name}} Image" class="group-image">
-                                            <div class="group-details">
-                                                <h3 class="group-title">{{this.g_name}}</h3>
-                                                <p class="group-description">Manage your {{this.g_type}} community with
-                                                    {{this.total_mem}} members.</p>
-                                                {{!-- <button class="manage-group-btn"
-                                                    data-group-id="{{this._id}}">Manage
-                                                    Community</button> --}}
-                                                {{#if (eq this.membershipType "admin")}}
-                                                <button class="manage-group-btn" data-group-id="{{this._id}}">Manage
-                                                    Community</button>
-                                                {{else}}
-                                                <button class="leave-group-btn" data-group-id="{{this._id}}">Leave
-                                                    Community</button>
-                                                {{/if}}
-
-
-                                            </div>
-                                            <div class="group-actions">
-                                                <button class="more-options-btn" aria-label="More options">•••</button>
-                                                <div class="more-options-menu"
-                                                    style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ddd; border-radius: 8px; padding: 8px;">
-                                                    <button class="see-group-btn" data-group-id="{{_id}}">See
-                                                        Group</button>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {{/each}}
-                                    </div>
+                        <div class="my-groups">
+                            <div class="flex justify-between items-center mb-4">
+                                <h2 class="section-title">My Communities</h2>
+                                <div class="search-container w-1/2">
+                                    <i class="fas fa-search grpsearch-icon"></i>
+                                    <input type="text" id="myGroupsSearch" class="grpsearch-input"
+                                        placeholder="Search my communities...">
+                                    <div id="myGroupsLoading" class="loading-spinner"></div>
                                 </div>
                             </div>
+                            <div id="myGroupsList">
+                                <p id="myGroupsNoResults" style="display:none;">You haven't created or joined
+                                    any
+                                    communities yet.</p>
+
+                                {{#each myGroups}}
+                                <div class="group-card my-card">
+                                    <img src="{{this.g_cover}}" alt="{{this.g_name}} Image" class="group-image">
+                                    <div class="group-details">
+                                        <h3 class="group-title">{{this.g_name}}</h3>
+                                        <p class="group-description">Manage your {{this.g_type}} community with
+                                            {{this.total_mem}} members.</p>
+                                        {{#if (eq this.membershipType "admin")}}
+                                        <button class="manage-group-btn" data-group-id="{{this._id}}">Manage
+                                            Community</button>
+                                        {{else}}
+                                        <button class="leave-group-btn" data-group-id="{{this._id}}">Leave
+                                            Community</button>
+                                        {{/if}}
+
+
+                                    </div>
+                                    <div class="group-actions">
+                                        <button class="more-options-btn" aria-label="More options">•••</button>
+                                        <div class="more-options-menu"
+                                            style="display: none; position: absolute; right: 0; background: white; border: 1px solid #ddd; border-radius: 8px; padding: 8px;">
+                                            <button class="see-group-btn" data-group-id="{{_id}}">See
+                                                Group</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {{/each}}
+                            </div>
+                        </div>
+                    </div>
                 </section>
 
+                <!-- Group Discovery Section -->
+                {{!-- <section class="group-discovery-section">
+                    <div class="group-discovery-container">
+
+                        <!-- Discover Groups Section -->
+                        <div class="discover-groups" id="discover-groups-section">
+                            <div class="section-header flex justify-between items-center mb-6">
+                                <div>
+                                    <h2 class="section-title">Discover Communities</h2>
+                                    <p class="section-subtitle">Search new groups and join them.</p>
+                                </div>
+                                <div class="search-container">
+                                    <i class="fas fa-search grpsearch-icon"></i>
+                                    <input type="text" id="discoverSearch" class="grpsearch-input"
+                                        placeholder="Search communities...">
+                                    <div id="discoverLoading" class="loading-spinner"></div>
+                                </div>
+                            </div>
+
+                            <div id="discoverGroupsList" class="comm-groups-grid">
+                                <p id="discoverNoResults" class="no-results-msg" style="display: none;">
+                                    No public communities available to join.
+                                </p>
+
+                                {{#each discoverGroups}}
+                                <article class="comm-card" data-group-name="{{this.g_name}}">
+                                    <!-- Full Width Header Image -->
+                                    <div class="comm-card-media">
+                                        <img src="{{this.g_cover}}" alt="{{this.g_name}} Cover" class="comm-group-image"
+                                            loading="lazy">
+                                        <span class="comm-group-badge">{{this.g_type}}</span>
+
+                                        <div class="comm-group-actions">
+                                            <button class="comm-more-btn" aria-label="More options">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                            </button>
+                                            <div class="comm-more-menu">
+                                                <button class="see-group-btn" data-group-id="{{_id}}">
+                                                    <i class="fas fa-external-link-alt"></i> See Group
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="comm-group-details">
+                                        <h3 class="comm-group-title">{{this.g_name}}</h3>
+                                        <p class="comm-group-description">
+                                            {{this.description}} Join this {{this.g_type}} community to connect with
+                                            others.
+                                        </p>
+
+                                        <div class="comm-card-footer">
+                                            {{#if isJoined}}
+                                            <button class="comm-status-btn joined-btn" disabled>
+                                                <i class="fas fa-check-circle me-1"></i> Joined
+                                            </button>
+                                            {{else if isPending}}
+                                            <button class="comm-status-btn pending-btn" disabled>
+                                                <i class="fas fa-clock me-1"></i> Pending
+                                            </button>
+                                            {{else}}
+                                            <button class="comm-btn join-group-btn" data-group-id="{{_id}}">
+                                                Join Community
+                                            </button>
+                                            {{/if}}
+                                        </div>
+                                    </div>
+                                </article>
+                                {{/each}}
+                            </div>
+                        </div>
+
+                        <div class="my-groups">
+                            <div class="section-header flex justify-between items-center mb-6">
+                                <div>
+                                    <h2 class="section-title">My Communities</h2>
+                                    <p class="section-subtitle">Aapke saare joined aur created groups</p>
+                                </div>
+                                <div class="search-container">
+                                    <i class="fas fa-search grpsearch-icon"></i>
+                                    <input type="text" id="myGroupsSearch" class="grpsearch-input"
+                                        placeholder="Search my communities...">
+                                    <div id="myGroupsLoading" class="loading-spinner"></div>
+                                </div>
+                            </div>
+
+                            <div id="myGroupsList" class="comm-groups-grid">
+                                <p id="myGroupsNoResults" class="no-results-msg" style="display:none;">
+                                    You haven't created or joined any communities yet.
+                                </p>
+
+                                {{#each myGroups}}
+                                <article class="comm-card my-card">
+
+                                    <div class="comm-card-media">
+                                        <img src="{{this.g_cover}}" alt="{{this.g_name}} Cover" class="comm-group-image"
+                                            loading="lazy">
+                                        <span class="comm-group-badge badge-member">{{this.total_mem}} Members</span>
+
+                                        <div class="comm-group-actions">
+                                            <button class="comm-more-btn" aria-label="More options">
+                                                <i class="fas fa-ellipsis-h"></i>
+                                            </button>
+                                            <div class="comm-more-menu">
+                                                <button class="see-group-btn" data-group-id="{{_id}}">
+                                                    <i class="fas fa-external-link-alt"></i> See Group
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="comm-group-details">
+                                        <h3 class="comm-group-title">{{this.g_name}}</h3>
+                                        <p class="comm-group-description">
+                                            Manage your {{this.g_type}} community with {{this.total_mem}} active
+                                            members.
+                                        </p>
+
+                                        <div class="comm-card-footer">
+                                            {{#if (eq this.membershipType "admin")}}
+                                            <button class="comm-btn manage-group-btn" data-group-id="{{this._id}}">
+                                                <i class="fas fa-cog me-1"></i> Manage Community
+                                            </button>
+                                            {{else}}
+                                            <button class="comm-btn leave-group-btn" data-group-id="{{this._id}}">
+                                                Leave Community
+                                            </button>
+                                            {{/if}}
+                                        </div>
+                                    </div>
+                                </article>
+                                {{/each}}
+                            </div>
+                        </div>
+
+                    </div>
+                </section> --}}
 
                 <div id="verifyMobileModal"
                     class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50"
@@ -1266,9 +1652,8 @@
                                 </div>
                             </div>
                             {{/unless}}
-                            {{#if user.mobile_verified}}
-                            {{#unless user.has_password}}
-                            <div id="passwordSection" class="space-y-4">
+
+                            <div id="passwordSection" class="space-y-4 hidden">
                                 <label for="newPassword" class="block text-sm font-medium text-gray-700">New
                                     Password</label>
                                 <input type="password" id="newPassword" name="password"
@@ -1289,8 +1674,6 @@
                                     style="display: none;">
                                 </p>
                             </div>
-                            {{/unless}}
-                            {{/if}}
                         </form>
                     </div>
 
@@ -1342,6 +1725,20 @@
                         </div>
                     </div>
                 </div>
+
+                <div id="passwordChoiceModal" class="modal-overlay" style="display:none;">
+                    <div class="modal-content" style="max-width: 400px; padding: 24px; text-align:center;">
+                        <h3 style="margin-bottom: 12px;">Mobile Verified! ✅</h3>
+                        <p style="margin-bottom: 20px; color:#374151;">
+                            Do you want to set a new password now, or continue using the temporary password?
+                        </p>
+                        <div style="display:flex; gap:10px; justify-content:center;">
+                            <button id="setNewPasswordBtn" class="send-invite-btn">Set New Password</button>
+                            <button id="skipPasswordBtn" class="close-btn">Skip for now</button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <footer class="main-footer text-center p-4 ">
                 <strong>Copyright © {{ date 'Y' }} <a href="#" style="color: #2F95FF;!important"> MySarafa
@@ -1377,7 +1774,6 @@
             <button class="kyc-required-btn">Get KYC</button>
         </div>
     </div>
-
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
@@ -1552,6 +1948,53 @@
                     loader.style.display = 'flex';
                 });
             });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const grid = document.getElementById('groupPaymentSummaryGrid');
+            // page load hote hi original server-rendered HTML cache kar lo
+            const originalSummaryHTML = grid ? grid.innerHTML : '';
+
+            document.getElementById('groupSummarySearch')?.addEventListener('input', debounce(async (e) => {
+                const query = e.target.value.trim();
+
+                if (!query) {
+                    // khali search -> reload nahi, cached original wapas daal do
+                    grid.innerHTML = originalSummaryHTML;
+                    return;
+                }
+
+                try {
+                    const res = await fetch(`/pay/search-group-summary?query=${encodeURIComponent(query)}`, {
+                        credentials: 'include'
+                    });
+                    const data = await res.json();
+
+                    if (data.success) {
+                        if (data.results.length === 0) {
+                            grid.innerHTML = `<p class="text-gray-500 text-sm">No matching community found.</p>`;
+                            return;
+                        }
+                        grid.innerHTML = data.results.map(r => `
+                    <div class="rate-item summary-card summary-cash-card">
+                        <div class="summary-icon-wrap">
+                            <img src="/img/cashImg.png" alt="${r.groupName}">
+                        </div>
+                        <div class="summary-content">
+                            <span class="text-xs text-gray-600">${r.groupName}</span>
+                            <p class="rate-value text-lg font-bold text-green-600">₹${r.total}</p>
+                            <div class="mt-2 text-sm">
+                                <p class="text-gray-500 font-medium">Total collected (verified)</p>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                    }
+                } catch (err) {
+                    console.error('Error searching group summary:', err);
+                }
+            }, 300));
         });
     </script>
     <script type="module" src="/js/firebase.js"></script>

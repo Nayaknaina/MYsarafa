@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MySarafa - Permissions</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .sidebar {
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .nav-link.active {
+            background: rgba(139, 92, 246, 0.3) !important;
+            border-left: 3px solid #8b5cf6;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626 !important;
+        }
+
+        @media (max-width: 640px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+        }
+
+        .sidebar-overlay {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .matrix th,
+        .matrix td {
+            text-align: center;
+            padding: 12px 16px;
+            white-space: nowrap;
+        }
+
+        .matrix th:first-child,
+        .matrix td:first-child {
+            text-align: left;
+        }
+
+        .matrix input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #8b5cf6;
+            cursor: pointer;
+        }
+
+        .system-tag {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            background: #ede9fe;
+            color: #6d28d9;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="flex h-screen bg-gray-100">
+        <!-- Mobile Hamburger Menu Button -->
+        <button onclick="toggleSidebar()"
+            class="md:hidden fixed top-4 left-4 z-50 bg-purple-600 text-white p-2 rounded-lg shadow-lg hover:bg-purple-700 transition">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+
+        <!-- Sidebar -->
+        <div class="sidebar w-64 text-white flex-shrink-0 fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-50"
+            id="sidebar">
+            <div class="p-6 h-full flex flex-col">
+                <div class="flex items-center justify-between mb-8">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
+                            <span class="font-bold text-lg">M</span>
+                        </div>
+                        <span class="text-xl font-bold">MySarafa</span>
+                    </div>
+                    <button onclick="toggleSidebar()" class="md:hidden text-white hover:text-gray-300">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+
+                <nav class="space-y-1 flex-1">
+                    <a href="dashboard.html"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-lg transition">
+                        <i class="fas fa-th-large w-5"></i>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="members.html"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-lg transition">
+                        <i class="fas fa-users w-5"></i>
+                        <span>Members</span>
+                    </a>
+                    <a href="kyc.html"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-lg transition">
+                        <i class="fas fa-id-card w-5"></i>
+                        <span>KYC Verification</span>
+                    </a>
+                    <a href="associations.html"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-lg transition">
+                        <i class="fas fa-building w-5"></i>
+                        <span>Groups</span>
+                    </a>
+                    <a href="roles.html"
+                        class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-lg transition">
+                        <i class="fas fa-user-tag w-5"></i>
+                        <span>Roles</span>
+                    </a>
+                    <a href="permissions.html"
+                        class="nav-link active flex items-center gap-3 px-4 py-3 rounded-lg transition">
+                        <i class="fas fa-lock w-5"></i>
+                        <span>Permissions</span>
+                    </a>
+                </nav>
+
+                <div class="mt-auto">
+                    <button onclick="handleLogout()"
+                        class="logout-btn w-full flex items-center gap-3 px-4 py-3 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600 hover:text-white transition">
+                        <i class="fas fa-sign-out-alt w-5"></i>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Overlay for mobile -->
+        <div class="fixed inset-0 bg-black/50 z-40 hidden md:hidden" id="sidebarOverlay" onclick="toggleSidebar()">
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto ml-0 md:ml-64">
+            <!-- Header -->
+            <header class="bg-white shadow-sm px-4 md:px-8 py-4 flex justify-between items-center sticky top-0 z-10">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-bold text-gray-800">Permissions</h1>
+                    <p class="text-sm text-gray-500 hidden md:block">Decide what each role can access. Check a box to
+                        grant it, uncheck to remove it — saves instantly.</p>
+                </div>
+                <div class="flex items-center gap-4">
+                    <select id="groupSelector" onchange="onGroupSelectorChange(this.value)"
+                        class="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
+                    </select>
+                    <div class="flex items-center gap-3">
+                        <span class="text-sm text-gray-600 font-medium hidden sm:block" id="adminName">Loading...</span>
+                        <div
+                            class="w-10 h-10 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold">
+                            <span id="adminInitial">A</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content -->
+            <div class="p-4 md:p-8">
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div class="p-4 border-b flex justify-between items-center">
+                        <div>
+                            <h2 class="text-base md:text-lg font-semibold text-gray-800">Role Permission Matrix</h2>
+                            <p class="text-xs text-gray-500">Roles created on the Roles page (default + custom) show up
+                                here automatically.</p>
+                        </div>
+                        <a href="roles.html" class="text-sm text-purple-600 hover:underline whitespace-nowrap">
+                            <i class="fas fa-plus mr-1"></i>Create new role
+                        </a>
+                    </div>
+                    <div class="table-wrapper">
+                        <div class="min-w-[700px]">
+                            <table class="w-full matrix" id="matrixTable">
+                                <thead>
+                                    <tr class="bg-gray-50 text-left text-xs text-gray-500 uppercase border-b"
+                                        id="matrixHead"></tr>
+                                </thead>
+                                <tbody id="matrixBody">
+                                    <tr>
+                                        <td colspan="8" class="text-center py-8 text-gray-500">
+                                            <i class="fas fa-spinner fa-spin text-2xl mb-2 block"></i>
+                                            Loading roles...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        // const ROLE_API = "http://localhost:5001/Groups/${currentGroupId}/roles";
+
+        function getRoleApi() {
+            return `http://localhost:5001/Groups/${currentGroupId}/roles`;
+        }
+
+        if (!token) {
+            window.location.href = 'login.html';
+        }
+
+        const getBasePath = () => {
+            const path = window.location.pathname;
+            return path.substring(0, path.lastIndexOf('/') + 1);
+        };
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', function (event) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            const isMobile = window.innerWidth < 768;
+            if (isMobile && sidebar && !sidebar.classList.contains('-translate-x-full')) {
+                if (!sidebar.contains(event.target) && !event.target.closest('button')) {
+                    sidebar.classList.add('-translate-x-full');
+                    overlay.classList.add('hidden');
+                }
+            }
+        });
+
+        window.addEventListener('resize', function () {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            if (window.innerWidth >= 768) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        });
+
+        // Load admin info (same as roles.html)
+        const userStr = localStorage.getItem('user');
+        if (userStr) {
+            const user = JSON.parse(userStr);
+            const fullName = user.f_name && user.l_name ? `${user.f_name} ${user.l_name}` : user.fullName || 'Admin';
+            document.getElementById('adminName').textContent = fullName;
+            document.getElementById('adminInitial').textContent = (fullName || 'A')[0].toUpperCase();
+        }
+
+        function handleLogout() {
+            localStorage.clear();
+            window.location.href = getBasePath() + 'login.html';
+        }
+
+        let allPermissions = [];
+        let allRoles = [];
+
+        function permLabel(p) {
+            return p.replace('manage_', '').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        }
+
+        async function api(url, options = {}) {
+            const res = await fetch(url, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                    ...(options.headers || {})
+                }
+            });
+            return res.json();
+        }
+
+        async function loadPermissions() {
+            const data = await api(`${getRoleApi()}/permissions`);
+            if (data.success) {
+                allPermissions = data.permissions;
+                renderHead();
+            }
+        }
+
+        function renderHead() {
+            const head = document.getElementById('matrixHead');
+            head.innerHTML = `<th class="px-4 py-3 font-semibold">Role</th>` +
+                allPermissions.map(p => `<th class="px-4 py-3 font-semibold">${permLabel(p)}</th>`).join('');
+        }
+
+
+        function renderBody() {
+            const tbody = document.getElementById('matrixBody');
+
+            if (!allRoles.length) {
+                tbody.innerHTML = `<tr><td colspan="${allPermissions.length + 1}" class="text-center py-8 text-gray-500">
+            No roles yet. <a href="roles.html" class="text-purple-600 hover:underline">Create one</a> first.
+        </td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = allRoles.map(role => {
+                const isDefault = !role.group;
+                const isAdminRole = role.roleName === 'admin';   // ⭐ admin row special treat hogi
+                return `
+        <tr class="border-b hover:bg-gray-50 transition">
+            <td class="px-4 py-3 font-medium">
+                ${role.roleName}
+                ${isDefault ? '<span class="system-tag">Default</span>' : ''}
+                ${isAdminRole ? '<span class="system-tag">Full Access</span>' : ''}
+            </td>
+            ${allPermissions.map(p => `
+                <td class="px-4 py-3">
+                    <input type="checkbox"
+                        ${isAdminRole ? 'checked disabled' : ((role.permissions || []).includes(p) ? 'checked' : '')}
+                        ${isAdminRole ? '' : `onchange="togglePermission('${role._id}', '${p}', this.checked, this)"`}>
+                </td>
+            `).join('')}
+        </tr>
+    `;
+            }).join('');
+        }
+
+        async function togglePermission(roleId, permission, isChecked, checkboxEl) {
+            checkboxEl.disabled = true;
+            const role = allRoles.find(r => r._id === roleId);
+            const currentPerms = role?.permissions || [];
+            const updated = isChecked
+                ? [...currentPerms, permission]
+                : currentPerms.filter(p => p !== permission);
+
+            const data = await api(`${getRoleApi()}/${roleId}`, {
+                method: 'PUT',
+                body: JSON.stringify({ permissions: updated })
+            });
+
+            // ⭐ Default role edit karne se naya group-specific role ban sakta hai (naya _id),
+            // isliye poori list reload karo taaki UI sahi state dikhaye
+            await loadRoles();
+        }
+
+        async function loadRoles() {
+            const data = await api(getRoleApi());
+            if (data.success) {
+                const roles = data.roles || [];
+
+                // ⭐ "admin" hamesha sabse top — baaki roles createdAt ke hisaab se (purane pehle)
+                const adminRole = roles.find(r => r.roleName === 'admin');
+                const otherRoles = roles
+                    .filter(r => r.roleName !== 'admin')
+                    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+                allRoles = adminRole ? [adminRole, ...otherRoles] : otherRoles;
+                renderBody();
+            }
+        }
+
+        // async function togglePermission(roleId, permission, isChecked, checkboxEl) {
+        //     checkboxEl.disabled = true;
+        //     const role = allRoles.find(r => r._id === roleId);
+        //     const currentPerms = role?.permissions || [];
+        //     const updated = isChecked
+        //         ? [...currentPerms, permission]
+        //         : currentPerms.filter(p => p !== permission);
+
+        //     const data = await api(`${getRoleApi()}/${roleId}`, {
+        //         method: 'PUT',
+        //         body: JSON.stringify({ permissions: updated })
+        //     });
+        //     checkboxEl.disabled = false;
+
+        //     if (data.success) {
+        //         if (role) role.permissions = data.role.permissions;
+        //     } else {
+        //         checkboxEl.checked = !isChecked;
+        //         alert(data.message || 'Failed to update permission');
+        //     }
+        // }
+
+
+        // let currentGroupId = null;
+
+        // async function initGroupContext() {
+        //     const res = await fetch('http://localhost:5001/Groups/my-groups-data', {
+        //         headers: { Authorization: `Bearer ${token}` }
+        //     });
+        //     const data = await res.json();
+        //     const myOwnedGroup = data.groups?.find(g => g.isOwner) || data.groups?.[0];
+        //     if (!myOwnedGroup) {
+        //         alert('Aapka koi group nahi hai');
+        //         return null;
+        //     }
+        //     currentGroupId = myOwnedGroup._id || myOwnedGroup.id;
+        //     return currentGroupId;
+        // }
+
+        let currentGroupId = null;
+
+        async function initGroupContext() {
+            const res = await fetch('http://localhost:5001/Groups/my-groups-data', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const data = await res.json();
+            const ownedGroups = data.groups?.filter(g => g.isOwner) || [];
+
+            if (!ownedGroups.length) {
+                document.getElementById('matrixBody').innerHTML =
+                    `<tr><td colspan="8" class="text-center py-8 text-gray-500">Aapka koi group nahi hai</td></tr>`;
+                return null;
+            }
+
+            renderGroupSelector(ownedGroups);
+
+            // Pehli baar load hone par: saved group use karo, warna pehla group
+            const savedGroupId = localStorage.getItem('lastSelectedGroupId');
+            const validSaved = ownedGroups.find(g => (g._id || g.id) === savedGroupId);
+            currentGroupId = validSaved ? savedGroupId : (ownedGroups[0]._id || ownedGroups[0].id);
+
+            const selector = document.getElementById('groupSelector');
+            if (selector) selector.value = currentGroupId;
+
+            return currentGroupId;
+        }
+
+        // ⭐ NAYA function
+        function renderGroupSelector(groups) {
+            const selector = document.getElementById('groupSelector');
+            if (!selector) return;
+            selector.innerHTML = groups.map(g =>
+                `<option value="${g._id || g.id}">${g.g_name || g.name}</option>`
+            ).join('');
+        }
+
+        function onGroupSelectorChange(selectedGroupId) {
+            currentGroupId = selectedGroupId;
+            localStorage.setItem('lastSelectedGroupId', selectedGroupId);
+            loadPermissions();
+            loadRoles();
+        }
+
+        function onGroupSelectorChange(selectedGroupId) {
+            currentGroupId = selectedGroupId;
+            loadPermissions();
+            loadRoles();
+        }
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            await initGroupContext();
+            if (!currentGroupId) return;
+            await loadPermissions();
+            await loadRoles();
+        });
+    </script>
+</body>
+
+</html>

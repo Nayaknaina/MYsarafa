@@ -176,16 +176,22 @@
         display: none;
         position: absolute;
         right: 0;
-        background: white;
-        border-radius: 0.5rem;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        top: 100%;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, .15);
+        min-width: 170px;
         z-index: 1000;
     }
 
-    .action-btn:hover+.dropdown-menu,
-    .dropdown-menu:hover {
+    .dropdown-menu.show {
         display: block;
     }
+
+    /* .action-btn:hover+.dropdown-menu,
+    .dropdown-menu:hover {
+        display: block;
+    } */
 
     .dropdown-item {
         display: flex;
@@ -648,6 +654,9 @@
         flex: 1;
         min-width: 0;
     }
+    table.dataTable thead>tr>th.sorting{
+        text-align: center;
+    }
 
     @media (max-width: 991px) {
         .filter-section {
@@ -803,7 +812,7 @@
                             <th>Mobile Number</th>
                             <th>Group</th>
                             <th>Action</th>
-                            <th>Info</th>
+                            {{!-- <th>Info</th> --}}
                         </tr>
                     </thead>
                     <tbody id="membersTableBody">
@@ -951,6 +960,7 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
     <script src="/js/all.js"></script>
+    {{!--
     <script>
 
         document.querySelector('.toggle-btn').addEventListener('click', function () {
@@ -973,6 +983,29 @@
             }
         });
 
+    </script> --}}
+    <script>
+
+        document.querySelector('.toggle-btn').addEventListener('click', function () {
+            document.querySelector('.actions').classList.toggle('show');
+        });
+
+        document.addEventListener('click', function (e) {
+            const actions = document.querySelector('.actions');
+            const toggleBtn = document.querySelector('.toggle-btn');
+            if (actions && toggleBtn) {
+                const isClickInside =
+                    actions.contains(e.target) ||
+                    toggleBtn.contains(e.target);
+                if (!isClickInside) {
+                    actions.classList.remove('show');
+                }
+            }
+            const verifyLink = e.target.closest(".verify-kyc-link");
+            if (!verifyLink) return;
+            e.preventDefault();
+            window.location.href = verifyLink.getAttribute("href");
+        });
     </script>
     <script type="module" src="/js/firebase.js"></script>
     {{> profile}}

@@ -11,6 +11,10 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    <link rel="icon" href="/assets/favicon/favicon_logo.png" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/favicon/favicon_logo.png">
+
     <style>
         .upload-wrapper {
             display: flex;
@@ -162,22 +166,42 @@
     <div class="main-container">
         {{> sidebar}}
 
-       <main class="main-content">
+        <main class="main-content">
             <div class="upload-wrapper">
                 <section class="upload-card">
                     <div class="upload-title"><i class="fas fa-cloud-upload-alt"></i> Upload Payment Screenshot</div>
                     <form id="paymentForm" enctype="multipart/form-data">
+                        <input type="hidden" id="reuploadPaymentId" value="{{paymentId}}">
+
                         <label for="Communityselection">Select Community</label>
                         <select name="community" id="Communityselection" class="upload-input" required>
                             <option value="">Select</option>
                             {{#each groups}}
-                            <option value="{{this._id}}" {{#if (eq this._id ../groupId)}}selected{{/if}}>{{this.g_name}}</option>
+                            <option value="{{this._id}}" {{#if (eq this._id ../groupId)}}selected{{/if}}>{{this.g_name}}
+                            </option>
                             {{/each}}
                         </select><br><br>
+
                         <label for="upiId">UPI ID</label>
-                        <input type="text" id="upiId" name="upiId" class="upload-input" placeholder="Enter UPI ID" required><br><br>
+                        <input type="text" id="upiId" name="upiId" class="upload-input" placeholder="Enter UPI ID"
+                            required><br><br>
+
                         <label for="amount">Amount</label>
-                        <input type="text" id="amount" name="amount" class="upload-input"  placeholder="Enter amount" required><br><br>
+                        <input type="number" id="amount" name="amount" class="upload-input" placeholder="Enter amount"
+                            required><br><br>
+
+                        <div id="periodMonthGroup">
+                            <label for="periodMonth">Payment Month</label>
+                            <input type="month" id="periodMonth" name="periodMonth" class="upload-input"><br>
+                            <div id="periodMonthError" style="color:#dc2626; font-size:13px; margin:4px 0 10px;"></div>
+                        </div>
+                        <div id="periodYearGroup" style="display:none;">
+                            <label for="periodYear">Payment Year</label>
+                            <input type="number" id="periodYear" name="periodYear" class="upload-input"
+                                placeholder="e.g. 2026"><br>
+                            <div id="periodYearError" style="color:#dc2626; font-size:13px; margin:4px 0 10px;"></div>
+                        </div>
+
                         <label for="method">Payment Method</label>
                         <select id="method" name="method" class="upload-input" required>
                             <option value="">Select Method</option>
@@ -185,11 +209,14 @@
                             <option value="Bank Transfer">Bank Transfer</option>
                             <option value="Cash">Cash</option>
                         </select><br><br>
+
                         <label for="paymentScreenshot">Select Screenshot</label>
-                        <input type="file" id="paymentScreenshot" name="paymentScreenshot" class="upload-input" accept="image/*,application/pdf" required>
+                        <input type="file" id="paymentScreenshot" name="paymentScreenshot" class="upload-input"
+                            accept="image/*,application/pdf" required>
                         <div class="upload-hint">Accepted formats: JPG, PNG, PDF. Image files will show a preview.</div>
                         <div class="upload-actions">
-                            <button type="submit" class="upload-btn" id="submitPaymentProof"><i class="fas fa-paper-plane"></i> Submit</button>
+                            <button type="submit" class="upload-btn" id="submitPaymentProof"><i
+                                    class="fas fa-paper-plane"></i> Submit</button>
                         </div>
                         <div class="preview-wrap" id="paymentPreview">
                             <div class="preview-label">Preview</div>
@@ -213,7 +240,7 @@
         </main>
     </div>
 
-<script>
+    <script>
         $(document).ready(function () {
             const paymentForm = $('#paymentForm');
             const paymentScreenshot = $('#paymentScreenshot');
@@ -242,6 +269,7 @@
             if (groupId) {
                 communitySelection.val(groupId);
                 updateSubmitButton();
+                communitySelection.trigger('change');
             }
 
             // Update submit button on input changes
@@ -274,11 +302,26 @@
             // Form submission
             paymentForm.on('submit', async function (e) {
                 e.preventDefault();
+
+                const periodMonth = $('#periodMonth').val();
+                const periodYear = $('#periodYear').val();
+                const period = periodMonth || periodYear;
+
+                if (!period) {
+                    toastr.error('Please select the payment period');
+                    submitButton.prop('disabled', false).text('Submit');
+                    return;
+                }
                 submitButton.prop('disabled', true).text('Submitting...');
 
                 const formData = new FormData(this);
                 formData.append('groupId', communitySelection.val());
-             
+                formData.append('period', period);
+
+                const reuploadId = $('#reuploadPaymentId').val();
+                if (reuploadId) {
+                    formData.append('paymentId', reuploadId);
+                }
                 try {
                     const response = await fetch('/pay/SS-upload', {
                         method: 'POST',
@@ -314,37 +357,82 @@
         }
 
         if (communitySelection) {
+            let currentPaidPeriods = [];
+
             communitySelection.addEventListener('change', async () => {
                 const groupId = communitySelection.value;
-                if (!groupId) {
-                    groupNamePreview.textContent = 'Not provided';
-                    groupDescriptionPreview.textContent = 'No description available';
-                    return;
-                }
-
+                if (!groupId) return;
                 try {
                     const response = await fetch(`/Groups/groups/${groupId}`, {
-                        method: 'GET',
                         credentials: 'include',
                         headers: { 'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0]}` }
                     });
                     const result = await response.json();
-                    console.log(result)
                     if (response.ok && result.success) {
-                      
-                 
-                           document.getElementById('amount').value = `₹ ${result.group.amount}`;
-                    } else {
-                        showNotification(result.message || 'Failed to load group details', 'error');
+                        document.getElementById('amount').value = result.group.amount;
+                        console.log("Group API:", result.group);
+                        console.log("Amount Type:", result.group.amount_type);
+                        const amountType = result.group.amount_type || 'monthly';
+
+                        const reuploadId = document.getElementById('reuploadPaymentId').value;
+                        const statusUrl = `/pay/user-period-status/${groupId}` + (reuploadId ? `?excludePaymentId=${reuploadId}` : '');
+                        const statusRes = await fetch(statusUrl, {
+                            credentials: 'include',
+                            headers: { 'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0]}` }
+                        });
+                        const statusData = await statusRes.json();
+                        currentPaidPeriods = statusData.paidPeriods || [];
+
+                        const start = new Date(statusData.createdAt);
+
+                        if (amountType === 'monthly') {
+                            document.getElementById('periodMonthGroup').style.display = 'block';
+                            document.getElementById('periodYearGroup').style.display = 'none';
+                            const minMonth = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}`;
+                            const monthInput = document.getElementById('periodMonth');
+                            monthInput.min = minMonth;
+                            monthInput.removeAttribute('max'); // future months allowed
+                            monthInput.value = '';
+                            document.getElementById('periodMonthError').textContent = '';
+                        } else {
+                            document.getElementById('periodMonthGroup').style.display = 'none';
+                            document.getElementById('periodYearGroup').style.display = 'block';
+                            const yearInput = document.getElementById('periodYear');
+                            yearInput.min = start.getFullYear();
+                            yearInput.removeAttribute('max');
+                            yearInput.value = '';
+                            document.getElementById('periodYearError').textContent = '';
+                        }
                     }
-                    
                 } catch (error) {
                     showNotification('Error loading group details: ' + error.message, 'error');
                 }
             });
+
+            // Already-paid month check
+            document.getElementById('periodMonth').addEventListener('change', function () {
+                const errorDiv = document.getElementById('periodMonthError');
+                if (this.value && currentPaidPeriods.includes(this.value)) {
+                    errorDiv.textContent = 'Payment for this month has already been completed. Please choose another month.';
+                    this.value = '';
+                } else {
+                    errorDiv.textContent = '';
+                }
+            });
+
+            // Already-paid year check
+            document.getElementById('periodYear').addEventListener('change', function () {
+                const errorDiv = document.getElementById('periodYearError');
+                if (this.value && currentPaidPeriods.includes(this.value)) {
+                    errorDiv.textContent = 'Payment for this year has already been completed. Please select a different year.';
+                    this.value = '';
+                } else {
+                    errorDiv.textContent = '';
+                }
+            });
         }
     </script>
-     <script src="/js/all.js"></script>
+    <script src="/js/all.js"></script>
 </body>
 
 </html>

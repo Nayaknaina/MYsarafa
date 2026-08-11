@@ -17,6 +17,8 @@
 
 </head> --}}
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
   .announcement-copy:active,
   .announcement-share:active {
     transform: scale(1.2);
@@ -427,6 +429,192 @@
       justify-content: center;
     }
   }
+
+  /*Test*/
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #f3f4f6;
+  }
+
+  .announcement-container {
+    width: 100%;
+    max-width: 620px;
+    margin: 30px auto;
+    padding: 0 16px;
+  }
+
+  .announcement-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* Base Card Styling matching the image */
+  .announcement-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 24px 28px;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+    position: relative;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .announcement-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.08);
+  }
+
+  /* Purple Group Badge */
+  .announcement-group {
+    display: inline-block;
+    background: #9381ff;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+
+  /* Clean Title */
+  .announcement-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e1b4b;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f5f9;
+    line-height: 1.3;
+  }
+
+  /* Body Content (Image + Text Grid) */
+  .announcement-content-body {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+  }
+
+  .announcement-img {
+    width: 130px;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+
+  .announcement-message {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #334155;
+    flex: 1;
+  }
+
+  .read-more-btn {
+    color: #9381ff;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    margin-left: 4px;
+  }
+
+  .announcement-meeting-link {
+    display: inline-block;
+    background: #eff6ff;
+    color: #2563eb;
+    padding: 6px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 12px;
+    margin-top: 8px;
+  }
+
+  /* Footer Section */
+  .announcement-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 14px;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  .announcement-user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #e2e8f0;
+  }
+
+  .user-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  .announcement-time {
+    font-size: 13px;
+    color: #94a3b8;
+    font-weight: 400;
+    margin-left: 6px;
+  }
+
+  /* Action Icons */
+  .announcement-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .action-btn {
+    color: #1e293b;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.15s ease, color 0.15s ease;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  .action-btn:hover {
+    color: #9381ff;
+    transform: scale(1.1);
+  }
+
+  .delete-action-btn {
+    color: #ef4444;
+  }
+
+  .delete-action-btn:hover {
+    color: #dc2626;
+  }
+
+  /* Responsive fixes */
+  @media (max-width: 480px) {
+    .announcement-card {
+      padding: 18px;
+    }
+
+    .announcement-content-body {
+      flex-direction: column;
+    }
+
+    .announcement-img {
+      width: 100%;
+      height: 160px;
+    }
+  }
 </style>
 
 <body data-user-id="{{user._id}}">
@@ -554,23 +742,23 @@
     const announcementList = document.getElementById('announcementList');
     announcementList.innerHTML = '';
 
-    if (announcements.length === 0) {
-      announcementList.innerHTML = '<p>No announcements found.</p>';
+    if (!announcements || announcements.length === 0) {
+      announcementList.innerHTML = '<p style="text-align:center; color:#94a3b8;">No announcements found.</p>';
       return;
     }
 
-    const messageLimit = 150; // number of characters before "Read More"
+    const messageLimit = 130;
 
     announcements.forEach(announcement => {
       const announcementCard = document.createElement('div');
       announcementCard.className = 'announcement-card';
       announcementCard.setAttribute('data-announcement-id', announcement._id);
 
-      // Format date
+      // Date formatting
       const createdAt = new Date(announcement.createdAt);
       const timeString = createdAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-      // Truncate message
+      // Truncate message handling
       let messageHtml = announcement.message;
       let needsTruncate = false;
 
@@ -584,23 +772,43 @@
         needsTruncate = true;
       }
 
+      // Default Avatar if user avatar not provided
+      const userAvatar = announcement.createdBy?.avatar
+        ? announcement.createdBy.avatar
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(announcement.createdBy?.name || 'User')}&background=9381ff&color=fff`;
+
       announcementCard.innerHTML = `
-      <div class="announcement-group">Group: ${announcement.group.name}</div>
+      <div class="announcement-group">GROUP: ${announcement.group?.name || 'COMMUNITY'}</div>
       <div class="announcement-title">${announcement.title}</div>
-      ${announcement.image ? `<img src="${announcement.image}" alt="Announcement Image" class="announcement-img">` : ''}
-      <div class="announcement-content">
-        <div class="announcement-message">${messageHtml}</div>
-        ${needsTruncate ? `<span class="read-more-btn">Read More</span>` : ""}
+      
+      <div class="announcement-content-body">
+        ${announcement.image ? `<img src="${announcement.image}" alt="Announcement Image" class="announcement-img">` : ''}
+        <div class="announcement-message">
+          ${messageHtml}
+          ${needsTruncate ? `<span class="read-more-btn">Read More</span>` : ""}
+          ${announcement.meetingLink ? `<br><a href="${announcement.meetingLink}" class="announcement-meeting-link" target="_blank"><i class="fas fa-video"></i> Join Meeting</a>` : ''}
+        </div>
+      </div>
+
+      <div class="announcement-footer">
+        <div class="announcement-user-info">
+          <img src="${userAvatar}" alt="User Avatar" class="user-avatar">
+          <span class="user-name">${announcement.createdBy?.name || 'Manager'}</span>
+          <span class="announcement-time">${timeString}</span>
+        </div>
         
         <div class="announcement-actions">
-          ${announcement.meetingLink ? `<a href="${announcement.meetingLink}" class="announcement-meeting-link" target="_blank">Join Meeting</a>` : ''}
-          <span class="announcement-copy" data-announcement='${JSON.stringify(announcement)}'><i class="fa-solid fa-copy"></i></span>
-          <span class="announcement-share" data-announcement='${JSON.stringify(announcement)}'><i class="fa-solid fa-share"></i></span>
-        </div>
-        <div class="announcement-meta">
-          <span class="announcement-user"><i class="fas fa-user-circle"></i> ${announcement.createdBy.name}</span>
-          <span class="announcement-time">${timeString}</span>
-         ${announcement.canDelete ? `<span class="Delete-btn" data-announcement-id="${announcement._id}"><i class="fa fa-trash" aria-hidden="true"></i></span>` : ''}
+          <button class="action-btn announcement-copy" title="Copy" data-announcement='${JSON.stringify(announcement)}'>
+            <i class="far fa-copy"></i>
+          </button>
+          <button class="action-btn announcement-share" title="Share" data-announcement='${JSON.stringify(announcement)}'>
+            <i class="fas fa-share-square"></i>
+          </button>
+          ${announcement.canDelete ? `
+            <button class="action-btn Delete-btn delete-action-btn" title="Delete" data-announcement-id="${announcement._id}">
+              <i class="far fa-trash-alt"></i>
+            </button>
+          ` : ''}
         </div>
       </div>
     `;
@@ -615,11 +823,11 @@
           if (moreText.style.display === "none") {
             moreText.style.display = "inline";
             dots.style.display = "none";
-            readMoreBtn.textContent = "Read Less";
+            readMoreBtn.textContent = " Read Less";
           } else {
             moreText.style.display = "none";
             dots.style.display = "inline";
-            readMoreBtn.textContent = "Read More";
+            readMoreBtn.textContent = " Read More";
           }
         });
       }

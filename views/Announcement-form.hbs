@@ -619,7 +619,7 @@
     document.addEventListener("DOMContentLoaded", () => {
       async function populateGroups() {
         try {
-          const response = await fetch('/Groups/groups', {
+          const response = await fetch('/Groups/groups?permission=manage_announcements', {   // ⭐ yahan add karo
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include'
@@ -627,9 +627,6 @@
           const result = await response.json();
           console.log("groups", result);
           if (response.ok) {
-
-
-
             const announcementGroupSelect = document.getElementById('announceGroupSelect');
             if (announcementGroupSelect) {
               announcementGroupSelect.innerHTML = '<option value="">Select Group</option>';
@@ -640,7 +637,6 @@
                 announcementGroupSelect.appendChild(option);
               });
             }
-
           } else {
             showNotification('Failed to load groups', 'error');
           }

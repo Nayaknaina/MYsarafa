@@ -20,16 +20,36 @@ exports.getRates = async (req, res) => {
     console.log("historical dates", historicalDates);
 
 
-    if (date && date !== 'latest') {
-        const start = moment(date).startOf('day').toDate();
-        const end = moment(date).endOf('day').toDate();
+    if (date && date !== "latest") {
+        const start = moment(date).startOf("day").toDate();
+        const end = moment(date).endOf("day").toDate();
+
         rates = await RateHistory.find({
-            createdAt: { $gte: start, $lte: end }
-        }).lean();
+            createdAt: {
+                $gte: start,
+                $lte: end
+            }
+        })
+            .sort({ createdAt: -1 })
+            .limit(1)
+            .lean();
+
     } else {
-        rates = await RateHistory.find().sort({ createdAt: -1 }).limit(2).lean();
+
+        rates = await RateHistory.find()
+            .sort({ createdAt: -1 })
+            .limit(1)
+            .lean();
     }
 
+    rates = rates.map(rate => ({
+        ...rate,
+
+        gold24k: Number(rate.gold || 0),
+        gold22k: Number(((rate.gold || 0) * 22 / 24).toFixed(2)),
+        gold18k: Number(((rate.gold || 0) * 18 / 24).toFixed(2))
+    }));
+    console.log(rates);
 
     if (req.xhr || req.headers.accept.indexOf('json') > -1) {
 
@@ -39,6 +59,7 @@ exports.getRates = async (req, res) => {
         res.render('goldPrices', {
             rates,
             historicalDates,
+            selectedDate: date || "",
             title: 'Live Precious Metal Rates',
             noData: rates.length === 0
         });
@@ -209,6 +230,7 @@ exports.fetchMetalRates = async () => {
         });
 
         const result = response.data;
+        console.log(result);
 
         const goldPrice = result?.metals?.mcx_gold || 0;
         const silverPrice = result?.metals?.mcx_silver || 0;
@@ -226,7 +248,7 @@ exports.fetchMetalRates = async () => {
         let silver_chp = 0;
 
         // calculate only if previous exists
-        if (prevRate && prevRate.gold != null && prevRate.silver != null){
+        if (prevRate && prevRate.gold != null && prevRate.silver != null) {
 
             // GOLD
             gold_ch = Number(Math.abs(goldPrice - prevRate.gold).toFixed(2));
@@ -285,3 +307,14 @@ cron.schedule('0 0 * * *', () => {
     exports.fetchMetalRates();
 
 }, { timezone: 'Asia/Kolkata' });
+
+// EACH SECOND
+
+// const cron = require('node-cron');
+
+// cron.schedule('* * * * * *', async () => {
+//     console.log('⏰ Cron running every second');
+//     await exports.fetchMetalRates();
+// }, {
+//     timezone: 'Asia/Kolkata'
+// });

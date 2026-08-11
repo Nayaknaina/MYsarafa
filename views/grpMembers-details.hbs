@@ -5,6 +5,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+
+    <link rel="icon" href="/assets/favicon/favicon_logo.png" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/favicon/favicon_logo.png">
+
   <title>Member Details - KYC Verification</title>
   <style>
     * {
@@ -469,8 +473,8 @@
             <div class="avatar-container">
               <img src="{{#if user.profilePicture}}{{user.profilePicture}}{{else}}/Assets/Images/imgperson{{/if}}"
                 class="avatar" height="80" width="80">
-              <div class="verification-badge" id="verificationBadge"
-                style="display: {{#if user.user_status}}flex{{else}}none{{/if}};">
+              <div class="verification-badge" id="verificationBadge" style="display: {{#ifEquals user.user_status "
+                verified"}}flex{{else}}none{{/ifEquals}};">
                 <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
                   <path d="M9 12l2 2 4-4"></path>
                   <circle cx="12" cy="12" r="10"></circle>
@@ -480,8 +484,13 @@
             <div class="profile-info">
               <h2>{{user.fullName}}</h2>
               <div class="member-status" id="memberStatus">
-                <span class="status-badge {{#if user.user_status}}verified{{else}}pending{{/if}}">
-                  {{#if user.user_status}}Verified{{else}}Pending Verification{{/if}}
+                <span class="status-badge {{#ifEquals user.user_status "
+                  verified"}}verified{{else}}pending{{/ifEquals}}">
+                  {{#ifEquals user.user_status "verified"}}
+                  Verified
+                  {{else}}
+                  Pending Verification
+                  {{/ifEquals}}
                 </span>
               </div>
               <p class="join-date">Joined: {{formatDate user.createdAt}}</p>
@@ -560,13 +569,17 @@
     </div>
 
     <!-- Verify Button -->
-    <button class="verify-btn {{#if user.user_status}}verified{{/if}}" id="verifyBtn" {{#if
-      user.user_status}}disabled{{/if}}>
+    <button class="verify-btn {{#ifEquals user.user_status " verified"}}verified{{/ifEquals}}" id="verifyBtn"
+      {{#ifEquals user.user_status "verified" }}disabled{{/ifEquals}}>
       <svg class="verify-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
         <path d="M9 12l2 2 4-4"></path>
         <circle cx="12" cy="12" r="10"></circle>
       </svg>
-      {{#if user.user_status}}Verified{{else}}Verify Member{{/if}}
+      {{#ifEquals user.user_status "verified"}}
+      Verified
+      {{else}}
+      Verify Member
+      {{/ifEquals}}
     </button>
 
     <!-- Success Modal -->

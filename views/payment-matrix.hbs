@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sarafa Community Dashboard</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+    {{!-- Date Range JS CDN --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/daterangepicker@3.1/daterangepicker.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/daterangepicker@3.1/daterangepicker.min.js"></script>
+
+    {{!-- Logo --}}
+    <link rel="icon" href="/assets/favicon/favicon_logo.png" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/favicon/favicon_logo.png">
+
+    <style>
+        .matrix-wrapper {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(47, 149, 255, .1);
+            padding: 20px;
+            min-height: calc(100vh - 120px);
+            margin-bottom: 70px;
+            padding-bottom: 40px;
+        }
+
+        .matrix-controls {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            margin-bottom: 25px;
+        }
+
+        .matrix-table-container {
+            overflow: auto;
+            max-height: 520px;
+            border: 1px solid #edf2f7;
+            border-radius: 16px;
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .matrix-table th,
+        .matrix-table td {
+            padding: 16px;
+            border-bottom: 1px solid #eef2f7;
+            text-align: center;
+        }
+
+        .matrix-table th {
+            background: #f8fbff;
+            color: #334155;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .matrix-table tbody tr {
+            transition: .2s;
+        }
+
+        .matrix-table tbody tr:hover {
+            background: #f8fbff;
+        }
+
+        .member-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .matrix-table td.member-name {
+            position: sticky;
+            left: 0;
+            background: #fff;
+            z-index: 11;
+        }
+
+        .matrix-table th.member-name-header {
+            position: sticky;
+            top: 0;
+            left: 0;
+            background: #f8fbff;
+            z-index: 10;
+        }
+
+        .matrix-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background: #f8fbff;
+        }
+
+        .member-name-header {
+            z-index: 20 !important;
+        }
+
+        .status-icon {
+            width: 34px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 15px;
+        }
+
+        .status-verified {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .status-missing {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .status-upcoming {
+            background: #f3f4f6;
+            color: #9ca3af;
+        }
+
+        .month-range-panel {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 100;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            padding: 16px;
+            margin-top: 6px;
+            width: 760px;
+            max-width: 95vw;
+            max-height: 80vh;
+            overflow: hidden;
+        }
+
+        .month-range-panel.active {
+            display: block;
+        }
+
+        .mrp-body {
+            display: flex;
+            gap: 24px;
+        }
+
+        .mrp-calendar {
+            flex: 1;
+        }
+
+        .mrp-cal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .mrp-cal-header button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #2f95ff;
+            padding: 2px 6px;
+        }
+
+        .mrp-cal-header button:disabled {
+            color: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .mrp-months-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .mrp-month-cell {
+            text-align: center;
+            padding: 8px 0;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            color: #374151;
+        }
+
+        .mrp-month-cell:hover:not(.mrp-disabled) {
+            background: #f3f4f6;
+        }
+
+        .mrp-month-cell.mrp-in-range {
+            background: #e7f3ff;
+            color: #1d7dd8;
+        }
+
+        .mrp-month-cell.mrp-start,
+        .mrp-month-cell.mrp-end {
+            background: #2f95ff;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .mrp-month-cell.mrp-start:hover,
+        .mrp-month-cell.mrp-end:hover {
+            background: #2f95ff;
+            color: #fff;
+        }
+
+        .mrp-month-cell.mrp-disabled {
+            color: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .mrp-footer {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #f1f5f9;
+        }
+
+        .mrp-footer>div {
+            display: flex;
+            gap: 8px;
+        }
+
+        .mrp-selected-text {
+            margin-right: auto;
+        }
+
+        /* New Design */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .dashboard-header h2 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .dashboard-header p {
+            margin-top: 6px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .header-badge {
+            background: #eef6ff;
+            color: #2f95ff;
+            padding: 10px 18px;
+            border-radius: 30px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            border-radius: 14px;
+            padding: 16px 18px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: #fff;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, .08);
+        }
+
+        .stat-card h3 {
+            margin: 0;
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .stat-card span {
+            font-size: 13px;
+            opacity: .95;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .blue {
+            background: linear-gradient(135deg, #4f8dfd, #1d4ed8);
+        }
+
+        .green {
+            background: linear-gradient(135deg, #34d399, #059669);
+        }
+
+        .orange {
+            background: linear-gradient(135deg, #fbbf24, #ea580c);
+        }
+
+        .purple {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+        }
+
+        .tracker-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 24px;
+            margin-top: 30px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, .06);
+        }
+
+        .tracker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .tracker-header h3 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        .tracker-header p {
+            margin-top: 6px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        /*Filters ko card jaisa look dene ke liye */
+        .matrix-controls>div {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #4b5563;
+        }
+
+        .filter-input {
+            height: 46px;
+            border: 1px solid #dbe3ef;
+            border-radius: 10px;
+            padding: 0 14px;
+            background: #fff;
+            transition: .25s;
+        }
+
+        .filter-input:focus {
+            border-color: #2f95ff;
+            box-shadow: 0 0 0 4px rgba(47, 149, 255, .15);
+            outline: none;
+        }
+
+        /* ================= MOBILE ================= */
+        @media (max-width:768px) {
+
+            .matrix-wrapper {
+                padding: 14px;
+                min-height: auto;
+                margin-bottom: 170px;
+            }
+
+            /* Header */
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .dashboard-header h2 {
+                font-size: 22px;
+            }
+
+            .dashboard-header p {
+                display: none;
+            }
+
+            .header-badge {
+                display: none;
+            }
+
+            /* Stats */
+            .dashboard-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                margin-bottom: 18px;
+            }
+
+            .stat-card {
+                padding: 12px;
+                gap: 10px;
+                border-radius: 12px;
+            }
+
+            .stat-icon {
+                width: 38px;
+                height: 38px;
+                font-size: 16px;
+            }
+
+            .stat-card h3 {
+                font-size: 16px;
+            }
+
+            .stat-card span {
+                font-size: 11px;
+            }
+
+            /* Tracker */
+            .tracker-card {
+                padding: 16px;
+                margin-top: 18px;
+            }
+
+            .tracker-header {
+                margin-bottom: 15px;
+            }
+
+            .tracker-header h3 {
+                font-size: 20px;
+            }
+
+            .tracker-header p {
+                display: none;
+            }
+
+            /* Filters */
+            .matrix-controls {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .matrix-controls>div {
+                width: 100%;
+            }
+
+            .filter-input {
+                width: 100% !important;
+                min-width: 100% !important;
+            }
+
+            /* Month Picker */
+            .mrp-body {
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .mrp-calendar {
+                width: 100%;
+            }
+
+            .month-range-panel {
+                left: 50%;
+                transform: translateX(-50%);
+                width: 95vw;
+                max-height: 85vh;
+            }
+
+            /* Table */
+            .matrix-table-container {
+                max-height: 420px;
+                overflow: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .matrix-table {
+                min-width: 650px;
+            }
+
+            .matrix-table th,
+            .matrix-table td {
+                padding: 12px 10px;
+                font-size: 12px;
+            }
+
+            .status-icon {
+                width: 28px;
+                height: 28px;
+                font-size: 13px;
+            }
+
+            /*Calender Date filter*/
+            .month-range-panel {
+                width: 95vw;
+                max-width: 95vw;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 12px;
+                max-height: 80vh;
+                overflow-y: auto;
+            }
+
+            .mrp-body {
+                flex-direction: column;
+            }
+
+            .mrp-calendar {
+                width: 100%;
+            }
+
+            .mrp-month-cell {
+                padding: 6px 0;
+                font-size: 12px;
+            }
+
+            .mrp-footer {
+                position: sticky;
+                bottom: 0;
+                background: #fff;
+                padding-top: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body data-user-id="{{user._id}}">
+    {{> header}}
+    <div class="main-container">
+        {{> sidebar}}
+        <main class="main-content">
+            <div class="matrix-wrapper">
+                <div class="dashboard-header">
+                    <div>
+                        <h2><i class="fas fa-credit-card"></i> Payment Tracker</h2>
+                        <p>Track monthly payment status of all association members.</p>
+                    </div>
+
+                    <div class="header-badge">
+                        <i class="fas fa-calendar-alt"></i>
+                        Payment Matrix
+                    </div>
+                </div>
+
+                <div class="dashboard-stats">
+
+                    <div class="stat-card blue">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <h3 id="totalMembers">0</h3>
+                            <span>Total Members</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card green">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div>
+                            <h3 id="paidMembers">0</h3>
+                            <span>Paid This Month</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card orange">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div>
+                            <h3 id="pendingMembers">0</h3>
+                            <span>Pending Payments</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card purple">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar"></i>
+                        </div>
+                        <div>
+                            <h3 id="selectedPeriod">--</h3>
+                            <span>Selected Period</span>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tracker-card">
+
+                    <div class="tracker-header">
+                        <div>
+                            <h3>
+                                Payment Matrix
+                            </h3>
+
+                            <p>
+                                View member-wise monthly payment history.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="matrix-controls">
+                        {{!-- style="display:flex; gap:16px; flex-wrap:wrap; align-items:flex-end; max-width:none;">
+                        --}}
+                        <div>
+                            <label class="filter-label">Select Association</label>
+                            <select id="matrixGroupSelect" class="filter-input" style="min-width:220px;">
+                                <option value="">Choose a group</option>
+                                {{#each groups}}
+                                <option value="{{this._id}}">{{this.g_name}}</option>
+                                {{/each}}
+                            </select>
+                        </div>
+                        <div id="yearFilterGroup" style="display:none; position:relative;">
+                            <label class="filter-label">Year Range</label>
+
+                            <input type="text" id="matrixYearRangeInput" class="filter-input" readonly
+                                placeholder="Select Year Range"
+                                style="min-width:220px; cursor:pointer; background:#fff;">
+
+                            <div id="yearRangePanel" class="month-range-panel">
+                                <div class="mrp-body">
+                                    <div class="mrp-calendar" id="yrLeftCal"></div>
+                                    <div class="mrp-calendar" id="yrRightCal"></div>
+                                </div>
+
+                                <div class="mrp-footer">
+                                    <span id="yrSelectedText" class="mrp-selected-text"></span>
+
+                                    <div>
+                                        <button id="yrCancelBtn" class="action-btn">
+                                            Cancel
+                                        </button>
+
+                                        <button id="yrApplyBtn" class="action-btn primary">
+                                            Apply
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="dateRangeFilterGroup" style="display:none; position:relative;">
+                            <label class="filter-label">Month/Year Range</label>
+                            <input type="text" id="matrixDateRangeInput" class="filter-input" placeholder="Select range"
+                                readonly style="min-width:220px; cursor:pointer; background:#fff;">
+
+                            <div id="monthRangePanel" class="month-range-panel">
+                                <div class="mrp-body">
+                                    <div class="mrp-calendar" id="mrpLeftCal"></div>
+                                    <div class="mrp-calendar" id="mrpRightCal"></div>
+                                </div>
+                                <div class="mrp-footer">
+                                    <span id="mrpSelectedText" class="mrp-selected-text"></span>
+                                    <div>
+                                        <button type="button" class="action-btn" id="mrpCancelBtn">Cancel</button>
+                                        <button type="button" class="action-btn primary" id="mrpApplyBtn">Apply</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="rangeFilterGroup" style="display:none;">
+                            <label class="filter-label">Range</label>
+                            <select id="matrixRangeSelect" class="filter-input">
+                                <option value="recent6">Recent 6 Months</option>
+                                <option value="h1">Jan - Jun</option>
+                                <option value="h2">Jul - Dec</option>
+                            </select>
+                        </div>
+                        <div id="memberFilterGroup" style="display:none;">
+                            <label class="filter-label">Search Member</label>
+                            <input type="text" id="matrixMemberSearch" class="filter-input"
+                                placeholder="Enter member name" style="min-width:400px;">
+                        </div>
+                    </div>
+
+                    <div class="matrix-table-container" id="matrixContainer" style="margin-top:20px;">
+                        <p style="color:#6b7280;">Select a group to view the matrix.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    {{!--
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
+
+    <script>
+        let matrixData = null;
+        let selectedStart = null;
+        let selectedEnd = null;
+
+        let mrpMinKey = null, mrpMaxKey = null;
+        let mrpLeftYear = null, mrpRightYear = null;
+        let mrpPendingStart = null, mrpPendingEnd = null;
+
+        let selectedYearStart = null;
+        let selectedYearEnd = null;
+
+        let yrMin = null;
+        let yrMax = null;
+
+        let yrLeft = null;
+        let yrRight = null;
+
+        let yrPendingStart = null;
+        let yrPendingEnd = null;
+
+        $('#matrixGroupSelect').on('change', async function () {
+            const groupId = $(this).val();
+            const container = $('#matrixContainer');
+            $('#dateRangeFilterGroup, #memberFilterGroup').hide();
+            $('#monthRangePanel').removeClass('active');
+            if (!groupId) {
+
+                matrixData = null;
+
+                $("#totalMembers").text("0");
+                $("#paidMembers").text("0");
+                $("#pendingMembers").text("0");
+                $("#selectedPeriod").text("--");
+
+                container.html('<p style="color:#6b7280;">Select a group to view the matrix.</p>');
+
+                return;
+            }
+
+            container.html('<p>Loading...</p>');
+            try {
+                const res = await fetch(`/pay/payment-matrix-data/${groupId}`, {
+                    credentials: 'include',
+                    headers: { 'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0] || ''}` }
+                });
+                const data = await res.json();
+                if (!res.ok || !data.success) { container.html(`<p style="color:#dc2626;">${data.message || 'Failed to load data'}</p>`); return; }
+                if (data.matrix.length === 0) { container.html('<p style="color:#6b7280;">Is group me koi member nahi hai.</p>'); return; }
+
+                matrixData = data;
+
+                const memberSel = $('#matrixMemberSelect');
+                memberSel.html('<option value="">All Members</option>');
+                data.matrix.forEach(m => memberSel.append(`<option value="${m.memberId}">${m.memberName}</option>`));
+                $('#memberFilterGroup').show();
+
+                if (data.amountType === "monthly") {
+
+                    const periods = data.periods;
+                    const defaultFromIdx = Math.max(0, periods.length - 6);
+
+                    selectedStart = periods[defaultFromIdx].key;
+                    selectedEnd = periods[periods.length - 1].key;
+
+                    initMonthRangePicker(periods);
+
+                    $("#dateRangeFilterGroup").show();
+                    $("#yearFilterGroup").hide();
+
+                } else {
+
+                    $("#dateRangeFilterGroup").hide();
+                    $("#yearFilterGroup").show();
+
+                    const yearSelect = $("#matrixYearSelect");
+                    const periods = data.periods;
+
+                    selectedYearStart = periods[Math.max(0, periods.length - 4)].key;
+
+                    selectedYearEnd = periods[periods.length - 1].key;
+
+                    initYearRangePicker(periods);
+
+                    $("#yearFilterGroup").show();
+                }
+                renderMatrix();
+            } catch (err) {
+                container.html(`<p style="color:#dc2626;">Error: ${err.message}</p>`);
+            }
+        });
+
+        $('#matrixMemberSearch').on('input', debounce(renderMatrix, 200));
+
+        function debounce(fn, wait) {
+            let t;
+            return function (...args) { clearTimeout(t); t = setTimeout(() => fn.apply(this, args), wait); };
+        }
+
+        // ---------- Month Range Picker ----------
+
+        function initMonthRangePicker(periods) {
+            mrpMinKey = periods[0].key;
+            mrpMaxKey = periods[periods.length - 1].key;
+
+            mrpPendingStart = selectedStart;
+            mrpPendingEnd = selectedEnd;
+
+            const startYear = parseInt(selectedStart.split('-')[0], 10);
+            const endYear = parseInt(selectedEnd.split('-')[0], 10);
+            mrpLeftYear = startYear;
+            mrpRightYear = endYear > startYear ? endYear : startYear + 1;
+
+            updateDateRangeInputText();
+            renderMonthRangePanel();
+        }
+
+        function initYearRangePicker(periods) {
+            yrMin = parseInt(periods[0].key);
+            yrMax = parseInt(periods[periods.length - 1].key);
+            yrPendingStart = parseInt(selectedYearStart);
+            yrPendingEnd = parseInt(selectedYearEnd);
+            yrLeft = yrMin;
+            yrRight = yrMin + 8;
+            updateYearInput();
+            renderYearPanel();
+        }
+
+        function keyToLabel(key) {
+            const [y, m] = key.split('-');
+            const d = new Date(parseInt(y, 10), parseInt(m, 10) - 1, 1);
+            return d.toLocaleString('en-US', { month: 'short', year: 'numeric' });
+        }
+
+        function updateDateRangeInputText() {
+            $('#matrixDateRangeInput').val(`${keyToLabel(selectedStart)} - ${keyToLabel(selectedEnd)}`);
+        }
+
+        function renderMonthRangePanel() {
+            $('#mrpLeftCal').html(buildCalendarHtml(mrpLeftYear, 'left'));
+            $('#mrpRightCal').html(buildCalendarHtml(mrpRightYear, 'right'));
+            updateMrpSelectedText();
+        }
+
+        function buildCalendarHtml(year, side) {
+            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const minYear = parseInt(mrpMinKey.split('-')[0], 10);
+            const maxYear = parseInt(mrpMaxKey.split('-')[0], 10);
+            const prevDisabled = year <= minYear;
+            const nextDisabled = year >= maxYear;
+
+            let html = `<div class="mrp-cal-header">
+        <button type="button" class="mrp-nav-prev" data-side="${side}" ${prevDisabled ? 'disabled' : ''}>&laquo;</button>
+        <span>${year}</span>
+        <button type="button" class="mrp-nav-next" data-side="${side}" ${nextDisabled ? 'disabled' : ''}>&raquo;</button>
+    </div>
+    <div class="mrp-months-grid">`;
+
+            for (let m = 0; m < 12; m++) {
+                const key = `${year}-${String(m + 1).padStart(2, '0')}`;
+                const disabled = key < mrpMinKey || key > mrpMaxKey;
+                let cls = 'mrp-month-cell';
+                if (disabled) cls += ' mrp-disabled';
+                if (mrpPendingStart === key) cls += ' mrp-start';
+                if (mrpPendingEnd === key) cls += ' mrp-end';
+                if (mrpPendingStart && mrpPendingEnd && key > mrpPendingStart && key < mrpPendingEnd) cls += ' mrp-in-range';
+                html += `<div class="${cls}" data-key="${key}">${monthNames[m]}</div>`;
+            }
+            html += `</div>`;
+            return html;
+        }
+
+        function updateMrpSelectedText() {
+            if (mrpPendingStart && mrpPendingEnd) {
+                $('#mrpSelectedText').text(`${keyToLabel(mrpPendingStart)} - ${keyToLabel(mrpPendingEnd)}`);
+            } else if (mrpPendingStart) {
+                $('#mrpSelectedText').text(`${keyToLabel(mrpPendingStart)} - ...`);
+            } else {
+                $('#mrpSelectedText').text('Select start month');
+            }
+        }
+
+        $(document).on('click', '#matrixDateRangeInput', function (e) {
+            e.stopPropagation();
+            $('#monthRangePanel').toggleClass('active');
+        });
+
+        $(document).on('click', '.mrp-month-cell:not(.mrp-disabled)', function (e) {
+            e.stopPropagation();
+            const key = $(this).data('key');
+            if (!mrpPendingStart || (mrpPendingStart && mrpPendingEnd)) {
+                mrpPendingStart = key;
+                mrpPendingEnd = null;
+            } else if (key < mrpPendingStart) {
+                mrpPendingEnd = mrpPendingStart;
+                mrpPendingStart = key;
+            } else {
+                mrpPendingEnd = key;
+            }
+            renderMonthRangePanel();
+        });
+
+        $(document).on('click', '.mrp-nav-prev', function (e) {
+            e.stopPropagation();
+            if ($(this).data('side') === 'left') mrpLeftYear--; else mrpRightYear--;
+            renderMonthRangePanel();
+        });
+
+        $(document).on('click', '.mrp-nav-next', function (e) {
+            e.stopPropagation();
+            if ($(this).data('side') === 'left') mrpLeftYear++; else mrpRightYear++;
+            renderMonthRangePanel();
+        });
+
+        $(document).on('click', '#mrpApplyBtn', function () {
+            if (mrpPendingStart && mrpPendingEnd) {
+                selectedStart = mrpPendingStart;
+                selectedEnd = mrpPendingEnd;
+                updateDateRangeInputText();
+                renderMatrix();
+            }
+            $('#monthRangePanel').removeClass('active');
+        });
+
+        $(document).on('click', '#mrpCancelBtn', function () {
+            mrpPendingStart = selectedStart;
+            mrpPendingEnd = selectedEnd;
+            $('#monthRangePanel').removeClass('active');
+        });
+
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('#dateRangeFilterGroup').length) {
+                $('#monthRangePanel').removeClass('active');
+            }
+        });
+
+        // ---------- Matrix Rendering ----------
+
+        function renderMatrix() {
+            if (!matrixData) return;
+            const container = $('#matrixContainer');
+            let periods = matrixData.periods;
+
+            if (matrixData.amountType === "yearly") {
+
+                periods = periods.filter(p =>
+
+                    Number(p.key) >= selectedYearStart &&
+
+                    Number(p.key) <= selectedYearEnd
+
+                );
+
+            }
+            else if (selectedStart && selectedEnd) {
+
+                periods = periods.filter(
+                    p => p.key >= selectedStart && p.key <= selectedEnd
+                );
+
+            }
+
+            if (matrixData.amountType === 'monthly' && selectedStart && selectedEnd) {
+                periods = periods.filter(p => p.key >= selectedStart && p.key <= selectedEnd);
+            }
+
+            if (periods.length === 0) {
+                container.html('<p style="color:#6b7280;">Is period ke liye data nahi hai (group creation date se pehle ka data nahi dikhta).</p>');
+                return;
+            }
+
+            const periodKeys = periods.map(p => p.key);
+            const searchTerm = $('#matrixMemberSearch').val().trim().toLowerCase();
+            const rows = searchTerm
+                ? matrixData.matrix.filter(r => r.memberName.toLowerCase().includes(searchTerm))
+                : matrixData.matrix;
+
+            if (rows.length === 0) {
+                container.html('<p style="color:#6b7280;">Koi member match nahi hua.</p>');
+                return;
+            }
+
+            let html = '<table class="matrix-table"><thead><tr><th class="member-name-header">Member</th>';
+            periods.forEach(p => html += `<th>${p.label}</th>`);
+            html += '</tr></thead><tbody>';
+
+            rows.forEach(row => {
+                console.log(row.cells);
+                html += `<tr><td class="member-name">${row.memberName}</td>`;
+                row.cells.filter(c => periodKeys.includes(c.period)).forEach(cell => {
+                    console.log(cell.status);
+                    let icon;
+                    if (cell.status === 'verified') icon = '<i class="fas fa-check-circle status-icon status-verified" title="Verified"></i>';
+                    else if (cell.status === 'pending') icon = '<i class="fas fa-clock status-icon status-pending" title="Pending / Reupload Required"></i>';
+                    else if (cell.status === 'upcoming') icon = '<i class="fas fa-minus status-icon status-upcoming" title="Not due yet"></i>';
+                    else icon = '<i class="fas fa-times-circle status-icon status-missing" title="Not Paid"></i>';
+                    html += `<td>${icon}</td>`;
+                });
+                html += '</tr>';
+            });
+            html += '</tbody></table>';
+            container.html(html);
+
+            // Total Members, paid,pending, selected range, 
+            const totalMembers = rows.length;
+
+            // Current selected month (range ka last month)
+            const now = new Date();
+
+            const currentPeriod =
+                now.getFullYear() +
+                "-" +
+                String(now.getMonth() + 1).padStart(2, "0");
+
+            let paid = 0;
+            let pending = 0;
+
+            rows.forEach(row => {
+                const payment = row.cells.find(c => c.period === currentPeriod);
+
+                if (!payment) return;
+
+                if (payment.status === "verified") {
+                    paid++;
+                } else if (
+                    payment.status === "pending" ||
+                    payment.status === "missing"
+                ) {
+                    pending++;
+                }
+            });
+
+            $("#totalMembers").text(rows.length);
+            $("#paidMembers").text(paid);
+            $("#pendingMembers").text(pending);
+
+            if (matrixData.amountType === "yearly") {
+                $("#selectedPeriod").text(
+                    `${periods[0].label} - ${periods[periods.length - 1].label}`
+                );
+            } else {
+                $("#selectedPeriod").text(
+                    `${periods[0].label} - ${periods[periods.length - 1].label}`
+                );
+            }
+        }
+        $("#yrApplyBtn").click(function () {
+
+            if (!yrPendingStart || !yrPendingEnd)
+                return;
+
+            selectedYearStart = yrPendingStart;
+            selectedYearEnd = yrPendingEnd;
+
+            updateYearInput();
+
+            renderMatrix();
+
+            $("#yearRangePanel").removeClass("active");
+
+        });
+
+        $(document).on("click", "#matrixYearRangeInput", function (e) {
+            e.stopPropagation();
+            $("#yearRangePanel").toggleClass("active");
+        });
+
+        $(document).on("click", function (e) {
+            if (!$(e.target).closest("#yearFilterGroup").length) {
+                $("#yearRangePanel").removeClass("active");
+            }
+        });
+        $("#yrCancelBtn").click(function () {
+
+            yrPendingStart = selectedYearStart;
+            yrPendingEnd = selectedYearEnd;
+
+            renderYearPanel();
+
+            $("#yearRangePanel").removeClass("active");
+
+        });
+
+        $(document).on("click", "#yearRangePanel .mrp-month-cell", function () {
+
+            const year = parseInt($(this).data("year"));
+
+            if (!yrPendingStart || yrPendingEnd) {
+
+                yrPendingStart = year;
+
+                yrPendingEnd = null;
+
+            }
+            else {
+
+                if (year < yrPendingStart) {
+
+                    yrPendingEnd = yrPendingStart;
+
+                    yrPendingStart = year;
+
+                }
+                else {
+
+                    yrPendingEnd = year;
+
+                }
+
+            }
+
+            renderYearPanel();
+
+        });
+
+        function buildYearGrid(start) {
+
+            let html = "";
+
+            html += `
+    <div class="mrp-cal-header">
+        <button class="yrPrev">&laquo;</button>
+
+        <span>${start} - ${start + 8}</span>
+
+        <button class="yrNext">&raquo;</button>
+    </div>
+
+    <div class="mrp-months-grid">
+    `;
+
+            for (let i = 0; i < 9; i++) {
+
+                const year = start + i;
+
+                const disabled = year < yrMin || year > yrMax;
+
+                let cls = "mrp-month-cell";
+
+                if (disabled)
+                    cls += " mrp-disabled";
+
+                if (year == yrPendingStart)
+                    cls += " mrp-start";
+
+                if (year == yrPendingEnd)
+                    cls += " mrp-end";
+
+                if (year > yrPendingStart && year < yrPendingEnd)
+                    cls += " mrp-in-range";
+
+                html += `
+        <div
+            class="${cls}"
+            data-year="${year}">
+            ${year}
+        </div>
+        `;
+            }
+            html += "</div>";
+            return html;
+        }
+
+        function renderYearPanel() {
+            $("#yrLeftCal").html(buildYearGrid(yrLeft));
+            $("#yrRightCal").html(buildYearGrid(yrRight));
+            updateYearText();
+        }
+        function updateYearInput() {
+            $("#matrixYearRangeInput").val(
+                `${selectedYearStart} - ${selectedYearEnd}`
+            );
+        }
+        $(document).on("click", ".yrPrev", function () {
+            yrLeft -= 9;
+            yrRight -= 9;
+            if (yrLeft < yrMin) {
+                yrLeft = yrMin;
+                yrRight = yrMin + 8;
+            }
+            renderYearPanel();
+        });
+
+        $(document).on("click", ".yrNext", function () {
+            yrLeft += 9;
+            yrRight += 9;
+            if (yrRight > yrMax) {
+                yrRight = yrMax;
+                yrLeft = Math.max(yrMin, yrMax - 8);
+            }
+            renderYearPanel();
+        });
+        function updateYearText() {
+            if (yrPendingStart && yrPendingEnd) {
+
+                $("#yrSelectedText").text(
+                    yrPendingStart + " - " + yrPendingEnd
+                );
+
+            }
+            else if (yrPendingStart) {
+                $("#yrSelectedText").text(
+                    yrPendingStart
+                );
+            }
+            else {
+                $("#yrSelectedText").text(
+                    "Select year"
+                );
+            }
+        }
+    </script>
+    {{!-- Total member, pending wghr sab --}}
+    {{!--
+    <script>
+        $('#totalMembers').text(rows.length);
+
+        $('#selectedPeriod').text(
+            `${periods[0].label} - ${periods[periods.length - 1].label}`
+        );
+
+        let paid = 0;
+        let pending = 0;
+
+        rows.forEach(row => {
+            const current = row.cells.find(c => c.period === periods[periods.length - 1].key);
+
+            if (current) {
+                if (current.status === "verified") paid++;
+                else if (current.status === "pending" || current.status === "missing")
+                    pending++;
+            }
+        });
+
+        $('#paidMembers').text(paid);
+        $('#pendingMembers').text(pending);
+    </script> --}}
+    <script src="/js/all.js"></script>
+</body>

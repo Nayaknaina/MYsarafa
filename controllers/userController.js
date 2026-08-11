@@ -11,6 +11,7 @@ const Business = require('../models/Business.model');
 const Gmem = require('../models/groupMem.model');
 const LedgerTxn = require('../models/ledgerTx.model');
 const LedgerCustomer = require('../models/ledger.model')
+const paymentController = require('./membershipController');
 const { getSignedUrl } = require('../middleware/multer');
 
 
@@ -197,6 +198,7 @@ exports.dashboard = async (req, res, next) => {
       totals.cashGet = lx.total_amount_in || 0;
       totals.cashGive = lx.total_amount_out || 0;
     }
+    const groupPaymentSummary = await paymentController.getGroupPaymentSummary(req.user.id);
     res.render("dashboard", {
       user: {
         ...user,
@@ -211,6 +213,7 @@ exports.dashboard = async (req, res, next) => {
       featuredBusinesses,
       isLeader,
       totals,
+      groupPaymentSummary,
       layout: 'main'
     });
   } catch (error) {
@@ -684,18 +687,42 @@ exports.getMemberDetails = async (req, res, next) => {
 };
 
 // Route to handle verification
+// exports.verifyMember = async (req, res, next) => {
+//   try {
+
+//     const userId = req.params.id;
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return res.status(404).json({ success: false, message: 'User not found' });
+//     }
+
+//     user.isVerified = true;
+//     await user.save();
+
+//     res.json({ success: true, message: 'Member verified successfully' });
+//   } catch (error) {
+//     console.error('Error verifying member:', error);
+//     res.status(500).json({ success: false, message: 'Server error' });
+//   }
+// };
+// Route to handle verification
 exports.verifyMember = async (req, res, next) => {
   try {
-
-
     const userId = req.params.id;
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    // Update verification status
-    user.isVerified = true;
+    if (user.kyc_status !== 'submitted') {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot verify. Current KYC status is '${user.kyc_status}'. User must submit KYC first.`
+      });
+    }
+
+    user.kyc_status = 'approved';
+    user.user_status = 'verified';
     await user.save();
 
     res.json({ success: true, message: 'Member verified successfully' });
@@ -768,6 +795,157 @@ exports.signout = async (req, res, next) => {
   }
 };
 
+// exports.associationSample = async (req, res, next) => {
+//   try {
+
+//     if (!req.user || !req.user.id) {
+//       return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
+//     }
+//     const user = await User.findById(req.user.id).lean();
+//     if (!user) {
+//       return res.status(404).json({ success: false, message: 'User not found' });
+//     }
+//     const memberships = await Gmem.find({ user: user._id })
+//       .populate({
+//         path: 'group',
+//         select: 'g_name g_cover description g_type total_mem user createdAt amount'
+//       })
+//       .lean();
+//     const isLeader = memberships.some(m => m.type === 'admin');
+
+//     const myGroups = memberships
+//       // .filter(m => m.group && m.type !== 'pending')
+//       .filter(m => m.group && m.type === 'admin')
+//       .map(m => ({
+//         _id: m.group._id,
+//         g_name: m.group.g_name,
+//         g_cover: m.group.g_cover ? getSignedUrl(m.group.g_cover) : '/assets/images/demo.jpg',
+//         description: m.group.description,
+//         g_type: m.group.g_type,
+//         total_mem: m.group.total_mem,
+//         user: m.group.user,
+//         createdAt: m.group.createdAt,
+//         membershipType: m.type,
+//         joinedAt: m.createdAt
+//       }))
+//       .sort((a, b) => {
+//         if (a.user.toString() === user._id.toString() && b.user.toString() === user._id.toString()) {
+//           return new Date(b.createdAt) - new Date(a.createdAt);
+//         }
+//         return new Date(b.joinedAt) - new Date(a.joinedAt);
+//       });
+
+//     const joinedGroupIds = myGroups.map(g => g._id.toString());
+//     const pendingGroupIds = memberships
+//       .filter(m => m.group && m.type === 'pending')
+//       .map(m => m.group._id.toString());
+
+//     let discoverGroups = await Group.find({
+//       $and: [
+//         { user: { $ne: user._id } },
+//         { _id: { $nin: joinedGroupIds } },
+//         { g_type: { $in: ['public', 'private'] } }
+//       ]
+//     })
+//       .select('g_name g_cover description g_type total_mem user createdAt')
+//       .sort({ createdAt: -1 })
+//       .limit(4)
+//       .lean();
+
+//     discoverGroups = discoverGroups.map(g => ({
+//       ...g,
+//       g_cover: g.g_cover ? getSignedUrl(g.g_cover) : '/assets/images/demo.jpg',
+//       isJoined: joinedGroupIds.includes(g._id.toString()),
+//       isPending: pendingGroupIds.includes(g._id.toString())
+//     }));
+
+//     // const memberGroups = myGroups.filter(g => g.membershipType === 'user');
+//     const memberGroups = memberships
+//       .filter(m => m.group && m.type === 'user')
+//       .map(m => ({
+//         _id: m.group._id,
+//         g_name: m.group.g_name,
+//         g_cover: m.group.g_cover ? getSignedUrl(m.group.g_cover) : '/assets/images/demo.jpg',
+//         description: m.group.description,
+//         g_type: m.group.g_type,
+//         total_mem: m.group.total_mem,
+//         user: m.group.user,
+//         createdAt: m.group.createdAt,
+//         membershipType: m.type,
+//         joinedAt: m.createdAt
+//       }));
+
+//     // const joinedGroupIds = memberships
+//     //   .filter(m => m.group && m.type === 'user')
+//     //   .map(m => m.group._id.toString());
+
+//     // const pendingGroupIds = memberships
+//     //   .filter(m => m.group && m.type === 'pending')
+//     //   .map(m => m.group._id.toString());
+
+//     // const createdGroupIds = memberships
+//     //   .filter(m => m.group && m.group.user.toString() === user._id.toString())
+//     //   .map(m => m.group._id.toString());
+
+//     // const excludeIds = [
+//     //   ...joinedGroupIds,
+//     //   ...pendingGroupIds,
+//     //   ...createdGroupIds
+//     // ];
+//     // let suggestedGroups = await Group.find({
+//     //   _id: { $nin: excludeIds },
+//     //   g_type: { $in: ['public', 'private'] }
+//     // })
+//     //   .select('g_name g_cover description g_type total_mem user createdAt')
+//     //   .sort({ members_count: -1, createdAt: -1 })
+//     //   .limit(6)
+//     //   .lean();
+
+
+//     const recentThreshold = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+//     let pendingGroup = null;
+//     for (const membership of memberships) {
+//       const group = membership.group;
+//       if (!group || group.amount <= 0 || group.updatedAt < recentThreshold) {
+//         continue;
+//       }
+//       if (membership.type === 'admin') {
+//         console.log(`Skipping modal for group ${group.g_name}: User is admin`);
+//         continue;
+//       }
+//       const payment = await Payment.findOne({
+//         user: user._id,
+//         group: group._id
+//       }).lean();
+//       if (!payment || (payment && group.updatedAt > payment.uploadedAt)) {
+//         pendingGroup = {
+//           ...group,
+//           qr_code: group.qr_code ? getSignedUrl(group.qr_code) : '/assets/images/demo.jpg'
+//         };
+//         break;
+//       }
+//     }
+
+//     res.render("Association", {
+//       user: {
+//         ...user,
+//         has_password: !!user.password
+//       },
+//       title: 'Sarafa Association',
+//       myGroups,
+//       discoverGroups,
+//       pendingGroup,
+//       memberGroups,
+
+//       layout: 'main'
+//     });
+//   } catch (error) {
+//     console.error('Error rendering dashboard:', error);
+//     res.status(500).json({ success: false, message: 'Server error: ' + error.message });
+//   }
+// };
+
+
 exports.associationSample = async (req, res, next) => {
   try {
 
@@ -783,12 +961,19 @@ exports.associationSample = async (req, res, next) => {
         path: 'group',
         select: 'g_name g_cover description g_type total_mem user createdAt amount'
       })
+      .populate('groupRole', 'roleName permissions')   // ⭐ ADDED: assigned role + permissions bhi chahiye
       .lean();
     const isLeader = memberships.some(m => m.type === 'admin');
 
+    // ⭐ FIX: myGroups ab sirf owner (type==='admin') tak seemit nahi —
+    // koi bhi member jiske paas is group ke liye kisi bhi permission wala role assign ho,
+    // wo bhi "Admin" section (myGroups) mein dikhega
+    const hasElevatedAccess = (m) =>
+      m.type === 'admin' ||
+      (m.groupRole && Array.isArray(m.groupRole.permissions) && m.groupRole.permissions.length > 0);
+
     const myGroups = memberships
-      // .filter(m => m.group && m.type !== 'pending')
-      .filter(m => m.group && m.type === 'admin')
+      .filter(m => m.group && hasElevatedAccess(m))
       .map(m => ({
         _id: m.group._id,
         g_name: m.group.g_name,
@@ -799,7 +984,9 @@ exports.associationSample = async (req, res, next) => {
         user: m.group.user,
         createdAt: m.group.createdAt,
         membershipType: m.type,
-        joinedAt: m.createdAt
+        joinedAt: m.createdAt,
+        role: m.groupRole ? m.groupRole.roleName : null,
+        permissions: m.groupRole ? m.groupRole.permissions : []
       }))
       .sort((a, b) => {
         if (a.user.toString() === user._id.toString() && b.user.toString() === user._id.toString()) {
@@ -832,9 +1019,10 @@ exports.associationSample = async (req, res, next) => {
       isPending: pendingGroupIds.includes(g._id.toString())
     }));
 
-    // const memberGroups = myGroups.filter(g => g.membershipType === 'user');
+    // ⭐ FIX: memberGroups mein ab sirf wahi 'user' type members aayenge jinke paas
+    // koi elevated permission NAHI hai — taaki myGroups aur memberGroups mein duplicate na ho
     const memberGroups = memberships
-      .filter(m => m.group && m.type === 'user')
+      .filter(m => m.group && m.type === 'user' && !hasElevatedAccess(m))
       .map(m => ({
         _id: m.group._id,
         g_name: m.group.g_name,
@@ -847,33 +1035,6 @@ exports.associationSample = async (req, res, next) => {
         membershipType: m.type,
         joinedAt: m.createdAt
       }));
-
-    // const joinedGroupIds = memberships
-    //   .filter(m => m.group && m.type === 'user')
-    //   .map(m => m.group._id.toString());
-
-    // const pendingGroupIds = memberships
-    //   .filter(m => m.group && m.type === 'pending')
-    //   .map(m => m.group._id.toString());
-
-    // const createdGroupIds = memberships
-    //   .filter(m => m.group && m.group.user.toString() === user._id.toString())
-    //   .map(m => m.group._id.toString());
-
-    // const excludeIds = [
-    //   ...joinedGroupIds,
-    //   ...pendingGroupIds,
-    //   ...createdGroupIds
-    // ];
-    // let suggestedGroups = await Group.find({
-    //   _id: { $nin: excludeIds },
-    //   g_type: { $in: ['public', 'private'] }
-    // })
-    //   .select('g_name g_cover description g_type total_mem user createdAt')
-    //   .sort({ members_count: -1, createdAt: -1 })
-    //   .limit(6)
-    //   .lean();
-
 
     const recentThreshold = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     let pendingGroup = null;
