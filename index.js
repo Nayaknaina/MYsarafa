@@ -140,7 +140,6 @@ app.use(errorHandler);
 //   next(error);
 // });
 
-
 app.set('socketio', io);
 io.on('connection', (socket) => {
     console.log(`New connection: socket.id=${socket.id}`);
