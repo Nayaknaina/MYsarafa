@@ -288,7 +288,7 @@ exports.unverifyPayment = async (req, res, next) => {
   }
 };
 
-// Cash Payment 
+// Cash Payment
 exports.getGroupMembersForEntry = async (req, res, next) => {
   try {
     const { groupId } = req.params;
