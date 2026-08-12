@@ -355,65 +355,67 @@ exports.manualCashEntry = async (req, res, next) => {
 
 // Payment status Tracking controller
 exports.renderMyPayments = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user.id).lean();
-    console.log('Checking payments for user:', req.user.id);
-    if (!user) {
-      return res.status(404).render('error', {
-        statusCode: 404,
-        title: 'User Not Found',
-        errorMessage: 'No user found with the provided credentials',
-        layout: false
-      });
-    }
+  console.log("my-payments route/ renderMypayments controller");
+  // try {
+  //   const user = await User.findById(req.user.id).lean();
+  //   console.log('Checking payments for user:', req.user.id);
+  //   if (!user) {
+  //     return res.status(404).render('error', {
+  //       statusCode: 404,
+  //       title: 'User Not Found',
+  //       errorMessage: 'No user found with the provided credentials',
+  //       layout: false
+  //     });
+  //   }
 
-    const payments = await Payment.find({ user: req.user.id })
-      .populate('group', 'g_name')
-      .sort({ uploadedAt: -1 })   // sabse naya sabse upar
-      .lean();
-    console.log('Payments found:', payments.length);
+  //   const payments = await Payment.find({ user: req.user.id })
+  //     .populate('group', 'g_name')
+  //     .sort({ uploadedAt: -1 })   // sabse naya sabse upar
+  //     .lean();
+  //   console.log('Payments found:', payments.length);
 
-    const formattedPayments = payments.map(payment => ({
-      ...payment,
-      screenshot_url: payment.screenshotUrl ? getSignedUrl(payment.screenshotUrl) : null
-    }));
+  //   const formattedPayments = payments.map(payment => ({
+  //     ...payment,
+  //     screenshot_url: payment.screenshotUrl ? getSignedUrl(payment.screenshotUrl) : null
+  //   }));
 
-    res.render('my-payments-status', {
-      user: user || {},
-      fullName: `${user.f_name || ''} ${user.l_name || ''}`.trim(),
-      payments: formattedPayments,
-      title: 'My Payments | MySarafa',
-      layout: false
-    });
-  } catch (error) {
-    console.error('Error rendering my payments page:', error);
-    next(error);
-  }
+  //   res.render('my-payments-status', {
+  //     user: user || {},
+  //     fullName: `${user.f_name || ''} ${user.l_name || ''}`.trim(),
+  //     payments: formattedPayments,
+  //     title: 'My Payments | MySarafa',
+  //     layout: false
+  //   });
+  // } catch (error) {
+  //   console.error('Error rendering my payments page:', error);
+  //   next(error);
+  // }
 };
 
 // Time Period
 exports.renderPaymentMatrixPage = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user.id).lean();
-    if (!user) {
-      return res.status(404).render('error', { statusCode: 404, title: 'User Not Found', errorMessage: 'No user found', layout: false });
-    }
+  console.log("payment-matrix route/ renderPaymentMatrixPage controller")
+  // try {
+  //   const user = await User.findById(req.user.id).lean();
+  //   if (!user) {
+  //     return res.status(404).render('error', { statusCode: 404, title: 'User Not Found', errorMessage: 'No user found', layout: false });
+  //   }
 
-    const adminMemberships = await Gmem.find({ user: req.user.id, type: 'admin' }).lean();
-    const adminGroupIds = adminMemberships.map(m => m.group);
-    const groups = await Group.find({ _id: { $in: adminGroupIds } }).select('g_name _id amount_type').lean();
+  //   const adminMemberships = await Gmem.find({ user: req.user.id, type: 'admin' }).lean();
+  //   const adminGroupIds = adminMemberships.map(m => m.group);
+  //   const groups = await Group.find({ _id: { $in: adminGroupIds } }).select('g_name _id amount_type').lean();
 
-    res.render('payment-matrix', {
-      user,
-      fullName: `${user.f_name || ''} ${user.l_name || ''}`.trim(),
-      groups,
-      title: 'Payment Tracker | MySarafa',
-      layout: false
-    });
-  } catch (error) {
-    console.error('Error rendering payment matrix page:', error);
-    next(error);
-  }
+  //   res.render('payment-matrix', {
+  //     user,
+  //     fullName: `${user.f_name || ''} ${user.l_name || ''}`.trim(),
+  //     groups,
+  //     title: 'Payment Tracker | MySarafa',
+  //     layout: false
+  //   });
+  // } catch (error) {
+  //   console.error('Error rendering payment matrix page:', error);
+  //   next(error);
+  // }
 };
 
 exports.getPaymentMatrixData = async (req, res, next) => {
