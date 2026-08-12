@@ -84,7 +84,8 @@
         const token = localStorage.getItem('token');
         const params = new URLSearchParams(window.location.search);
         const groupId = params.get('groupId');
-        const API_BASE = `http://localhost:5001/Groups/${groupId}/roles`;
+        // const API_BASE = `http://localhost:5001/Groups/${groupId}/roles`;
+        const API_BASE = `https://app.mysarafa.com/Groups/${groupId}/roles`;
 
         if (!token) window.location.href = 'login.html';
         if (!groupId) alert('No groupId provided in URL. Use ?groupId=YOUR_GROUP_ID');

@@ -210,7 +210,8 @@
         // const ROLE_API = "http://localhost:5001/Groups/${currentGroupId}/roles";
 
         function getRoleApi() {
-            return `http://localhost:5001/Groups/${currentGroupId}/roles`;
+            // return `http://localhost:5001/Groups/${currentGroupId}/roles`;
+            return `https://app.mysarafa.com/Groups/${currentGroupId}/roles`;
         }
 
         if (!token) {
@@ -406,7 +407,8 @@
         let currentGroupId = null;
 
         async function initGroupContext() {
-            const res = await fetch('http://localhost:5001/Groups/my-groups-data', {
+            // const res = await fetch('http://localhost:5001/Groups/my-groups-data', {
+             const res = await fetch('https://app.mysarafa.com/Groups/my-groups-data', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await res.json();
