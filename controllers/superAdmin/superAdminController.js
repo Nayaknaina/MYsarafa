@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const axios = require("axios");
 const { getSignedUrl } = require('../../middleware/multer');  // root/middleware — shared
 const bcrypt = require("bcryptjs");
-const { getPagination } = require("../../views/superAdmin/utils/pagination");
+const { getPagination } = require("../../views/superadmin/utils/pagination");
 
 const GMem = require('../../models/groupMem.model');
 
