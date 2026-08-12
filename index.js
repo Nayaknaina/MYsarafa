@@ -79,7 +79,7 @@ app.use('/ledger', ledgerRoutes);
 app.use("/api/roles", roleRoutes);
 
 // Serve superadmin frontend if needed
-app.use('/superadmin-frontend', express.static(path.join(__dirname, 'views/superAdmin')));
+app.use('/superadmin-frontend', express.static(path.join(__dirname, 'views/superadmin')));
 
 // Serve HTML files
 app.get('/', (req, res) => {
