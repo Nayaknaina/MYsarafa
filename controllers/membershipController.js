@@ -289,22 +289,79 @@ exports.unverifyPayment = async (req, res, next) => {
 };
 
 // Cash Payment
+// exports.getGroupMembersForEntry = async (req, res, next) => {
+//   try {
+//     const { groupId } = req.params;
+//     const adminCheck = await Gmem.findOne({ user: req.user.id, group: groupId, type: 'admin' });
+//     if (!adminCheck) {
+//       return res.status(403).json({ success: false, message: 'Unauthorized' });
+//     }
+//     const members = await Gmem.find({ group: groupId, type: { $ne: 'pending' } })  // 👈 pending exclude
+//       .populate('user', 'f_name l_name')
+//       .lean();
+
+//     const formatted = members
+//       .filter(m => m.user)   // null-safe
+//       .map(m => ({ id: m.user._id, name: `${m.user.f_name} ${m.user.l_name}` }));
+
+//     res.json({ success: true, members: formatted });
+//   } catch (error) {
+//     next(error);
+//   }
+// };
+// Cash Payment
 exports.getGroupMembersForEntry = async (req, res, next) => {
   try {
     const { groupId } = req.params;
-    const adminCheck = await Gmem.findOne({ user: req.user.id, group: groupId, type: 'admin' });
+
+    const adminCheck = await Gmem.findOne({
+      user: req.user.id,
+      group: groupId,
+      type: 'admin'
+    });
+
     if (!adminCheck) {
-      return res.status(403).json({ success: false, message: 'Unauthorized' });
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized'
+      });
     }
-    const members = await Gmem.find({ group: groupId, type: { $ne: 'pending' } })  // 👈 pending exclude
+
+    // Group ki payment information nikalo
+    const group = await Group.findById(groupId)
+      .select('amount amount_type')
+      .lean();
+
+    if (!group) {
+      return res.status(404).json({
+        success: false,
+        message: 'Group not found'
+      });
+    }
+
+    const members = await Gmem.find({
+      group: groupId,
+      type: { $ne: 'pending' }
+    })
       .populate('user', 'f_name l_name')
       .lean();
 
     const formatted = members
-      .filter(m => m.user)   // null-safe
-      .map(m => ({ id: m.user._id, name: `${m.user.f_name} ${m.user.l_name}` }));
+      .filter(m => m.user)
+      .map(m => ({
+        id: m.user._id,
+        name: `${m.user.f_name || ''} ${m.user.l_name || ''}`.trim()
+      }));
 
-    res.json({ success: true, members: formatted });
+    res.json({
+      success: true,
+      members: formatted,
+
+      // Group ki payment details
+      amount: group.amount,
+      amount_type: group.amount_type
+    });
+
   } catch (error) {
     next(error);
   }
@@ -509,17 +566,50 @@ exports.getPaymentMatrixData = async (req, res, next) => {
   }
 };
 
+// exports.getUserPeriodStatus = async (req, res, next) => {
+//   try {
+//     const { groupId } = req.params;
+//     const { excludePaymentId } = req.query; // reupload case me current payment exclude
+//     const group = await Group.findById(groupId).lean();
+//     if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
+
+//     const membership = await Gmem.findOne({ user: req.user.id, group: groupId });
+//     if (!membership) return res.status(403).json({ success: false, message: 'Unauthorized' });
+
+//     const query = { user: req.user.id, group: groupId };
+//     if (excludePaymentId) query._id = { $ne: excludePaymentId };
+
+//     const paidPayments = await Payment.find(query).select('period').lean();
+//     const paidPeriods = paidPayments.map(p => p.period).filter(Boolean);
+
+//     res.json({ success: true, amountType: group.amount_type || 'monthly', createdAt: group.createdAt, paidPeriods });
+//   } catch (error) { next(error); }
+// };
+
 exports.getUserPeriodStatus = async (req, res, next) => {
   try {
     const { groupId } = req.params;
-    const { excludePaymentId } = req.query; // reupload case me current payment exclude
+    const { excludePaymentId, memberId } = req.query; // memberId naya, optional
     const group = await Group.findById(groupId).lean();
     if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
 
     const membership = await Gmem.findOne({ user: req.user.id, group: groupId });
     if (!membership) return res.status(403).json({ success: false, message: 'Unauthorized' });
 
-    const query = { user: req.user.id, group: groupId };
+    // ⭐ Yahi naya part hai — agar memberId nahi bheja gaya, to purana behavior hi chalega
+    let targetUserId = req.user.id;
+    if (memberId && memberId !== req.user.id) {
+      if (membership.type !== 'admin') {
+        return res.status(403).json({ success: false, message: 'Only group admins can check other members\' payment status' });
+      }
+      const memberCheck = await Gmem.findOne({ user: memberId, group: groupId });
+      if (!memberCheck) {
+        return res.status(404).json({ success: false, message: 'Member not found in this group' });
+      }
+      targetUserId = memberId;
+    }
+
+    const query = { user: targetUserId, group: groupId };
     if (excludePaymentId) query._id = { $ne: excludePaymentId };
 
     const paidPayments = await Payment.find(query).select('period').lean();

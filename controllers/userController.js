@@ -42,6 +42,7 @@ exports.dashboard = async (req, res, next) => {
       })
       .lean();
     const isLeader = memberships.some(m => m.type === 'admin');
+    
     // Map myGroups with membership details
     const myGroups = memberships
       // .filter(m => m.group && m.type !== 'pending' && m.type === 'user')

@@ -399,6 +399,112 @@
         align-items: center;
         justify-content: center;
     }
+
+    .period-display {
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .period-display i {
+        color: #2f95ff;
+    }
+
+    .period-display.disabled {
+        opacity: .6;
+        cursor: not-allowed;
+        background: #f8fafc;
+    }
+
+    .period-calendar {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        margin-top: 6px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        box-shadow: 0 4px 20px rgba(47, 149, 255, 0.15);
+        padding: 12px;
+        z-index: 200;
+    }
+
+    .period-calendar.active {
+        display: block;
+    }
+
+    .period-calendar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-weight: 600;
+        color: #111827;
+        font-size: 14px;
+    }
+
+    .period-nav-btn {
+        background: #f3f4f6;
+        border: none;
+        border-radius: 6px;
+        width: 28px;
+        height: 28px;
+        cursor: pointer;
+        color: #374151;
+    }
+
+    .period-nav-btn:hover {
+        background: #e5e7eb;
+    }
+
+    .period-nav-btn:disabled {
+        opacity: .4;
+        cursor: not-allowed;
+    }
+
+    .period-calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .period-cell {
+        padding: 10px 4px;
+        text-align: center;
+        border-radius: 8px;
+        font-size: 13px;
+        cursor: pointer;
+        border: 1px solid transparent;
+        transition: background .2s, border-color .2s;
+        color: #374151;
+    }
+
+    .period-cell:hover {
+        background: #e7f3ff;
+        border-color: #2f95ff;
+    }
+
+    .period-cell.selected {
+        background: #2f95ff;
+        color: #fff;
+        font-weight: 600;
+    }
+
+    .period-cell.disabled-before {
+        color: #d1d5db;
+        cursor: not-allowed;
+        text-decoration: line-through;
+    }
+
+    .period-cell.paid {
+        background: #fef3c7;
+        color: #b45309;
+        cursor: not-allowed;
+        text-decoration: line-through;
+    }
 </style>
 
 <body data-user-id="{{user._id}}">
@@ -549,6 +655,30 @@
             <input type="number" id="cashAmount" class="filter-input" placeholder="Amount"
                 style="margin-bottom:10px; width:100%;">
             <input type="date" id="cashDate" class="filter-input" style="margin-bottom:16px; width:100%;">
+            {{!-- <select id="period" required>
+                <option value="">Select Period</option>
+            </select> --}}
+            <div style="position:relative; margin-bottom:16px;">
+                <div id="periodDisplay" class="filter-input period-display disabled" tabindex="0">
+                    <span id="periodDisplayText">Select Member First</span>
+                    <i class="fas fa-calendar-alt"></i>
+                </div>
+                <input type="hidden" id="period" required>
+
+                <div id="periodCalendar" class="period-calendar">
+                    <div class="period-calendar-header">
+                        <button type="button" class="period-nav-btn" id="periodPrevYear">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span id="periodCalendarYear">2026</span>
+                        <button type="button" class="period-nav-btn" id="periodNextYear">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="period-calendar-grid" id="periodMonthsGrid"></div>
+                    <div class="period-calendar-grid" id="periodYearsGrid" style="display:none;"></div>
+                </div>
+            </div>
             <div style="display:flex; gap:10px; justify-content:flex-end;">
                 <button id="cancelCashEntry" class="action-btn">Cancel</button>
                 <button id="submitCashEntry" class="action-btn primary">Save</button>
@@ -668,6 +798,7 @@
         });
     </script>
     {{!-- Cash Payment --}}
+    {{!--
     <script>
         $('#openCashModal').click(() => $('#cashEntryModal').css('display', 'flex'));
         $('#cancelCashEntry').click(() => $('#cashEntryModal').hide());
@@ -694,6 +825,47 @@
                     data.members.forEach(m => {
                         $('#cashMemberSelect').append(`<option value="${m.id}">${m.name}</option>`);
                     });
+
+                    const amountType = data.amount_type;
+
+                    if (amountType === 'monthly') {
+
+                        const months = [
+                            'January',
+                            'February',
+                            'March',
+                            'April',
+                            'May',
+                            'June',
+                            'July',
+                            'August',
+                            'September',
+                            'October',
+                            'November',
+                            'December'
+                        ];
+
+                        months.forEach(month => {
+                            $('#cashPeriodSelect').append(
+                                `<option value="${month}">${month}</option>`
+                            );
+                        });
+
+                    } else if (amountType === 'yearly') {
+
+                        const currentYear = new Date().getFullYear();
+
+                        for (let year = currentYear - 2; year <= currentYear + 2; year++) {
+                            $('#cashPeriodSelect').append(
+                                `<option value="${year}">${year}</option>`
+                            );
+                        }
+
+                    } else {
+                        $('#cashPeriodSelect').append(
+                            '<option value="" disabled>Period not available</option>'
+                        );
+                    }
                 } else {
                     toastr.error(data.message || 'Failed to load members');
                 }
@@ -721,7 +893,7 @@
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0] || ''}`
                     },
-                    body: JSON.stringify({ groupId, memberId, amount, date })
+                    body: JSON.stringify({ groupId, memberId, amount, date, period })
                 });
                 const result = await res.json();
                 if (res.ok && result.success) {
@@ -735,6 +907,279 @@
             }
         });
 
+        function setPeriodOptions(amountType) {
+            const periodSelect = document.getElementById('period');
+
+            periodSelect.innerHTML = '<option value="">Select Period</option>';
+
+            if (amountType === 'monthly') {
+
+                const months = [
+                    'January',
+                    'February',
+                    'March',
+                    'April',
+                    'May',
+                    'June',
+                    'July',
+                    'August',
+                    'September',
+                    'October',
+                    'November',
+                    'December'
+                ];
+
+                months.forEach(month => {
+                    const option = document.createElement('option');
+                    option.value = month;
+                    option.textContent = month;
+                    periodSelect.appendChild(option);
+                });
+
+            } else if (amountType === 'yearly') {
+
+                const currentYear = new Date().getFullYear();
+
+                for (let year = currentYear; year >= currentYear - 5; year--) {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    periodSelect.appendChild(option);
+                }
+            }
+        }
+
+    </script> --}}
+    {{!-- Cash Payment --}}
+    {{!-- Cash Payment --}}
+    <script>
+        let periodState = {
+            amountType: 'monthly',
+            createdAt: null,
+            paidPeriods: [],
+            viewYear: new Date().getFullYear(),
+            selected: null
+        };
+
+        $('#openCashModal').click(() => {
+            $('#cashEntryModal').css('display', 'flex');
+        });
+
+        $('#cancelCashEntry').click(() => {
+            $('#cashEntryModal').hide();
+            resetCashForm();
+        });
+
+        function resetCashForm() {
+            $('#cashGroupSelect').val('');
+            $('#cashMemberSelect').html('<option value="">Select Member</option>');
+            $('#cashAmount').val('');
+            $('#cashDate').val('');
+            resetPeriodPicker();
+        }
+
+        function resetPeriodPicker() {
+            periodState = { amountType: 'monthly', createdAt: null, paidPeriods: [], viewYear: new Date().getFullYear(), selected: null };
+            $('#period').val('');
+            $('#periodDisplayText').text('Select Member First');
+            $('#periodDisplay').addClass('disabled');
+            closePeriodCalendar();
+        }
+
+        // Group change -> members list load karo
+        $('#cashGroupSelect').on('change', async function () {
+            const groupId = $(this).val();
+            $('#cashMemberSelect').html('<option value="">Select Member</option>');
+            resetPeriodPicker();
+            if (!groupId) return;
+
+            try {
+                const res = await fetch(`/pay/group-members-list/${groupId}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0] || ''}`
+                    }
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    if (data.members.length === 0) {
+                        $('#cashMemberSelect').append('<option value="" disabled>No members found</option>');
+                    }
+                    data.members.forEach(m => {
+                        $('#cashMemberSelect').append(`<option value="${m.id}">${m.name}</option>`);
+                    });
+                } else {
+                    toastr.error(data.message || 'Failed to load members');
+                }
+            } catch (err) {
+                toastr.error('Error loading members: ' + err.message);
+            }
+        });
+
+        // Member change -> uske paid periods load karo (memberId query param se admin apne group ke kisi bhi member ka status dekh sakta hai)
+        $('#cashMemberSelect').on('change', async function () {
+            const memberId = $(this).val();
+            const groupId = $('#cashGroupSelect').val();
+            resetPeriodPicker();
+            if (!memberId || !groupId) return;
+
+            try {
+                const res = await fetch(`/pay/user-period-status/${groupId}?memberId=${memberId}`, {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0] || ''}`
+                    }
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    periodState.amountType = data.amountType;
+                    periodState.createdAt = data.createdAt;
+                    periodState.paidPeriods = data.paidPeriods;
+                    periodState.viewYear = data.createdAt ? new Date(data.createdAt).getFullYear() : new Date().getFullYear();
+                    $('#periodDisplay').removeClass('disabled');
+                    $('#periodDisplayText').text('Select Period');
+                } else {
+                    toastr.error(data.message || 'Failed to load payment status');
+                }
+            } catch (err) {
+                toastr.error('Error: ' + err.message);
+            }
+        });
+
+        // Calendar open/close
+        $('#periodDisplay').on('click', function (e) {
+            e.stopPropagation();
+            if ($(this).hasClass('disabled')) return;
+            if ($('#periodCalendar').hasClass('active')) {
+                closePeriodCalendar();
+            } else {
+                renderPeriodCalendar();
+                $('#periodCalendar').addClass('active');
+            }
+        });
+
+        $(document).on('click', function (e) {
+            if (!$(e.target).closest('#periodCalendar, #periodDisplay').length) {
+                closePeriodCalendar();
+            }
+        });
+
+        function closePeriodCalendar() {
+            $('#periodCalendar').removeClass('active');
+        }
+
+        function renderPeriodCalendar() {
+            const createdDate = periodState.createdAt ? new Date(periodState.createdAt) : null;
+            const minYear = createdDate ? createdDate.getFullYear() : new Date().getFullYear();
+            const minMonth = createdDate ? createdDate.getMonth() : 0;
+
+            if (periodState.amountType === 'monthly') {
+                $('.period-calendar-header').show();
+                $('#periodMonthsGrid').show();
+                $('#periodYearsGrid').hide();
+
+                if (periodState.viewYear < minYear) periodState.viewYear = minYear;
+                $('#periodCalendarYear').text(periodState.viewYear);
+                $('#periodPrevYear').prop('disabled', periodState.viewYear <= minYear);
+
+                const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+                let html = '';
+                months.forEach((m, idx) => {
+                    const value = `${periodState.viewYear}-${String(idx + 1).padStart(2, '0')}`;
+                    const isBefore = periodState.viewYear === minYear && idx < minMonth;
+                    const isPaid = periodState.paidPeriods.includes(value);
+                    let cls = 'period-cell';
+                    if (isBefore) cls += ' disabled-before';
+                    else if (isPaid) cls += ' paid';
+                    if (periodState.selected === value) cls += ' selected';
+                    html += `<div class="${cls}" data-value="${value}" data-label="${m} ${periodState.viewYear}" data-paid="${isPaid}" data-before="${isBefore}">${m.slice(0, 3)}</div>`;
+                });
+                $('#periodMonthsGrid').html(html);
+            } else if (periodState.amountType === 'yearly') {
+                $('.period-calendar-header').hide();
+                $('#periodMonthsGrid').hide();
+                $('#periodYearsGrid').show();
+
+                let html = '';
+                for (let y = minYear; y <= minYear + 10; y++) {
+                    const value = `${y}`;
+                    const isPaid = periodState.paidPeriods.includes(value);
+                    let cls = 'period-cell';
+                    if (isPaid) cls += ' paid';
+                    if (periodState.selected === value) cls += ' selected';
+                    html += `<div class="${cls}" data-value="${value}" data-label="${y}" data-paid="${isPaid}" data-before="false">${y}</div>`;
+                }
+                $('#periodYearsGrid').html(html);
+            } else {
+                $('.period-calendar-header').hide();
+                $('#periodYearsGrid').hide();
+                $('#periodMonthsGrid').show().html('<div style="grid-column:1/-1; color:#9ca3af; text-align:center;">Period not available</div>');
+            }
+        }
+
+        $('#periodPrevYear').on('click', function () {
+            periodState.viewYear--;
+            renderPeriodCalendar();
+        });
+        $('#periodNextYear').on('click', function () {
+            periodState.viewYear++;
+            renderPeriodCalendar();
+        });
+
+        $(document).on('click', '.period-cell', function () {
+            if ($(this).data('before') === true || $(this).data('before') === 'true') {
+                toastr.warning('Group banne se pehle ka period select nahi kar sakte');
+                return;
+            }
+            if ($(this).data('paid') === true || $(this).data('paid') === 'true') {
+                toastr.info(`Payment already done for this ${periodState.amountType === 'monthly' ? 'month' : 'year'}`);
+                return;
+            }
+            const value = $(this).data('value');
+            const label = $(this).data('label');
+            periodState.selected = value;
+            $('#period').val(value);
+            $('#periodDisplayText').text(label);
+            renderPeriodCalendar();
+            closePeriodCalendar();
+        });
+
+        // Submit
+        $('#submitCashEntry').click(async function () {
+            const groupId = $('#cashGroupSelect').val();
+            const memberId = $('#cashMemberSelect').val();
+            const amount = $('#cashAmount').val();
+            const date = $('#cashDate').val();
+            const period = $('#period').val();
+
+            if (!groupId || !memberId || !amount || !period) {
+                toastr.error('Please fill all required fields, including period');
+                return;
+            }
+
+            try {
+                const res = await fetch('/pay/manual-entry', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0] || ''}`
+                    },
+                    body: JSON.stringify({ groupId, memberId, amount, date, period })
+                });
+                const result = await res.json();
+                if (res.ok && result.success) {
+                    toastr.success('Cash payment recorded');
+                    setTimeout(() => location.reload(), 1000);
+                } else {
+                    toastr.error(result.message || 'Failed to record payment');
+                }
+            } catch (err) {
+                toastr.error('Error: ' + err.message);
+            }
+        });
     </script>
     <script src="/js/all.js"></script>
 </body>
