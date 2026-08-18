@@ -340,22 +340,34 @@ exports.getAnnouncements = async (req, res) => {
     let query = {};
 
     if (groupId) {
-      // ⭐ Specific group ki saari announcements — permission check ke saath
-      const permCheck = await checkGroupPermission(req.user.id, groupId, 'manage_announcements');
+      // ⭐ VIEW ke liye alag permission check — 'manage_announcements' nahi
+      const permCheck = await checkGroupPermission(req.user.id, groupId, 'view_announcements');
       if (!permCheck.allowed) {
         return res.status(403).json({ success: false, message: 'You do not have access to this group\'s announcements' });
       }
       query.group = groupId;
     } else {
-      // ⭐ Koi specific groupId nahi diya gaya — is user ke apne (owned) groups ki
-      // SAARI announcements dikhao, chahe post kisi ne bhi ki ho (khud ya koi role-wala member)
-      const ownedMemberships = await GMem.find({ user: req.user.id, type: 'admin' }).select('group').lean();
-      const ownedGroupIds = ownedMemberships.map(m => m.group);
+      // ⭐ Koi specific groupId nahi diya — sirf un groups ki announcements dikhao
+      // jahan user ke paas 'view_announcements' permission hai (ya admin hai)
+      const memberships = await GMem.find({ user: req.user.id, type: { $ne: 'pending' } })
+        .select('group type')
+        .lean();
 
-      if (ownedGroupIds.length > 0) {
-        query.group = { $in: ownedGroupIds };
+      const allowedGroupIds = [];
+      for (const m of memberships) {
+        if (m.type === 'admin') {
+          allowedGroupIds.push(m.group);
+          continue;
+        }
+        const permCheck = await checkGroupPermission(req.user.id, m.group, 'view_announcements');
+        if (permCheck.allowed) {
+          allowedGroupIds.push(m.group);
+        }
+      }
+
+      if (allowedGroupIds.length > 0) {
+        query.group = { $in: allowedGroupIds };
       } else {
-        // User kisi group ka owner nahi hai — purana default behavior: sirf apni khud ki
         query.createdBy = req.user.id;
       }
     }

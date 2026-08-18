@@ -765,20 +765,27 @@ exports.groupDetails = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Invalid group ID' });
         }
 
-        const group = await Group.findById(groupId).populate('user', 'f_name l_name')   // 🆕 admin ka naam populate karo
-            .lean();
+        const group = await Group.findById(groupId).populate('user', 'f_name l_name').lean();
         if (!group) {
             return res.status(404).json({ success: false, message: 'Group not found' });
         }
 
-        const membership = await GMem.findOne({ group: groupId, user: user._id }).lean();
+        // ⭐ groupRole bhi populate karo — uske permissions chahiye
+        const membership = await GMem.findOne({ group: groupId, user: user._id })
+            .populate('groupRole', 'permissions roleName')
+            .lean();
 
         if (group.g_type === 'private' && (!membership || membership.type === 'pending')) {
             return res.status(403).json({ success: false, message: 'You do not have access to this private group' });
         }
 
         const isMember = !!membership;
-        const isAdmin = membership && membership.type === 'admin';   // ⭐ yahi ISI group ke liye sahi check hai
+        const isAdmin = membership && membership.type === 'admin';
+
+        // ⭐ Naya: role-based permission checks
+        const permissions = membership?.groupRole?.permissions || [];
+        const canManageSettings = isAdmin || permissions.includes('manage_group_settings');
+        const canManageAnnouncements = isAdmin || permissions.includes('manage_announcements');
 
         let members = await GMem.find({ group: groupId, type: { $ne: 'pending' } })
             .populate('user', 'f_name l_name profilePicture')
@@ -794,11 +801,15 @@ exports.groupDetails = async (req, res) => {
             }
         }));
 
-        let announcements = await Announcement.find({ group: groupId })
-            .sort({ createdAt: -1 })
-            .populate('createdBy', 'f_name l_name profilePicture')
-            .populate('likes', 'f_name l_name profilePicture')
-            .lean();
+        // ⭐ Announcements sirf tab fetch karo jab permission ho
+        let announcements = [];
+        if (canManageAnnouncements) {
+            announcements = await Announcement.find({ group: groupId })
+                .sort({ createdAt: -1 })
+                .populate('createdBy', 'f_name l_name profilePicture')
+                .populate('likes', 'f_name l_name profilePicture')
+                .lean();
+        }
 
         if (group.g_cover && (group.g_cover.startsWith('/assets/') || group.g_cover.startsWith('data:'))) {
             // as-is
@@ -808,8 +819,8 @@ exports.groupDetails = async (req, res) => {
             group.g_cover = '/assets/images/demo.jpg';
         }
 
-        // ⭐ MAIN FIX: isAdmin ke hisaab se alag-alag template render karo
-        if (isAdmin) {
+        // ⭐ MAIN FIX: ab type ke bajaye canManageSettings ke hisaab se render karo
+        if (canManageSettings) {
             announcements = announcements.map(a => {
                 const fullName = a.createdBy
                     ? `${a.createdBy.f_name || ''} ${a.createdBy.l_name || ''}`.trim()
@@ -833,6 +844,7 @@ exports.groupDetails = async (req, res) => {
                 user, group, members, announcements,
                 hasAnnouncements: announcements.length > 0,
                 isMember, isAdmin,
+                canManageSettings, canManageAnnouncements,   // ⭐ template me pass karo
                 layout: false
             });
         } else {
@@ -851,6 +863,7 @@ exports.groupDetails = async (req, res) => {
                 announcements: formattedAnnouncements,
                 hasAnnouncements: formattedAnnouncements.length > 0,
                 isMember,
+                canManageAnnouncements,   // ⭐ template me pass karo
                 layout: false
             });
         }
