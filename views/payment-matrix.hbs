@@ -156,7 +156,7 @@
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
             padding: 16px;
             margin-top: 6px;
-            width: 760px;
+            width: 480px;
             max-width: 95vw;
             max-height: 80vh;
             overflow: hidden;
@@ -168,27 +168,19 @@
 
         .mrp-body {
             display: flex;
-            gap: 24px;
+            gap: 16px;
         }
 
         .mrp-calendar {
             flex: 1;
-        }
-
-        .mrp-cal-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-weight: 600;
-            color: #111827;
+            min-width: 0;
         }
 
         .mrp-cal-header button {
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             color: #2f95ff;
             padding: 2px 6px;
         }
@@ -201,16 +193,21 @@
         .mrp-months-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
+            gap: 4px;
+            /* 👈 6px se kam, tighter grid */
         }
 
         .mrp-month-cell {
             text-align: center;
-            padding: 8px 0;
+            padding: 6px 0;
+            /* 👈 8px se kam */
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 12px;
+            /* 👈 13px se kam */
+            line-height: 1.4;
             cursor: pointer;
             color: #374151;
+            box-sizing: border-box;
         }
 
         .mrp-month-cell:hover:not(.mrp-disabled) {
@@ -245,8 +242,9 @@
             justify-content: flex-end;
             align-items: center;
             gap: 10px;
-            margin-top: 12px;
-            padding-top: 12px;
+            margin-top: 10px;
+            /* 👈 12px se kam */
+            padding-top: 10px;
             border-top: 1px solid #f1f5f9;
         }
 
@@ -257,6 +255,8 @@
 
         .mrp-selected-text {
             margin-right: auto;
+            font-size: 13px;
+            color: #4b5563;
         }
 
         /* New Design */
@@ -541,8 +541,19 @@
                 overflow-y: auto;
             }
 
+            .month-range-panel {
+                width: 92vw;
+                max-width: 92vw;
+                left: 50%;
+                transform: translateX(-50%);
+                padding: 12px;
+                max-height: 75vh;
+                overflow-y: auto;
+            }
+
             .mrp-body {
                 flex-direction: column;
+                gap: 10px;
             }
 
             .mrp-calendar {
@@ -550,8 +561,8 @@
             }
 
             .mrp-month-cell {
-                padding: 6px 0;
-                font-size: 12px;
+                padding: 8px 0;
+                font-size: 13px;
             }
 
             .mrp-footer {

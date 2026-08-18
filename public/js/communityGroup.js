@@ -72,10 +72,35 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    document.getElementById('amount').addEventListener('input', function () {
+        const amount = parseFloat(this.value) || 0;
+        const qrLabel = document.querySelector('label[for="qrCode"]');
+        const qrHint = qrLabel.nextElementSibling.nextElementSibling; // form-hint <small>
+        if (amount > 0) {
+            qrLabel.textContent = 'Payment QR Code *';
+            if (qrHint) qrHint.textContent = 'Membership amount set hai — QR code upload karna zaroori hai.';
+        } else {
+            qrLabel.textContent = 'Payment QR Code';
+            if (qrHint) qrHint.textContent = 'Upload a QR code image for collecting membership payments (optional, recommended size: 200x200 pixels).';
+        }
+    });
+
     // Form submission with AJAX
     if (groupCreateForm) {
         groupCreateForm.addEventListener('submit', async function (e) {
             e.preventDefault();
+
+            const amountValue = parseFloat(document.getElementById('amount').value) || 0;
+            const qrCodeInput = document.getElementById('qrCode');
+            const hasNewQrFile = qrCodeInput.files.length > 0;
+
+            const hasExistingQr = document.getElementById('groupId')?.dataset?.hasQr === 'true';
+
+            if (amountValue > 0 && !hasNewQrFile && !hasExistingQr) {
+                formError.textContent = 'Since a membership amount has been set, uploading a Payment QR Code is mandatory.';
+                formError.style.display = 'block';
+                return;
+            }
 
             // Show loader and disable button
             createGroupBtn.disabled = true;

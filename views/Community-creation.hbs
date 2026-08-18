@@ -736,6 +736,26 @@
       padding: 8px 18px;
       box-shadow: 0 2px 8px rgba(85, 29, 255, 0.10);
     }
+
+    #amountType {
+      appearance: auto;
+      cursor: pointer;
+      color: #374151;
+      font-size: 15px;
+      font-weight: 500;
+      background: #fff;
+    }
+
+    #amountType option {
+      color: #374151;
+      background: #fff;
+      padding: 10px;
+    }
+
+    #amountType:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
   </style>
 </head>
 <script src="https://cdn.tailwindcss.com"></script>
@@ -758,7 +778,8 @@
         <div class="group-create-form-section">
           <h2 class="form-title">{{#if group}}Edit Community Group{{else}}Community Group{{/if}}</h2>
           <form class="group-create-form" id="groupCreateForm">
-            <input type="hidden" id="groupId" name="groupId" value="{{group._id}}">
+            <input type="hidden" id="groupId" name="groupId" value="{{group._id}}"
+              data-has-qr="{{#if group.qr_code}}true{{else}}false{{/if}}">
             <input type="hidden" id="questionsInput" name="questions" value="{{json questions}}">
             <div class="form-section">
               <label for="communityName" class="form-label">Community Name</label>
@@ -796,11 +817,16 @@
               </small>
             </div>
             <div class="form-section">
-              <label for="amountType">Membership Amount Type</label>
-              <select id="amountType" name="amountType" class="upload-input" required>
+              <label for="amountType" class="form-label">Membership Amount Type</label>
+
+              <select id="amountType" name="amountType" class="form-input" required>
                 <option value="monthly">Monthly</option>
                 <option value="yearly">Yearly</option>
               </select>
+
+              <small class="form-hint">
+                Choose whether the membership amount is charged monthly or yearly.
+              </small>
             </div>
             <div class="form-section">
               <label for="amountDescription" class="form-label">Amount Description</label>

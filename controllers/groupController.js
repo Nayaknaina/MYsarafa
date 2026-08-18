@@ -140,6 +140,16 @@ exports.createGroup = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Community name and type are required' });
         }
 
+        const amountNum = parseFloat(amount) || 0;
+
+        // Agar membership amount maanga ja raha hai (amount > 0), to QR code mandatory hai
+        if (amountNum > 0 && !(req.files && req.files.qrCode)) {
+            return res.status(400).json({
+                success: false,
+                message: 'QR code is required when a membership amount is set'
+            });
+        }
+
         if (!['private', 'public'].includes(communityType.toLowerCase())) {
             return res.status(400).json({ success: false, message: 'Invalid community type' });
         }
@@ -284,6 +294,18 @@ exports.updateGroup = async (req, res) => {
 
         if (!communityName || !communityType) {
             return res.status(400).json({ success: false, message: 'Community name and type are required' });
+        }
+
+        // ⭐ Yahan move kiya — ab 'group' available hai
+        const amountNum = parseFloat(amount) || 0;
+        const hasNewQr = req.files && req.files.qrCode;
+        const hasExistingQr = group.qr_code;
+
+        if (amountNum > 0 && !hasNewQr && !hasExistingQr) {
+            return res.status(400).json({
+                success: false,
+                message: 'QR code is required when a membership amount is set'
+            });
         }
 
         if (!['private', 'public'].includes(communityType.toLowerCase())) {
