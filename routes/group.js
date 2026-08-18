@@ -6,6 +6,7 @@ const monthlyMembershipCheck = require('../middleware/monthlymembershipVisible')
 const profileImageMiddleware = require('../middleware/profileImageMiddleware');
 const groupRoleRoutes = require('./groupRole.routes');
 const groupPermission = require('../middleware/groupPermission');
+const notificationController = require('../controllers/notificationController');
 
 const { upload } = require('../middleware/multer');
 
@@ -32,6 +33,7 @@ router.get('/group-view/:groupId', authMiddleware, profileImageMiddleware, group
 
 router.get('/pending-requests', authMiddleware, groupController.pendingRequests);
 router.post('/approve-request/:requestId', authMiddleware, groupController.approveRequest);
+router.post('/decline-request/:requestId', authMiddleware, groupController.declineRequest);
 
 // router.post('/add-member', authMiddleware, groupController.addGroupMember);
 // router.post('/remove-member', authMiddleware, groupController.removeGroupMember);
@@ -72,5 +74,8 @@ router.post('/:groupId/invite', authMiddleware, groupPermission('manage_members'
 router.post('/regenerate-member-access', authMiddleware, groupPermission('manage_members'), groupController.regenerateMemberAccess);
 
 router.use('/:groupId/roles', groupRoleRoutes);
+
+router.get('/my-notifications', authMiddleware, notificationController.getMyNotifications);
+router.post('/mark-all-read', authMiddleware, notificationController.markAllRead);   
 
 module.exports = router;

@@ -637,44 +637,140 @@ exports.joinGroup = async (req, res) => {
     }
 };
 
+// exports.groupDetails = async (req, res) => {
+//     try {
+//         const groupId = req.params.groupId;
+//         const user = await User.findById(req.user.id).lean();
+
+//         if (!user) {
+//             return res.status(404).json({ success: false, message: 'User not found' });
+//         }
+
+//         if (!mongoose.isValidObjectId(groupId)) {
+//             return res.status(400).json({ success: false, message: 'Invalid group ID' });
+//         }
+
+//         const group = await Group.findById(groupId).lean();
+//         if (!group) {
+//             return res.status(404).json({ success: false, message: 'Group not found' });
+//         }
+
+
+//         const membership = await GMem.findOne({ group: groupId, user: user._id }).lean();
+//         console.log("Membership =>", membership);
+//         if (group.g_type === 'private' && (!membership || membership.type === 'pending')) {
+//             return res.status(403).json({ success: false, message: 'You do not have access to this private group' });
+//         }
+//         let members = await GMem.find({ group: groupId, type: { $ne: 'pending' } })
+//             .populate('user', 'name email mobile profile_pic') // Assuming User model has these fields
+//             .lean();
+
+//         members = members.map(m => ({
+//             ...m,
+//             user: {
+//                 ...m.user,
+//                 profile_pic: m.user?.profile_pic
+//                     ? getSignedUrl(m.user.profile_pic)
+//                     : '/assets/images/default-profile.jpg'
+//             }
+//         }));
+
+
+//         let announcements = await Announcement.find({ group: groupId })
+//             .sort({ createdAt: -1 })
+//             .populate('createdBy', 'f_name l_name profilePicture')
+//             .populate('likes', 'f_name l_name profilePicture')
+//             .lean();
+
+//         console.log("Members =>", members);
+//         console.log("Announcements =>", announcements);
+
+//         announcements = announcements.map(a => {
+//             const fullName = a.createdBy
+//                 ? `${a.createdBy.f_name || ''} ${a.createdBy.l_name || ''}`.trim()
+//                 : 'Unknown User';
+
+//             return {
+//                 ...a,
+//                 createdBy: {
+//                     ...a.createdBy,
+//                     full_name: fullName,
+//                     profile_pic: (a.createdBy?.profilePicture &&
+//                         !a.createdBy.profilePicture.startsWith('/assets/'))
+//                         ? getSignedUrl(a.createdBy.profilePicture)
+//                         : '/assets/images/default-profile.jpg'
+//                 },
+//                 image: (a.image && !a.image.startsWith('/assets/') && !a.image.startsWith('/uploads/'))
+//                     ? getSignedUrl(a.image)
+//                     : a.image || '/assets/images/demo.jpg'
+//             };
+//         });
+//         console.log("Fetched announcements:", announcements);
+
+
+//         if (group.g_cover && (group.g_cover.startsWith('/assets/') || group.g_cover.startsWith('data:'))) {
+//         } else if (group.g_cover) {
+//             group.g_cover = getSignedUrl(group.g_cover);
+//         } else {
+//             group.g_cover = '/assets/images/demo.jpg';
+//         }
+//         console.log("isMember =>", !!membership);
+//         res.render('group-info', {
+//             user,
+//             group,
+//             members,
+//             announcements,
+//             hasAnnouncements: announcements.length > 0,
+//             isMember: !!membership,
+//             isAdmin: membership && membership.type === 'admin',
+//             layout: false
+//         });
+//     } catch (error) {
+//         console.error('Error rendering group details:', error);
+//         res.status(500).json({ success: false, message: 'Server error: ' + error.message });
+//     }
+// };
 exports.groupDetails = async (req, res) => {
     try {
         const groupId = req.params.groupId;
-        const user = await User.findById(req.user.id).lean();
+        const userId = req.user.id;
+        const user = await User.findById(userId).lean();
 
         if (!user) {
             return res.status(404).json({ success: false, message: 'User not found' });
         }
-
         if (!mongoose.isValidObjectId(groupId)) {
             return res.status(400).json({ success: false, message: 'Invalid group ID' });
         }
 
-        const group = await Group.findById(groupId).lean();
+        const group = await Group.findById(groupId).populate('user', 'f_name l_name')   // 🆕 admin ka naam populate karo
+            .lean();
         if (!group) {
             return res.status(404).json({ success: false, message: 'Group not found' });
         }
 
-
         const membership = await GMem.findOne({ group: groupId, user: user._id }).lean();
-        console.log("Membership =>", membership);
+
         if (group.g_type === 'private' && (!membership || membership.type === 'pending')) {
             return res.status(403).json({ success: false, message: 'You do not have access to this private group' });
         }
+
+        const isMember = !!membership;
+        const isAdmin = membership && membership.type === 'admin';   // ⭐ yahi ISI group ke liye sahi check hai
+
         let members = await GMem.find({ group: groupId, type: { $ne: 'pending' } })
-            .populate('user', 'name email mobile profile_pic') // Assuming User model has these fields
+            .populate('user', 'f_name l_name profilePicture')
             .lean();
 
         members = members.map(m => ({
             ...m,
             user: {
                 ...m.user,
-                profile_pic: m.user?.profile_pic
-                    ? getSignedUrl(m.user.profile_pic)
+                profilePicture: m.user?.profilePicture
+                    ? getSignedUrl(m.user.profilePicture)
                     : '/assets/images/default-profile.jpg'
             }
         }));
-
 
         let announcements = await Announcement.find({ group: groupId })
             .sort({ createdAt: -1 })
@@ -682,56 +778,65 @@ exports.groupDetails = async (req, res) => {
             .populate('likes', 'f_name l_name profilePicture')
             .lean();
 
-        console.log("Members =>", members);
-        console.log("Announcements =>", announcements);
-
-        announcements = announcements.map(a => {
-            const fullName = a.createdBy
-                ? `${a.createdBy.f_name || ''} ${a.createdBy.l_name || ''}`.trim()
-                : 'Unknown User';
-
-            return {
-                ...a,
-                createdBy: {
-                    ...a.createdBy,
-                    full_name: fullName,
-                    profile_pic: (a.createdBy?.profilePicture &&
-                        !a.createdBy.profilePicture.startsWith('/assets/'))
-                        ? getSignedUrl(a.createdBy.profilePicture)
-                        : '/assets/images/default-profile.jpg'
-                },
-                image: (a.image && !a.image.startsWith('/assets/') && !a.image.startsWith('/uploads/'))
-                    ? getSignedUrl(a.image)
-                    : a.image || '/assets/images/demo.jpg'
-            };
-        });
-        console.log("Fetched announcements:", announcements);
-
-
         if (group.g_cover && (group.g_cover.startsWith('/assets/') || group.g_cover.startsWith('data:'))) {
-            // already static/illustration - as-is rehne do
+            // as-is
         } else if (group.g_cover) {
             group.g_cover = getSignedUrl(group.g_cover);
         } else {
             group.g_cover = '/assets/images/demo.jpg';
         }
-        console.log("isMember =>", !!membership);
-        res.render('group-info', {
-            user,
-            group,
-            members,
-            announcements,
-            hasAnnouncements: announcements.length > 0,
-            isMember: !!membership,
-            isAdmin: membership && membership.type === 'admin',
-            layout: false
-        });
+
+        // ⭐ MAIN FIX: isAdmin ke hisaab se alag-alag template render karo
+        if (isAdmin) {
+            announcements = announcements.map(a => {
+                const fullName = a.createdBy
+                    ? `${a.createdBy.f_name || ''} ${a.createdBy.l_name || ''}`.trim()
+                    : 'Unknown User';
+                return {
+                    ...a,
+                    createdBy: {
+                        ...a.createdBy,
+                        full_name: fullName,
+                        profile_pic: (a.createdBy?.profilePicture && !a.createdBy.profilePicture.startsWith('/assets/'))
+                            ? getSignedUrl(a.createdBy.profilePicture)
+                            : '/assets/images/default-profile.jpg'
+                    },
+                    image: (a.image && !a.image.startsWith('/assets/') && !a.image.startsWith('/uploads/'))
+                        ? getSignedUrl(a.image)
+                        : a.image || '/assets/images/demo.jpg'
+                };
+            });
+
+            return res.render('group-info', {
+                user, group, members, announcements,
+                hasAnnouncements: announcements.length > 0,
+                isMember, isAdmin,
+                layout: false
+            });
+        } else {
+            const formattedAnnouncements = announcements.map(a => ({
+                ...a,
+                image: (a.image && !a.image.startsWith('/assets/') && !a.image.startsWith('/uploads/'))
+                    ? getSignedUrl(a.image)
+                    : (a.image || null),
+                isLiked: a.likes?.some(u => u?._id?.toString() === userId.toString()),
+                likeCount: a.likes?.length || 0
+            }));
+
+            return res.render('group-info-member', {
+                user: { ...user, has_password: !!user.password },
+                group, members,
+                announcements: formattedAnnouncements,
+                hasAnnouncements: formattedAnnouncements.length > 0,
+                isMember,
+                layout: false
+            });
+        }
     } catch (error) {
         console.error('Error rendering group details:', error);
         res.status(500).json({ success: false, message: 'Server error: ' + error.message });
     }
 };
-
 
 exports.approveRequest = async (req, res) => {
     try {
@@ -855,6 +960,62 @@ exports.pendingRequests = async (req, res) => {
     }
 };
 
+exports.declineRequest = async (req, res) => {
+    try {
+        const { requestId } = req.params;
+
+        console.log("🔹 [declineRequest] Request ID:", requestId);
+        console.log("🔹 [declineRequest] Admin ID:", req.user?.id);
+
+        if (!mongoose.isValidObjectId(requestId)) {
+            return res.status(400).json({
+                success: false,
+                message: 'Invalid request ID'
+            });
+        }
+
+        const request = await GMem.findById(requestId);
+
+        if (!request) {
+            return res.status(404).json({
+                success: false,
+                message: 'Membership request not found'
+            });
+        }
+
+        // Check whether logged-in user is admin of this group
+        const adminMember = await GMem.findOne({
+            group: request.group,
+            user: req.user.id,
+            type: 'admin'
+        });
+
+        if (!adminMember) {
+            return res.status(403).json({
+                success: false,
+                message: 'You are not authorized to decline this request'
+            });
+        }
+
+        // Remove pending request
+        await GMem.findByIdAndDelete(requestId);
+
+        console.log("✅ [declineRequest] Request declined:", requestId);
+
+        return res.status(200).json({
+            success: true,
+            message: 'Membership request declined successfully'
+        });
+
+    } catch (error) {
+        console.error("❌ [declineRequest] Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Something went wrong, please try again later'
+        });
+    }
+};
 
 // exports.getGroups = async (req, res) => {
 //     try {

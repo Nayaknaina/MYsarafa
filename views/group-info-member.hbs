@@ -400,6 +400,13 @@
                     <h2>About</h2>
                     <p>{{group.description}}</p>
                     <hr>
+                    <!-- 🆕 Membership Amount -->
+                    {{#if group.amount}}
+                    <p style="background:#f0f2f5; padding:10px 12px; border-radius:8px; margin-bottom:10px;">
+                        <strong><i class="fa-solid fa-indian-rupee-sign"></i> Membership Fee:</strong>
+                        ₹{{group.amount}} / {{#if (eq group.amount_type 'yearly')}}Year{{else}}Month{{/if}}
+                    </p>
+                    {{/if}}
                     <p><strong>Type:</strong> {{group.g_type}}</p>
                     <p><strong>Members:</strong> {{group.total_mem}}</p>
                     <p><strong>Created:</strong> {{formatDate group.createdAt}}</p>

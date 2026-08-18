@@ -81,7 +81,6 @@ exports.dashboard = async (req, res, next) => {
     })
       .select('g_name g_cover description g_type total_mem user createdAt')
       .sort({ createdAt: -1 })
-      .limit(4)
       .lean();
 
     discoverGroups = discoverGroups.map(g => ({
@@ -214,7 +213,7 @@ exports.dashboard = async (req, res, next) => {
       featuredBusinesses,
       isLeader,
       totals,
-      groupPaymentSummary,
+      groupPaymentSummary: groupPaymentSummary.slice(0, 2),
       layout: 'main'
     });
   } catch (error) {

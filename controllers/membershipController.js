@@ -13,6 +13,7 @@ const exiftoolBin = require('dist-exiftool');
 const ep = new exiftool.ExiftoolProcess(exiftoolBin);
 const { getSignedUrl } = require('../middleware/multer');
 
+const { notifyUsers } = require('../utils/notify');
 
 exports.renderMembershipPage = async (req, res, next) => {
   try {
@@ -57,19 +58,37 @@ exports.renderSSupload = async (req, res, next) => {
       });
     }
 
-    // const groups = await Group.find({ user: req.user.id }).select('g_name _id').lean();
     const memberships = await Gmem.find({ user: req.user.id, type: { $ne: 'admin' } })
-      .populate('group', 'g_name _id')
+      .populate('group', 'g_name _id amount')   // 🆕 amount bhi select karo
       .lean();
-    const groups = memberships.map(m => m.group).filter(g => g); // Filter out null groups
 
+    // 🆕 Sirf wahi groups rakho jinka membership amount set hai (0 ya missing wale hata do)
+    const groups = memberships
+      .map(m => m.group)
+      .filter(g => g && g.amount && g.amount > 0);
+
+    let reuploadPeriod = '';
+    let lockedGroupId = req.query.groupId || '';
+
+    if (req.query.paymentId) {
+      const existingPayment = await Payment.findOne({
+        _id: req.query.paymentId,
+        user: req.user.id
+      }).lean();
+
+      if (existingPayment) {
+        reuploadPeriod = existingPayment.period;
+        lockedGroupId = existingPayment.group.toString();
+      }
+    }
 
     res.render('ss-upload', {
       user: user || {},
       groups: groups || [],
       layout: false,
       group: null,
-      paymentId: req.query.paymentId || ''
+      paymentId: req.query.paymentId || '',
+      reuploadPeriod
     });
   } catch (error) {
     console.error('Error rendering membership page:', error);
@@ -125,6 +144,137 @@ exports.rendertabularPayReceived = async (req, res, next) => {
 };
 
 
+// exports.uploadScreenshot = async (req, res, next) => {
+//   try {
+//     const { upiId, amount, method, groupId, paymentId, period } = req.body;
+//     const file = req.file;
+
+//     if (!groupId || !file || !upiId || !amount || !method || !period) {
+//       return res.status(400).json({ success: false, message: 'Missing required fields' });
+//     }
+//     const dupQuery = paymentId ? { upiId, _id: { $ne: paymentId } } : { upiId };
+//     const existing = await Payment.findOne(dupQuery);
+//     if (existing) {
+//       return res.status(409).json({
+//         success: false,
+//         message: 'This UPI ID / transaction reference has already been used for a payment.'
+//       });
+//     }
+
+//     const membership = await Gmem.findOne({ user: req.user.id, group: groupId, type: { $ne: 'admin' } });
+//     if (!membership) {
+//       return res.status(403).json({ success: false, message: 'Unauthorized: Not a member of this group' });
+//     }
+
+//     const group = await Group.findById(groupId);
+//     if (!group) {
+//       return res.status(404).json({ success: false, message: 'Group not found' });
+//     }
+
+//     const fileKey = file.key;
+
+//     let date, time;
+//     try {
+//       await ep.open();
+//       const metadata = await ep.readMetadata(file.path || file.location || '');
+//       await ep.close();
+//       if (metadata.data[0]?.DateTimeOriginal) {
+//         const dateTime = new Date(metadata.data[0].DateTimeOriginal);
+//         date = dateTime.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' });
+//         time = dateTime.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+//       } else {
+//         const uploadedAt = new Date();
+//         date = uploadedAt.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' });
+//         time = uploadedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+//       }
+//     } catch (err) {
+//       console.warn('Metadata read failed, fallback to upload time');
+//       const uploadedAt = new Date();
+//       date = uploadedAt.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' });
+//       time = uploadedAt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+//     }
+
+//     let payment;
+
+//     if (paymentId) {
+//       payment = await Payment.findOne({ _id: paymentId, user: req.user.id });
+//       if (!payment) {
+//         return res.status(404).json({ success: false, message: 'Original payment record not found' });
+//       }
+
+//       if (period !== payment.period) {
+//         return res.status(400).json({
+//           success: false,
+//           message: 'You cannot change the period while re-uploading the payment.'
+//         });
+//       }
+
+//       payment.screenshotUrl = fileKey;
+//       payment.upiId = upiId;
+//       payment.amount = amount;
+//       payment.method = method;
+//       payment.date = date;
+//       payment.time = time;
+//       payment.isVerified = false;
+//       payment.period = period;
+//       payment.reuploadRequested = false;
+//       payment.uploadedAt = new Date();
+
+//       try {
+//         await payment.save();
+
+//       } catch (err) {
+//         if (err.code === 11000) {
+//           return res.status(409).json({ success: false, message: 'This UPI ID has already been used.' });
+//         }
+//         throw err;
+//       }
+//     } else {
+//       payment = new Payment({
+//         user: req.user.id,
+//         group: groupId,
+//         screenshotUrl: fileKey,
+//         upiId,
+//         amount,
+//         method,
+//         date,
+//         time,
+//         period,
+//         isVerified: false,
+//         reuploadRequested: false,
+//         uploadedAt: new Date(),
+//       });
+
+//       try {
+//         await payment.save();
+//       } catch (err) {
+//         if (err.code === 11000) {
+//           return res.status(409).json({ success: false, message: 'This UPI ID has already been used.' });
+//         }
+//         throw err;
+//       }
+//     }
+
+//     res.json({
+//       success: true,
+//       message: paymentId ? 'Screenshot reuploaded successfully' : 'Screenshot uploaded successfully',
+//       payment: {
+//         id: payment._id,
+//         screenshotUrl: getSignedUrl(fileKey),
+//       },
+//     });
+//   } catch (error) {
+//     console.error('Error uploading screenshot:', error);
+//     console.error("UPLOAD ERROR:");
+//     console.error(error);
+//     console.error(error.stack);
+//     return res.status(500).json({
+//       success: false,
+//       message: error.message || 'Server error while uploading screenshot'
+//     });
+//   }
+// };
+
 exports.uploadScreenshot = async (req, res, next) => {
   try {
     const { upiId, amount, method, groupId, paymentId, period } = req.body;
@@ -134,7 +284,6 @@ exports.uploadScreenshot = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
 
-    // Duplicate UPI check — reupload case me current record ko exclude karo
     const dupQuery = paymentId ? { upiId, _id: { $ne: paymentId } } : { upiId };
     const existing = await Payment.findOne(dupQuery);
     if (existing) {
@@ -178,12 +327,21 @@ exports.uploadScreenshot = async (req, res, next) => {
     }
 
     let payment;
+    let isReupload = false;   // ⭐ NEW
 
     if (paymentId) {
-      // REUPLOAD FLOW — existing record ko update karo
+      // REUPLOAD FLOW
       payment = await Payment.findOne({ _id: paymentId, user: req.user.id });
       if (!payment) {
         return res.status(404).json({ success: false, message: 'Original payment record not found' });
+      }
+
+      // ⭐ period tampering check (pichle jawab se)
+      if (period !== payment.period) {
+        return res.status(400).json({
+          success: false,
+          message: 'Reupload karte waqt period change nahi kar sakte'
+        });
       }
 
       payment.screenshotUrl = fileKey;
@@ -199,6 +357,7 @@ exports.uploadScreenshot = async (req, res, next) => {
 
       try {
         await payment.save();
+        isReupload = true;   // ⭐ NEW
       } catch (err) {
         if (err.code === 11000) {
           return res.status(409).json({ success: false, message: 'This UPI ID has already been used.' });
@@ -211,12 +370,7 @@ exports.uploadScreenshot = async (req, res, next) => {
         user: req.user.id,
         group: groupId,
         screenshotUrl: fileKey,
-        upiId,
-        amount,
-        method,
-        date,
-        time,
-        period,
+        upiId, amount, method, date, time, period,
         isVerified: false,
         reuploadRequested: false,
         uploadedAt: new Date(),
@@ -232,6 +386,30 @@ exports.uploadScreenshot = async (req, res, next) => {
       }
     }
 
+    // ⭐ NEW: Reupload hua to group ke admin(s) ko notify karo
+    if (isReupload) {
+      try {
+        const admins = await Gmem.find({ group: groupId, type: 'admin' }).select('user').lean();
+        const adminUserIds = admins.map(a => a.user).filter(id => id.toString() !== req.user.id.toString());
+
+        if (adminUserIds.length > 0) {
+          const uploader = await User.findById(req.user.id).select('f_name l_name').lean();
+          const uploaderName = `${uploader?.f_name || ''} ${uploader?.l_name || ''}`.trim() || 'A member';
+
+          await notifyUsers(
+            adminUserIds,
+            'Payment Re-uploaded',
+            `${uploaderName} re-uploaded the payment proof for ${group.g_name} (${period})`,
+            'payment_reupload',
+            { paymentId: payment._id.toString(), groupId: groupId.toString() },
+            '/pay/Pay-received-ss'
+          );
+        }
+      } catch (notifyErr) {
+        console.error('Error sending reupload notification:', notifyErr);
+      }
+    }
+
     res.json({
       success: true,
       message: paymentId ? 'Screenshot reuploaded successfully' : 'Screenshot uploaded successfully',
@@ -242,9 +420,6 @@ exports.uploadScreenshot = async (req, res, next) => {
     });
   } catch (error) {
     console.error('Error uploading screenshot:', error);
-    console.error("UPLOAD ERROR:");
-    console.error(error);
-    console.error(error.stack);
     return res.status(500).json({
       success: false,
       message: error.message || 'Server error while uploading screenshot'
@@ -490,7 +665,7 @@ exports.getPaymentMatrixData = async (req, res, next) => {
       .lean();
     const formattedMembers = members
       .filter(m => m.user)
-      .map(m => ({ id: m.user._id.toString(), name: `${m.user.f_name} ${m.user.l_name}` }));
+      .map(m => ({ id: m.user._id.toString(), name: `${m.user.f_name} ${m.user.l_name}`, joinedAt: m.createdAt }));
 
     const amountType = group.amount_type || 'monthly';
     const start = new Date(group.createdAt);
@@ -548,16 +723,30 @@ exports.getPaymentMatrixData = async (req, res, next) => {
       else if (statusMap[key] !== 'verified') statusMap[key] = 'pending';
     });
 
-    const matrix = formattedMembers.map(member => ({
-      memberId: member.id,
-      memberName: member.name,
-      cells: periods.map(period => {
-        const key = `${member.id}_${period.key}`;
-        let status = statusMap[key];
-        if (!status) status = period.isFuture ? 'upcoming' : 'missing'; // future+unpaid = upcoming, cross nahi
-        return { period: period.key, status };
-      })
-    }));
+    const matrix = formattedMembers.map(member => {
+      const joinedDate = member.joinedAt ? new Date(member.joinedAt) : null;
+
+      return {
+        memberId: member.id,
+        memberName: member.name,
+        cells: periods.map(period => {
+          const key = `${member.id}_${period.key}`;
+          let status = statusMap[key];
+
+          const periodEndDate = amountType === 'monthly'
+            ? new Date(Number(period.key.split('-')[0]), Number(period.key.split('-')[1]), 0)
+            : new Date(`${period.key}-12-31`);
+
+          if (joinedDate && periodEndDate < joinedDate) {
+            status = 'not_joined';   // ⭐ NEW: join se pehle ka period
+          } else if (!status) {
+            status = period.isFuture ? 'upcoming' : 'missing';
+          }
+
+          return { period: period.key, status };
+        })
+      };
+    });
 
     res.json({ success: true, groupName: group.g_name, amountType, periods, matrix });
   } catch (error) {
@@ -569,14 +758,26 @@ exports.getPaymentMatrixData = async (req, res, next) => {
 // exports.getUserPeriodStatus = async (req, res, next) => {
 //   try {
 //     const { groupId } = req.params;
-//     const { excludePaymentId } = req.query; // reupload case me current payment exclude
+//     const { excludePaymentId, memberId } = req.query; // memberId naya, optional
 //     const group = await Group.findById(groupId).lean();
 //     if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
 
 //     const membership = await Gmem.findOne({ user: req.user.id, group: groupId });
 //     if (!membership) return res.status(403).json({ success: false, message: 'Unauthorized' });
 
-//     const query = { user: req.user.id, group: groupId };
+//     let targetUserId = req.user.id;
+//     if (memberId && memberId !== req.user.id) {
+//       if (membership.type !== 'admin') {
+//         return res.status(403).json({ success: false, message: 'Only group admins can check other members\' payment status' });
+//       }
+//       const memberCheck = await Gmem.findOne({ user: memberId, group: groupId });
+//       if (!memberCheck) {
+//         return res.status(404).json({ success: false, message: 'Member not found in this group' });
+//       }
+//       targetUserId = memberId;
+//     }
+
+//     const query = { user: targetUserId, group: groupId };
 //     if (excludePaymentId) query._id = { $ne: excludePaymentId };
 
 //     const paidPayments = await Payment.find(query).select('period').lean();
@@ -589,24 +790,26 @@ exports.getPaymentMatrixData = async (req, res, next) => {
 exports.getUserPeriodStatus = async (req, res, next) => {
   try {
     const { groupId } = req.params;
-    const { excludePaymentId, memberId } = req.query; // memberId naya, optional
+    const { excludePaymentId, memberId } = req.query;
     const group = await Group.findById(groupId).lean();
     if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
 
     const membership = await Gmem.findOne({ user: req.user.id, group: groupId });
     if (!membership) return res.status(403).json({ success: false, message: 'Unauthorized' });
 
-    // ⭐ Yahi naya part hai — agar memberId nahi bheja gaya, to purana behavior hi chalega
     let targetUserId = req.user.id;
+    let targetMembership = membership;   // ⭐ default: apni khud ki membership date
+
     if (memberId && memberId !== req.user.id) {
       if (membership.type !== 'admin') {
-        return res.status(403).json({ success: false, message: 'Only group admins can check other members\' payment status' });
+        return res.status(403).json({ success: false, message: "Only group admins can check other members' payment status" });
       }
       const memberCheck = await Gmem.findOne({ user: memberId, group: groupId });
       if (!memberCheck) {
         return res.status(404).json({ success: false, message: 'Member not found in this group' });
       }
       targetUserId = memberId;
+      targetMembership = memberCheck;   // ⭐ target member ki apni membership date
     }
 
     const query = { user: targetUserId, group: groupId };
@@ -615,7 +818,12 @@ exports.getUserPeriodStatus = async (req, res, next) => {
     const paidPayments = await Payment.find(query).select('period').lean();
     const paidPeriods = paidPayments.map(p => p.period).filter(Boolean);
 
-    res.json({ success: true, amountType: group.amount_type || 'monthly', createdAt: group.createdAt, paidPeriods });
+    res.json({
+      success: true,
+      amountType: group.amount_type || 'monthly',
+      createdAt: targetMembership.createdAt,   // ⭐ group.createdAt ki jagah membership.createdAt
+      paidPeriods
+    });
   } catch (error) { next(error); }
 };
 

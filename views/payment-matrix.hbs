@@ -129,6 +129,11 @@
             color: #d97706;
         }
 
+        .status-not-joined {
+            background: #f1f5f9;
+            color: #94a3b8;
+        }
+
         .status-missing {
             background: #fee2e2;
             color: #dc2626;
@@ -1014,6 +1019,7 @@
                     if (cell.status === 'verified') icon = '<i class="fas fa-check-circle status-icon status-verified" title="Verified"></i>';
                     else if (cell.status === 'pending') icon = '<i class="fas fa-clock status-icon status-pending" title="Pending / Reupload Required"></i>';
                     else if (cell.status === 'upcoming') icon = '<i class="fas fa-minus status-icon status-upcoming" title="Not due yet"></i>';
+                    else if (cell.status === 'not_joined') icon = '<i class="fas fa-user-slash status-icon status-not-joined" title="Not a member yet"></i>';
                     else icon = '<i class="fas fa-times-circle status-icon status-missing" title="Not Paid"></i>';
                     html += `<td>${icon}</td>`;
                 });
@@ -1232,29 +1238,5 @@
         }
     </script>
     {{!-- Total member, pending wghr sab --}}
-    {{!--
-    <script>
-        $('#totalMembers').text(rows.length);
-
-        $('#selectedPeriod').text(
-            `${periods[0].label} - ${periods[periods.length - 1].label}`
-        );
-
-        let paid = 0;
-        let pending = 0;
-
-        rows.forEach(row => {
-            const current = row.cells.find(c => c.period === periods[periods.length - 1].key);
-
-            if (current) {
-                if (current.status === "verified") paid++;
-                else if (current.status === "pending" || current.status === "missing")
-                    pending++;
-            }
-        });
-
-        $('#paidMembers').text(paid);
-        $('#pendingMembers').text(pending);
-    </script> --}}
     <script src="/js/all.js"></script>
 </body>

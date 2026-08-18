@@ -172,6 +172,7 @@
                     <div class="upload-title"><i class="fas fa-cloud-upload-alt"></i> Upload Payment Screenshot</div>
                     <form id="paymentForm" enctype="multipart/form-data">
                         <input type="hidden" id="reuploadPaymentId" value="{{paymentId}}">
+                        <input type="hidden" id="reuploadPeriod" value="{{reuploadPeriod}}">
 
                         <label for="Communityselection">Select Community</label>
                         <select name="community" id="Communityselection" class="upload-input" required>
@@ -225,21 +226,29 @@
                     </form>
                 </section>
                 <aside class="community-info">
-                    <div class="community-title">Sarafa Community</div>
+                    <div class="community-title">Selected Community QR</div>
+
+                    <div class="qr-preview" id="sideQrPreview"
+                        style="display:none; justify-content:center; align-items:center; background:linear-gradient(135deg,#7b2ff7,#f107a3); padding:20px; border-radius:16px; margin-bottom:16px;">
+                        <img id="sideQrImg" src="" alt="QR Code"
+                            style="width:200px; height:200px; object-fit:contain; background:#fff; border-radius:12px; padding:10px;">
+                    </div>
+
+                    <div style="text-align:center; font-weight:700; color:#1c1e21; margin-bottom:20px;"
+                        id="sideQrGroupName"></div>
+                    <div style="text-align:center; font-weight:600; color:#551DFF; margin-bottom:20px; font-size:15px;"
+                        id="sideQrAmount"></div>
                     <p class="community-text">We are a vibrant network of members collaborating to uplift each other,
-                        share opportunities, and celebrate together. Your participation helps us organize events,
-                        support initiatives, and strengthen our bonds.</p>
+                        share opportunities, and celebrate together...</p>
                     <div class="community-list">
-                        <div class="community-item"><i class="fas fa-heart"></i> Stronger Connections</div>
-                        <div class="community-item"><i class="fas fa-bolt"></i> Quick Support</div>
-                        <div class="community-item"><i class="fas fa-calendar"></i> Engaging Events</div>
-                        <div class="community-item"><i class="fas fa-star"></i> Member Spotlight</div>
+                        ...
                     </div>
                 </aside>
             </div>
         </main>
     </div>
 
+    {{!--
     <script>
         $(document).ready(function () {
             const paymentForm = $('#paymentForm');
@@ -257,13 +266,11 @@
                 toastr[type](message);
             }
 
-            // Enable/disable submit button based on form validity
             function updateSubmitButton() {
                 const isValid = communitySelection.val() && upiIdInput.val() && amountInput.val() && methodInput.val() && paymentScreenshot[0].files.length > 0;
                 submitButton.prop('disabled', !isValid);
             }
 
-            // Pre-select group from query parameter
             const urlParams = new URLSearchParams(window.location.search);
             const groupId = urlParams.get('groupId');
             if (groupId) {
@@ -272,7 +279,6 @@
                 communitySelection.trigger('change');
             }
 
-            // Update submit button on input changes
             communitySelection.on('change', updateSubmitButton);
             upiIdInput.on('input', updateSubmitButton);
             amountInput.on('input', updateSubmitButton);
@@ -299,7 +305,6 @@
                 updateSubmitButton();
             });
 
-            // Form submission
             paymentForm.on('submit', async function (e) {
                 e.preventDefault();
 
@@ -330,6 +335,227 @@
                         headers: {
                             'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0] || ''}`
                         }
+                    });
+                    const result = await response.json();
+                    if (response.ok && result.success) {
+                        showNotification('Screenshot uploaded successfully', 'success');
+                        setTimeout(() => window.location.href = '/user-app/dashboard', 2000);
+                    } else {
+                        showNotification(result.message || 'Failed to upload screenshot', 'error');
+                        submitButton.prop('disabled', false).text('Submit');
+                    }
+                } catch (error) {
+                    showNotification('Error uploading screenshot: ' + error.message, 'error');
+                    submitButton.prop('disabled', false).text('Submit');
+                }
+            });
+        });
+    </script> --}}
+    <script>
+        $(document).ready(function () {
+            const paymentForm = $('#paymentForm');
+            const paymentScreenshot = $('#paymentScreenshot');
+            const paymentPreview = $('#paymentPreview');
+            const paymentPreviewImg = $('#paymentPreviewImg');
+            const communitySelection = $('#Communityselection');
+            const submitButton = $('#submitPaymentProof');
+            const upiIdInput = $('#upiId');
+            const amountInput = $('#amount');
+            const methodInput = $('#method');
+
+            let currentPaidPeriods = [];
+            const reuploadId = $('#reuploadPaymentId').val();
+            const reuploadPeriod = $('#reuploadPeriod').val();
+
+            function showNotification(message, type) { toastr[type](message); }
+
+            function updateSubmitButton() {
+                const isValid = communitySelection.val() && upiIdInput.val() && amountInput.val() && methodInput.val() && paymentScreenshot[0].files.length > 0;
+                submitButton.prop('disabled', !isValid);
+            }
+
+            communitySelection.on('change', updateSubmitButton);
+            upiIdInput.on('input', updateSubmitButton);
+            amountInput.on('input', updateSubmitButton);
+            methodInput.on('change', updateSubmitButton);
+
+            paymentScreenshot.on('change', function (e) {
+                const file = e.target.files[0];
+                if (file) {
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            paymentPreviewImg.attr('src', e.target.result);
+                            paymentPreview.show();
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        paymentPreviewImg.attr('src', '');
+                        paymentPreview.show();
+                    }
+                } else {
+                    paymentPreview.hide();
+                }
+                updateSubmitButton();
+            });
+
+            // ⭐ SIRF ek jagah se poora logic — group select hone par (ya reupload auto-load pe) chalta hai
+            async function loadGroupDetails(groupId) {
+                if (!groupId) return;
+                document.getElementById('periodMonthError').textContent = '';
+                document.getElementById('periodYearError').textContent = '';
+
+                try {
+                    const groupRes = await fetch(`/Groups/groups/${groupId}`, {
+                        credentials: 'include',
+                        headers: { 'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0] || ''}` }
+                    });
+                    const groupResult = await groupRes.json();
+                    if (!groupRes.ok || !groupResult.success) {
+                        showNotification('Error loading group details', 'error');
+                        return;
+                    }
+                    document.getElementById('amount').value = groupResult.group.amount;
+
+                    const sideQrPreview = document.getElementById('sideQrPreview');
+                    const sideQrImg = document.getElementById('sideQrImg');
+                    const sideQrGroupName = document.getElementById('sideQrGroupName');
+                    const sideQrAmount = document.getElementById('sideQrAmount');
+
+                    if (groupResult.group.qr_code) {
+                        sideQrImg.src = groupResult.group.qr_code;
+                    } else {
+                        sideQrImg.src = '/assets/images/default-qr.jpg';
+                    }
+                    sideQrGroupName.textContent = groupResult.group.g_name || '';
+
+                    const amt = groupResult.group.amount || 0;
+                    const amtType = groupResult.group.amount_type || 'monthly'; // 'monthly' ya 'yearly'
+                    sideQrAmount.textContent = `₹${amt} / ${amtType === 'yearly' ? 'Year' : 'Month'}`;
+
+                    sideQrPreview.style.display = 'flex';
+
+                    const statusUrl = `/pay/user-period-status/${groupId}` + (reuploadId ? `?excludePaymentId=${reuploadId}` : '');
+                    const statusRes = await fetch(statusUrl, {
+                        credentials: 'include',
+                        headers: { 'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0] || ''}` }
+                    });
+                    const statusData = await statusRes.json();
+                    if (!statusRes.ok || !statusData.success) {
+                        showNotification(statusData.message || 'Error loading payment status', 'error');
+                        return;
+                    }
+
+                    currentPaidPeriods = statusData.paidPeriods || [];
+                    const amountType = statusData.amountType || 'monthly';   // ⭐ ISI ek jagah se amountType decide hota hai — kahin aur nahi
+                    const start = new Date(statusData.createdAt);            // ⭐ ye ab membership joinedAt hoga (Fix 3 me niche)
+
+                    const monthInput = document.getElementById('periodMonth');
+                    const yearInput = document.getElementById('periodYear');
+
+                    if (amountType === 'monthly') {
+                        document.getElementById('periodMonthGroup').style.display = 'block';
+                        document.getElementById('periodYearGroup').style.display = 'none';
+
+                        if (reuploadId && reuploadPeriod) {
+                            // ⭐ Reupload: sirf isi month ko select-able banao, poora field lock
+                            monthInput.min = reuploadPeriod;
+                            monthInput.max = reuploadPeriod;
+                            monthInput.value = reuploadPeriod;
+                            monthInput.disabled = true;
+                        } else {
+                            const minMonth = `${start.getFullYear()}-${String(start.getMonth() + 1).padStart(2, '0')}`;
+                            monthInput.min = minMonth;
+                            monthInput.removeAttribute('max');
+                            monthInput.value = '';
+                            monthInput.disabled = false;
+                        }
+                    } else {
+                        document.getElementById('periodMonthGroup').style.display = 'none';
+                        document.getElementById('periodYearGroup').style.display = 'block';
+
+                        if (reuploadId && reuploadPeriod) {
+                            // ⭐ Reupload: sirf isi year ko select-able banao
+                            yearInput.min = reuploadPeriod;
+                            yearInput.max = reuploadPeriod;
+                            yearInput.value = reuploadPeriod;
+                            yearInput.disabled = true;
+                        } else {
+                            yearInput.min = start.getFullYear();
+                            yearInput.removeAttribute('max');
+                            yearInput.value = '';
+                            yearInput.disabled = false;
+                        }
+                    }
+                } catch (error) {
+                    showNotification('Error loading group details: ' + error.message, 'error');
+                }
+            }
+
+            communitySelection.on('change', function () {
+                const groupId = $(this).val();
+
+                if (!groupId) {
+                    document.getElementById('sideQrPreview').style.display = 'none';
+                    document.getElementById('sideQrGroupName').textContent = '';
+                    document.getElementById('sideQrAmount').textContent = '';
+                    document.getElementById('amount').value = '';
+                    document.getElementById('periodMonthGroup').style.display = 'block';
+                    document.getElementById('periodYearGroup').style.display = 'none';
+                    document.getElementById('periodMonth').value = '';
+                    document.getElementById('periodYear').value = '';
+                    document.getElementById('periodMonthError').textContent = '';
+                    document.getElementById('periodYearError').textContent = '';
+                    currentPaidPeriods = [];
+                    updateSubmitButton();
+                    return;
+                }
+
+                loadGroupDetails(groupId);
+            });
+
+            // Page load par (reupload link se aane par) group preselect + lock karo
+            const urlParams = new URLSearchParams(window.location.search);
+            const groupIdFromUrl = urlParams.get('groupId');
+            if (groupIdFromUrl) {
+                communitySelection.val(groupIdFromUrl);
+                if (reuploadId) {
+                    communitySelection.prop('disabled', true);   // ⭐ reupload me group bhi change na ho paye
+                }
+                updateSubmitButton();
+                loadGroupDetails(groupIdFromUrl);   // ⭐ direct call, trigger('change') pe depend nahi
+            }
+
+            document.getElementById('periodMonth').addEventListener('change', function () {
+                const errorDiv = document.getElementById('periodMonthError');
+                if (this.value && currentPaidPeriods.includes(this.value)) {
+                    errorDiv.textContent = 'Payment for this month has already been completed.';
+                    this.value = '';
+                } else { errorDiv.textContent = ''; }
+            });
+            document.getElementById('periodYear').addEventListener('change', function () {
+                const errorDiv = document.getElementById('periodYearError');
+                if (this.value && currentPaidPeriods.includes(this.value)) {
+                    errorDiv.textContent = 'Payment for this year has already been completed.';
+                    this.value = '';
+                } else { errorDiv.textContent = ''; }
+            });
+
+            paymentForm.on('submit', async function (e) {
+                e.preventDefault();
+                const period = $('#periodMonth').val() || $('#periodYear').val();
+                if (!period) { toastr.error('Please select the payment period'); return; }
+
+                submitButton.prop('disabled', true).text('Submitting...');
+                const formData = new FormData(this);
+                formData.append('groupId', communitySelection.val());
+                formData.append('period', period);
+                if (reuploadId) formData.append('paymentId', reuploadId);
+
+                try {
+                    const response = await fetch('/pay/SS-upload', {
+                        method: 'POST', body: formData, credentials: 'include',
+                        headers: { 'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0] || ''}` }
                     });
                     const result = await response.json();
                     if (response.ok && result.success) {
@@ -394,6 +620,15 @@
                             monthInput.removeAttribute('max'); // future months allowed
                             monthInput.value = '';
                             document.getElementById('periodMonthError').textContent = '';
+
+                            if (reuploadId && reuploadPeriod) {
+                                monthInput.value = reuploadPeriod;
+                                monthInput.disabled = true;
+                            } else {
+                                monthInput.value = '';
+                                monthInput.disabled = false;
+                            }
+
                         } else {
                             document.getElementById('periodMonthGroup').style.display = 'none';
                             document.getElementById('periodYearGroup').style.display = 'block';
@@ -402,6 +637,14 @@
                             yearInput.removeAttribute('max');
                             yearInput.value = '';
                             document.getElementById('periodYearError').textContent = '';
+
+                            if (reuploadId && reuploadPeriod) {
+                                yearInput.value = reuploadPeriod;
+                                yearInput.disabled = true;
+                            } else {
+                                yearInput.value = '';
+                                yearInput.disabled = false;
+                            }
                         }
                     }
                 } catch (error) {

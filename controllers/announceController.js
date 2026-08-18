@@ -60,36 +60,36 @@ exports.Announcement = async (req, res, next) => {
   }
 };
 
-exports.Announcementform = async (req, res, next) => {
-  try {
-    console.log("/user/Announcementform");
-    if (!req.user || !req.user.id) {
-      return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
-    }
+// exports.Announcementform = async (req, res, next) => {
+//   try {
+//     console.log("/user/Announcementform");
+//     if (!req.user || !req.user.id) {
+//       return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
+//     }
 
-    const user = await User.findById(req.user.id).lean();
-    if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
-    }
+//     const user = await User.findById(req.user.id).lean();
+//     if (!user) {
+//       return res.status(404).json({ success: false, message: 'User not found' });
+//     }
 
-    const groupMember = await GMem.findOne({ user: req.user.id, type: 'admin' });
-    if (!groupMember) {
-      return res.status(403).render('error', { errorMessage: 'Please make your Association first! You are not authorized to create announcements', layout: false });
-    }
+//     const groupMember = await GMem.findOne({ user: req.user.id, type: 'admin' });
+//     if (!groupMember) {
+//       return res.status(403).render('error', { errorMessage: 'Please make your Association first! You are not authorized to create announcements', layout: false });
+//     }
 
-    res.render("Announcement-form", {
-      user: {
-        ...user,
-        has_password: !!user.password
-      },
-      //   groupId,
-      title: 'Sarafa Create Announcement | MySarafa',
-    });
-  } catch (error) {
-    console.error('Error rendering announcement form:', error);
-    res.status(500).render('500', { errorMessage: 'Server error: ' + error.message, layout: false });
-  }
-};
+//     res.render("Announcement-form", {
+//       user: {
+//         ...user,
+//         has_password: !!user.password
+//       },
+//       //   groupId,
+//       title: 'Sarafa Create Announcement | MySarafa',
+//     });
+//   } catch (error) {
+//     console.error('Error rendering announcement form:', error);
+//     res.status(500).render('500', { errorMessage: 'Server error: ' + error.message, layout: false });
+//   }
+// };
 
 
 // exports.createAnnouncement = async (req, res) => {
@@ -180,6 +180,46 @@ exports.Announcementform = async (req, res, next) => {
 //     });
 //   }
 // };
+
+exports.Announcementform = async (req, res, next) => {
+  try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
+    }
+
+    const user = await User.findById(req.user.id).lean();
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // ⭐ Hardcoded admin check ki jagah — user ke saare groups me permission check karo
+    const memberships = await GMem.find({ user: req.user.id }).select('group').lean();
+
+    let hasPermission = false;
+    for (const m of memberships) {
+      const permCheck = await checkGroupPermission(req.user.id, m.group, 'manage_announcements');
+      if (permCheck.allowed) {
+        hasPermission = true;
+        break;
+      }
+    }
+
+    if (!hasPermission) {
+      return res.status(403).render('error', {
+        errorMessage: 'Please make your Association first! You are not authorized to create announcements',
+        layout: false
+      });
+    }
+
+    res.render("Announcement-form", {
+      user: { ...user, has_password: !!user.password },
+      title: 'Sarafa Create Announcement | MySarafa',
+    });
+  } catch (error) {
+    console.error('Error rendering announcement form:', error);
+    res.status(500).render('500', { errorMessage: 'Server error: ' + error.message, layout: false });
+  }
+};
 
 exports.createAnnouncement = async (req, res) => {
   try {

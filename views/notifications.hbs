@@ -498,22 +498,16 @@
             </div>
             <div class="notifications-container">
                 <div class="notification-section" id="today-section">
-                    <h3 class="section-title">Today</h3>
+                    <h3 class="section-title">Join Requests</h3>
                     <div id="today-notifications">
                         {{#each todayRequests}}
                         <div class="notification-item unread" data-type="request" data-request-id="{{this.requestId}}">
-                            {{!-- <div class="notification-avatar">
-                                <img src="/Assets/Images/default-avatar.jpg" alt="User Avatar" class="avatar-img">
-                            </div> --}}
                             <div class="notification-content">
                                 <div class="notification-text">
                                     <strong>{{this.userName}}</strong> requested to join
                                     <strong>{{this.groupName}}</strong>
                                     <span class="notification-time">{{this.createdAt}}</span>
                                 </div>
-                                {{!-- <div class="notification-preview" style="font-style: normal;">
-                                    "Hi, I’d like to join this community to participate in events."
-                                </div> --}}
                                 <div class="request-action-buttons">
                                     <button class="btn-accept" data-request-id="{{this.requestId}}"
                                         data-group-id="{{this.groupId}}"><i class="fas fa-check"></i> Accept</button>
@@ -523,15 +517,17 @@
                             </div>
                         </div>
                         {{else}}
-                        <div class="notifications-empty">
-                            <i class="fas fa-bell-slash"></i>
-                            <h3>No Notifications</h3>
-                            <p>You don't have any notifications at the moment.</p>
-                        </div>
+                        <p style="color:#9ca3af; padding:10px;">No pending requests.</p>
                         {{/each}}
                     </div>
                 </div>
+
+                <div class="notification-section" id="general-section">
+                    <h3 class="section-title">Updates</h3>
+                    <div id="general-notifications"></div>
+                </div>
             </div>
+
         </main>
     </div>
 
@@ -573,6 +569,40 @@
                     toastr.error('Error fetching notifications');
                 }
             });
+            $.ajax({
+                url: '/Groups/my-notifications',
+                method: 'GET',
+                xhrFields: { withCredentials: true },
+                success: function (response) {
+                    if (response.success && response.notifications.length > 0) {
+                        $('#general-notifications').empty();
+                        response.notifications.forEach(n => appendGeneralNotification(n));
+                    } else {
+                        $('#general-notifications').html('<p style="color:#9ca3af; padding:10px;">No updates yet.</p>');
+                    }
+                },
+                error: function (err) {
+                    console.error('Error fetching general notifications:', err);
+                }
+            });
+
+            function appendGeneralNotification(n) {
+                const timeAgo = new Date(n.createdAt).toLocaleString(undefined, {
+                    day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+                });
+                const html = `
+        <div class="notification-item ${n.isRead ? '' : 'unread'}" data-type="${n.type}"
+             style="cursor:pointer;" onclick="window.location.href='${n.link}'">
+            <div class="notification-content">
+                <div class="notification-text">
+                    ${n.body}
+                    <span class="notification-time">${timeAgo}</span>
+                </div>
+            </div>
+        </div>
+    `;
+                $('#general-notifications').append(html);
+            }
             socket.on('membershipRequest', function (data) {
                 console.log("📩 Incoming membershipRequest socket data:", data);
                 notificationCount++;

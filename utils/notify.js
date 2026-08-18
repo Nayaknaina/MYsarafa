@@ -1,7 +1,8 @@
 const { getMessaging } = require("firebase-admin/messaging");
 const User = require("../models/user.model");
+const Notification = require("../models/notification.model");
 
-async function sendNotificationToUsers(userIds, title, body, data = {}) {
+async function sendNotificationToUsers(userIds, title, body, data = {}, link = "/announcements") {
 
     console.log("===== NOTIFY FUNCTION CALLED =====");
     console.log("Users:", userIds);
@@ -39,10 +40,7 @@ async function sendNotificationToUsers(userIds, title, body, data = {}) {
         try {
             const message = {
                 tokens,
-                notification: {
-                    title,
-                    body,
-                },
+                notification: { title, body },
                 data: stringData,
                 webpush: {
                     notification: {
@@ -51,7 +49,7 @@ async function sendNotificationToUsers(userIds, title, body, data = {}) {
                         icon: "/assets/favicon/favicon_logo.png"
                     },
                     fcmOptions: {
-                        link: "/announcements"
+                        link
                     }
                 }
             };
@@ -96,4 +94,20 @@ async function sendNotificationToUsers(userIds, title, body, data = {}) {
     return { successCount, failureCount };
 }
 
-module.exports = { sendNotificationToUsers };
+async function saveNotificationsToDb(userIds, title, body, type, data = {}, link = "/announcements") {
+  if (!userIds || !userIds.length) return;
+  try {
+    const docs = userIds.map(uid => ({ recipient: uid, type, title, body, link, data }));
+    await Notification.insertMany(docs);
+  } catch (err) {
+    console.error("Error saving notifications to DB:", err.message);
+  }
+}
+
+// ⭐ NEW — isko hi controllers se call karenge
+async function notifyUsers(userIds, title, body, type, data = {}, link = "/announcements") {
+  await saveNotificationsToDb(userIds, title, body, type, data, link);
+  return sendNotificationToUsers(userIds, title, body, data, link);
+}
+
+module.exports = { sendNotificationToUsers, saveNotificationsToDb, notifyUsers };
