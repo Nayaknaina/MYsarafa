@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
-    <link rel="icon" href="/assets/favicon/favicon_logo.png" type="image/png">
-    <link rel="apple-touch-icon" href="/assets/favicon/favicon_logo.png">
+  <link rel="icon" href="/assets/favicon/favicon_logo.png" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/favicon/favicon_logo.png">
 
   <title>Member Details - KYC Verification</title>
   <style>
@@ -62,6 +62,11 @@
     .status-badge.verified {
       background-color: #d1fae5;
       color: #065f46;
+    }
+
+    .status-badge.blacklisted {
+      background-color: #fee2e2;
+      color: #b91c1c;
     }
 
     .content-grid {
@@ -434,6 +439,35 @@
       background: #2563eb;
     }
 
+    .blacklist-reason-box {
+      margin-top: 16px;
+      padding: 16px;
+      background: #fff1f2;
+      border: 1px solid #fecaca;
+      border-left: 4px solid #dc2626;
+      border-radius: 8px;
+    }
+
+    .blacklist-reason-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #b91c1c;
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .blacklist-reason-title i {
+      font-size: 14px;
+    }
+
+    .blacklist-reason-text {
+      color: #7f1d1d;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
     @media (max-width: 768px) {
       .content-grid {
         grid-template-columns: 1fr;
@@ -472,7 +506,7 @@
           <div class="profile-header">
             <div class="avatar-container">
               <img src="{{#if user.profilePicture}}{{user.profilePicture}}{{else}}/Assets/Images/imgperson{{/if}}"
-                class="avatar" height="80" width="80">
+                class="avatar {{#if user.blacklistStatus}}blacklisted-avatar{{/if}}" height="80" width="80">
               <div class="verification-badge" id="verificationBadge" style="display: {{#ifEquals user.user_status "
                 verified"}}flex{{else}}none{{/ifEquals}};">
                 <svg class="check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
@@ -484,19 +518,31 @@
             <div class="profile-info">
               <h2>{{user.fullName}}</h2>
               <div class="member-status" id="memberStatus">
-                <span class="status-badge {{#ifEquals user.user_status "
-                  verified"}}verified{{else}}pending{{/ifEquals}}">
-                  {{#ifEquals user.user_status "verified"}}
-                  Verified
-                  {{else}}
-                  Pending Verification
-                  {{/ifEquals}}
+
+                {{#if user.blacklistStatus}}
+                <span class="status-badge blacklisted">
+                  Blacklisted
                 </span>
+
+                {{else}}
+
+                {{#ifEquals user.user_status "verified"}}
+                <span class="status-badge verified">
+                  Verified
+                </span>
+                {{else}}
+                <span class="status-badge pending">
+                  Pending Verification
+                </span>
+                {{/ifEquals}}
+
+                {{/if}}
+
               </div>
               <p class="join-date">Joined: {{formatDate user.createdAt}}</p>
             </div>
           </div>
-          <div class="profile-details">
+          {{!-- <div class="profile-details">
             <div class="detail-row">
               <span class="label">Email:</span>
               <span class="value">{{#if user.email}}{{user.email}}{{else}}-{{/if}}</span>
@@ -517,7 +563,52 @@
               <span class="label">Shop Name:</span>
               <span class="value">{{#if user.shopname}}{{user.shopname}}{{else}}-{{/if}}</span>
             </div>
+          </div> --}}
+          <div class="profile-details">
+
+            <div class="detail-row">
+              <span class="label">Email:</span>
+              <span class="value">{{#if user.email}}{{user.email}}{{else}}-{{/if}}</span>
+            </div>
+
+            <div class="detail-row">
+              <span class="label">Phone:</span>
+              <span class="value">{{#if user.phone}}{{user.phone}}{{else}}-{{/if}}</span>
+            </div>
+
+            <div class="detail-row">
+              <span class="label">Address:</span>
+              <span class="value">{{#if user.address}}{{user.address}}{{else}}-{{/if}}</span>
+            </div>
+
+            <div class="detail-row">
+              <span class="label">Date of Birth:</span>
+              <span class="value">{{#if user.dob}}{{formatDate user.dob}}{{else}}-{{/if}}</span>
+            </div>
+
+            <div class="detail-row">
+              <span class="label">Shop Name:</span>
+              <span class="value">{{#if user.shopname}}{{user.shopname}}{{else}}-{{/if}}</span>
+            </div>
+
           </div>
+
+          {{#if user.blacklistStatus}}
+          <div class="blacklist-reason-box">
+            <div class="blacklist-reason-title">
+              <i class="fas fa-ban"></i>
+              Blacklist Reason
+            </div>
+
+            <div class="blacklist-reason-text">
+              {{#if user.blacklistReason}}
+              {{user.blacklistReason}}
+              {{else}}
+              No reason provided
+              {{/if}}
+            </div>
+          </div>
+          {{/if}}
         </div>
       </div>
 
