@@ -219,6 +219,9 @@ exports.postUpdate = async (req, res) => {
 
 // Fetch & Store Metal Rates
 exports.fetchMetalRates = async () => {
+    const currentTime = new Date().toLocaleString('en-IN', {
+        timeZone: 'Asia/Kolkata'
+    });
     try {
 
         const url = 'https://api.metals.dev/v1/latest?api_key=WND0GG4RLAJTPFVBT7G7725VBT7G7&currency=INR&unit=g';
@@ -230,6 +233,7 @@ exports.fetchMetalRates = async () => {
         });
 
         const result = response.data;
+        console.log(`✅ API Success: ${currentTime}`);
         console.log(result);
 
         const goldPrice = result?.metals?.mcx_gold || 0;
@@ -295,26 +299,26 @@ exports.fetchMetalRates = async () => {
         console.log('✅ Rate Saved =>', savedRate);
 
     } catch (error) {
-        console.error('❌ Error Fetching Metal Rates =>', error.message);
+        console.error(`❌ Metal Rate API Failed: ${currentTime}`, error.message);
     }
 };
 
 const cron = require('node-cron');
 
-cron.schedule('0 0 * * *', () => {
-    console.log('⏰ Cron running daily at 12 Am');
-    // exports.fetchAndStoreRates();
+// cron.schedule('0 0 * * *', () => {
+//     console.log('⏰ Cron running daily at 12 Am');
+// exports.fetchAndStoreRates();
+//     exports.fetchMetalRates();
+
+// }, { timezone: 'Asia/Kolkata' });
+
+cron.schedule('0 0,12,18 * * *', () => {
+    console.log(`⏰ Cron Triggered: ${new Date().toLocaleString('en-IN', {
+        timeZone: 'Asia/Kolkata'
+    })}`);
     exports.fetchMetalRates();
+}, {
+    timezone: 'Asia/Kolkata'
+});
 
-}, { timezone: 'Asia/Kolkata' });
 
-// EACH SECOND
-
-// const cron = require('node-cron');
-
-// cron.schedule('* * * * * *', async () => {
-//     console.log('⏰ Cron running every second');
-//     await exports.fetchMetalRates();
-// }, {
-//     timezone: 'Asia/Kolkata'
-// });
