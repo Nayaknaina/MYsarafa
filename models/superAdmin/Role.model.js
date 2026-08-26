@@ -8,7 +8,8 @@ const PERMISSIONS = [
     'manage_roles',
     'manage_business',
     'manage_kyc',
-    'manage_group_settings'
+    'manage_group_settings',
+    'view_payment_matrix'
 ];
 
 const roleSchema = new mongoose.Schema({

@@ -19,10 +19,346 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
-  .announcement-copy:active,
+  /* =========================
+     Base
+  ========================= */
+
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background-color: #f3f4f6;
+  }
+
+  /* =========================
+     Announcement Container
+  ========================= */
+
+  .announcement-container {
+    width: 100%;
+    max-width: 620px;
+    margin: 30px auto;
+    padding: 0 16px;
+  }
+
+  .announcement-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 30px;
+    /* Space after last announcement */
+  }
+
+  /* =========================
+     Announcement Card
+  ========================= */
+
+  .announcement-card {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 24px 28px;
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
+    border: 1px solid #f1f5f9;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .announcement-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.08);
+  }
+
+  /* =========================
+     Group Badge
+  ========================= */
+
+  .announcement-group {
+    display: inline-block;
+    background: #9381ff;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+
+  /* =========================
+     Announcement Title
+  ========================= */
+
+  .announcement-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1e1b4b;
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #f1f5f9;
+    line-height: 1.3;
+  }
+
+  /* =========================
+     Content Body
+  ========================= */
+
+  .announcement-content-body {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 18px;
+  }
+
+  /* =========================
+     Announcement Image
+  ========================= */
+
+  .announcement-img {
+    width: 130px;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 12px;
+    flex-shrink: 0;
+    border: 2px solid #e2e8f0;
+  }
+
+  /* =========================
+     Announcement Message
+  ========================= */
+
+  .announcement-message {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #334155;
+    flex: 1;
+  }
+
+  /* =========================
+     Read More
+  ========================= */
+
+  .read-more-btn {
+    color: #9381ff;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    margin-left: 4px;
+  }
+
+  /* =========================
+     Meeting Link
+  ========================= */
+
+  .announcement-meeting-link {
+    display: inline-block;
+    background: #eff6ff;
+    color: #2563eb;
+    padding: 6px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 12px;
+    margin-top: 8px;
+    transition: all 0.3s ease;
+  }
+
+  .announcement-meeting-link:hover {
+    background: #dbeafe;
+    transform: translateY(-1px);
+  }
+
+  /* =========================
+     Announcement Footer
+  ========================= */
+
+  .announcement-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 14px;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  /* =========================
+     User Info
+  ========================= */
+
+  .announcement-user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #e2e8f0;
+    flex-shrink: 0;
+  }
+
+  .user-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  .announcement-time {
+    font-size: 13px;
+    color: #94a3b8;
+    font-weight: 400;
+    margin-left: 6px;
+  }
+
+  /* =========================
+     Action Buttons
+  ========================= */
+
+  .announcement-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+  }
+
+  .action-btn {
+    color: #1e293b;
+    font-size: 18px;
+    cursor: pointer;
+    transition: transform 0.15s ease, color 0.15s ease;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+
+  .action-btn:hover {
+    color: #9381ff;
+    transform: scale(1.1);
+  }
+
+  /* Copy */
+
+  .announcement-copy {
+    color: #64748b;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+  }
+
+  .announcement-copy:hover {
+    background: #e0f2fe;
+    color: #0369a1;
+    transform: scale(1.05);
+  }
+
+  .announcement-copy:active {
+    transform: scale(1.2);
+  }
+
+  /* Share */
+
+  .announcement-share {
+    color: #64748b;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+  }
+
+  .announcement-share:hover {
+    background: #fef3c7;
+    color: #d97706;
+    transform: scale(1.05);
+  }
+
   .announcement-share:active {
     transform: scale(1.2);
   }
+
+  /* Delete */
+
+  .Delete-btn {
+    color: #ef4444;
+    cursor: pointer;
+    font-size: 18px;
+    transition: color 0.3s ease, transform 0.15s ease;
+  }
+
+  .delete-action-btn {
+    color: #ef4444;
+  }
+
+  .delete-action-btn:hover {
+    color: #dc2626;
+    transform: scale(1.1);
+  }
+
+  /* =========================
+     New Announcement Button
+  ========================= */
+
+  .Announcement-btn {
+    position: absolute;
+    top: 100px;
+    right: 35px;
+    width: 91px;
+    height: 40px;
+    background: linear-gradient(245deg,
+        #D324A8 -67.04%,
+        #551DFF 129.05%);
+    border-radius: 9px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .Announcement-btn:hover {
+    background: linear-gradient(245deg,
+        #551DFF -67.04%,
+        #D324A8 129.05%);
+    transform: translateY(-1px);
+  }
+
+  /* =========================
+     Unused/Other Announcement
+     Components
+  ========================= */
+
+  .new-event-btn {
+    background: linear-gradient(245deg,
+        #D324A8 -67.04%,
+        #551DFF 129.05%);
+    color: #fff;
+    border: none;
+    border-radius: 22px;
+    padding: 10px 28px;
+    font-size: 1rem;
+    font-weight: 300;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .new-event-btn:hover {
+    background: linear-gradient(245deg,
+        #551DFF -67.04%,
+        #D324A8 129.05%);
+  }
+
+  /* =========================
+     Chat Styles
+     (Kept because they were
+     present in your original CSS)
+  ========================= */
 
   .chat-container {
     display: flex;
@@ -118,300 +454,17 @@
     background: #1256a3;
   }
 
-  .announcement-container {
-    width: 100%;
-    height: 100%;
-    margin: 40px auto;
-    padding: 0 16px;
-  }
+  /* =========================
+     Responsive - Tablet
+  ========================= */
 
-  .announcement-post-box {
-    display: flex;
-    align-items: center;
-    background: #f3f4f6;
-    border-radius: 16px;
-    padding: 18px 24px;
-    margin-bottom: 24px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    gap: 16px;
-  }
-
-  .announcement-post-box i {
-    font-size: 2rem;
-    color: #aaa;
-  }
-
-  .announcement-input {
-    flex: 1 1 0%;
-    min-width: 0;
-    max-width: 100%;
-    font-size: 1rem;
-    padding: 10px 8px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    outline: none;
-  }
-
-  .announcement-add-btn {
-    flex-shrink: 0;
-    background: #1976d2;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.3rem;
-    padding: 0 18px;
-    height: 40px;
-    cursor: pointer;
-    transition: background 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .announcement-add-btn:hover {
-    background: #1256a3;
-  }
-
-  .announcement-list {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
-
-  .announcement-card {
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.10);
-    padding: 24px;
-    margin-bottom: 8px;
-    position: relative;
-  }
-
-  /*.announcement-message {
-      font-size: 1.1rem;
-      margin-bottom: 18px;
-    }
-*/
-  /* .announcement-meta {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 12px;
-    }
-*/
-  /* .announcement-user {
-      font-weight: bold;
-      color: #2f95ff;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }*/
-
-  /*.announcement-time {
-      color: #aaa;
-      font-size: 1rem;
-      font-weight: 600;
-    }*/
-
-  .new-event-btn {
-    background: linear-gradient(245deg, #D324A8 -67.04%, #551DFF 129.05%);
-    color: #fff;
-    border: none;
-    border-radius: 22px;
-    padding: 10px 28px;
-    font-size: 1rem;
-    font-weight: 300;
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-    transition: background 0.2s, color 0.2s;
-  }
-
-  .new-event-btn:hover {
-    background: linear-gradient(245deg, #551DFF -67.04%, #D324A8 129.05%);
-
-  }
-
-  .Announcement-btn {
-    position: absolute;
-    top: 100px;
-    right: 35px;
-    width: 91px;
-    height: 40px;
-    background: linear-gradient(245deg, #D324A8 -67.04%, #551DFF 129.05%);
-    border-radius: 9px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    border: none;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
-    color: white;
-    font-size: 1.2rem;
-    font-weight: 600;
-
-
-  }
-
-  /*.announcement-img{
-      width: 50%;
-      height: auto;
-      border-radius: 12px;
-      margin-bottom: 16px;
-    }
-    .announcement-card{
-      display: flex;
-      
-    }
-    .announcement-content{
-      margin-left: 10px;
-    }*/
-
-  .announcement-group {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 8px 8px 0 0;
-    font-size: 14px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .announcement-title {
-    background: #f8fafc;
-    padding: 1px 20px;
-    font-size: 20px;
-    font-weight: 700;
-    color: #1e293b;
-    border-bottom: 1px solid #e2e8f0;
-  }
-
-  .announcement-content {
-    padding: 20px;
-    background: white;
-    border-radius: 0 0 12px 12px;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  }
-
-  .Delete-btn {
-    top: 20px;
-    right: 20px;
-    color: #ef4444;
-    cursor: pointer;
-    font-size: 18px;
-    transition: color 0.3s ease;
-  }
-
-  .announcement-img {
-    width: 120px;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 8px;
-    float: left;
-    margin: 0 16px 16px 0;
-    border: 2px solid #e2e8f0;
-  }
-
-  .announcement-message {
-    font-size: 16px;
-    line-height: 1.6;
-    color: #475569;
-    margin-bottom: 16px;
-    text-align: justify;
-  }
-
-  .announcement-meeting-link {
-    display: inline-block;
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 12px;
-    margin-bottom: 20px;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
-  }
-
-  .announcement-meeting-link:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(16, 185, 129, 0.4);
-  }
-
-  .announcement-actions {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 16px;
-    justify-content: flex-end;
-  }
-
-  .announcement-copy,
-  .announcement-share {
-
-    color: #64748b;
-    padding: 8px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 16px;
-  }
-
-  .announcement-copy:hover {
-    background: #e0f2fe;
-    color: #0369a1;
-    transform: scale(1.05);
-  }
-
-  .announcement-share:hover {
-    background: #fef3c7;
-    color: #d97706;
-    transform: scale(1.05);
-  }
-
-  .announcement-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    /*padding-top: 16px;
-  border-top: 1px solid #e2e8f0;*/
-    font-size: 14px;
-    color: #64748b;
-  }
-
-  .announcement-user {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-weight: 500;
-  }
-
-  .announcement-user i {
-    color: #667eea;
-    font-size: 16px;
-  }
-
-  .announcement-time {
-    font-weight: 400;
-    color: #94a3b8;
-  }
-
-  /* Container styling for the entire announcement card */
-  .announcement-card {
-    max-width: 600px;
-    /*margin: 20px auto; Center the card*/
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-    background: white;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-
-  .announcement-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-  }
-
-  /* Responsive design */
   @media (max-width: 768px) {
+
+    .announcement-container {
+      max-width: 100%;
+      padding: 0 12px;
+    }
+
     .announcement-img {
       width: 100%;
       height: 200px;
@@ -420,7 +473,6 @@
     }
 
     .announcement-meta {
-      /*.announcement-actions: column;*/
       gap: 8px;
       align-items: flex-start;
     }
@@ -428,180 +480,23 @@
     .announcement-actions {
       justify-content: center;
     }
+
+    .Announcement-btn {
+      right: 20px;
+    }
   }
 
-  /*Test*/
+  /* =========================
+     Responsive - Mobile
+  ========================= */
 
-  body {
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    background-color: #f3f4f6;
-  }
-
-  .announcement-container {
-    width: 100%;
-    max-width: 620px;
-    margin: 30px auto;
-    padding: 0 16px;
-  }
-
-  .announcement-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  /* Base Card Styling matching the image */
-  .announcement-card {
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 24px 28px;
-    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05);
-    border: 1px solid #f1f5f9;
-    position: relative;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .announcement-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.08);
-  }
-
-  /* Purple Group Badge */
-  .announcement-group {
-    display: inline-block;
-    background: #9381ff;
-    color: #ffffff;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    padding: 6px 14px;
-    border-radius: 20px;
-    margin-bottom: 14px;
-  }
-
-  /* Clean Title */
-  .announcement-title {
-    font-size: 20px;
-    font-weight: 700;
-    color: #1e1b4b;
-    margin-bottom: 16px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid #f1f5f9;
-    line-height: 1.3;
-  }
-
-  /* Body Content (Image + Text Grid) */
-  .announcement-content-body {
-    display: flex;
-    gap: 16px;
-    align-items: flex-start;
-    margin-bottom: 18px;
-  }
-
-  .announcement-img {
-    width: 130px;
-    height: 130px;
-    object-fit: cover;
-    border-radius: 12px;
-    flex-shrink: 0;
-  }
-
-  .announcement-message {
-    font-size: 14px;
-    line-height: 1.6;
-    color: #334155;
-    flex: 1;
-  }
-
-  .read-more-btn {
-    color: #9381ff;
-    font-weight: 600;
-    font-size: 13px;
-    cursor: pointer;
-    margin-left: 4px;
-  }
-
-  .announcement-meeting-link {
-    display: inline-block;
-    background: #eff6ff;
-    color: #2563eb;
-    padding: 6px 12px;
-    border-radius: 8px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 12px;
-    margin-top: 8px;
-  }
-
-  /* Footer Section */
-  .announcement-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 14px;
-    border-top: 1px solid #f1f5f9;
-  }
-
-  .announcement-user-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .user-avatar {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    object-fit: cover;
-    background: #e2e8f0;
-  }
-
-  .user-name {
-    font-size: 14px;
-    font-weight: 600;
-    color: #1e293b;
-  }
-
-  .announcement-time {
-    font-size: 13px;
-    color: #94a3b8;
-    font-weight: 400;
-    margin-left: 6px;
-  }
-
-  /* Action Icons */
-  .announcement-actions {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .action-btn {
-    color: #1e293b;
-    font-size: 18px;
-    cursor: pointer;
-    transition: transform 0.15s ease, color 0.15s ease;
-    background: none;
-    border: none;
-    padding: 0;
-  }
-
-  .action-btn:hover {
-    color: #9381ff;
-    transform: scale(1.1);
-  }
-
-  .delete-action-btn {
-    color: #ef4444;
-  }
-
-  .delete-action-btn:hover {
-    color: #dc2626;
-  }
-
-  /* Responsive fixes */
   @media (max-width: 480px) {
+
+    .announcement-container {
+      padding: 0 10px;
+      margin: 20px auto;
+    }
+
     .announcement-card {
       padding: 18px;
     }
@@ -613,6 +508,38 @@
     .announcement-img {
       width: 100%;
       height: 160px;
+      margin: 0 0 16px 0;
+    }
+
+    .announcement-footer {
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .announcement-user-info {
+      flex-wrap: wrap;
+    }
+
+    .announcement-actions {
+      width: 100%;
+      justify-content: flex-end;
+      gap: 14px;
+    }
+
+    .announcement-title {
+      font-size: 18px;
+    }
+
+    .announcement-message {
+      font-size: 14px;
+    }
+
+    .Announcement-btn {
+      width: 80px;
+      height: 36px;
+      right: 15px;
+      top: 90px;
+      font-size: 1rem;
     }
   }
 </style>
@@ -804,11 +731,11 @@
           <button class="action-btn announcement-share" title="Share" data-announcement='${JSON.stringify(announcement)}'>
             <i class="fas fa-share-square"></i>
           </button>
-          ${announcement.canDelete ? `
-            <button class="action-btn Delete-btn delete-action-btn" title="Delete" data-announcement-id="${announcement._id}">
-              <i class="far fa-trash-alt"></i>
-            </button>
-          ` : ''}
+          <button class="action-btn Delete-btn delete-action-btn"
+        title="Delete"
+        data-announcement-id="${announcement._id}">
+  <i class="far fa-trash-alt"></i>
+</button>
         </div>
       </div>
     `;

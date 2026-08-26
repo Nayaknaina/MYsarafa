@@ -1,0 +1,51 @@
+/* =========================  MySarafa SuperAdmin - Common Sidebar CSS ============================ */
+
+.sidebar {
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+    min-height: 100vh;
+    transition: transform 0.3s ease-in-out;
+}
+
+.sidebar .nav-link.active {
+    background: rgba(139, 92, 246, 0.3) !important;
+    border-left: 3px solid #8b5cf6;
+}
+
+.sidebar .logout-btn:hover {
+    background: #dc2626 !important;
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* =========================  Tablet + Mobile Sidebar works as a drawer =========================== */
+
+@media (max-width: 1023px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.sidebar-open {
+        transform: translateX(0);
+    }
+
+    header>div:first-child {
+        padding-left: 55px;
+    }
+}
+
+/* =========================== Desktop Sidebar always visible  ========================= */
+
+@media (min-width: 1024px) {
+    .sidebar {
+        transform: translateX(0);
+    }
+
+    header>div:first-child {
+        padding-left: 0;
+    }
+}

@@ -1,0 +1,110 @@
+<!-- Sidebar -->
+
+<aside id="sidebar" class="sidebar fixed inset-y-0 left-0 z-50 w-64
+           -translate-x-full lg:translate-x-0
+           transition-transform duration-300 ease-in-out
+           text-white">
+
+    <div class="h-full flex flex-col">
+
+        <!-- Logo -->
+        <div class="sidebar-logo flex items-center justify-between px-5 py-5 border-b border-white/10">
+
+            <a href="dashboard.html" class="flex items-center gap-3 min-w-0">
+
+                <img src="/assets/logo/mysarafa_logo.png" alt="MySarafa" class="w-12 h-12 object-contain flex-shrink-0">
+
+                <div class="min-w-0">
+                    <h2 class="text-lg font-bold tracking-wide">
+                        MySarafa
+                    </h2>
+                    <p class="text-[11px] text-gray-400">
+                        Admin Panel
+                    </p>
+                </div>
+
+            </a>
+
+            <!-- Close button: Tablet + Mobile -->
+            <button onclick="toggleSidebar()" class="lg:hidden text-white hover:text-gray-300
+           w-8 h-8 flex items-center justify-center">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+
+        </div>
+
+
+        <!-- Navigation -->
+        <nav class="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
+
+            <a href="dashboard.html" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition">
+
+                <i class="fas fa-th-large w-5"></i>
+                <span>Dashboard</span>
+
+            </a>
+
+
+            <a href="members.html" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition">
+
+                <i class="fas fa-users w-5"></i>
+                <span>Members</span>
+
+            </a>
+
+
+            <a href="kyc.html" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition">
+
+                <i class="fas fa-id-card w-5"></i>
+                <span>KYC Verification</span>
+
+            </a>
+
+
+            <a href="associations.html" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition">
+
+                <i class="fas fa-building w-5"></i>
+                <span>Associations</span>
+
+            </a>
+
+
+            <a href="roles.html" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition">
+
+                <i class="fas fa-user-tag w-5"></i>
+                <span>Roles</span>
+
+            </a>
+
+
+            <a href="permissions.html" class="nav-link flex items-center gap-3 px-4 py-3 rounded-lg transition">
+
+                <i class="fas fa-lock w-5"></i>
+                <span>Permissions</span>
+
+            </a>
+
+        </nav>
+
+
+        <!-- Logout -->
+        <div class="p-3 border-t border-white/10">
+
+            <button onclick="handleLogout()" class="logout-btn w-full flex items-center gap-3
+                       px-4 py-3 bg-red-600/20 text-red-400
+                       rounded-lg hover:bg-red-600 hover:text-white
+                       transition">
+
+                <i class="fas fa-sign-out-alt w-5"></i>
+                <span>Logout</span>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</aside>
+<!-- Sidebar Overlay -->
+<div id="sidebarOverlay" class="sidebar-overlay fixed inset-0 z-40 hidden lg:hidden" onclick="closeSidebar()">
+</div>

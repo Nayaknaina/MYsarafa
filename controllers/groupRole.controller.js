@@ -1,172 +1,3 @@
-// const GroupRole = require('../models/groupRole.model');
-// const GMem = require('../models/groupMem.model');
-// const Group = require('../models/group.model');
-
-
-// exports.getAvailablePermissions = (req, res) => {
-//     res.status(200).json({ success: true, permissions: GroupRole.PERMISSIONS });
-// };
-
-// exports.createGroupRole = async (req, res) => {
-//     try {
-//         const { groupId } = req.params;
-//         const { roleName, description, permissions } = req.body;
-
-//         if (!roleName) {
-//             return res.status(400).json({ success: false, message: 'Role name is required' });
-//         }
-
-//         const validPermissions = (permissions || []).filter(p => GroupRole.PERMISSIONS.includes(p));
-
-//         const existing = await GroupRole.findOne({ group: groupId, roleName: roleName.trim() });
-//         if (existing) {
-//             return res.status(400).json({ success: false, message: 'This role already exists in your group' });
-//         }
-
-//         const role = await GroupRole.create({
-//             group: groupId,
-//             roleName: roleName.trim(),
-//             description: description || '',
-//             permissions: validPermissions,
-//             createdBy: req.user._id
-//         });
-
-//         res.status(201).json({ success: true, message: 'Role created successfully', role });
-//     } catch (error) {
-//         console.error('createGroupRole error:', error);
-//         res.status(500).json({ success: false, message: 'Server error' });
-//     }
-// };
-
-// exports.getGroupRoles = async (req, res) => {
-//     try {
-//         const { groupId } = req.params;
-//         const roles = await GroupRole.find({
-//             $or: [{ group: null }, { group: groupId }]
-//         }).sort({ group: 1, createdAt: -1 }); // null (default) pehle aayenge
-//         res.status(200).json({ success: true, roles });
-//     } catch (error) {
-//         res.status(500).json({ success: false, message: 'Server error' });
-//     }
-// };
-
-// async function togglePermission(roleId, permission, isChecked, currentPermissions) {
-//     const updated = isChecked
-//         ? [...currentPermissions, permission]
-//         : currentPermissions.filter(p => p !== permission);
-
-//     await fetch(`${API_BASE}/${groupId}/roles/${roleId}`, {
-//         method: 'PUT',
-//         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-//         body: JSON.stringify({ permissions: updated })
-//     });
-// }
-
-
-// exports.updateGroupRole = async (req, res) => {
-//     try {
-//         const { groupId, roleId } = req.params;
-//         const { roleName, description, permissions } = req.body;
-
-//         const role = await GroupRole.findOne({ _id: roleId, group: groupId });
-//         if (!role) {
-//             return res.status(404).json({ success: false, message: 'Role not found in this group' });
-//         }
-
-//         if (roleName) role.roleName = roleName.trim();
-//         if (description !== undefined) role.description = description;
-//         if (permissions) {
-//             role.permissions = permissions.filter(p => GroupRole.PERMISSIONS.includes(p));
-//         }
-
-//         await role.save();
-//         res.status(200).json({ success: true, message: 'Role updated successfully', role });
-//     } catch (error) {
-//         res.status(500).json({ success: false, message: 'Server error' });
-//     }
-// };
-
-
-// exports.deleteGroupRole = async (req, res) => {
-//     try {
-//         const { groupId, roleId } = req.params;
-
-//         const membersWithRole = await GMem.countDocuments({ group: groupId, groupRole: roleId });
-//         if (membersWithRole > 0) {
-//             return res.status(400).json({
-//                 success: false,
-//                 message: `This role is assigned to ${membersWithRole} member(s). Unassign them first.`
-//             });
-//         }
-
-//         const deleted = await GroupRole.findOneAndDelete({ _id: roleId, group: groupId });
-//         if (!deleted) {
-//             return res.status(404).json({ success: false, message: 'Role not found in this group' });
-//         }
-
-//         res.status(200).json({ success: true, message: 'Role deleted successfully' });
-//     } catch (error) {
-//         res.status(500).json({ success: false, message: 'Server error' });
-//     }
-// };
-
-
-// exports.assignGroupRole = async (req, res) => {
-//     try {
-//         const { groupId } = req.params;
-//         const { memberId, roleId } = req.body;
-
-//         const membership = await GMem.findOne({ group: groupId, user: memberId });
-//         if (!membership) {
-//             return res.status(404).json({ success: false, message: 'This user is not a member of the group' });
-//         }
-
-//         if (membership.type === 'admin') {
-//             return res.status(400).json({ success: false, message: 'Cannot assign a role to the group admin' });
-//         }
-
-//         if (roleId) {
-
-//             const role = await GroupRole.findOne({
-//                 _id: roleId,
-//                 $or: [{ group: null }, { group: groupId }]
-//             });
-//             if (!role) {
-//                 return res.status(404).json({ success: false, message: 'Role not found in this group' });
-//             }
-//             membership.groupRole = roleId;
-//         } else {
-//             membership.groupRole = null;
-//         }
-
-//         await membership.save();
-//         const updated = await GMem.findById(membership._id).populate('groupRole').populate('user', 'f_name l_name email');
-
-//         res.status(200).json({ success: true, message: 'Role assigned successfully', membership: updated });
-//     } catch (error) {
-//         console.error('assignGroupRole error:', error);
-//         res.status(500).json({ success: false, message: 'Server error' });
-//     }
-// };
-
-
-// exports.getGroupMembersWithRoles = async (req, res) => {
-//     try {
-//         const { groupId } = req.params;
-//         const members = await GMem.find({ group: groupId, type: { $ne: 'pending' } })
-//             .populate('user', 'f_name l_name email mobile_no')
-//             .populate('groupRole', 'roleName permissions')
-//             .lean();
-
-
-//         const validMembers = members.filter(m => m.user);
-
-//         res.status(200).json({ success: true, members: validMembers });
-//     } catch (error) {
-//         res.status(500).json({ success: false, message: 'Server error' });
-//     }
-// };
-
 const GroupRole = require('../models/groupRole.model');
 const GMem = require('../models/groupMem.model');
 const Group = require('../models/group.model');
@@ -239,7 +70,6 @@ exports.updateGroupRole = async (req, res) => {
         const { groupId, roleId } = req.params;
         const { roleName, description, permissions } = req.body;
 
-        // ⭐ FIX: default (group: null) roles bhi match karne chahiye, sirf group-specific nahi
         const role = await GroupRole.findOne({
             _id: roleId,
             $or: [{ group: null }, { group: groupId }]
@@ -248,10 +78,10 @@ exports.updateGroupRole = async (req, res) => {
             return res.status(404).json({ success: false, message: 'Role not found in this group' });
         }
 
-        // ⭐ Default role ko directly edit nahi karte (warna sabke liye badal jayega).
-        // Iski jagah is group ke liye ek "apna override" clone bana dete hain.
         if (role.group === null) {
             let override = await GroupRole.findOne({ group: groupId, roleName: role.roleName });
+            const isNewOverride = !override;   // ⭐ NEW: track karo ki override pehle se tha ya abhi bana
+
             if (!override) {
                 override = new GroupRole({
                     group: groupId,
@@ -266,6 +96,16 @@ exports.updateGroupRole = async (req, res) => {
                 override.permissions = permissions.filter(p => GroupRole.PERMISSIONS.includes(p));
             }
             await override.save();
+
+            // ⭐ FIX: agar naya override abhi bana hai, to is group ke jitne members
+            // purani default role._id use kar rahe the, unhe naye override._id pe migrate karo
+            if (isNewOverride) {
+                await GMem.updateMany(
+                    { group: groupId, groupRole: role._id },
+                    { $set: { groupRole: override._id } }
+                );
+            }
+
             return res.status(200).json({ success: true, message: 'Role customized for your group', role: override });
         }
 
@@ -361,7 +201,7 @@ exports.assignGroupRole = async (req, res) => {
 exports.getGroupMembersWithRoles = async (req, res) => {
     try {
         const { groupId } = req.params;
-        const group = await Group.findById(groupId).select('g_name').lean();  
+        const group = await Group.findById(groupId).select('g_name').lean();
         const members = await GMem.find({ group: groupId, type: { $ne: 'pending' } })
             .populate('user', 'f_name l_name email mobile_no')
             .populate('groupRole', 'roleName permissions')
@@ -369,8 +209,58 @@ exports.getGroupMembersWithRoles = async (req, res) => {
 
         const validMembers = members.filter(m => m.user);
 
-        res.status(200).json({ success: true, members: validMembers, group }); 
+        res.status(200).json({ success: true, members: validMembers, group });
     } catch (error) {
         res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
+// Members page ke Role Filter ke liye
+exports.getRolesForMemberFilter = async (req, res) => {
+    try {
+        const { groupId } = req.params;
+
+        // Default + current group ke custom roles
+        const roles = await GroupRole.find({
+            $or: [
+                { group: null },
+                { group: groupId }
+            ],
+            roleName: { $ne: 'super_admin' }
+        })
+            .select('roleName description group createdBy')
+            .sort({ group: 1, createdAt: -1 })
+            .lean();
+
+        // Agar group ne default role ka override banaya hai
+        // to default wala duplicate remove karo
+        const overriddenNames = new Set(
+            roles
+                .filter(r => r.group && r.group.toString() === groupId)
+                .map(r => r.roleName.trim().toLowerCase())
+        );
+
+        const uniqueRoles = roles.filter(role => {
+            if (role.group === null) {
+                return !overriddenNames.has(
+                    role.roleName.trim().toLowerCase()
+                );
+            }
+
+            return true;
+        });
+
+        return res.status(200).json({
+            success: true,
+            roles: uniqueRoles
+        });
+
+    } catch (error) {
+        console.error('getRolesForMemberFilter error:', error);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Server error'
+        });
     }
 };

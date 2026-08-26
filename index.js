@@ -24,6 +24,7 @@ const businessRoutes = require('./routes/businesses');
 const ledgerRoutes = require('./routes/ledger');
 const roleRoutes = require("./routes/superAdmin/roleRoutes");
 const Role = require("./models/superAdmin/Role.model");
+const groupRole = require('./routes/groupRole.routes');
 
 const { engine } = require('express-handlebars');
 const jwt = require('jsonwebtoken');
@@ -77,6 +78,7 @@ app.use('/rates', ratesRoutes);
 app.use('/businesses', businessRoutes);
 app.use('/ledger', ledgerRoutes);
 app.use("/api/roles", roleRoutes);
+app.use('/Groups/:groupId/groupRole', groupRole);
 
 // Serve superadmin frontend if needed
 app.use('/superadmin-frontend', express.static(path.join(__dirname, 'views/superadmin')));

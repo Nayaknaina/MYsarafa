@@ -14,6 +14,7 @@ const ep = new exiftool.ExiftoolProcess(exiftoolBin);
 const { getSignedUrl } = require('../middleware/multer');
 
 const { notifyUsers } = require('../utils/notify');
+const { checkGroupPermission } = require('../middleware/utils/groupPermission.util');
 
 exports.renderMembershipPage = async (req, res, next) => {
   try {
@@ -624,18 +625,65 @@ exports.renderMyPayments = async (req, res, next) => {
   }
 };
 
+// user ke saare groups nikalta hai jaha usko diya gaya permission hai
+// checkGroupPermission ko hi reuse karta hai (super_admin, owner, group-admin, custom role — sab handle ho jaayega)
+async function getGroupsWithPermission(userId, permission) {
+  const memberships = await Gmem.find({ user: userId, type: { $ne: 'pending' } }).select('group').lean();
+  const ownedGroups = await Group.find({ user: userId }).select('_id').lean();
+
+  const candidateGroupIds = new Set([
+    ...memberships.map(m => m.group.toString()),
+    ...ownedGroups.map(g => g._id.toString())
+  ]);
+
+  const allowedGroups = [];
+  for (const groupId of candidateGroupIds) {
+    const result = await checkGroupPermission(userId, groupId, permission);
+    if (result.allowed && result.group) {
+      allowedGroups.push({
+        _id: result.group._id,
+        g_name: result.group.g_name,
+        amount_type: result.group.amount_type
+      });
+    }
+  }
+  return allowedGroups;
+}
+
+// exports.renderPaymentMatrixPage = async (req, res, next) => {
+//   console.log("payment-matrix route/ renderPaymentMatrixPage controller")
+//   try {
+//     const user = await User.findById(req.user.id).lean();
+//     if (!user) {
+//       return res.status(404).render('error', { statusCode: 404, title: 'User Not Found', errorMessage: 'No user found', layout: false });
+//     }
+
+//     const adminMemberships = await Gmem.find({ user: req.user.id, type: 'admin' }).lean();
+//     const adminGroupIds = adminMemberships.map(m => m.group);
+//     const groups = await Group.find({ _id: { $in: adminGroupIds } }).select('g_name _id amount_type').lean();
+
+//     res.render('payment-matrix', {
+//       user,
+//       fullName: `${user.f_name || ''} ${user.l_name || ''}`.trim(),
+//       groups,
+//       title: 'Payment Tracker | MySarafa',
+//       layout: false
+//     });
+//   } catch (error) {
+//     console.error('Error rendering payment matrix page:', error);
+//     next(error);
+//   }
+// };
 // Time Period
 exports.renderPaymentMatrixPage = async (req, res, next) => {
-  console.log("payment-matrix route/ renderPaymentMatrixPage controller")
   try {
     const user = await User.findById(req.user.id).lean();
     if (!user) {
       return res.status(404).render('error', { statusCode: 404, title: 'User Not Found', errorMessage: 'No user found', layout: false });
     }
 
-    const adminMemberships = await Gmem.find({ user: req.user.id, type: 'admin' }).lean();
-    const adminGroupIds = adminMemberships.map(m => m.group);
-    const groups = await Group.find({ _id: { $in: adminGroupIds } }).select('g_name _id amount_type').lean();
+    // admin-only groups ki jagah — permission-based groups
+    const groups = await getGroupsWithPermission(req.user.id, 'view_payment_matrix');
 
     res.render('payment-matrix', {
       user,
@@ -654,8 +702,9 @@ exports.getPaymentMatrixData = async (req, res, next) => {
   try {
     const { groupId } = req.params;
 
-    const adminCheck = await Gmem.findOne({ user: req.user.id, group: groupId, type: 'admin' });
-    if (!adminCheck) return res.status(403).json({ success: false, message: 'Unauthorized' });
+    // Remove Admin check permission so that every allowed role can access it. 
+    // const adminCheck = await Gmem.findOne({ user: req.user.id, group: groupId, type: 'admin' });
+    // if (!adminCheck) return res.status(403).json({ success: false, message: 'Unauthorized' });
 
     const group = await Group.findById(groupId).lean();
     if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
@@ -663,6 +712,7 @@ exports.getPaymentMatrixData = async (req, res, next) => {
     const members = await Gmem.find({ group: groupId, type: 'user' })
       .populate('user', 'f_name l_name')
       .lean();
+
     const formattedMembers = members
       .filter(m => m.user)
       .map(m => ({ id: m.user._id.toString(), name: `${m.user.f_name} ${m.user.l_name}`, joinedAt: m.createdAt }));

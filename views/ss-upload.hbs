@@ -17,21 +17,51 @@
 
     <style>
         .upload-wrapper {
+            width: calc(100% - 48px);
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
             gap: 24px;
             align-items: flex-start;
-            flex-wrap: wrap;
+            box-sizing: border-box;
+            padding-bottom: 50px;
+        }
+
+        .upload-card,
+        .community-info {
+            box-sizing: border-box;
+            min-width: 0;
         }
 
         .upload-card {
+            flex: 1 1 0;
+            width: 50%;
+            max-width: none;
+
             background: #fff;
             border-radius: 12px;
             box-shadow: 0 6px 24px rgba(47, 149, 255, 0.13);
             padding: 22px;
-            flex: 1 1 340px;
-            max-width: 520px;
             border-bottom: 4px solid #551DFF;
         }
+
+        .community-info {
+            flex: 1 1 0;
+            width: 50%;
+            max-width: none;
+
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 24px rgba(85, 29, 255, 0.13);
+            padding: 22px;
+
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* =========================================================
+   COMMON
+   ========================================================= */
 
         .upload-title {
             font-weight: 700;
@@ -48,6 +78,7 @@
             border: 1.5px solid #bdbdbd;
             border-radius: 8px;
             font-size: 1rem;
+            box-sizing: border-box;
         }
 
         .upload-input:focus {
@@ -99,16 +130,9 @@
             box-shadow: 0 2px 8px rgba(25, 118, 210, 0.10);
         }
 
-        .community-info {
-            flex: 1 1 300px;
-            max-width: 580px;
-            background: #fff;
-            border-radius: 12px;
-            padding: 22px;
-            box-shadow: 0 6px 24px rgba(85, 29, 255, 0.13);
-            position: relative;
-            overflow: hidden;
-        }
+        /* =========================================================
+   COMMUNITY CARD
+   ========================================================= */
 
         .community-info::before {
             content: "";
@@ -117,8 +141,12 @@
             right: -60px;
             width: 200px;
             height: 200px;
-            background: radial-gradient(circle, #D324A8 0%, #551DFF 80%, transparent 100%);
+            background: radial-gradient(circle,
+                    #D324A8 0%,
+                    #551DFF 80%,
+                    transparent 100%);
             opacity: .12;
+            pointer-events: none;
         }
 
         .community-title {
@@ -152,9 +180,304 @@
             color: #1976d2;
         }
 
-        @media (max-width: 700px) {
+        /* QR */
+        #sideQrPreview {
+            margin-bottom: 30px !important;
+        }
+
+        #sideQrGroupName {
+            margin-bottom: 20px !important;
+        }
+
+        #sideQrAmount {
+            margin-bottom: 20px !important;
+        }
+
+        /* =========================================================
+   TABLET
+   768px - 1024px
+   ========================================================= */
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+
+            .main-content {
+                width: 100% !important;
+                height: auto !important;
+                min-height: 100vh !important;
+                max-height: none !important;
+
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+
+                padding: 20px 30px 120px !important;
+                box-sizing: border-box !important;
+            }
+
+            .upload-wrapper {
+                width: 100% !important;
+
+                display: flex !important;
+                flex-direction: column !important;
+
+                gap: 30px !important;
+
+                margin: 0 auto !important;
+                padding: 0 0 120px !important;
+
+                box-sizing: border-box !important;
+            }
+
+            .upload-card,
+            .community-info {
+                width: 100% !important;
+                max-width: 100% !important;
+                flex: none !important;
+
+                box-sizing: border-box !important;
+            }
+
+            /* ===============================
+       UPLOAD BOX
+       =============================== */
+
+            .upload-card {
+                padding: 20px !important;
+            }
+
+            /* ===============================
+       SELECTED COMMUNITY QR
+       =============================== */
+
+            .community-info {
+                height: auto !important;
+                min-height: auto !important;
+                max-height: none !important;
+
+                overflow: visible !important;
+
+                padding: 20px 20px 80px !important;
+
+                /* IMPORTANT */
+                margin: 0 0 80px !important;
+
+                box-sizing: border-box !important;
+            }
+
+            /* QR ke neeche */
+            #sideQrPreview {
+                margin-bottom: 35px !important;
+            }
+
+            /* Community name */
+            #sideQrGroupName {
+                margin-bottom: 25px !important;
+            }
+
+            /* Amount */
+            #sideQrAmount {
+                margin-bottom: 30px !important;
+            }
+
+            /* Description ke neeche */
+            .community-text {
+                margin-bottom: 30px !important;
+                line-height: 1.6 !important;
+            }
+
+            /* Last list ke neeche bhi space */
             .community-list {
-                grid-template-columns: 1fr;
+                margin-bottom: 50px !important;
+            }
+
+            /* QR image */
+            #sideQrImg {
+                width: 180px !important;
+                height: 180px !important;
+                object-fit: contain !important;
+            }
+
+            .community-list {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 10px !important;
+            }
+
+            .main-container,
+            .main-content {
+                height: auto !important;
+                max-height: none !important;
+                overflow: visible !important;
+            }
+
+            .community-info {
+                margin-bottom: 100px !important;
+            }
+        }
+
+        /* =========================================================
+   MOBILE
+   ========================================================= */
+
+        @media (max-width: 767px) {
+
+            html,
+            body {
+                height: auto !important;
+                min-height: 100% !important;
+                overflow-x: hidden !important;
+                overflow-y: auto !important;
+            }
+
+            .main-container {
+                width: 100%;
+                height: auto !important;
+                min-height: 100vh !important;
+                overflow: visible !important;
+            }
+
+            .main-content {
+                width: 100%;
+                height: auto !important;
+                min-height: 100vh !important;
+                max-height: none !important;
+                overflow: visible !important;
+
+                padding: 14px 0 70px !important;
+                box-sizing: border-box;
+            }
+
+            /* Cards ke BAHAR left-right space */
+            .upload-wrapper {
+                width: calc(100% - 28px);
+                max-width: none;
+
+                margin: 0 auto;
+
+                display: flex;
+                flex-direction: column;
+                gap: 24px;
+
+                padding: 0 0 50px;
+                box-sizing: border-box;
+            }
+
+            .upload-card,
+            .community-info {
+                width: 100% !important;
+                max-width: 100% !important;
+                flex: none !important;
+                box-sizing: border-box;
+            }
+
+            .upload-card {
+                padding: 18px 16px 30px !important;
+            }
+
+            .upload-card label {
+                display: block;
+                margin-bottom: 6px;
+            }
+
+            .upload-input {
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .upload-actions {
+                margin-top: 16px;
+                margin-bottom: 20px;
+            }
+
+            .community-info {
+                height: auto !important;
+                min-height: 0 !important;
+                max-height: none !important;
+
+                padding: 18px 16px 45px !important;
+
+                /* Mobile me bhi card ke bahar bottom space */
+                margin: 0 0 30px !important;
+
+                overflow: visible !important;
+            }
+
+            #sideQrPreview {
+                width: 100%;
+                box-sizing: border-box;
+                padding: 16px !important;
+                margin-bottom: 30px !important;
+                border-radius: 14px !important;
+            }
+
+            #sideQrImg {
+                width: 155px !important;
+                height: 155px !important;
+                max-width: 100%;
+                object-fit: contain;
+            }
+
+            #sideQrGroupName {
+                margin-bottom: 16px !important;
+                line-height: 1.4;
+            }
+
+            #sideQrAmount {
+                margin-bottom: 24px !important;
+                line-height: 1.4;
+            }
+
+            .community-text {
+                line-height: 1.55;
+                margin-bottom: 18px !important;
+            }
+
+            .community-list {
+                width: 100%;
+                grid-template-columns: 1fr !important;
+                gap: 8px;
+                margin-top: 14px;
+                margin-bottom: 0;
+            }
+
+            .community-item {
+                width: 100%;
+                box-sizing: border-box;
+                padding: 10px;
+            }
+        }
+
+        /* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+        @media (max-width: 480px) {
+
+            .main-content {
+                padding: 10px 0 70px !important;
+            }
+
+            .upload-wrapper {
+                width: calc(100% - 20px);
+                gap: 22px;
+                padding-bottom: 50px;
+            }
+
+            .upload-card {
+                padding: 16px 14px 30px !important;
+            }
+
+            .community-info {
+                padding: 16px 12px 45px !important;
+                margin-bottom: 30px !important;
+            }
+
+            #sideQrPreview {
+                padding: 14px !important;
+                margin-bottom: 30px !important;
+            }
+
+            #sideQrImg {
+                width: 145px !important;
+                height: 145px !important;
             }
         }
     </style>
@@ -229,7 +552,7 @@
                     <div class="community-title">Selected Community QR</div>
 
                     <div class="qr-preview" id="sideQrPreview"
-                        style="display:none; justify-content:center; align-items:center; background:linear-gradient(135deg,#7b2ff7,#f107a3); padding:20px; border-radius:16px; margin-bottom:16px;">
+                        style="display:none; justify-content:center; align-items:center; background:linear-gradient(135deg,#7b2ff7,#f107a3); padding:20px; border-radius:16px; margin-bottom:30px;">
                         <img id="sideQrImg" src="" alt="QR Code"
                             style="width:200px; height:200px; object-fit:contain; background:#fff; border-radius:12px; padding:10px;">
                     </div>

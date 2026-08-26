@@ -14,7 +14,27 @@ const announcementUpload = upload.fields([{ name: 'image', maxCount: 1 }]);
 router.get('/Announcement', authMiddleware, monthlyMembershipCheck, profileImageMiddleware, announcementController.Announcement);
 router.get('/new', authMiddleware, profileImageMiddleware, announcementController.Announcementform);
 
-router.post('/create', authMiddleware, announcementUpload, announcementController.createAnnouncement);
+// router.post('/create', authMiddleware, announcementUpload, announcementController.createAnnouncement);
+router.post(
+    '/create',
+    authMiddleware,
+    (req, res, next) => {
+        announcementUpload(req, res, function (err) {
+
+            if (err) {
+                console.error('MULTER ERROR:', err);
+
+                return res.status(400).json({
+                    success: false,
+                    message: err.message || 'Image upload failed'
+                });
+            }
+
+            next();
+        });
+    },
+    announcementController.createAnnouncement
+);
 router.get('/list', authMiddleware, profileImageMiddleware, announcementController.getAnnouncements);
 
 router.delete('/delete/:id', authMiddleware, announcementController.deleteAnnouncement);

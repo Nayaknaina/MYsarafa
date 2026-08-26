@@ -15,6 +15,10 @@
     <link rel="icon" href="/assets/favicon/favicon_logo.png" type="image/png">
     <link rel="apple-touch-icon" href="/assets/favicon/favicon_logo.png">
     <style>
+        /* =========================================================
+       NORMAL / DESKTOP
+       ========================================================= */
+
         .payment-table {
             width: 100%;
             border-collapse: collapse;
@@ -42,6 +46,7 @@
             border-bottom: none;
         }
 
+        /* Status */
         .status-badge {
             background: #d1f7e6;
             color: #1b8c4a;
@@ -56,6 +61,7 @@
             color: #b45309;
         }
 
+        /* Page Title */
         .page-title {
             font-size: 22px;
             font-weight: 700;
@@ -70,6 +76,7 @@
             color: #2f95ff;
         }
 
+        /* View Link */
         .view-link {
             color: #2f95ff;
             text-decoration: none;
@@ -79,6 +86,35 @@
         .view-link:hover {
             text-decoration: underline;
         }
+
+        /* =========================================================
+       FILTERS - NORMAL
+       ========================================================= */
+
+        .payment-filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .payment-filters input,
+        .payment-filters select {
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            min-width: 180px;
+            outline: none;
+        }
+
+        .payment-filters input:focus,
+        .payment-filters select:focus {
+            border-color: #2f95ff;
+        }
+
+        /* =========================================================
+       SCREENSHOT MODAL - NORMAL
+       ========================================================= */
 
         .ss-modal-overlay {
             display: none;
@@ -128,77 +164,258 @@
             justify-content: center;
         }
 
-        @media (max-width: 500px) {
 
-            .payment-table,
-            .payment-table thead,
-            .payment-table tbody,
-            .payment-table th,
-            .payment-table td,
-            .payment-table tr {
-                display: block;
+        /* =========================================================
+       TABLET - 769px to 1024px
+       ========================================================= */
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+
+            .main-content {
+                padding: 20px !important;
             }
 
-            .payment-table thead {
-                display: none;
+            .page-title {
+                font-size: 22px;
+                margin-bottom: 20px;
             }
 
-            .payment-table tr {
-                margin-bottom: 16px;
+            /* Payment Container */
+
+            .payment-records-list {
                 background: #fff;
-                border-radius: 10px;
-                box-shadow: 0 1px 3px rgba(47, 149, 255, 0.07);
-                padding: 8px;
+                border-radius: 14px;
+                padding: 16px;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, .06);
+                margin-bottom: 80px !important;
             }
 
-            .payment-table td {
-                padding: 8px 6px;
-                border-bottom: none;
-                position: relative;
-            }
-
-            .payment-table td:before {
-                content: attr(data-label);
-                font-weight: 600;
-                color: #374151;
-                display: block;
-                margin-bottom: 2px;
-                font-size: 12px;
-            }
-        }
-
-        /*Filters*/
-        .payment-filters {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .payment-filters input,
-        .payment-filters select {
-            padding: 10px 14px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            min-width: 180px;
-            outline: none;
-        }
-
-        .payment-filters input:focus,
-        .payment-filters select:focus {
-            border-color: #2f95ff;
-        }
-
-        @media(max-width:768px) {
+            /* Filters */
 
             .payment-filters {
-                flex-direction: column;
+                display: grid;
+                grid-template-columns: 1.4fr 1fr 1fr;
+                gap: 12px;
+                margin-bottom: 22px;
+                width: 100%;
             }
 
             .payment-filters input,
             .payment-filters select,
             .payment-filters button {
                 width: 100%;
+                min-width: 0;
+                min-height: 44px;
+                box-sizing: border-box;
+            }
+
+            /* First Row
+           Search | Date | Method
+        */
+
+            #groupFilter {
+                grid-column: 1;
+            }
+
+            #dateFilter {
+                grid-column: 2;
+            }
+
+            #methodFilter {
+                grid-column: 3;
+            }
+
+            /* Second Row
+           Status | Clear
+        */
+
+            #statusFilter {
+                grid-column: 1;
+            }
+
+            #clearFilters {
+                grid-column: 2;
+            }
+
+            /* Table */
+
+            .payment-table {
+                box-shadow: none;
+            }
+        }
+
+
+        /* =========================================================
+       MOBILE - 768px and below
+       ========================================================= */
+
+        @media (max-width: 768px) {
+
+            .main-content {
+                padding-bottom: 100px !important;
+            }
+
+            .page-title {
+                font-size: 20px;
+                margin-bottom: 18px;
+            }
+
+            /* Payment Container */
+
+            .payment-records-list {
+                padding: 12px !important;
+                padding-bottom: 30px !important;
+                margin-bottom: 80px !important;
+                background: #fff;
+                border-radius: 14px;
+                box-shadow: 0 4px 16px rgba(0, 0, 0, .06);
+            }
+
+            /* Filters */
+
+            .payment-filters {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                margin-bottom: 22px;
+            }
+
+            .payment-filters input,
+            .payment-filters select,
+            .payment-filters button {
+                width: 100%;
+                min-width: 0;
+                min-height: 44px;
+                box-sizing: border-box;
+            }
+
+            /* =====================================================
+           PAYMENT TABLE → CARD
+           ===================================================== */
+
+            .payment-table,
+            .payment-table tbody,
+            .payment-table tr,
+            .payment-table td {
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            .payment-table {
+                background: transparent;
+                box-shadow: none;
+                border: none;
+            }
+
+            .payment-table thead {
+                display: none;
+            }
+
+            /* Payment Card */
+
+            .payment-table tbody tr {
+                background: #fff;
+                border: 1px solid #e5e7eb;
+                border-radius: 14px;
+                padding: 14px;
+                margin-bottom: 16px;
+                box-shadow: 0 3px 12px rgba(0, 0, 0, 0.06);
+            }
+
+            /* Card Fields */
+
+            .payment-table tbody tr td {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 15px;
+
+                padding: 10px 2px;
+                border-bottom: 1px solid #f1f5f9;
+
+                font-size: 14px;
+                line-height: 1.5;
+                text-align: right;
+
+                color: #111827;
+                font-weight: 500;
+            }
+
+            .payment-table tbody tr td:last-child {
+                border-bottom: none;
+            }
+
+            /* Field Labels */
+
+            .payment-table tbody tr td::before {
+                content: attr(data-label);
+                display: block;
+
+                flex: 0 0 85px;
+
+                font-size: 13px;
+                font-weight: 600;
+                color: #6b7280;
+
+                text-align: left;
+            }
+
+            /* Amount */
+
+            .payment-table tbody tr td:nth-child(5) {
+                font-weight: 700;
+            }
+
+            /* Status */
+
+            .payment-table tbody tr td:nth-child(6) {
+                align-items: center;
+            }
+
+            .payment-table tbody tr td:nth-child(6)::before {
+                align-self: flex-start;
+            }
+
+            .status-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+
+                padding: 5px 10px;
+                border-radius: 20px;
+
+                font-size: 11px;
+                white-space: nowrap;
+            }
+
+            /* Reupload Link */
+
+            .reupload-link {
+                display: inline-block;
+                margin-top: 6px;
+                font-size: 12px;
+                text-align: right;
+            }
+
+            /* Screenshot Button */
+
+            .payment-table .view-screenshot-btn {
+                padding: 7px 12px;
+                font-size: 12px;
+                white-space: nowrap;
+            }
+
+            /* Empty State */
+
+            .payment-table tbody tr td[colspan] {
+                display: block;
+                text-align: center;
+                padding: 25px 10px;
+            }
+
+            .payment-table tbody tr td[colspan]::before {
+                display: none;
             }
         }
     </style>

@@ -1,18 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MySarafa - Group Roles & Permissions</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" href="/assets/favicon/favicon_logo.png" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/favicon/favicon_logo.png">
     <style>
-        .perm-table th, .perm-table td { padding: 10px 16px; text-align: center; }
-        .perm-table th:first-child, .perm-table td:first-child { text-align: left; }
-        .section-card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 24px; overflow: hidden; }
-        .section-header { padding: 14px 20px; background: #f9fafb; border-bottom: 1px solid #e5e7eb; font-weight: 600; }
+        .perm-table th,
+        .perm-table td {
+            padding: 10px 16px;
+            text-align: center;
+        }
+
+        .perm-table th:first-child,
+        .perm-table td:first-child {
+            text-align: left;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 14px 20px;
+            background: #f9fafb;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 600;
+        }
     </style>
 </head>
+
 <body class="bg-gray-100 p-4 md:p-8">
 
     <div class="max-w-5xl mx-auto">
@@ -21,7 +46,8 @@
                 <h1 class="text-2xl font-bold text-gray-800">Roles & Permissions</h1>
                 <p class="text-sm text-gray-500">Manage roles for your group and assign permissions.</p>
             </div>
-            <button onclick="openCreateModal()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm">
+            <button onclick="openCreateModal()"
+                class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm">
                 <i class="fas fa-plus"></i> New Role
             </button>
         </div>
@@ -31,7 +57,9 @@
             <div class="section-header">Default Roles (available to everyone)</div>
             <div class="table-wrapper overflow-x-auto">
                 <table class="w-full perm-table" id="defaultRolesTable">
-                    <thead><tr class="bg-gray-50 text-xs text-gray-500 uppercase border-b" id="defaultRolesHead"></tr></thead>
+                    <thead>
+                        <tr class="bg-gray-50 text-xs text-gray-500 uppercase border-b" id="defaultRolesHead"></tr>
+                    </thead>
                     <tbody id="defaultRolesBody"></tbody>
                 </table>
             </div>
@@ -42,7 +70,9 @@
             <div class="section-header">My Custom Roles (only for this group)</div>
             <div class="table-wrapper overflow-x-auto">
                 <table class="w-full perm-table" id="customRolesTable">
-                    <thead><tr class="bg-gray-50 text-xs text-gray-500 uppercase border-b" id="customRolesHead"></tr></thead>
+                    <thead>
+                        <tr class="bg-gray-50 text-xs text-gray-500 uppercase border-b" id="customRolesHead"></tr>
+                    </thead>
                     <tbody id="customRolesBody"></tbody>
                 </table>
             </div>
@@ -71,8 +101,10 @@
     <div id="createModal" class="fixed inset-0 bg-black/40 hidden justify-center items-center z-50">
         <div class="bg-white rounded-xl w-[420px] p-6">
             <h2 class="text-lg font-bold mb-4">Create New Role</h2>
-            <input type="text" id="newRoleName" placeholder="Role name (e.g. Manager)" class="w-full border rounded-lg px-4 py-2 mb-4">
-            <textarea id="newRoleDesc" placeholder="Description (optional)" class="w-full border rounded-lg px-4 py-2 mb-4"></textarea>
+            <input type="text" id="newRoleName" placeholder="Role name (e.g. Manager)"
+                class="w-full border rounded-lg px-4 py-2 mb-4">
+            <textarea id="newRoleDesc" placeholder="Description (optional)"
+                class="w-full border rounded-lg px-4 py-2 mb-4"></textarea>
             <div class="flex justify-end gap-3">
                 <button onclick="closeCreateModal()" class="px-4 py-2 rounded bg-gray-300">Cancel</button>
                 <button onclick="createRole()" class="px-4 py-2 rounded bg-purple-600 text-white">Create</button>
@@ -258,4 +290,5 @@
         })();
     </script>
 </body>
+
 </html>

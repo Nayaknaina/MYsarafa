@@ -7,13 +7,10 @@
     <title>MySarafa - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link rel="icon" href="/assets/favicon/favicon_logo.png" type="image/png">
+    <link rel="apple-touch-icon" href="/assets/favicon/favicon_logo.png">
     <style>
-        .sidebar {
-            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-            min-height: 100vh;
-            transition: transform 0.3s ease-in-out;
-        }
-
         .stat-card {
             transition: all 0.3s ease;
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -31,22 +28,6 @@
         .nav-link.active {
             background: rgba(139, 92, 246, 0.3) !important;
             border-left: 3px solid #8b5cf6;
-        }
-
-        @media (max-width: 640px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-
-            .sidebar.open {
-                transform: translateX(0);
-            }
-        }
-
-        .sidebar-overlay {
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
         }
 
         .table-wrapper {
@@ -74,82 +55,21 @@
 
 <body>
     <div class="flex h-screen bg-gray-100">
-        <!-- Mobile Hamburger Menu Button -->
-        <button onclick="toggleSidebar()"
-            class="md:hidden fixed top-4 left-4 z-50 bg-purple-600 text-white p-2 rounded-lg shadow-lg hover:bg-purple-700 transition">
+
+        <div id="sidebar-container"></div>
+        <button id="sidebarToggle" onclick="toggleSidebar()"
+            class="lg:hidden fixed top-4 left-4 z-[60] bg-purple-600 text-white p-2.5 rounded-lg shadow-lg">
             <i class="fas fa-bars text-xl"></i>
         </button>
 
-        <!-- Sidebar -->
-        <div class="sidebar w-64 text-white flex-shrink-0 fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-50"
-            id="sidebar">
-            <div class="p-6 h-full flex flex-col">
-                <div class="flex items-center justify-between mb-8">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center">
-                            <span class="font-bold text-lg">M</span>
-                        </div>
-                        <span class="text-xl font-bold">MySarafa</span>
-                    </div>
-                    <button onclick="toggleSidebar()" class="md:hidden text-white hover:text-gray-300">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-
-                <nav class="space-y-1 flex-1">
-                    <a href="dashboard.html"
-                        class="nav-link active flex items-center gap-3 px-4 py-3 rounded-lg transition">
-                        <i class="fas fa-th-large w-5"></i>
-                        <span>Dashboard</span>
-                    </a>
-                    <a href="members.html"
-                        class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-lg transition">
-                        <i class="fas fa-users w-5"></i>
-                        <span>Members</span>
-                    </a>
-                    <a href="kyc.html"
-                        class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-lg transition">
-                        <i class="fas fa-id-card w-5"></i>
-                        <span>KYC Verification</span>
-                    </a>
-                    <a href="associations.html"
-                        class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-lg transition">
-                        <i class="fas fa-building w-5"></i>
-                        <span>Associations</span>
-                    </a>
-                    <a href="roles.html"
-                        class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-lg transition">
-                        <i class="fas fa-user-tag w-5"></i>
-                        <span>Roles</span>
-                    </a>
-                    <!-- <a href="group-roles.html"
-                        class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-lg transition">
-                        <i class="fas fa-user-tag w-5"></i>
-                        <span>Roles</span>
-                    </a> -->
-                    <a href="permissions.html"
-                        class="flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-lg transition">
-                        <i class="fas fa-lock w-5"></i>
-                        <span>Permissions</span>
-                    </a>
-                </nav>
-
-                <div class="mt-auto">
-                    <button onclick="handleLogout()"
-                        class="logout-btn w-full flex items-center gap-3 px-4 py-3 bg-red-600/20 text-red-400 rounded-lg hover:bg-red-600 hover:text-white transition">
-                        <i class="fas fa-sign-out-alt w-5"></i>
-                        <span>Logout</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
         <!-- Overlay for mobile -->
-        <div class="fixed inset-0 bg-black/50 z-40 hidden md:hidden" id="sidebarOverlay" onclick="toggleSidebar()">
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black/50
+           backdrop-blur-sm
+           z-40 hidden lg:hidden" onclick="toggleSidebar()">
         </div>
 
         <!-- Main Content -->
-        <div class="flex-1 overflow-auto ml-0 md:ml-64">
+        <div class="flex-1 min-w-0 overflow-auto ml-0 lg:ml-64">
             <!-- Header -->
             <header class="bg-white shadow-sm px-4 md:px-8 py-4 flex justify-between items-center sticky top-0 z-10">
                 <div>
@@ -258,37 +178,8 @@
     </div>
 
     <script>
-        // Toggle sidebar on mobile
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        }
-
-        document.addEventListener('click', function (event) {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            const isMobile = window.innerWidth < 768;
-            if (isMobile && sidebar && !sidebar.classList.contains('-translate-x-full')) {
-                if (!sidebar.contains(event.target) && !event.target.closest('button')) {
-                    sidebar.classList.add('-translate-x-full');
-                    overlay.classList.add('hidden');
-                }
-            }
-        });
-
-        window.addEventListener('resize', function () {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            if (window.innerWidth >= 768) {
-                sidebar.classList.remove('-translate-x-full');
-                overlay.classList.add('hidden');
-            }
-        });
-
         // ✅ API & Auth
-        // const API_BASE = 'http://localhost:5001/superadmin/api'; 
+        // const API_BASE = 'http://localhost:5001/superadmin/api';
         const API_BASE = 'https://app.mysarafa.com/superadmin/api';
         const getBasePath = () => {
             const path = window.location.pathname;
@@ -417,14 +308,11 @@
             }).join('');
         }
 
-        function handleLogout() {
-            console.log('🚪 Logging out...');
-            localStorage.clear();
-            window.location.href = getBasePath() + 'login.html';
-        }
-
-        document.addEventListener('DOMContentLoaded', loadDashboard);
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboard();
+        });
     </script>
+    <script src="js/sidebar.js"></script>
 </body>
 
 </html>

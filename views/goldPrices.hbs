@@ -8,11 +8,30 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
+
     <style>
+        /* =========================================================
+   BASE / DESKTOP
+========================================================= */
+
         h1 {
-            color: #000000;
+            color: #000;
             margin-bottom: 20px;
             font-size: 1.5em;
+        }
+
+        .rates-page .main-container {
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .rates-page .main-content {
+            flex: 1 1 auto;
+            width: auto;
+            max-width: none;
+            min-width: 0;
+            box-sizing: border-box;
         }
 
         .filter-section {
@@ -20,81 +39,522 @@
             text-align: right;
         }
 
+        .filter-section label {
+            font-size: inherit;
+        }
+
         .filter-section select {
-            padding: 8px;
+            padding: 8px 12px;
             border-radius: 6px;
             border: 1px solid #ddd;
+            background: #fff;
+            cursor: pointer;
         }
 
         .rates-card {
-            background: white;
+            width: 100%;
+            max-width: 100%;
+            box-sizing: border-box;
+
+            background: #fff;
             border-radius: 10px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
             padding: 20px;
-            margin-bottom: 20px;
+            margin: 0 0 20px 0;
+
+            overflow: hidden;
+        }
+
+        .rates-card h2 {
+            margin: 0 0 15px;
+            font-size: 20px;
+            color: #0047ab;
         }
 
         .rates-table {
             width: 100%;
             border-collapse: collapse;
+            table-layout: fixed;
         }
 
         .rates-table th,
         .rates-table td {
-            padding: 12px;
+            padding: 12px 8px;
             text-align: center;
             border-bottom: 1px solid #eee;
+            white-space: nowrap;
         }
 
         .rates-table th {
             background: #f0f2f5;
             color: #0047ab;
+            font-size: 14px;
+        }
+
+        .rates-table td {
+            font-size: 14px;
+        }
+
+        /* Trend */
+
+        .up,
+        .down {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
 
         .up {
             color: #28a745;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .up i {
-            margin-right: 5px;
         }
 
         .down {
             color: #dc3545;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .down i {
-            margin-right: 5px;
         }
 
         .same {
             color: #6c757d;
         }
 
-        .trend-icon {
-            font-size: 1.2em;
+        /* Responsive views hidden by default */
+
+        .responsive-rate-table,
+        .mobile-rate-list {
+            display: none;
         }
 
-        @media (max-width: 768px) {
-            .rates-table {
-                font-size: 0.9em;
+        .updated-time {
+            color: #374151;
+        }
+
+
+        /* =========================================================
+   TABLET
+   768px - 1024px
+========================================================= */
+
+        @media (min-width: 768px) and (max-width: 1024px) {
+
+            .rates-page .main-content {
+                width: 100%;
+                max-width: 100%;
+                min-width: 0;
+
+                padding: 20px;
+                box-sizing: border-box;
             }
 
-            .rates-table th,
-            .rates-table td {
-                padding: 8px;
+            .rates-page h1 {
+                font-size: 24px;
+            }
+
+            /* Filter */
+
+            .filter-section {
+                width: 100%;
+                margin-bottom: 18px;
+                text-align: left;
+                box-sizing: border-box;
+            }
+
+            .filter-section label {
+                display: block;
+                font-size: 14px;
+                margin-bottom: 6px;
+            }
+
+            .filter-section select {
+                width: 100%;
+                max-width: 100%;
+                height: 40px;
+
+                margin-top: 0;
+
+                font-size: 13px;
+                box-sizing: border-box;
+            }
+
+            /* Card */
+
+            .rates-page .rates-card {
+                width: 100%;
+                max-width: 100%;
+
+                padding: 18px;
+                margin: 0 0 18px 0;
+
+                box-sizing: border-box;
+            }
+
+            .rates-page .rates-card h2 {
+                font-size: 18px;
+                margin-bottom: 13px;
+            }
+
+            /* Hide desktop table */
+
+            .rates-page .rates-table {
+                display: none;
+            }
+
+            /* Tablet table */
+
+            .rates-page .responsive-rate-table {
+                display: block;
+                width: 100%;
+            }
+
+            .rates-page .rate-grid {
+                width: 100%;
+
+                display: grid;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+
+                border: 1px solid #e5e7eb;
+                border-radius: 6px;
+
+                overflow: hidden;
+                box-sizing: border-box;
+
+                margin-bottom: 8px;
+            }
+
+            .rates-page .rate-grid .rate-heading,
+            .rates-page .rate-grid .rate-value {
+                min-width: 0;
+                box-sizing: border-box;
+
+                text-align: center;
+            }
+
+            .rates-page .rate-grid .rate-heading {
+                background: #eef5ff;
+                color: #003b82;
+
+                font-weight: 600;
+                font-size: 13px;
+
+                padding: 11px 6px;
+
+                border-right: 1px solid #dbe3ed;
+                border-bottom: 1px solid #dbe3ed;
+            }
+
+            .rates-page .rate-grid .rate-value {
+                padding: 11px 6px;
+
+                font-size: 13px;
+
+                border-right: 1px solid #e5e7eb;
+                border-bottom: 1px solid #e5e7eb;
+
+                white-space: nowrap;
+            }
+
+            /* Remove right border from last column */
+
+            .rates-page .rate-grid>*:nth-child(4n) {
+                border-right: none;
+            }
+
+            /* Remove bottom border from last row */
+
+            .rates-page .rate-grid>*:nth-last-child(-n+4) {
+                border-bottom: none;
+            }
+
+            /* Last grid: Change / Change % */
+
+            .rates-page .rate-grid-last {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .rates-page .rate-grid-last>* {
+                border-bottom: none;
+            }
+
+            .rates-page .rate-grid-last>*:nth-child(2) {
+                border-right: none;
+            }
+        }
+
+
+        /* =========================================================
+   MOBILE
+   767px AND BELOW
+========================================================= */
+
+        @media (max-width: 767px) {
+
+            body.rates-page,
+            body.rates-page .main-container,
+            body.rates-page .main-content {
+                height: auto !important;
+                max-height: none !important;
+                overflow: visible !important;
+            }
+
+            /* Main */
+
+            .rates-page .main-container {
+                width: 100%;
+                display: block;
+            }
+
+            .rates-page .main-content {
+                width: 100%;
+                max-width: 100%;
+                min-width: 0;
+                padding: 15px;
+                margin: 0;
+                box-sizing: border-box;
+            }
+
+            /* Heading */
+
+            .rates-page h1 {
+                width: 100%;
+                font-size: 22px;
+                line-height: 1.35;
+                margin-bottom: 18px;
+            }
+
+            /* Filter */
+
+            .rates-page .filter-section {
+                width: 100%;
+
+                margin-bottom: 18px;
+
+                text-align: left;
+
+                box-sizing: border-box;
+            }
+
+            .rates-page .filter-section label {
+                display: block;
+
+                font-size: 14px;
+                font-weight: 600;
+
+                margin-bottom: 6px;
+            }
+
+            .rates-page .filter-section select {
+                width: 100%;
+                height: 40px;
+
+                font-size: 13px;
+
+                box-sizing: border-box;
+            }
+
+            /* Cards */
+
+            .rates-page .rates-card {
+                width: 100%;
+                max-width: 100%;
+
+                padding: 14px;
+                margin: 0 0 18px 0;
+
+                border-radius: 9px;
+
+                box-sizing: border-box;
+                overflow: visible;
+            }
+
+            .rates-page .rates-card h2 {
+                font-size: 18px;
+                margin-bottom: 13px;
+            }
+
+            /* Hide desktop + tablet */
+
+            .rates-page .rates-table,
+            .rates-page .responsive-rate-table {
+                display: none;
+            }
+
+            /* Mobile list */
+
+            .rates-page .mobile-rate-list {
+                display: block;
+
+                width: 100%;
+                max-width: 100%;
+
+                border: 1px solid #e1e5ea;
+                border-radius: 7px;
+
+                overflow: hidden;
+
+                box-sizing: border-box;
+            }
+
+            .rates-page .mobile-rate-row {
+                display: flex;
+                align-items: center;
+
+                width: 100%;
+                min-width: 0;
+                min-height: 39px;
+
+                box-sizing: border-box;
+
+                background: #fff;
+                border-bottom: 1px solid #e5e7eb;
+            }
+
+            .rates-page .mobile-rate-row:last-child {
+                border-bottom: none;
+            }
+
+            /* Label */
+
+            .rates-page .mobile-rate-label {
+                width: 48%;
+                min-width: 0;
+
+                padding: 9px 10px;
+
+                box-sizing: border-box;
+
+                background: #f5f8fc;
+
+                color: #374151;
+
+                font-size: 13px;
+                font-weight: 600;
+
+                display: flex;
+                align-items: center;
+            }
+
+            /* Value */
+
+            .rates-page .mobile-rate-value {
+                width: 52%;
+                min-width: 0;
+
+                padding: 9px 10px;
+
+                box-sizing: border-box;
+
+                color: #111827;
+
+                font-size: 13px;
+                font-weight: 500;
+
+                text-align: right;
+
+                display: flex;
+                align-items: center;
+                justify-content: flex-end;
+
+                white-space: nowrap;
+            }
+
+            /* Trend */
+
+            .rates-page .mobile-rate-value .up,
+            .rates-page .mobile-rate-value .down,
+            .rates-page .mobile-rate-value .same {
+                display: inline-flex;
+
+                align-items: center;
+                justify-content: flex-end;
+
+                font-size: 13px;
+
+                white-space: nowrap;
+            }
+
+            /* Updated */
+
+            .rates-page .updated-time {
+                display: block;
+
+                width: 100%;
+
+                margin-top: 12px;
+                margin-bottom: 8px;
+                padding-bottom: 6px;
+
+                font-size: 12px;
+                line-height: 1.4;
+
+                color: #374151;
+
+                box-sizing: border-box;
+            }
+
+            .rates-page .mobile-rate-label,
+            .rates-page .mobile-rate-value {
+                font-size: 14px;
+            }
+        }
+
+
+        /* =========================================================
+   SMALL MOBILE
+   480px AND BELOW
+========================================================= */
+
+        @media (max-width: 480px) {
+
+            .rates-page .main-content {
+                padding: 12px;
+            }
+
+            .rates-page h1 {
+                font-size: 20px;
+            }
+
+            .rates-page .rates-card {
+                padding: 12px;
+                margin-bottom: 16px;
+            }
+
+            .rates-page .rates-card h2 {
+                font-size: 17px;
+            }
+
+            .rates-page .mobile-rate-label {
+                width: 47%;
+
+                padding: 9px;
+
+                font-size: 12px;
+            }
+
+            .rates-page .mobile-rate-value {
+                width: 53%;
+
+                padding: 9px;
+
+                font-size: 12px;
+            }
+
+            .rates-page .mobile-rate-value .up,
+            .rates-page .mobile-rate-value .down,
+            .rates-page .mobile-rate-value .same {
+                font-size: 12px;
+            }
+
+            .rates-page .updated-time {
+                font-size: 11px;
+
+                margin-top: 12px;
+                padding-bottom: 8px;
             }
         }
     </style>
 </head>
 
-<body>
+<body class="rates-page">
     {{> header}}
 
     <div class="main-container">
@@ -115,7 +575,7 @@
             {{#each rates as |rate|}}
 
             <!-- GOLD CARD -->
-            <div class="rates-card">
+            {{!-- <div class="rates-card">
                 <h2>Gold Rates</h2>
 
                 <table class="rates-table">
@@ -166,12 +626,248 @@
                 </table>
 
                 <p>Updated : {{dateFormat rate.createdAt "MMMM DD, YYYY hh:mm A"}}</p>
-            </div>
+            </div> --}}
+            <!-- GOLD CARD -->
+            <div class="rates-card">
 
+                <h2>Gold Rates</h2>
+
+                <!-- =========================
+         DESKTOP TABLE
+    ========================== -->
+
+                <table class="rates-table">
+
+                    <thead>
+                        <tr>
+                            <th>Current</th>
+                            <th>24K</th>
+                            <th>22K</th>
+                            <th>18K</th>
+                            <th>MCX</th>
+                            <th>AM</th>
+                            <th>PM</th>
+                            <th>Change</th>
+                            <th>Change %</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+
+                            <td>
+                                {{formatNumber rate.gold "en-IN" maximumFractionDigits=2}}
+                            </td>
+
+                            <td>
+                                {{formatNumber rate.gold24k "en-IN" maximumFractionDigits=2}}
+                            </td>
+
+                            <td>
+                                {{formatNumber rate.gold22k "en-IN" maximumFractionDigits=2}}
+                            </td>
+
+                            <td>
+                                {{formatNumber rate.gold18k "en-IN" maximumFractionDigits=2}}
+                            </td>
+
+                            <td>
+                                {{formatNumber rate.mcx_gold "en-IN" maximumFractionDigits=2}}
+                            </td>
+
+                            <td>
+                                {{formatNumber rate.mcx_gold_am "en-IN" maximumFractionDigits=2}}
+                            </td>
+
+                            <td>
+                                {{formatNumber rate.mcx_gold_pm "en-IN" maximumFractionDigits=2}}
+                            </td>
+
+                            <td>
+                                <span class="{{getTrendClass rate.goldTrend}}">
+                                    <i class="fas fa-{{getTrendIcon rate.goldTrend}}"></i>
+                                    {{rate.gold_ch}}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="{{getTrendClass rate.goldTrend}}">
+                                    {{rate.gold_chp}}%
+                                </span>
+                            </td>
+
+                        </tr>
+                    </tbody>
+
+                </table>
+
+
+                <!-- =========================
+         TABLET VIEW
+    ========================== -->
+
+                <div class="responsive-rate-table">
+
+                    <!-- First 4 columns -->
+                    <div class="rate-grid">
+
+                        <div class="rate-heading">Current</div>
+                        <div class="rate-heading">24K</div>
+                        <div class="rate-heading">22K</div>
+                        <div class="rate-heading">18K</div>
+
+                        <div class="rate-value">
+                            {{formatNumber rate.gold "en-IN" maximumFractionDigits=2}}
+                        </div>
+
+                        <div class="rate-value">
+                            {{formatNumber rate.gold24k "en-IN" maximumFractionDigits=2}}
+                        </div>
+
+                        <div class="rate-value">
+                            {{formatNumber rate.gold22k "en-IN" maximumFractionDigits=2}}
+                        </div>
+
+                        <div class="rate-value">
+                            {{formatNumber rate.gold18k "en-IN" maximumFractionDigits=2}}
+                        </div>
+
+                    </div>
+
+
+                    <!-- Remaining columns -->
+                    <div class="rate-grid">
+
+                        <div class="rate-heading">MCX</div>
+                        <div class="rate-heading">AM</div>
+                        <div class="rate-heading">PM</div>
+                        <div class="rate-heading">Change</div>
+
+                        <div class="rate-value">
+                            {{formatNumber rate.mcx_gold "en-IN" maximumFractionDigits=2}}
+                        </div>
+
+                        <div class="rate-value">
+                            {{formatNumber rate.mcx_gold_am "en-IN" maximumFractionDigits=2}}
+                        </div>
+
+                        <div class="rate-value">
+                            {{formatNumber rate.mcx_gold_pm "en-IN" maximumFractionDigits=2}}
+                        </div>
+
+                        <div class="rate-value">
+                            <span class="{{getTrendClass rate.goldTrend}}">
+                                <i class="fas fa-{{getTrendIcon rate.goldTrend}}"></i>
+                                {{rate.gold_ch}}
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <!-- Change % -->
+                    <div class="rate-grid rate-grid-last">
+
+                        <div class="rate-heading">Change %</div>
+
+                        <div class="rate-value">
+                            <span class="{{getTrendClass rate.goldTrend}}">
+                                {{rate.gold_chp}}%
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- =========================
+         MOBILE VIEW
+    ========================== -->
+
+                <div class="mobile-rate-list">
+
+                    <div class="mobile-rate-row">
+                        <div class="mobile-rate-label">Current</div>
+                        <div class="mobile-rate-value">
+                            {{formatNumber rate.gold "en-IN" maximumFractionDigits=2}}
+                        </div>
+                    </div>
+
+                    <div class="mobile-rate-row">
+                        <div class="mobile-rate-label">24K</div>
+                        <div class="mobile-rate-value">
+                            {{formatNumber rate.gold24k "en-IN" maximumFractionDigits=2}}
+                        </div>
+                    </div>
+
+                    <div class="mobile-rate-row">
+                        <div class="mobile-rate-label">22K</div>
+                        <div class="mobile-rate-value">
+                            {{formatNumber rate.gold22k "en-IN" maximumFractionDigits=2}}
+                        </div>
+                    </div>
+
+                    <div class="mobile-rate-row">
+                        <div class="mobile-rate-label">18K</div>
+                        <div class="mobile-rate-value">
+                            {{formatNumber rate.gold18k "en-IN" maximumFractionDigits=2}}
+                        </div>
+                    </div>
+
+                    <div class="mobile-rate-row">
+                        <div class="mobile-rate-label">MCX</div>
+                        <div class="mobile-rate-value">
+                            {{formatNumber rate.mcx_gold "en-IN" maximumFractionDigits=2}}
+                        </div>
+                    </div>
+
+                    <div class="mobile-rate-row">
+                        <div class="mobile-rate-label">AM</div>
+                        <div class="mobile-rate-value">
+                            {{formatNumber rate.mcx_gold_am "en-IN" maximumFractionDigits=2}}
+                        </div>
+                    </div>
+
+                    <div class="mobile-rate-row">
+                        <div class="mobile-rate-label">PM</div>
+                        <div class="mobile-rate-value">
+                            {{formatNumber rate.mcx_gold_pm "en-IN" maximumFractionDigits=2}}
+                        </div>
+                    </div>
+
+                    <div class="mobile-rate-row">
+                        <div class="mobile-rate-label">Change</div>
+                        <div class="mobile-rate-value">
+                            <span class="{{getTrendClass rate.goldTrend}}">
+                                <i class="fas fa-{{getTrendIcon rate.goldTrend}}"></i>
+                                {{rate.gold_ch}}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mobile-rate-row">
+                        <div class="mobile-rate-label">Change %</div>
+                        <div class="mobile-rate-value">
+                            <span class="{{getTrendClass rate.goldTrend}}">
+                                {{rate.gold_chp}}%
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <p class="updated-time">
+                    Updated :
+                    {{dateFormat rate.createdAt "MMMM DD, YYYY hh:mm A"}}
+                </p>
+
+            </div>
 
             <!-- SILVER CARD -->
 
-            <div class="rates-card">
+            {{!-- <div class="rates-card">
                 <h2>Silver Rates</h2>
 
                 <table class="rates-table">
@@ -215,6 +911,176 @@
                 </table>
 
                 <p>Updated : {{dateFormat rate.createdAt "MMMM DD, YYYY hh:mm A"}}</p>
+
+            </div> --}}
+
+            <!-- SILVER CARD -->
+            <div class="rates-card">
+
+                <h2>Silver Rates</h2>
+
+                <!-- DESKTOP -->
+                <table class="rates-table">
+
+                    <thead>
+                        <tr>
+                            <th>Current</th>
+                            <th>MCX</th>
+                            <th>AM</th>
+                            <th>PM</th>
+                            <th>Change</th>
+                            <th>Change %</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr>
+
+                            <td>
+                                {{formatNumber rate.silver "en-IN" maximumFractionDigits=2}}
+                            </td>
+
+                            <td>
+                                {{formatNumber rate.mcx_silver "en-IN" maximumFractionDigits=2}}
+                            </td>
+
+                            <td>
+                                {{formatNumber rate.mcx_silver_am "en-IN" maximumFractionDigits=2}}
+                            </td>
+
+                            <td>
+                                {{formatNumber rate.mcx_silver_pm "en-IN" maximumFractionDigits=2}}
+                            </td>
+
+                            <td>
+                                <span class="{{getTrendClass rate.silverTrend}}">
+                                    <i class="fas fa-{{getTrendIcon rate.silverTrend}}"></i>
+                                    {{rate.silver_ch}}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="{{getTrendClass rate.silverTrend}}">
+                                    {{rate.silver_chp}}%
+                                </span>
+                            </td>
+
+                        </tr>
+                    </tbody>
+
+                </table>
+
+
+                <!-- TABLET -->
+                <div class="responsive-rate-table">
+
+                    <div class="rate-grid">
+
+                        <div class="rate-heading">Current</div>
+                        <div class="rate-heading">MCX</div>
+                        <div class="rate-heading">AM</div>
+                        <div class="rate-heading">PM</div>
+
+                        <div class="rate-value">
+                            {{formatNumber rate.silver "en-IN" maximumFractionDigits=2}}
+                        </div>
+
+                        <div class="rate-value">
+                            {{formatNumber rate.mcx_silver "en-IN" maximumFractionDigits=2}}
+                        </div>
+
+                        <div class="rate-value">
+                            {{formatNumber rate.mcx_silver_am "en-IN" maximumFractionDigits=2}}
+                        </div>
+
+                        <div class="rate-value">
+                            {{formatNumber rate.mcx_silver_pm "en-IN" maximumFractionDigits=2}}
+                        </div>
+
+                    </div>
+
+
+                    <div class="rate-grid rate-grid-last">
+
+                        <div class="rate-heading">Change</div>
+
+                        <div class="rate-value">
+                            <span class="{{getTrendClass rate.silverTrend}}">
+                                <i class="fas fa-{{getTrendIcon rate.silverTrend}}"></i>
+                                {{rate.silver_ch}}
+                            </span>
+                        </div>
+
+                        <div class="rate-heading">Change %</div>
+
+                        <div class="rate-value">
+                            <span class="{{getTrendClass rate.silverTrend}}">
+                                {{rate.silver_chp}}%
+                            </span>
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- MOBILE -->
+                <div class="mobile-rate-list">
+
+                    <div class="mobile-rate-row">
+                        <div class="mobile-rate-label">Current</div>
+                        <div class="mobile-rate-value">
+                            {{formatNumber rate.silver "en-IN" maximumFractionDigits=2}}
+                        </div>
+                    </div>
+
+                    <div class="mobile-rate-row">
+                        <div class="mobile-rate-label">MCX</div>
+                        <div class="mobile-rate-value">
+                            {{formatNumber rate.mcx_silver "en-IN" maximumFractionDigits=2}}
+                        </div>
+                    </div>
+
+                    <div class="mobile-rate-row">
+                        <div class="mobile-rate-label">AM</div>
+                        <div class="mobile-rate-value">
+                            {{formatNumber rate.mcx_silver_am "en-IN" maximumFractionDigits=2}}
+                        </div>
+                    </div>
+
+                    <div class="mobile-rate-row">
+                        <div class="mobile-rate-label">PM</div>
+                        <div class="mobile-rate-value">
+                            {{formatNumber rate.mcx_silver_pm "en-IN" maximumFractionDigits=2}}
+                        </div>
+                    </div>
+
+                    <div class="mobile-rate-row">
+                        <div class="mobile-rate-label">Change</div>
+                        <div class="mobile-rate-value">
+                            <span class="{{getTrendClass rate.silverTrend}}">
+                                <i class="fas fa-{{getTrendIcon rate.silverTrend}}"></i>
+                                {{rate.silver_ch}}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mobile-rate-row">
+                        <div class="mobile-rate-label">Change %</div>
+                        <div class="mobile-rate-value">
+                            <span class="{{getTrendClass rate.silverTrend}}">
+                                {{rate.silver_chp}}%
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <p class="updated-time">
+                    Updated :
+                    {{dateFormat rate.createdAt "MMMM DD, YYYY hh:mm A"}}
+                </p>
 
             </div>
 

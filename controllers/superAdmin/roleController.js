@@ -333,9 +333,6 @@ exports.getRoleStats = async (req, res) => {
   ---------------------------------------------------------------
 */
 
-// const Role = require("../../models/superAdmin/Role.model");
-
-// Available permissions ki list — matrix ke columns banane ke liye
 exports.getAvailablePermissions = (req, res) => {
     res.status(200).json({
         success: true,

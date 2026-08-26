@@ -9,6 +9,9 @@ const axios = require("axios");
 const { getSignedUrl } = require('../middleware/multer')
 const bcrypt = require("bcryptjs");
 const Role = require("../models/superAdmin/Role.model");
+const GMem = require('../models/groupMem.model');
+const Announcement = require('../models/announcement.model');
+const Comment = require('../models/commentModel');
 
 
 //** Get Login Page */
@@ -403,14 +406,61 @@ exports.updateGroup = async (req, res) => {
 exports.deleteGroup = async (req, res) => {
     try {
         const { id } = req.params;
+
+        // 1. Check group exists
+        const group = await Group.findById(id);
+
+        if (!group) {
+            return res.status(404).json({
+                success: false,
+                message: 'Group not found'
+            });
+        }
+
+        // 2. Find all announcements of this group
+        const announcements = await Announcement.find({
+            group: id
+        }).select('_id');
+
+        // 3. Get announcement IDs
+        const announcementIds = announcements.map(
+            announcement => announcement._id
+        );
+
+        // 4. Delete comments of these announcements
+        if (announcementIds.length > 0) {
+            await Comment.deleteMany({
+                announcement: { $in: announcementIds }
+            });
+        }
+
+        // 5. Delete all announcements of this group
+        await Announcement.deleteMany({
+            group: id
+        });
+
+        // 6. Remove all members from this group
+        await GMem.deleteMany({
+            group: id
+        });
+
+        // 7. Finally delete the group
         await Group.findByIdAndDelete(id);
-        res.json({ success: true, message: 'Group deleted successfully' });
+
+        return res.status(200).json({
+            success: true,
+            message: 'Group and all related data deleted successfully'
+        });
+
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: 'Server error' });
+        console.error('deleteGroup error:', error);
+
+        return res.status(500).json({
+            success: false,
+            message: 'Server error'
+        });
     }
 };
-
 
 //**  Updated KYC page */
 exports.getAllKYC = async (req, res) => {

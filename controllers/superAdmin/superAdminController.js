@@ -1,7 +1,8 @@
 const User = require('../../models/user.model');      // root/models — shared
 const Group = require('../../models/group.model');    // root/models — shared
 const Contact = require('../../models/contact.model'); // root/models — shared
-const Role = require('../../models/superAdmin/Role.model');           // superAdmin/models — admin-only
+const Role = require('../../models/superAdmin/Role.model');
+const GroupRole = require('../../models/groupRole.model');         // superAdmin/models — admin-only
 const jwt = require('jsonwebtoken');
 const axios = require("axios");
 const { getSignedUrl } = require('../../middleware/multer');  // root/middleware — shared
@@ -136,7 +137,6 @@ exports.getUsersApi = async (req, res) => {
     try {
         const { role, user_status, search, kyc_status, page = 1, limit = 10 } = req.query;
         const filter = {};
-        if (role) filter.role = role;
         if (user_status) filter.user_status = user_status;
         if (kyc_status) filter.kyc_status = kyc_status;
         if (search) {
@@ -148,13 +148,43 @@ exports.getUsersApi = async (req, res) => {
             ];
         }
 
-        // ⭐ Agar super_admin nahi hai, sirf apne (owned) group ke members tak seemit karo
+        // ⭐ 1) Role filter (GroupRole based) — sirf matching role wale user ids
+        let roleMemberIds = null;
+        if (role) {
+            if (role === 'super_admin') {
+                const superAdminRole = await Role.findOne({ roleName: 'super_admin' });
+                filter.role = superAdminRole?._id || null;
+            } else {
+                const matchingRoles = await GroupRole.find({ roleName: role }).select('_id');
+                const roleIds = matchingRoles.map(r => r._id);
+                roleMemberIds = await GMem.find({ groupRole: { $in: roleIds } }).distinct('user');
+                roleMemberIds = roleMemberIds.map(id => id.toString());
+            }
+        }
+
+        // ⭐ 2) Scope filter — sirf isi admin ke apne groups ke members (khud admin ko exclude karo)
+        let scopeMemberIds = null;
         if (!req.isSuperAdmin) {
             const myGroups = await Group.find({ user: req.user._id }).select('_id');
             const myGroupIds = myGroups.map(g => g._id);
-            const memberDocs = await GMem.find({ group: { $in: myGroupIds } }).select('user');
-            const memberIds = [...new Set(memberDocs.map(m => m.user.toString()))];
-            filter._id = { $in: memberIds };
+            const memberDocs = await GMem.find({
+                group: { $in: myGroupIds },
+                type: { $ne: 'pending' },
+                user: { $ne: req.user._id }   // ⭐ admin khud ko list se hata do
+            }).select('user');
+            scopeMemberIds = [...new Set(memberDocs.map(m => m.user.toString()))];
+        }
+
+        // ⭐ 3) Dono filters ka intersection nikalo
+        if (roleMemberIds && scopeMemberIds) {
+            filter._id = { $in: roleMemberIds.filter(id => scopeMemberIds.includes(id)) };
+        } else if (roleMemberIds) {
+            filter._id = { $in: roleMemberIds };
+        } else if (scopeMemberIds) {
+            filter._id = { $in: scopeMemberIds };
+        } else if (!req.isSuperAdmin) {
+            // koi bhi member nahi mila to empty list bhejo
+            filter._id = { $in: [] };
         }
 
         const pageNum = parseInt(page) || 1;
@@ -164,10 +194,47 @@ exports.getUsersApi = async (req, res) => {
         const total = await User.countDocuments(filter);
         const users = await User.find(filter).select('-password').sort({ createdAt: -1 }).skip(skip).limit(limitNum).lean();
 
+        // ⭐ Har user ke group + group-role details nikalo (table mein dikhane ke liye)
+        const userIds = users.map(u => u._id);
+
+        // ⭐ Sirf current logged-in admin ke apne groups tak scope karo
+        // (agar super_admin hai to saare groups allowed, warna sirf apne owned groups)
+        let scopeGroupIds = null;
+        if (!req.isSuperAdmin) {
+            const myGroups = await Group.find({ user: req.user._id }).select('_id');
+            scopeGroupIds = myGroups.map(g => g._id);
+        }
+
+        const gmemQuery = { user: { $in: userIds }, type: { $ne: 'pending' } };
+        if (scopeGroupIds) {
+            gmemQuery.group = { $in: scopeGroupIds };
+        }
+
+        const gmemDocs = await GMem.find(gmemQuery)
+            .populate('group', 'g_name')
+            .populate('groupRole', 'roleName')
+            .lean();
+
+        const groupMap = {};
+        gmemDocs.forEach(g => {
+            if (!g.user) return;
+            const uid = g.user.toString();
+            if (!groupMap[uid]) groupMap[uid] = [];
+            groupMap[uid].push({
+                groupName: g.group?.g_name || 'N/A',
+                roleName: g.groupRole?.roleName || (g.type === 'admin' ? 'admin' : 'member')
+            });
+        });
+
+        const usersWithGroups = users.map(u => ({
+            ...u,
+            groupMemberships: groupMap[u._id.toString()] || []
+        }));
+
         res.status(200).json({
             success: true,
             data: {
-                users,
+                users: usersWithGroups,
                 pagination: {
                     total, page: pageNum, limit: limitNum,
                     totalPages: Math.ceil(total / limitNum),
@@ -469,6 +536,22 @@ exports.getAssociationByIdApi = async (req, res) => {
         if (!group) return res.status(404).json({ success: false, message: 'Group not found' });
         res.status(200).json({ success: true, association: { ...group, name: group.g_name } });
     } catch (error) {
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
+exports.getRolesForMemberFilterGlobal = async (req, res) => {
+    try {
+        const roles = await GroupRole.find({ roleName: { $ne: 'super_admin' } })
+            .select('roleName')
+            .lean();
+
+        const uniqueNames = [...new Set(roles.map(r => r.roleName))];
+        const uniqueRoles = uniqueNames.map(name => ({ roleName: name }));
+
+        res.status(200).json({ success: true, roles: uniqueRoles });
+    } catch (error) {
+        console.error('getRolesForMemberFilterGlobal error:', error);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };

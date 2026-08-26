@@ -509,22 +509,34 @@
 
     uploadInput.addEventListener('change', function () {
       if (this.files && this.files[0]) {
+
         const file = this.files[0];
-        if (file.type.startsWith('image/')) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            previewImg.src = e.target.result;
-            previewImgContainer.style.display = 'block';
-          };
-          reader.readAsDataURL(file);
-        } else {
+
+        // File type check
+        if (!file.type.startsWith('image/')) {
+          this.value = '';
+          toastr.error('Please upload an image file');
+          return;
+        }
+
+        // 1 MB size check
+        if (file.size > 1 * 1024 * 1024) {
+          this.value = '';
           previewImg.src = '';
           previewImgContainer.style.display = 'none';
-          toastr.error('Please upload an image file');
+
+          toastr.error('Image size must be less than 1 MB');
+          return;
         }
-      } else {
-        previewImg.src = '';
-        previewImgContainer.style.display = 'none';
+
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          previewImg.src = e.target.result;
+          previewImgContainer.style.display = 'block';
+        };
+
+        reader.readAsDataURL(file);
       }
     });
 

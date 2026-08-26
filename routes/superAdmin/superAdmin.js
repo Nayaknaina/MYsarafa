@@ -17,7 +17,7 @@ router.get('/forgot-password', superAdminController.forgotPasswordPage);
 router.post('/forgot-password/send-otp', superAdminController.sendOTP);  // send OTP to mobile
 router.post('/forgot-password/verify-otp', superAdminController.verifyOTP); // verify OTP
 router.post('/forgot-password/reset', superAdminController.resetPassword); // reset password
- 
+
 
 
 router.get('/dashboard', superAdminAuth, profileImageMiddleware, superAdminController.getDashboard);
@@ -89,6 +89,12 @@ router.put('/api/users/:id',
 router.delete('/api/users/:id',
     superAdminAuth,
     superAdminController.deleteUser);
+
+router.get(
+    '/api/roles/member-filter',
+    superAdminAuth,
+    superAdminApiController.getRolesForMemberFilterGlobal
+);
 
 router.get(
     '/api/roles/stats',

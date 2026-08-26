@@ -4,6 +4,7 @@ const membershipController = require('../controllers/membershipController');
 const { authMiddleware, isAdmin } = require('../middleware/auth');
 const monthlyMembershipCheck = require('../middleware/monthlymembershipVisible');
 const profileImageMiddleware = require('../middleware/profileImageMiddleware');
+const groupPermission = require('../middleware/groupPermission');
 const multer = require('multer');
 
 const { upload } = require('../middleware/multer');
@@ -55,7 +56,8 @@ router.get('/my-payments', authMiddleware, profileImageMiddleware, membershipCon
 
 // Time Period
 router.get('/payment-matrix', authMiddleware, membershipController.renderPaymentMatrixPage);
-router.get('/payment-matrix-data/:groupId', authMiddleware, membershipController.getPaymentMatrixData);
+// router.get('/payment-matrix-data/:groupId', authMiddleware, membershipController.getPaymentMatrixData);
+router.get('/payment-matrix-data/:groupId',authMiddleware,groupPermission('view_payment_matrix'),membershipController.getPaymentMatrixData);
 
 router.get('/user-period-status/:groupId', authMiddleware, membershipController.getUserPeriodStatus);
 router.get('/search-group-summary', authMiddleware, membershipController.searchGroupPaymentSummary);
