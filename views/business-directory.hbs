@@ -15,157 +15,423 @@
     <link rel="canonical" href="https://app.mysarafa.com/businesses">
 </head> --}}
 
+
 <style>
-    /* Custom styles if needed beyond Tailwind */
+    /* ==========================================
+   Base & Layout Configurations
+   ========================================== */
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        background-color: #f8fafc;
+        color: #1e293b;
+        line-height: 1.5;
+    }
+
+    .main-container {
+        display: flex;
+        height: calc(100vh - 64px);
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .main-layout {
+        display: flex;
+        flex-direction: row;
+        gap: 2rem;
+        align-items: flex-start;
+    }
+
+    .main-layout>.flex-1 {
+        min-width: 0;
+        flex: 1;
+    }
+
+    /* ==========================================
+   Discover Businesses Grid & Cards
+   ========================================== */
+    .business-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1.5rem;
+        width: 100%;
+    }
+
+    @media (max-width: 1200px) {
+        .business-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 640px) {
+        .business-grid {
+            grid-template-columns: 1fr;
+            padding: 0 10px;
+            padding-bottom: 75px;
+        }
+    }
+
+    /* Card Outer Wrapper */
     .business-card {
-        transition: all 0.3s ease;
+        background-color: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        cursor: pointer;
     }
 
     .business-card:hover {
         transform: translateY(-4px);
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+        border-color: #cbd5e1;
+    }
+
+    .business-card-inner {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    /* Business Card Image */
+    .business-card-image-wrapper {
+        width: 100%;
+        height: 180px;
+        background-color: #f1f5f9;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .business-card-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .business-card:hover .business-card-image {
+        transform: scale(1.05);
+    }
+
+    /* Business Card Details */
+    .business-card-content {
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+
+    .business-name {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin: 0 0 0.5rem 0;
+        line-height: 1.375;
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .business-desc {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin: 0 0 1rem 0;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .business-category {
+        display: inline-block;
+        align-self: flex-start;
+        background-color: #eff6ff;
+        color: #2563eb;
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.25rem 0.625rem;
+        border-radius: 9999px;
+        margin-bottom: 0.5rem;
+    }
+
+    .business-owner {
+        font-size: 0.8125rem;
+        color: #94a3b8;
+        margin: 0 0 1.25rem 0;
+    }
+
+    .business-card-btn {
+        margin-top: auto;
+        width: 100%;
+        padding: 0.625rem 1rem;
+        background-color: #f8fafc;
+        color: #334155;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: center;
+    }
+
+    .business-card-btn:hover {
+        background-color: #2563eb;
+        color: #ffffff;
+        border-color: #2563eb;
+    }
+
+    /* ==========================================
+   My Businesses Sidebar
+   ========================================== */
+    .my-businesses-sidebar {
+        width: 100%;
+        background-color: #ffffff;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        height: fit-content;
+    }
+
+    @media (min-width: 1024px) {
+        .my-businesses-sidebar {
+            width: 320px;
+            flex-shrink: 0;
+        }
+    }
+
+    .my-business-list-scroll {
+        max-height: 600px;
+        overflow-y: auto;
+        padding-right: 0.25rem;
+    }
+
+    /* Scrollbar Customization */
+    .my-business-list-scroll::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .my-business-list-scroll::-webkit-scrollbar-track {
+        background: #f1f5f9;
+        border-radius: 4px;
+    }
+
+    .my-business-list-scroll::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
+
+    .my-business-list-scroll::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
     }
 
     .my-business-item {
-        transition: background-color 0.2s ease;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
     .my-business-item:hover {
-        background-color: #f9fafb;
+        border-color: #93c5fd;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
+    /* Action Dropdown Menu */
+    .action-menu {
+        z-index: 20;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    /* ==========================================
+   Modals & Overlays
+   ========================================== */
     .modal-overlay {
         display: none;
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 1000;
-        justify-content: center;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 50;
         align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        animation: fadeIn 0.2s ease-out;
     }
 
     .modal-content {
-        background: white;
-        border-radius: 12px;
-        width: 90%;
+        background-color: #ffffff;
+        border-radius: 0.75rem;
         max-width: 600px;
+        width: 100%;
         max-height: 90vh;
         overflow-y: auto;
         position: relative;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        animation: slideUp 0.25s ease-out;
     }
 
     .close-btn {
         position: absolute;
-        top: 10px;
-        right: 15px;
-        background: none;
+        top: 1rem;
+        right: 1rem;
+        background: transparent;
         border: none;
-        font-size: 24px;
+        font-size: 1.5rem;
+        line-height: 1;
+        color: #64748b;
         cursor: pointer;
-        color: #9ca3af;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.375rem;
+        transition: background-color 0.2s ease, color 0.2s ease;
     }
 
     .close-btn:hover {
-        color: #ef4444;
+        background-color: #f1f5f9;
+        color: #0f172a;
     }
 
-    .form-input {
-        width: 100%;
-        padding: 10px;
-        margin-bottom: 12px;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        font-size: 1rem;
+    /* Modal Animations */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
     }
 
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* ==========================================
+   Form UI Controls inside Modals
+   ========================================== */
+    #businessForm {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .form-input,
     .form-select,
     .form-textarea {
         width: 100%;
-        padding: 10px;
-        margin-bottom: 12px;
-        border: 1px solid #d1d5db;
-        border-radius: 6px;
-        font-size: 1rem;
+        padding: 0.75rem 1rem;
+        border: 1px solid #cbd5e1;
+        border-radius: 0.5rem;
+        font-size: 0.875rem;
+        color: #1e293b;
+        background-color: #ffffff;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .form-textarea {
         resize: vertical;
+        min-height: 80px;
     }
 
     .submit-btn {
-        width: 100%;
-        padding: 12px;
-        background: #2a4aa7;
-        color: white;
+        background-color: #2563eb;
+        color: #ffffff;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
         border: none;
-        border-radius: 6px;
-        font-weight: 500;
+        border-radius: 0.5rem;
         cursor: pointer;
-        transition: background 0.3s;
+        transition: background-color 0.2s ease;
+        margin-top: 0.5rem;
     }
 
     .submit-btn:hover {
-        background: #224485;
+        background-color: #1d4ed8;
     }
 
-    .action-menu {
-        transition: transform 0.2s ease, opacity 0.2s ease;
-        opacity: 0;
-        pointer-events: none;
-    }
-
-    .action-menu.scale-y-100 {
-        opacity: 1;
-        pointer-events: auto;
-    }
-
-    /* Star Rating Styles */
+    /* ========================================== Ratings & Reviews Elements ========================================== */
     .star-rating {
-        display: flex;
+        display: inline-flex;
         align-items: center;
         gap: 0.125rem;
     }
 
-    .star-rating .star {
-        font-size: 0.6875rem;
-        /* Even smaller for ultra-compact */
-        color: #d1d5db;
+    .star {
+        font-size: 0.875rem;
+        color: #cbd5e1;
     }
 
-    .star-rating .star.filled {
-        color: #fbbf24;
+    .star.filled {
+        color: #f59e0b;
     }
 
-    .star-rating .review-count {
-        font-size: 0.6875rem;
-        color: #6b7280;
-        margin-left: 0.25rem;
+    .star.fa-star-half-alt {
+        color: #f59e0b;
     }
 
-    @media (max-width: 768px) {
+    .page-content {
+        flex: 1;
+        min-width: 0;
+        height: 100%;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    /* Mobile + Tablet */
+    @media (max-width: 1023px) {
         .main-layout {
             flex-direction: column;
-        }
-
-        .sidebar {
             width: 100%;
-            order: 2;
         }
 
-        .grid-cols-3 {
-            grid-template-columns: 1fr;
+        /* My Businesses ko upar */
+        .my-businesses-sidebar {
+            order: -1;
+            width: 100%;
+        }
+
+        /* Discover Businesses niche */
+        .main-layout>.flex-1 {
+            order: 1;
+            width: 100%;
         }
     }
 </style>
 
-<body>
+<body data-user-id="{{user._id}}">
 
     {{> header}}
 
     <div class="main-container">
         <!-- Sidebar -->
         {{> sidebar}}
-        <div class="w-full p-4">
+        <div class="w-full p-4 page-content">
             <!-- Header Section -->
             <div class="mb-2">
                 <h1 class="text-2xl font-bold text-gray-900 mb-2">Business Connect</h1>
@@ -185,44 +451,61 @@
                 <div class="flex-1">
                     <h2 class="text-xl font-semibold text-gray-800 mb-6">Discover Businesses</h2>
                     {{#if discoverBusinesses.length}}
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3"
-                        id="discoverBusinessesGrid">
+                    <div class="business-grid" id="discoverBusinessesGrid">
                         {{#each discoverBusinesses}}
 
-                        <div class="business-card cursor-pointer" onclick="openBusinessDetailsModal('{{_id}}')">
+                        <div class="business-card" onclick="openBusinessDetailsModal('{{_id}}')">
 
-                            <div class="bg-white rounded-lg shadow-sm overflow-hidden h-full flex flex-col border">
-                                <img src="{{profile_pic}}" alt="{{name}}"
-                                    class="w-full h-24 object-cover flex-shrink-0">
+                            <div class="business-card-inner">
+
+                                <!-- Business Image -->
+                                <div class="business-card-image-wrapper">
+
+                                    <img src="{{profile_pic}}" alt="{{name}}" class="business-card-image"
+                                        onerror="this.src='/default-business.jpg'">
+
+                                </div>
 
 
-                                <div class="p-2 flex-1 flex flex-col justify-between">
+                                <!-- Card Content -->
+                                <div class="business-card-content">
 
+                                    <!-- Business Name -->
                                     <h3 class="business-name">
                                         {{name}}
                                     </h3>
 
+
+                                    <!-- Description -->
                                     <p class="business-desc">
                                         {{description}}
                                     </p>
 
-                                    <p class="business-meta">
+
+                                    <!-- Category -->
+                                    <p class="business-category">
                                         {{category}}
                                     </p>
 
-                                    <p class="business-meta">
+
+                                    <!-- Owner -->
+                                    <p class="business-owner">
                                         {{owner.f_name}} {{owner.l_name}}
                                     </p>
 
-                                    <button
-                                        class="w-full bg-green-500 text-white px-1 py-1 rounded text-xs hover:bg-green-600 transition text-center"
-                                        onclick="event.stopPropagation(); contactOwner('{{owner._id}}')">
+
+                                    <!-- Button -->
+                                    <button type="button" class="business-card-btn"
+                                        onclick="event.stopPropagation(); openBusinessDetailsModal('{{_id}}')">
+
                                         Visit Profile
+
                                     </button>
 
                                 </div>
 
                             </div>
+
                         </div>
                         {{/each}}
                     </div>
@@ -234,7 +517,7 @@
                 </div>
 
                 <!-- My Businesses list (30%) -->
-                <aside class="w-lg ">
+                <aside class="my-businesses-sidebar">
                     <h2 class="text-2xl font-semibold text-gray-800 mb-6">My Businesses</h2>
                     {{#if myBusinesses.length}}
                     <ul class="space-y-4 my-business-list-scroll">
@@ -297,7 +580,10 @@
         <div id="businessFormModal" class="modal-overlay">
             <div class="modal-content p-6">
                 <button class="close-btn" id="closeBusinessFormModal">&times;</button>
-                <h3 id="modalTitle" class="text-xl font-semibold mb-4 text-gray-800">Add New Business</h3>
+
+                <h3 id="modalTitle">
+                    Add New Business
+                </h3>
                 <form id="businessForm" enctype="multipart/form-data">
                     <input type="hidden" id="businessId" name="id">
                     <input type="text" name="name" class="form-input" placeholder="Business Name" required>
@@ -369,54 +655,139 @@
                 method: 'GET',
                 dataType: 'json',
                 success: function (data) {
+
                     if (!data.success) {
                         showNotification(data.message || 'Failed to load details', 'error');
                         return;
                     }
+
                     const modal = document.getElementById('businessDetailsModal');
                     const content = document.getElementById('businessDetailsContent');
-                    const isOwner = data.business.owner._id.toString() === '{{user._id}}';
+
+                    // Current logged-in user
+                    const currentUserId = String('{{userId}}').trim();
+
+                    const businessOwnerId = String(
+                        data.business.owner?._id || data.business.owner || ''
+                    ).trim();
+
+                    const isOwner = businessOwnerId === currentUserId;
+
+                    console.log("========== REVIEW CHECK ==========");
+                    console.log("Current User ID:", currentUserId);
+                    console.log("Business Owner ID:", businessOwnerId);
+                    console.log("Is Owner:", isOwner);
+
                     const reviewsHtml = data.business.reviews && data.business.reviews.length > 0
-                        ? data.business.reviews.map(review => `
-                        <div class="border-t pt-2 mb-2 p-2 bg-gray-50 rounded">
-                            <div class="flex items-center mb-1">
-                                <span class="text-sm font-medium">${review.user ? review.user.full_name : 'Anonymous'}</span>
-                                <span class="ml-auto text-xs text-gray-500">${new Date(review.createdAt).toLocaleDateString()}</span>
-                            </div>
-                            <div class="flex mb-1">${renderStars(review.rating)}</div>
-                            <p class="text-sm text-gray-700">${review.comment || 'No comment'}</p>
-                        </div>
-                    `).join('')
+                        ? data.business.reviews.map(review => {
+                            const reviewerName = review.user
+                                ? `${review.user.f_name || ''} ${review.user.l_name || ''}`.trim() || 'Anonymous'
+                                : 'Anonymous';
+                            const reviewDate = review.createdAt
+                                ? new Date(review.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+                                : '';
+                            return `
+        <div class="border-b pb-2 mb-2 p-2 bg-gray-50 rounded">
+            <div class="flex justify-between items-center mb-1">
+                <span class="font-medium text-sm text-gray-800">${reviewerName}</span>
+                <span class="text-xs text-gray-400">${reviewDate}</span>
+            </div>
+            <div class="star-rating mb-1">${renderStars(review.rating)}</div>
+            <p class="text-sm text-gray-600">${review.comment || ''}</p>
+        </div>`;
+                        }).join('')
                         : '<p class="text-gray-500 italic">No reviews yet.</p>';
 
-                    const reviewForm = !isOwner ? `
-                    <div class="mt-4 p-4 border-t bg-blue-50 rounded-lg">
-                        <h5 class="font-semibold mb-2">Add Your Review</h5>
-                        <form id="reviewForm">
-                            <div class="mb-2">
-                                <label class="block text-sm font-medium mb-1">Rating (1-5):</label>
-                                <select name="rating" class="w-full p-2 border rounded" id="rating" required>
-                                    <option value="">Select Rating</option>
-                                    <option value="1">1 ★</option>
-                                    <option value="2">2 ★★</option>
-                                    <option value="3">3 ★★★</option>
-                                    <option value="4">4 ★★★★</option>
-                                    <option value="5">5 ★★★★★</option>
-                                </select>
-                            </div>
-                            <div class="mb-3">
-                                <label class="block text-sm font-medium mb-1">Comment (optional):</label>
-                                <textarea name="comment" rows="3" maxlength="500" class="w-full p-2 border rounded" placeholder="Share your experience..."></textarea>
-                            </div>
-                            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">Submit Review</button>
-                        </form>
-                    </div>
-                ` : '<p class="text-gray-500 mt-4">You own this business.</p>';
+                    const hasReviewed = data.business.reviews?.some(review => {
+                        const reviewUserId = String(
+                            review.user?._id || review.user || ''
+                        ).trim();
+
+                        return reviewUserId === currentUserId;
+                    });
+
+                    console.log("Has Reviewed:", hasReviewed);
+
+                    const reviewForm = !isOwner && !hasReviewed ? `
+        <div class="mt-4 p-4 border-t bg-blue-50 rounded-lg">
+            <h5 class="font-semibold mb-2">
+                Add Your Review
+            </h5>
+
+        <form id="reviewForm">
+
+            <div class="mb-2">
+                <label class="block text-sm font-medium mb-1">
+                    Rating (1-5):
+                </label>
+
+                <select
+                    name="rating"
+                    class="w-full p-2 border rounded"
+                    id="rating"
+                    required>
+
+                    <option value="">Select Rating</option>
+                    <option value="1">1 ★</option>
+                    <option value="2">2 ★★</option>
+                    <option value="3">3 ★★★</option>
+                    <option value="4">4 ★★★★</option>
+                    <option value="5">5 ★★★★★</option>
+
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="block text-sm font-medium mb-1">
+                    Comment:
+                </label>
+
+                <textarea
+                    name="comment"
+                    rows="3"
+                    maxlength="500"
+                    class="w-full p-2 border rounded"
+                    placeholder="Share your experience..."
+                    required></textarea>
+            </div>
+
+            <button
+                type="submit"
+                class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition">
+                Submit Review
+            </button>
+
+        </form>
+   </div>
+    ` : (!isOwner && hasReviewed ? `
+        <div class="mt-4 p-4 border-t bg-gray-50 rounded-lg text-center">
+            <p class="text-sm text-gray-600">
+                You have already added review for this business.
+            </p>
+        </div>
+    ` : '');
+
+                    const ownerPhone = data.business.owner?.mobile_no;
 
                     const contactBtn = !isOwner ? `
-                    <button onclick="contactOwner('${data.business.owner._id}')" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 mt-2">
-                        <i class="fas fa-envelope mr-1"></i>Contact Owner
-                    </button>` : '';
+    <div class="flex gap-2 mt-3">
+
+        <button
+            onclick="openWhatsApp('${ownerPhone || ''}')"
+            class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+            <i class="fab fa-whatsapp mr-1"></i>
+            WhatsApp
+        </button>
+
+        <button
+            onclick="callOwner('${ownerPhone || ''}')"
+            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+            <i class="fas fa-phone mr-1"></i>
+            Call
+        </button>
+
+    </div>
+` : '';
 
                     content.innerHTML = `
                     <h3 class="text-2xl font-bold mb-4">${data.business.name}</h3>
@@ -568,9 +939,29 @@
         }
 
         // Contact Owner (placeholder)
-        function contactOwner(ownerId) {
-            showNotification('Contact initiated (implement messaging)', 'info');
-            closeBusinessDetailsModal();
+        function openWhatsApp(phone) {
+            if (!phone) {
+                showNotification('Owner phone number is not available', 'error');
+                return;
+            }
+
+            let cleanPhone = phone.toString().replace(/\D/g, '');
+
+            // India number
+            if (cleanPhone.length === 10) {
+                cleanPhone = '91' + cleanPhone;
+            }
+
+            window.open(`https://wa.me/${cleanPhone}`, '_blank');
+        }
+
+        function callOwner(phone) {
+            if (!phone) {
+                showNotification('Owner phone number is not available', 'error');
+                return;
+            }
+
+            window.location.href = `tel:${phone}`;
         }
 
         // Delete Business
@@ -658,5 +1049,9 @@
     </script>
     <script type="module" src="/js/firebase.js"></script>
 </body>
+
+<script src="/js/all.js"></script>
+<script type="module" src="/js/firebase.js"></script>
+{{> profile}}
 
 </html>

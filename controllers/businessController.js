@@ -8,7 +8,7 @@ exports.getBusinessDirectory = async (req, res) => {
         const { search, category } = req.query;
         const userId = req.user._id;
 
-     
+
         let query = {};
         if (search) query.name = { $regex: search, $options: 'i' };
         if (category) query.category = category;
@@ -21,8 +21,8 @@ exports.getBusinessDirectory = async (req, res) => {
             visibility: 'public',
             owner: { $ne: userId }
         })
-        .populate('owner', 'f_name l_name')
-        .lean();
+            .populate('owner', 'f_name l_name')
+            .lean();
 
 
         for (const biz of myBusinesses) {
@@ -54,7 +54,7 @@ exports.getBusinessDirectory = async (req, res) => {
             search,
             category,
             user: req.user,
-        
+            userId: req.user._id.toString(),
             title: 'Business Directory'
         });
 
@@ -67,7 +67,10 @@ exports.getBusinessDirectory = async (req, res) => {
 exports.getBusinessDetails = async (req, res) => {
     try {
         console.log("Fetching business details for ID:", req.params.id);
-        const business = await Business.findById(req.params.id).populate('owner', 'full_name').lean();
+        const business = await Business.findById(req.params.id)
+            .populate('owner', 'full_name f_name l_name mobile_no')
+            .populate('reviews.user', 'full_name f_name l_name')
+            .lean();
         if (!business) return res.status(404).render('error', { message: 'Business not found' });
 
         // Check visibility: If private, only owner can view
@@ -149,20 +152,61 @@ exports.renderEditForm = async (req, res) => {
 
 exports.updateBusiness = async (req, res) => {
     try {
-        const business = await Business.findOne({ _id: req.params.id, owner: req.user._id });
-        if (!business) return res.status(403).render('error', { message: 'Unauthorized' });
+        const {
+            name,
+            type,
+            category,
+            description,
+            location,
+            contact,
+            website,
+            visibility
+        } = req.body;
 
-        Object.assign(business, { name, type, category, description, location, contact, website, visibility }); 
-        if (req.file) business.profile_pic = req.file.key;
+        const business = await Business.findOne({
+            _id: req.params.id,
+            owner: req.user._id
+        });
+
+        if (!business) {
+            return res.status(403).json({
+                success: false,
+                message: 'Unauthorized'
+            });
+        }
+
+        Object.assign(business, {
+            name,
+            type,
+            category,
+            description,
+            location,
+            contact,
+            website,
+            visibility
+        });
+
+        if (req.file) {
+            business.profile_pic = req.file.key;
+        }
 
         await business.save();
+
         res.status(200).json({
             success: true,
             message: 'Business updated successfully',
-            business: { id: business._id }
+            business: {
+                id: business._id
+            }
         });
+
     } catch (error) {
-        res.status(500).render('error', { message: 'Failed to update business' });
+        console.error('Update Business Error:', error);
+
+        res.status(500).json({
+            success: false,
+            message: 'Failed to update business'
+        });
     }
 };
 
@@ -180,20 +224,21 @@ exports.deleteBusiness = async (req, res) => {
 
 exports.addReview = async (req, res) => {
     try {
-         let { rating, comment } = req.body; 
+        let { rating, comment } = req.body;
         //console.log('Received rating (raw):', req.body.rating);
         // console.log('After conversion:', rating);
         const businessId = req.params.id;
         const userId = req.user._id;
-        
-         rating = parseInt(rating);
+
+        rating = parseInt(rating);
         if (!rating || isNaN(rating) || rating < 1 || rating > 5) {
             return res.status(400).json({ success: false, message: 'Invalid rating value' });
         }
 
-
         const business = await Business.findById(businessId);
         if (!business) return res.status(404).json({ success: false, message: 'Business not found' });
+        // console.log("Business Owner:", business.owner);
+        // console.log("Logged-in User:", userId);
         if (business.owner.toString() === userId.toString()) {
             return res.status(403).json({ success: false, message: 'Cannot review your own business' });
         }

@@ -1,11 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const businessController = require('../controllers/businessController');
-const {authMiddleware,isAdmin} = require('../middleware/auth');
-const {upload} = require('../middleware/multer');
-const  monthlyMembershipCheck  = require('../middleware/monthlymembershipVisible');
+const { authMiddleware, isAdmin } = require('../middleware/auth');
+const { upload } = require('../middleware/multer');
+const monthlyMembershipCheck = require('../middleware/monthlymembershipVisible');
 const profileImageMiddleware = require('../middleware/profileImageMiddleware');
-const { getSignedUrl} = require('../middleware/multer');
+const { getSignedUrl } = require('../middleware/multer');
 
 
 router.get('/listUP', authMiddleware, profileImageMiddleware, monthlyMembershipCheck, businessController.getBusinessDirectory);
@@ -18,7 +18,8 @@ router.post('/business', authMiddleware, upload.single('profile_pic'), businessC
 
 // Edit business (only owner's)
 router.get('/:id/edit', authMiddleware, businessController.renderEditForm);
-router.post('/:id', authMiddleware, upload.single('profile_pic'), businessController.updateBusiness);
+// router.post('/:id', authMiddleware, upload.single('profile_pic'), businessController.updateBusiness);
+router.put('/:id', authMiddleware, upload.single('profile_pic'), businessController.updateBusiness);
 
 // Delete business (only owner's)
 router.delete('/:id/delete', authMiddleware, businessController.deleteBusiness);
