@@ -926,8 +926,19 @@
                         closeBusinessFormModal();
                         location.reload();
                     },
-                    error: function () {
-                        showNotification('Failed to add business', 'error');
+                    error: function (xhr) {
+
+                        console.log('UPLOAD ERROR:', xhr);
+                        console.log('STATUS:', xhr.status);
+                        console.log('RESPONSE:', xhr.responseText);
+
+                        let message = 'Failed to add business';
+
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            message = xhr.responseJSON.message;
+                        }
+
+                        showNotification(message, 'error');
                     }
                 });
             };
