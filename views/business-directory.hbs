@@ -914,18 +914,47 @@
             document.getElementById('modalTitle').textContent = 'Add New Business';
             form.onsubmit = function (e) {
                 e.preventDefault();
+
+                // Get selected image
+                const imageInput = form.querySelector('[name="profile_pic"]');
+                const imageFile = imageInput.files[0];
+
+                // 1 MB limit
+                const maxSize = 1 * 1024 * 1024;
+
+                // Check image size before sending request
+                if (imageFile && imageFile.size > maxSize) {
+
+                    showNotification(
+                        'Image size must be less than 1 MB',
+                        'error'
+                    );
+
+                    // Clear selected image
+                    imageInput.value = '';
+
+                    return;
+                }
+
                 const formData = new FormData(form);
+
                 $.ajax({
                     url: '/businesses/business',
                     method: 'POST',
                     data: formData,
                     processData: false,
                     contentType: false,
+
                     success: function (res) {
-                        showNotification('Business added successfully', 'success');
+                        showNotification(
+                            'Business added successfully',
+                            'success'
+                        );
+
                         closeBusinessFormModal();
                         location.reload();
                     },
+
                     error: function (xhr) {
 
                         console.log('UPLOAD ERROR:', xhr);

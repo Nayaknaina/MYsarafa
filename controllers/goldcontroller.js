@@ -312,7 +312,7 @@ const cron = require('node-cron');
 
 // }, { timezone: 'Asia/Kolkata' });
 
-cron.schedule('0 0,12,18 * * *', () => {
+cron.schedule('30 11,15,18 * * *', () => {
     console.log(`⏰ Cron Triggered: ${new Date().toLocaleString('en-IN', {
         timeZone: 'Asia/Kolkata'
     })}`);
