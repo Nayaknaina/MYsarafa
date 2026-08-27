@@ -571,109 +571,6 @@
         </main>
     </div>
 
-    {{!--
-    <script>
-        $(document).ready(function () {
-            const paymentForm = $('#paymentForm');
-            const paymentScreenshot = $('#paymentScreenshot');
-            const paymentPreview = $('#paymentPreview');
-            const paymentPreviewImg = $('#paymentPreviewImg');
-            const fileNameText = $('#fileName');
-            const communitySelection = $('#Communityselection');
-            const submitButton = $('#submitPaymentProof');
-            const upiIdInput = $('#upiId');
-            const amountInput = $('#amount');
-            const methodInput = $('#method');
-
-            function showNotification(message, type) {
-                toastr[type](message);
-            }
-
-            function updateSubmitButton() {
-                const isValid = communitySelection.val() && upiIdInput.val() && amountInput.val() && methodInput.val() && paymentScreenshot[0].files.length > 0;
-                submitButton.prop('disabled', !isValid);
-            }
-
-            const urlParams = new URLSearchParams(window.location.search);
-            const groupId = urlParams.get('groupId');
-            if (groupId) {
-                communitySelection.val(groupId);
-                updateSubmitButton();
-                communitySelection.trigger('change');
-            }
-
-            communitySelection.on('change', updateSubmitButton);
-            upiIdInput.on('input', updateSubmitButton);
-            amountInput.on('input', updateSubmitButton);
-            methodInput.on('change', updateSubmitButton);
-            paymentScreenshot.on('change', function (e) {
-                const file = e.target.files[0];
-                if (file) {
-                    fileNameText.text(`Selected: ${file.name}`);
-                    if (file.type.startsWith('image/')) {
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            paymentPreviewImg.attr('src', e.target.result);
-                            paymentPreview.show();
-                        };
-                        reader.readAsDataURL(file);
-                    } else {
-                        paymentPreviewImg.attr('src', '');
-                        paymentPreview.show();
-                    }
-                } else {
-                    fileNameText.text('');
-                    paymentPreview.hide();
-                }
-                updateSubmitButton();
-            });
-
-            paymentForm.on('submit', async function (e) {
-                e.preventDefault();
-
-                const periodMonth = $('#periodMonth').val();
-                const periodYear = $('#periodYear').val();
-                const period = periodMonth || periodYear;
-
-                if (!period) {
-                    toastr.error('Please select the payment period');
-                    submitButton.prop('disabled', false).text('Submit');
-                    return;
-                }
-                submitButton.prop('disabled', true).text('Submitting...');
-
-                const formData = new FormData(this);
-                formData.append('groupId', communitySelection.val());
-                formData.append('period', period);
-
-                const reuploadId = $('#reuploadPaymentId').val();
-                if (reuploadId) {
-                    formData.append('paymentId', reuploadId);
-                }
-                try {
-                    const response = await fetch('/pay/SS-upload', {
-                        method: 'POST',
-                        body: formData,
-                        credentials: 'include',
-                        headers: {
-                            'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0] || ''}`
-                        }
-                    });
-                    const result = await response.json();
-                    if (response.ok && result.success) {
-                        showNotification('Screenshot uploaded successfully', 'success');
-                        setTimeout(() => window.location.href = '/user-app/dashboard', 2000);
-                    } else {
-                        showNotification(result.message || 'Failed to upload screenshot', 'error');
-                        submitButton.prop('disabled', false).text('Submit');
-                    }
-                } catch (error) {
-                    showNotification('Error uploading screenshot: ' + error.message, 'error');
-                    submitButton.prop('disabled', false).text('Submit');
-                }
-            });
-        });
-    </script> --}}
     <script>
         $(document).ready(function () {
             const paymentForm = $('#paymentForm');
@@ -705,6 +602,16 @@
             paymentScreenshot.on('change', function (e) {
                 const file = e.target.files[0];
                 if (file) {
+                    // ⭐ NEW: upload se pehle hi size check kar lo
+                    const MAX_SIZE = 1 * 1024 * 1024; // 1 MB
+                    if (file.size > MAX_SIZE) {
+                        toastr.error('Image size is too large. Maximum 1 MB is allowed.');
+                        paymentScreenshot.val(''); // input clear kar do
+                        paymentPreview.hide();
+                        updateSubmitButton();
+                        return; // yahin ruk jao, aage kuch mat karo
+                    }
+
                     if (file.type.startsWith('image/')) {
                         const reader = new FileReader();
                         reader.onload = function (e) {
@@ -880,7 +787,20 @@
                         method: 'POST', body: formData, credentials: 'include',
                         headers: { 'Authorization': `Bearer ${document.cookie.split('token=')[1]?.split(';')[0] || ''}` }
                     });
-                    const result = await response.json();
+
+                    let result;
+                    const contentType = response.headers.get('content-type') || '';
+                    if (contentType.includes('application/json')) {
+                        result = await response.json();
+                    } else {
+                        result = {
+                            success: false,
+                            message: response.status === 413
+                                ? 'Image size is too large. Maximum 1 MB is allowed.'
+                                : 'Something went wrong while uploading. Please try again.'
+                        };
+                    }
+
                     if (response.ok && result.success) {
                         showNotification('Screenshot uploaded successfully', 'success');
                         setTimeout(() => window.location.href = '/user-app/dashboard', 2000);
