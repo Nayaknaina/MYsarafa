@@ -1,4 +1,3 @@
-console.log("✅ superAdmin.js Loaded");
 const express = require('express');
 const router = express.Router();
 const superAdminController = require('../../controllers/superAdminController');
@@ -65,7 +64,6 @@ router.post('/contact', superAdminController.superadmincontact);
 // ============================================
 // 📌 JSON API ROUTES (naye JS frontend ke liye) — prefix: /superadmin/api/...
 // ============================================
-console.log("LOGIN ROUTE HIT");
 router.post('/api/auth/login', superAdminApiController.loginApi);
 router.get('/api/dashboard/stats', superAdminAuth, superAdminApiController.getDashboardStatsApi);
 

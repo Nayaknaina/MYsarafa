@@ -12,7 +12,7 @@ module.exports = {
     gt: function (a, b) {
         return a > b;
     },
-    lt: function (a, b){
+    lt: function (a, b) {
         return a < b;
     },
     gte: function (a, b) {
@@ -48,8 +48,22 @@ module.exports = {
     formatNumber: function (value, locale, options) {
         return value ? value.toLocaleString(locale, options) : "N/A";
     },
+    // dateFormat: function (date) {
+    //     return new Date(date).toLocaleString("en-IN");
+    // },
     dateFormat: function (date) {
-        return new Date(date).toLocaleString("en-IN");
+        if (!date) return "";
+
+        return new Date(date).toLocaleString("en-IN", {
+            timeZone: "Asia/Kolkata",
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: true
+        });
     },
     truncate: function (str, len) {
         if (str.length && str.length > len) return str.substring(0, len) + "...";
@@ -88,7 +102,7 @@ module.exports = {
         if (days === 1) return "Yesterday";
         return `${days} days ago`;
     },
-     date: function (year) {
-            return new Date().getFullYear();
+    date: function (year) {
+        return new Date().getFullYear();
     }
 };

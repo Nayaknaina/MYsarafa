@@ -60,127 +60,6 @@ exports.Announcement = async (req, res, next) => {
   }
 };
 
-// exports.Announcementform = async (req, res, next) => {
-//   try {
-//     console.log("/user/Announcementform");
-//     if (!req.user || !req.user.id) {
-//       return res.status(401).json({ success: false, message: 'Unauthorized: User not authenticated' });
-//     }
-
-//     const user = await User.findById(req.user.id).lean();
-//     if (!user) {
-//       return res.status(404).json({ success: false, message: 'User not found' });
-//     }
-
-//     const groupMember = await GMem.findOne({ user: req.user.id, type: 'admin' });
-//     if (!groupMember) {
-//       return res.status(403).render('error', { errorMessage: 'Please make your Association first! You are not authorized to create announcements', layout: false });
-//     }
-
-//     res.render("Announcement-form", {
-//       user: {
-//         ...user,
-//         has_password: !!user.password
-//       },
-//       //   groupId,
-//       title: 'Sarafa Create Announcement | MySarafa',
-//     });
-//   } catch (error) {
-//     console.error('Error rendering announcement form:', error);
-//     res.status(500).render('500', { errorMessage: 'Server error: ' + error.message, layout: false });
-//   }
-// };
-
-
-// exports.createAnnouncement = async (req, res) => {
-//   try {
-//     console.log('createAnnouncement Headers:', req.headers);
-//     console.log('createAnnouncement Body:', req.body);
-//     console.log('createAnnouncement Files:', req.files);
-
-//     const { title, message, groupId } = req.body;
-
-//     if (!title || !message || !groupId) {
-//       return res.status(400).json({ success: false, message: 'Title, message, and group ID are required' });
-//     }
-
-//     const group = await Group.findOne({ _id: groupId, user: req.user.id });
-//     if (!group) {
-//       return res.status(403).json({ success: false, message: 'You are not authorized to create announcements for this group' });
-//     }
-
-//     let imagePath = '';
-//     if (req.files && req.files['image']) {
-//       const file = req.files['image'][0];
-//       imagePath = file.key;
-//     }
-
-//     const announcement = new Announcement({
-//       title,
-//       message,
-//       meetingLink: '',
-//       image: imagePath,
-//       createdBy: req.user.id,
-//       group: groupId,
-
-//     });
-
-//     await announcement.save();
-//     console.log("Announcement saved successfully");
-
-//     const users = await User.find({
-//       fcmToken: { $exists: true, $ne: null }
-//     }).select("fcmToken");
-
-//     console.log("Users found:", users.length);
-
-//     const tokens = users
-//       .map(user => user.fcmToken)
-//       .filter(Boolean);
-
-//     console.log("FCM Tokens:", tokens);
-//     console.log("About to send notification...");
-
-//     if (tokens.length > 0) {
-//       const notificationPayload = {
-//         notification: {
-//           title,
-//           body: message
-//         },
-//         tokens
-//       };
-
-//       const messaging = getMessaging();
-
-//       const response = await messaging.sendEachForMulticast(notificationPayload);
-
-//       console.log("Notification API executed");
-//       console.log("Notifications sent:", response.successCount);
-//       console.log("Notifications failed:", response.failureCount);
-//       console.log("Full Response:", response);
-
-//       if (response.failureCount > 0) {
-//         console.log("FCM Response:", response.responses);
-//       }
-//     }
-
-//     res.status(201).json({
-//       success: true,
-//       message: "Announcement created successfully",
-//       announcement
-//     });
-
-//   } catch (error) {
-//     console.error("Error creating announcement:", error);
-
-//     res.status(500).json({
-//       success: false,
-//       message: "Error creating announcement",
-//       error: error.message
-//     });
-//   }
-// };
-
 exports.Announcementform = async (req, res, next) => {
   try {
     if (!req.user || !req.user.id) {
@@ -280,10 +159,43 @@ exports.createAnnouncement = async (req, res) => {
 
 // exports.getAnnouncements = async (req, res) => {
 //   try {
+//     const { groupId } = req.query;
+//     let query = {};
 
-//     const announcements = await Announcement.find({
-//       createdBy: req.user.id
-//     })
+//     if (groupId) {
+//       // ⭐ VIEW ke liye alag permission check — 'manage_announcements' nahi
+//       const permCheck = await checkGroupPermission(req.user.id, groupId, 'view_announcements');
+//       if (!permCheck.allowed) {
+//         return res.status(403).json({ success: false, message: 'You do not have access to this group\'s announcements' });
+//       }
+//       query.group = groupId;
+//     } else {
+//       // ⭐ Koi specific groupId nahi diya — sirf un groups ki announcements dikhao
+//       // jahan user ke paas 'view_announcements' permission hai (ya admin hai)
+//       const memberships = await GMem.find({ user: req.user.id, type: { $ne: 'pending' } })
+//         .select('group type')
+//         .lean();
+
+//       const allowedGroupIds = [];
+//       for (const m of memberships) {
+//         if (m.type === 'admin') {
+//           allowedGroupIds.push(m.group);
+//           continue;
+//         }
+//         const permCheck = await checkGroupPermission(req.user.id, m.group, 'view_announcements');
+//         if (permCheck.allowed) {
+//           allowedGroupIds.push(m.group);
+//         }
+//       }
+
+//       if (allowedGroupIds.length > 0) {
+//         query.group = { $in: allowedGroupIds };
+//       } else {
+//         query.createdBy = req.user.id;
+//       }
+//     }
+
+//     const announcements = await Announcement.find(query)
 //       .populate('createdBy', 'f_name l_name')
 //       .populate('group', 'g_name')
 //       .populate('likes', 'f_name l_name profilePicture')
@@ -334,21 +246,27 @@ exports.createAnnouncement = async (req, res) => {
 //     });
 //   }
 // };
+
 exports.getAnnouncements = async (req, res) => {
   try {
     const { groupId } = req.query;
     let query = {};
 
+    // Helper: view ya manage — dono me se koi bhi ho to allowed
+    const canViewGroup = async (gId) => {
+      const viewCheck = await checkGroupPermission(req.user.id, gId, 'view_announcements');
+      if (viewCheck.allowed) return true;
+      const manageCheck = await checkGroupPermission(req.user.id, gId, 'manage_announcements');
+      return manageCheck.allowed;
+    };
+
     if (groupId) {
-      // ⭐ VIEW ke liye alag permission check — 'manage_announcements' nahi
-      const permCheck = await checkGroupPermission(req.user.id, groupId, 'view_announcements');
-      if (!permCheck.allowed) {
+      const allowed = await canViewGroup(groupId);
+      if (!allowed) {
         return res.status(403).json({ success: false, message: 'You do not have access to this group\'s announcements' });
       }
       query.group = groupId;
     } else {
-      // ⭐ Koi specific groupId nahi diya — sirf un groups ki announcements dikhao
-      // jahan user ke paas 'view_announcements' permission hai (ya admin hai)
       const memberships = await GMem.find({ user: req.user.id, type: { $ne: 'pending' } })
         .select('group type')
         .lean();
@@ -359,17 +277,19 @@ exports.getAnnouncements = async (req, res) => {
           allowedGroupIds.push(m.group);
           continue;
         }
-        const permCheck = await checkGroupPermission(req.user.id, m.group, 'view_announcements');
-        if (permCheck.allowed) {
+        const allowed = await canViewGroup(m.group);   // ⭐ ab view OR manage dono check ho rahe hain
+        if (allowed) {
           allowedGroupIds.push(m.group);
         }
       }
 
-      if (allowedGroupIds.length > 0) {
-        query.group = { $in: allowedGroupIds };
-      } else {
-        query.createdBy = req.user.id;
-      }
+      // ⭐ Group-wise allowed announcements + khud ki har announcement (chahe group access chala bhi jaye) — dono mile
+      query = {
+        $or: [
+          ...(allowedGroupIds.length ? [{ group: { $in: allowedGroupIds } }] : []),
+          { createdBy: req.user.id }
+        ]
+      };
     }
 
     const announcements = await Announcement.find(query)
@@ -379,41 +299,32 @@ exports.getAnnouncements = async (req, res) => {
       .sort({ createdAt: -1 })
       .lean();
 
-
     const formattedAnnouncements = announcements.map(announcement => ({
       _id: announcement._id,
       title: announcement.title,
       message: announcement.message,
       meetingLink: announcement.meetingLink,
-
       image: announcement.image ? getSignedUrl(announcement.image) : null,
-
       createdBy: {
         name: announcement.createdBy
           ? `${announcement.createdBy.f_name || ''} ${announcement.createdBy.l_name || ''}`.trim()
           : "Unknown"
       },
-
       group: {
         id: announcement.group?._id || null,
         name: announcement.group?.g_name || "Unknown"
       },
-
       createdAt: announcement.createdAt,
-
       likeCount: announcement.likes?.length || 0,
-
       isLiked: announcement.likes?.some(
         like => like._id.toString() === req.user.id.toString()
       )
     }));
 
-
     res.json({
       success: true,
       announcements: formattedAnnouncements
     });
-
 
   } catch (error) {
     console.log(error);
@@ -553,7 +464,7 @@ exports.toggleLike = async (req, res) => {
         }
       );
 
-      console.log("toggleLike -> notification result:", result);   // 👈 YE ADD KARO
+      console.log("toggleLike -> notification result:", result);   // YE ADD KARO
     } else {
       console.log("toggleLike -> notification SKIPPED (self-like or not new like)");
     }

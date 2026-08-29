@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 // Yahi list matrix page (permissions.html) me columns ban ke dikhegi.
 // Naya permission add karna ho to sirf yaha ek string add karo, baaki sab jagah automatic reflect hoga.
 const PERMISSIONS = [
+    'view_announcements',
     'manage_announcements',
     'manage_members',
     'manage_roles',

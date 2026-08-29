@@ -786,6 +786,9 @@ exports.groupDetails = async (req, res) => {
         const permissions = membership?.groupRole?.permissions || [];
         const canManageSettings = isAdmin || permissions.includes('manage_group_settings');
         const canManageAnnouncements = isAdmin || permissions.includes('manage_announcements');
+        const canViewAnnouncements = isAdmin
+            || permissions.includes('view_announcements')
+            || permissions.includes('manage_announcements');   // manage rakhne wale ko view bhi milega
 
         let members = await GMem.find({ group: groupId, type: { $ne: 'pending' } })
             .populate('user', 'f_name l_name profilePicture')
@@ -803,7 +806,7 @@ exports.groupDetails = async (req, res) => {
 
         // ⭐ Announcements sirf tab fetch karo jab permission ho
         let announcements = [];
-        if (canManageAnnouncements) {
+        if (canViewAnnouncements) {          // manage ki jagah view check
             announcements = await Announcement.find({ group: groupId })
                 .sort({ createdAt: -1 })
                 .populate('createdBy', 'f_name l_name profilePicture')
@@ -844,7 +847,7 @@ exports.groupDetails = async (req, res) => {
                 user, group, members, announcements,
                 hasAnnouncements: announcements.length > 0,
                 isMember, isAdmin,
-                canManageSettings, canManageAnnouncements,   // ⭐ template me pass karo
+                canManageSettings, canManageAnnouncements, canViewAnnouncements,
                 layout: false
             });
         } else {
@@ -863,7 +866,7 @@ exports.groupDetails = async (req, res) => {
                 announcements: formattedAnnouncements,
                 hasAnnouncements: formattedAnnouncements.length > 0,
                 isMember,
-                canManageAnnouncements,   // ⭐ template me pass karo
+                canManageAnnouncements, canViewAnnouncements,
                 layout: false
             });
         }
@@ -1836,27 +1839,42 @@ exports.groupViewMember = async (req, res) => {
             group.g_cover = '/assets/images/demo.jpg';
         }
 
-        const membership = await GMem.findOne({ user: userId, group: groupId }).lean();
+        // groupRole populate karo — permission check ke liye zaroori
+        const membership = await GMem.findOne({ user: userId, group: groupId })
+            .populate('groupRole', 'permissions roleName')
+            .lean();
         const isMember = !!membership;
+        const isAdmin = membership && membership.type === 'admin';
+
+        // Sirf ek hi permission — 'manage_announcements' — dono view aur manage control karega.
+        // Isse ye milta hai to hi announcements dikhengi, warna bilkul nahi.
+        const permissions = membership?.groupRole?.permissions || [];
+        const canManageAnnouncements = isAdmin || permissions.includes('manage_announcements');
+        const canViewAnnouncements = isAdmin
+            || permissions.includes('view_announcements')
+            || permissions.includes('manage_announcements');
 
         const members = await GMem.find({ group: groupId })
             .populate('user', 'f_name l_name profilePicture')
             .lean();
 
-        const announcements = await Announcement.find({ group: groupId })
-            .populate('createdBy', 'f_name l_name profilePicture')
-            .populate('likes', 'f_name l_name profilePicture')
-            .sort({ createdAt: -1 })
-            .lean();
+        let formattedAnnouncements = [];
+        if (canViewAnnouncements) {
+            const announcements = await Announcement.find({ group: groupId })
+                .populate('createdBy', 'f_name l_name profilePicture')
+                .populate('likes', 'f_name l_name profilePicture')
+                .sort({ createdAt: -1 })
+                .lean();
 
-        const formattedAnnouncements = announcements.map(a => ({
-            ...a,
-            image: (a.image && !a.image.startsWith('/assets/') && !a.image.startsWith('/uploads/'))
-                ? getSignedUrl(a.image)
-                : (a.image || null),
-            isLiked: a.likes?.some(u => u?._id?.toString() === userId.toString()),
-            likeCount: a.likes?.length || 0
-        }));
+            formattedAnnouncements = announcements.map(a => ({
+                ...a,
+                image: (a.image && !a.image.startsWith('/assets/') && !a.image.startsWith('/uploads/'))
+                    ? getSignedUrl(a.image)
+                    : (a.image || null),
+                isLiked: a.likes?.some(u => u?._id?.toString() === userId.toString()),
+                likeCount: a.likes?.length || 0
+            }));
+        }
 
         res.render('group-info-member', {
             group,
@@ -1864,6 +1882,7 @@ exports.groupViewMember = async (req, res) => {
             members,
             announcements: formattedAnnouncements,
             hasAnnouncements: formattedAnnouncements.length > 0,
+            canManageAnnouncements, canViewAnnouncements,   
             user: { ...req.user, has_password: !!req.user.password }
         });
     } catch (error) {
