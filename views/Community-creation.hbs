@@ -1033,6 +1033,47 @@
   <script src="/js/all.js"></script>
   <script type="module" src="/js/firebase.js"></script>
 
+  <script>
+    const MAX_FILE_SIZE_MB = 1;
+    const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
+    function checkFileSize(inputEl, fieldLabel) {
+      const file = inputEl.files[0];
+      if (!file) return true;
+      if (file.size > MAX_FILE_SIZE_BYTES) {
+        toastr.error(`${fieldLabel} is larger than ${MAX_FILE_SIZE_MB}MB (${(file.size / (1024 * 1024)).toFixed(2)}MB). Please choose a smaller file.`);
+        inputEl.value = '';
+        return false;
+      }
+      return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const coverInput = document.getElementById('coverImage');
+      const qrInput = document.getElementById('qrCode');
+
+      if (coverInput) {
+        coverInput.addEventListener('change', () => checkFileSize(coverInput, 'Cover Photo'));
+      }
+      if (qrInput) {
+        qrInput.addEventListener('change', () => checkFileSize(qrInput, 'QR Code'));
+      }
+
+      // Submit ke time bhi double-check (safety net)
+      const form = document.getElementById('groupCreateForm');
+      if (form) {
+        form.addEventListener('submit', (e) => {
+          const coverOk = coverInput ? checkFileSize(coverInput, 'Cover Photo') : true;
+          const qrOk = qrInput ? checkFileSize(qrInput, 'QR Code') : true;
+          if (!coverOk || !qrOk) {
+            e.preventDefault();
+            e.stopImmediatePropagation(); // taaki communityGroup.js ka submit handler bhi na chale
+          }
+        }, true); // capture phase — communityGroup.js ke submit listener se PEHLE chalega
+      }
+    });
+  </script>
+
 </body>
 
 </html>

@@ -10,21 +10,31 @@ const notificationController = require('../controllers/notificationController');
 
 const { upload } = require('../middleware/multer');
 
+const handleGroupUpload = (req, res, next) => {
+  upload.fields([
+    { name: 'coverImage', maxCount: 1 },
+    { name: 'qrCode', maxCount: 1 },
+  ])(req, res, function (err) {
+    if (err) {
+      console.error('MULTER ERROR (group upload):', err);
+      return res.status(400).json({
+        success: false,
+        message: err.code === 'LIMIT_FILE_SIZE'
+          ? 'File size 1MB se zyada nahi honi chahiye'
+          : (err.message || 'Image upload failed')
+      });
+    }
+    next();
+  });
+};
+
 router.get('/community/:groupId?', authMiddleware, monthlyMembershipCheck, profileImageMiddleware, groupController.communityCreation);
 router.get('/group-member/:groupId?', authMiddleware, monthlyMembershipCheck, profileImageMiddleware, groupController.groupMemberPage);
 router.get('/my', authMiddleware, monthlyMembershipCheck, profileImageMiddleware, groupController.myGroupsPage);
 
-router.post('/create', authMiddleware, upload.fields([
-  { name: 'coverImage', maxCount: 1 },
-  { name: 'qrCode', maxCount: 1 },
+router.post('/create', authMiddleware, handleGroupUpload, groupController.createGroup);
 
-]), groupController.createGroup);
-
-router.put('/update/:groupId', authMiddleware, upload.fields([
-  { name: 'coverImage', maxCount: 1 },
-  { name: 'qrCode', maxCount: 1 },
-
-]), groupController.updateGroup);
+router.put('/update/:groupId', authMiddleware, handleGroupUpload, groupController.updateGroup);
 router.delete('/group/:id', authMiddleware, groupController.deleteGroup);
 
 router.post('/join', authMiddleware, groupController.joinGroup);
@@ -76,6 +86,6 @@ router.post('/regenerate-member-access', authMiddleware, groupPermission('manage
 router.use('/:groupId/roles', groupRoleRoutes);
 
 router.get('/my-notifications', authMiddleware, notificationController.getMyNotifications);
-router.post('/mark-all-read', authMiddleware, notificationController.markAllRead);   
+router.post('/mark-all-read', authMiddleware, notificationController.markAllRead);
 
 module.exports = router;

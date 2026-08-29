@@ -654,7 +654,8 @@
         flex: 1;
         min-width: 0;
     }
-    table.dataTable thead>tr>th.sorting{
+
+    table.dataTable thead>tr>th.sorting {
         text-align: center;
     }
 
@@ -863,7 +864,8 @@
                     name="memberEmail" required>
                 <label for="memberNumber">Mobile Number</label>
                 <input type="tel" class="add-member-input" id="memberNumber" name="memberNumber"
-                    placeholder="Enter mobile number">
+                    placeholder="Enter mobile number" pattern="[0-9]{10}" maxlength="10" minlength="10"
+                    inputmode="numeric" oninput="this.value = this.value.replace(/[^0-9]/g, '')" required>
                 {{!-- <label for="shopName">Shop Name</label>
                 <input type="text" class="add-member-input" id="shopName" placeholder="Enter shop name">
                 <label for="memberAddress">Address</label>

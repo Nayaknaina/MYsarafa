@@ -683,6 +683,10 @@
                             <span>Add a Description</span>
                         </div>
 
+                        {{!-- <div class="checklist-item" data-action="post">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                            <span>Create a Post</span>
+                        </div> --}}
                         <div class="checklist-item" data-action="post">
                             <i class="fa-solid fa-pen-to-square"></i>
                             <span>Create a Post</span>
@@ -1191,8 +1195,7 @@
                 if (action === 'cover') document.getElementById('editCoverBtn').click();
                 if (action === 'description') document.getElementById('editDescBtn').click();
                 if (action === 'post') {
-                    // NOTE: adjust this path to match your actual "create announcement" route
-                    window.location.href = `/Announcement-form?groupId=${GROUP_ID}`;
+                    window.location.href = '/announcements/new';
                 }
             });
         });
